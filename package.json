@@ -1,0 +1,44 @@
+{
+  "name": "tunixlabs",
+  "version": "1.0.0",
+  "description": "Sitio web de TunixLabs con consultoría en IA y sistema de tesorería",
+  "main": "index.js",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TUNIX17/tunixlabs.git"
+  },
+  "keywords": [
+    "ia",
+    "consultoria",
+    "tesoreria",
+    "automatizacion"
+  ],
+  "author": "TUNIX17",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/TUNIX17/tunixlabs/issues"
+  },
+  "homepage": "https://github.com/TUNIX17/tunixlabs#readme",
+  "dependencies": {
+    "next": "^13.4.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "devDependencies": {
+    "@types/node": "^18.0.0",
+    "@types/react": "^18.0.0",
+    "@types/react-dom": "^18.0.0",
+    "autoprefixer": "^10.4.14",
+    "eslint": "^8.38.0",
+    "eslint-config-next": "^13.4.0",
+    "postcss": "^8.4.21",
+    "tailwindcss": "^3.3.1",
+    "typescript": "^5.0.4"
+  }
+} 
