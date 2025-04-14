@@ -108,28 +108,6 @@ export default function AdminPage() {
 
   return (
     <div className="min-h-screen flex flex-col">
-      {/* Header */}
-      <header className="bg-white shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
-          <div className="flex items-center">
-            <h1 className="text-2xl font-bold text-primary">
-              <Link href="/inicio">TunixLabs</Link>
-            </h1>
-          </div>
-          <nav className="flex space-x-8">
-            <Link href="/inicio" className="text-gray-900 hover:text-primary font-medium">
-              Inicio
-            </Link>
-            <Link href="/curso7i" className="text-gray-900 hover:text-primary font-medium">
-              Curso 7i
-            </Link>
-            <Link href="/curso7i/admin" className="text-primary font-medium">
-              Admin
-            </Link>
-          </nav>
-        </div>
-      </header>
-
       {/* Main Content */}
       <main className="flex-grow">
         <div className="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
@@ -232,18 +210,6 @@ export default function AdminPage() {
           )}
         </div>
       </main>
-
-      {/* Footer */}
-      <footer className="bg-gray-800 text-white py-8 mt-auto">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <p>© {new Date().getFullYear()} TunixLabs - Panel de Administración</p>
-            <p className="mt-2 text-sm text-gray-400">
-              Acceso restringido para administradores del Curso 7i
-            </p>
-          </div>
-        </div>
-      </footer>
     </div>
   );
 } 

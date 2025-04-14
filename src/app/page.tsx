@@ -1,8 +1,20 @@
-export default function Home() {
-  // Esta función se ejecuta en el cliente
-  if (typeof window !== 'undefined') {
-    window.location.href = '/inicio';
-  }
+'use client';
 
-  return null;
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+
+export default function Home() {
+  const router = useRouter();
+  
+  useEffect(() => {
+    router.push('/inicio');
+  }, [router]);
+
+  return (
+    <div className="flex min-h-screen flex-col items-center justify-center p-24">
+      <div className="text-center">
+        <p className="text-lg text-gray-500">Redirigiendo a inicio...</p>
+      </div>
+    </div>
+  );
 } 
