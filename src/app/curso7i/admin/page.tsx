@@ -15,8 +15,8 @@ const sampleTransactions = [
     description: 'Compra de libros de texto',
     category: 'Material Didáctico',
     amount: 75000,
-    type: 'gasto',
-    status: 'completado'
+    type: 'gasto' as const,
+    status: 'completado' as const
   },
   {
     id: '2',
@@ -24,8 +24,8 @@ const sampleTransactions = [
     description: 'Pago de mensualidad - Juan Pérez',
     category: 'Mensualidad',
     amount: 50000,
-    type: 'ingreso',
-    status: 'completado'
+    type: 'ingreso' as const,
+    status: 'completado' as const
   },
   {
     id: '3',
@@ -33,8 +33,8 @@ const sampleTransactions = [
     description: 'Pago de mensualidad - María González',
     category: 'Mensualidad',
     amount: 50000,
-    type: 'ingreso',
-    status: 'completado'
+    type: 'ingreso' as const,
+    status: 'completado' as const
   },
   {
     id: '4',
@@ -42,8 +42,8 @@ const sampleTransactions = [
     description: 'Pago de mensualidad - Carlos Rodríguez',
     category: 'Mensualidad',
     amount: 50000,
-    type: 'ingreso',
-    status: 'completado'
+    type: 'ingreso' as const,
+    status: 'completado' as const
   },
   {
     id: '5',
@@ -51,8 +51,8 @@ const sampleTransactions = [
     description: 'Transporte para visita educativa',
     category: 'Transporte',
     amount: 45000,
-    type: 'gasto',
-    status: 'completado'
+    type: 'gasto' as const,
+    status: 'completado' as const
   },
   {
     id: '6',
@@ -60,14 +60,14 @@ const sampleTransactions = [
     description: 'Refrigerios para sesión semanal',
     category: 'Refrigerio',
     amount: 130000,
-    type: 'gasto',
-    status: 'completado'
+    type: 'gasto' as const,
+    status: 'completado' as const
   }
-] as const;
+];
 
 export default function AdminPage() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [transactions, setTransactions] = useState<any[]>(sampleTransactions);
+  const [transactions, setTransactions] = useState<Array<typeof sampleTransactions[0]>>(sampleTransactions);
   const [activeTab, setActiveTab] = useState<'form' | 'transactions'>('form');
 
   // Función para autenticación
@@ -89,7 +89,7 @@ export default function AdminPage() {
     const newTransaction = {
       ...transaction,
       id: uuidv4(),
-      status: 'completado'
+      status: 'completado' as const
     };
     
     setTransactions(prev => [newTransaction, ...prev]);

@@ -5,9 +5,6 @@ const nextConfig = {
   images: {
     domains: ['tunixlabs.com'],
   },
-  experimental: {
-    appDir: true,
-  },
 };
 
 module.exports = nextConfig; 
