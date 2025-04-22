@@ -216,38 +216,35 @@ body {
 }
 
 @keyframes particle-move {
-  0% {
+  0%, 100% {
     transform: translate(0, 0);
   }
   25% {
-    transform: translate(100px, 100px);
+    transform: translate(10px, -10px);
   }
   50% {
-    transform: translate(200px, 0);
+    transform: translate(0, -20px);
   }
   75% {
-    transform: translate(100px, -100px);
-  }
-  100% {
-    transform: translate(0, 0);
+    transform: translate(-10px, -10px);
   }
 }
 
 @keyframes orbit {
-  0% {
-    transform: rotate(0deg) translateX(100px) rotate(0deg);
+  from {
+    transform: rotate(0deg) translateX(40px) rotate(0deg);
   }
-  100% {
-    transform: rotate(360deg) translateX(100px) rotate(-360deg);
+  to {
+    transform: rotate(360deg) translateX(40px) rotate(-360deg);
   }
 }
 
 @keyframes text-shimmer {
   0% {
-    background-position: -100% 0;
+    background-position: 0% 50%;
   }
   100% {
-    background-position: 100% 0;
+    background-position: 200% 50%;
   }
 }
 
@@ -272,6 +269,77 @@ body {
     opacity: 1;
     transform: scale(1.1);
   }
+}
+
+/* Animación para líneas de escaneo */
+@keyframes scan-line {
+  0% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(8px);
+  }
+}
+
+/* Estilos para efectos 3D */
+.perspective-1000 {
+  perspective: 1000px;
+}
+
+.transform-style-3d {
+  transform-style: preserve-3d;
+}
+
+.translate-z-6 {
+  transform: translateZ(6px);
+}
+
+.translate-z-8 {
+  transform: translateZ(8px);
+}
+
+.translate-z-16 {
+  transform: translateZ(16px);
+}
+
+.translate-z-20 {
+  transform: translateZ(20px);
+}
+
+.rotate-y-90 {
+  transform: rotateY(90deg);
+}
+
+.rotate-x-90 {
+  transform: rotateX(90deg);
+}
+
+.rotate-15 {
+  transform: rotate(15deg);
+}
+
+.-rotate-15 {
+  transform: rotate(-15deg);
+}
+
+.rotate-25 {
+  transform: rotate(25deg);
+}
+
+.-rotate-25 {
+  transform: rotate(-25deg);
+}
+
+.hover\:rotate-y-10:hover {
+  transform: rotateY(10deg);
+}
+
+.hover\:rotate-x-5:hover {
+  transform: rotateX(5deg);
+}
+
+.-translate-x-30 {
+  transform: translateX(-7.5rem);
 }
 
 /* Clases de animación */

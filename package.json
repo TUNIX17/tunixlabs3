@@ -26,17 +26,22 @@
   },
   "homepage": "https://github.com/TUNIX17/tunixlabs#readme",
   "dependencies": {
+    "@react-spring/three": "^9.7.5",
+    "@react-three/drei": "^9.80.3",
+    "@react-three/fiber": "^8.13.6",
     "@types/uuid": "^10.0.0",
     "next": "^13.4.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-icons": "^5.5.0",
+    "three": "^0.151.3",
     "uuid": "^11.1.0"
   },
   "devDependencies": {
     "@types/node": "^18.0.0",
     "@types/react": "^18.0.0",
     "@types/react-dom": "^18.0.0",
+    "@types/three": "^0.175.0",
     "autoprefixer": "^10.4.14",
     "eslint": "^8.38.0",
     "eslint-config-next": "^13.4.0",
