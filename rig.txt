@@ -1,0 +1,142 @@
+# Estructura Jerárquica del Esqueleto del Robot (ROBOT2.glb)
+
+## Jerarquía Principal
+Scene
+└── rig [rotación: 90°, 0°, 0°]
+    └── root [rotación: -90°, 0°, 0°]
+        └── body [posición: 0.00, 19.96, 0.00]
+            └── body_top0 [posición: 0.00, 3.06, 0.00]
+                └── body_top1 [posición: 0.00, 3.67, 0.00]
+                    └── body_top2 [posición: 0.00, 3.06, 0.00]
+
+## Cadenas de Huesos Principales
+
+### Cadena de la Cabeza
+body_top2
+└── neck [posición: 0.00, 2.00, 0.00]
+    └── head [posición: 0.00, 6.95, 0.00]
+
+### Cadena del Brazo Izquierdo
+body_top2
+└── shoulder_left [posición: 8.11, -0.37, 0.30] [rotación: -1.38°, 1.37°, -89.85°]
+    └── arm_left_top [posición: 0.00, 2.32, 0.00] [rotación: -0.31°, -0.30°, -0.19°]
+        └── arm_left_bot [posición: 0.00, 7.55, 0.00] [rotación: 0.64°, 0.64°, 0.05°]
+            └── arm_left_hand [posición: 0.00, 8.28, 0.00] [rotación: 96.96°, 43.99°, -50.66°]
+                ├── Dedo Índice Izquierdo:
+                │   └── index_left0 [posición: 1.25, 1.65, 0.25] [rotación: -90.67°, -45.41°, -32.18°]
+                │       └── index_left1 [posición: 0.00, 1.68, 0.00]
+                │           └── index_left2 [posición: 0.00, 0.75, 0.00]
+                │               └── index_left3 [posición: 0.00, 0.75, 0.00]
+                │
+                ├── Dedo Medio Izquierdo:
+                │   └── middle_left0 [posición: -2.32, 3.71, 1.33] [rotación: -80.10°, -46.32°, -49.13°]
+                │       └── middle_left1 [posición: 0.00, 2.50, 0.00]
+                │           └── middle_left2 [posición: 0.00, 1.11, 0.00]
+                │               └── middle_left3 [posición: 0.00, 1.11, 0.00]
+                │
+                └── Pulgar Izquierdo:
+                    └── thumb_left0 [posición: -0.98, -1.67, -2.67] [rotación: -90.71°, -46.43°, -69.86°]
+                        └── thumb_left1 [posición: 0.00, 2.74, 0.00]
+                            └── thumb_left2 [posición: 0.00, 3.29, 0.00] [rotación: -1.96°, -3.29°, 16.98°]
+                                └── thumb_left3 [posición: 0.00, 2.61, 0.00]
+
+### Cadena del Brazo Derecho
+body_top2
+└── shoulder_right [posición: -4.64, -0.37, 0.30] [rotación: -1.38°, -1.37°, 89.85°]
+    └── arm_right_top [posición: 0.00, 2.32, 0.00] [rotación: -0.31°, 0.30°, 0.19°]
+        └── arm_right_bot [posición: 0.00, 7.55, 0.00] [rotación: 0.64°, -0.64°, -0.05°]
+            └── arm_right_hand [posición: 0.00, 8.28, 0.00] [rotación: -3.08°, 7.28°, -37.35°]
+                ├── Dedo Índice Derecho:
+                │   └── index_right0 [posición: -2.26, 0.45, -0.46] [rotación: 15.38°, -7.01°, 6.79°]
+                │       └── index_right1 [posición: 0.00, 1.54, 0.00]
+                │           └── index_right2 [posición: 0.00, 0.69, 0.00]
+                │               └── index_right3 [posición: 0.00, 0.69, 0.00]
+                │
+                ├── Dedo Medio Derecho:
+                │   └── middle_right0 [posición: 1.01, 1.87, 0.48] [rotación: 26.77°, -7.15°, 33.31°]
+                │       └── middle_right1 [posición: 0.00, 2.21, 0.00]
+                │           └── middle_right2 [posición: 0.00, 0.98, 0.00]
+                │               └── middle_right3 [posición: 0.00, 0.98, 0.00]
+                │
+                ├── Dedo Anular Derecho:
+                │   └── ring_right0 [posición: 2.02, 2.40, -0.96] [rotación: -1.60°, -3.07°, 40.47°]
+                │       └── ring_right1 [posición: 0.00, 5.23, 0.00] [rotación: 6.48°, -6.94°, 21.22°]
+                │           └── ring_right2 [posición: 0.00, 2.31, 0.00] [rotación: 20.45°, -56.76°, -29.35°]
+                │               └── ring_right3 [posición: 0.00, 2.18, 0.00]
+                │
+                └── Pulgar Derecho:
+                    └── thumb_right0 [posición: -2.06, -1.34, 4.31] [rotación: 13.53°, -4.58°, 41.10°]
+                        └── thumb_right1 [posición: 0.00, 1.21, 0.00]
+                            └── thumb_right2 [posición: 0.00, 1.46, 0.00]
+                                └── thumb_right3 [posición: 0.00, 1.21, 0.00]
+
+### Cadena de las Piernas
+body
+├── Pierna Derecha:
+│   └── leg_right_top [posición: -4.18, -1.67, -0.08] [rotación: 0.00°, 0.00°, -180.00°]
+│       └── leg_right_bot [posición: 0.00, 7.20, 0.00]
+│           └── leg_right_foot [posición: 0.00, 5.89, 0.00]
+│
+└── Pierna Izquierda:
+    └── leg_left_top [posición: 7.65, -1.67, -0.08] [rotación: 0.00°, 0.00°, -180.00°]
+        └── leg_left_bot [posición: 0.00, 7.20, 0.00]
+            └── leg_left_foot [posición: 0.00, 5.89, 0.00]
+
+## Guía de Animación para el Robot
+
+### Puntos Clave para Animación
+- **Torso/Cuerpo**: Comienza siempre animando desde la raíz (body) hacia abajo (body_top0, body_top1, body_top2)
+- **Cabeza**: La cadena neck->head debe configurarse para seguir el cursor con rotaciones suaves
+- **Brazos**: Siempre anima primero el hombro (shoulder), luego el brazo superior (arm_top) y finalmente el antebrazo (arm_bot)
+- **Manos**: Los dedos deben animarse después de posicionar la mano
+- **Piernas**: Sigue el orden jerárquico leg_top -> leg_bot -> leg_foot
+
+### Ejes de Rotación y Valores Iniciales
+- **Torso**: 
+  - body_top1: [rotación: 0.46°, 0.31°, 0.00°] - Pequeños movimientos para respiración
+  - body_top2: [rotación: 0.00°, 0.00°, 0.00°] - Rotación ligera para seguir la cabeza
+
+- **Cabeza**:
+  - neck: [rotación: 0.00°, 0.00°, 0.00°] - Rotación en eje Y para seguir el cursor
+  - head: [rotación: 0.00°, 0.00°, 0.00°] - Rotación principal para seguir el cursor
+
+- **Hombros**: 
+  - shoulder_left: [rotación: -1.38°, 1.37°, -89.85°]
+  - shoulder_right: [rotación: -1.38°, -1.37°, 89.85°]
+
+- **Brazos**:
+  - arm_left_top: [rotación: -0.31°, -0.30°, -0.19°]
+  - arm_right_top: [rotación: -0.31°, 0.30°, 0.19°]
+  - arm_left_bot: [rotación: 0.64°, 0.64°, 0.05°]
+  - arm_right_bot: [rotación: 0.64°, -0.64°, -0.05°]
+
+- **Manos**:
+  - arm_left_hand: [rotación: 96.96°, 43.99°, -50.66°]
+  - arm_right_hand: [rotación: -3.08°, 7.28°, -37.35°]
+
+### Configuraciones para Seguimiento del Cursor
+```javascript
+// Seguimiento suave del cursor con la cabeza
+const headBone = headRef.current;
+const neckBone = neckRef.current;
+const bodyTop2Bone = bodyTop2Ref.current;
+
+if (headBone) {
+  headBone.rotation.y = currentMouseRef.current.x * 0.5; // Factor horizontal
+  headBone.rotation.x = currentMouseRef.current.y * 0.3; // Factor vertical
+}
+
+if (neckBone) {
+  neckBone.rotation.y = currentMouseRef.current.x * 0.3; // Menor factor para cuello
+}
+
+if (bodyTop2Bone) {
+  bodyTop2Bone.rotation.y = currentMouseRef.current.x * 0.1; // Factor mínimo para torso superior
+}
+```
+
+### Técnicas para Animaciones Avanzadas
+- **Animación de Respiración**: Oscilación sutil de body_top1 usando Math.sin()
+- **Seguimiento del Mouse**: Aplicar rotaciones a cabeza, cuello y torso superior con diferentes factores
+- **Gestos de Manos**: Controlar la rotación de las articulaciones de los dedos (ver estructura detallada arriba)
+- **Posición Inicial**: Los valores proporcionados representan la pose de reposo para iniciar animaciones
