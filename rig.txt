@@ -140,3 +140,35 @@ if (bodyTop2Bone) {
 - **Seguimiento del Mouse**: Aplicar rotaciones a cabeza, cuello y torso superior con diferentes factores
 - **Gestos de Manos**: Controlar la rotación de las articulaciones de los dedos (ver estructura detallada arriba)
 - **Posición Inicial**: Los valores proporcionados representan la pose de reposo para iniciar animaciones
+
+# Notas sobre la Orientación de Ejes (descubierto el YYYY-MM-DD)
+
+## Hombro Izquierdo (shoulder_left)
+- **Eje Z (Rotación)**:
+  - Controla principalmente el movimiento ARRIBA/ABAJO del brazo.
+  - T-Pose (brazo horizontal): Aproximadamente -90 grados (-1.57 radianes).
+  - Para BAJAR el brazo: Usar valores MÁS NEGATIVOS que -90 grados.
+    - Z = -135 grados (-2.35 rad): "Bajaron un poco" desde T-Pose.
+    - Z = -155 grados (-2.71 rad): Brazos más abajo, pero "subieron un poco" comparado con "hasta los pies".
+    - Z = -160 grados (-2.79 rad): Brazos abajo a los costados (con X e Y en 0). ¡ESTA ES LA BASE!
+    - Z = -170 grados (-2.97 rad): "Bajaron hasta los pies" (demasiado abajo).
+  - Para SUBIR el brazo (desde la T-Pose): Usar valores MENOS NEGATIVOS que -90 grados (ej: -45, -20 grados).
+- **Eje X (Rotación)**: Probablemente controla el movimiento ADELANTE/ATRÁS del brazo. (VALOR BASE PARA POSE NATURAL: por determinar, probar con ej: 10 a 15 grados)
+- **Eje Y (Rotación)**: Probablemente controla la SEPARACIÓN/UNIÓN del brazo al cuerpo (aducción/abducción). (VALOR BASE PARA POSE NATURAL: por determinar, probar con ej: 10 a 15 grados)
+
+## Hombro Derecho (shoulder_right)
+- **Eje Z (Rotación)**:
+  - Controla principalmente el movimiento ARRIBA/ABAJO del brazo.
+  - T-Pose (brazo horizontal): Aproximadamente +90 grados (+1.57 radianes).
+  - Para BAJAR el brazo: Usar valores MÁS POSITIVOS que +90 grados.
+    - Z = +135 grados (+2.35 rad): "Bajaron un poco" desde T-Pose.
+    - Z = +155 grados (+2.71 rad): Brazos más abajo, pero "subieron un poco" comparado con "hasta los pies".
+    - Z = +160 grados (+2.79 rad): Brazos abajo a los costados (con X e Y en 0). ¡ESTA ES LA BASE!
+    - Z = +170 grados (+2.97 rad): "Bajaron hasta los pies" (demasiado abajo).
+  - Para SUBIR el brazo (desde la T-Pose): Usar valores MENOS POSITIVOS que +90 grados (ej: +45, +20 grados).
+- **Eje X (Rotación)**: Probablemente ADELANTE/ATRÁS (simétrico al izquierdo). (VALOR BASE PARA POSE NATURAL: por determinar, probar con ej: 10 a 15 grados)
+- **Eje Y (Rotación)**: Probablemente SEPARACIÓN/UNIÓN (simétrico al izquierdo). (VALOR BASE PARA POSE NATURAL: por determinar, probar con ej: -10 a -15 grados)
+
+## Codos (arm_left_bot / arm_right_bot)
+- **Eje X (Rotación)**: Parece controlar la FLEXIÓN del codo.
+  - Valor de +20 grados (0.35 rad) causa una flexión. (VALOR BASE PARA POSE NATURAL: por determinar, ajustar después de hombros)
