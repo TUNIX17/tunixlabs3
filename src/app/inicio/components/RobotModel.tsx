@@ -1151,7 +1151,7 @@ function RobotModel() {
       <Canvas 
         shadows 
         className="overflow-visible" 
-        camera={{ position: [0, 0.5, 270], fov: 35 }}
+        camera={{ position: [0, 0.5, 200], fov: 30 }}
         onPointerMove={handlePointerMove}
         gl={{ alpha: true, antialias: true }}
         style={{ 
