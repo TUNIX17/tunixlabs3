@@ -1189,12 +1189,13 @@ function RobotModel() {
           />
           <Environment files="/potsdamer_platz_1k.hdr" />
           <ContactShadows
-            position={[0, -1.5, 0]}
-            opacity={0.45}
-            scale={20}
-            blur={1.5}
-            far={9}
-            resolution={512}
+            position={[0, -1.51, 0]}
+            opacity={0.6}
+            scale={16}
+            blur={1.0}
+            far={6}
+            resolution={1024}
+            color="#000000"
           />
         </Suspense>
       </Canvas>
