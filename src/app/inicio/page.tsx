@@ -7,6 +7,49 @@ import { FiDatabase, FiActivity, FiUsers, FiBarChart2, FiCode, FiMessageCircle }
 import React from 'react';
 import dynamic from 'next/dynamic';
 
+// Definir el componente de partículas flotantes en un archivo separado
+const FloatingParticles = dynamic(() => 
+  Promise.resolve().then(() => {
+    const FloatingParticlesComponent = ({ count = 20 }: { count?: number }) => {
+      const [particles, setParticles] = useState<Array<{
+        top: string;
+        left: string;
+        width: string;
+        height: string;
+        backgroundColor: string;
+        animation: string;
+      }>>([]);
+      
+      useEffect(() => {
+        const newParticles = Array(count).fill(0).map(() => ({
+          top: `${Math.random() * 100}%`,
+          left: `${Math.random() * 100}%`,
+          width: `${Math.random() * 4 + 2}px`,
+          height: `${Math.random() * 4 + 2}px`,
+          backgroundColor: `rgba(${Math.floor(Math.random() * 100 + 100)}, ${Math.floor(Math.random() * 100 + 100)}, 246, ${Math.random() * 0.5 + 0.2})`,
+          animation: `float ${Math.random() * 10 + 10}s infinite ease-in-out ${Math.random() * 5}s`
+        }));
+        setParticles(newParticles);
+      }, [count]);
+      
+      return (
+        <div className="absolute inset-0 pointer-events-none">
+          {particles.map((particle, i) => (
+            <div 
+              key={i}
+              className="absolute rounded-full"
+              style={particle}
+            />
+          ))}
+        </div>
+      );
+    };
+    
+    return FloatingParticlesComponent;
+  }),
+  { ssr: false }
+);
+
 // Carga dinámica del componente RobotModel para evitar errores de SSR
 const RobotModel = dynamic(() => import('./components/RobotModel'), {
   ssr: false,
@@ -21,8 +64,12 @@ export default function HomePage() {
   const [scrolled, setScrolled] = useState(false);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const neuralNetworkRef = useRef<HTMLDivElement>(null);
+  const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
+    // Marcar como montado solo en el cliente
+    setIsMounted(true);
+    
     const handleScroll = () => {
       const isScrolled = window.scrollY > 50;
       if (isScrolled !== scrolled) {
@@ -190,33 +237,15 @@ export default function HomePage() {
                 </div>
               </div>
               <div className="mt-12 relative sm:max-w-lg sm:mx-auto lg:mt-0 lg:max-w-none lg:mx-0 lg:col-span-6 lg:flex lg:items-center">
-                <div className="relative mx-auto w-full card-3d">
-                  <div className="card-3d-inner glass-card rounded-lg shadow-lg lg:max-w-md animate-float">
-                    <div className="relative block w-full rounded-lg overflow-hidden">
+                <div className="relative mx-auto w-full">
+                  <div className="rounded-lg overflow-visible">
+                    <div className="relative block w-full overflow-visible">
                       <div className="w-full h-80 relative">
-                        {/* Fondo con gradiente mejorado */}
-                        <div className="absolute inset-0 w-full h-full bg-gradient-to-br from-blue-500 via-indigo-600 to-purple-700 opacity-20"></div>
-                        
                         {/* Robot 3D interactivo */}
                         <RobotModel />
                         
                         {/* Partículas flotantes */}
-                        <div className="absolute inset-0 pointer-events-none">
-                          {[...Array(20)].map((_, i) => (
-                            <div 
-                              key={i}
-                              className="absolute rounded-full"
-                              style={{
-                                top: `${Math.random() * 100}%`,
-                                left: `${Math.random() * 100}%`,
-                                width: `${Math.random() * 4 + 2}px`,
-                                height: `${Math.random() * 4 + 2}px`,
-                                backgroundColor: `rgba(${Math.floor(Math.random() * 100 + 100)}, ${Math.floor(Math.random() * 100 + 100)}, 246, ${Math.random() * 0.5 + 0.2})`,
-                                animation: `float ${Math.random() * 10 + 10}s infinite ease-in-out ${Math.random() * 5}s`
-                              }}
-                            />
-                          ))}
-                        </div>
+                        <FloatingParticles count={20} />
                       </div>
                     </div>
                   </div>
