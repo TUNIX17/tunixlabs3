@@ -11,6 +11,9 @@ import {
   Sparkles
 } from '@react-three/drei';
 import * as THREE from 'three';
+import { useRobotInteraction, RobotInteractionState } from '../../../hooks/useRobotInteraction';
+import FloatingMicButton from '../../../components/VoiceInterface/FloatingMicButton';
+import InteractionModal from '../../../components/VoiceInterface/InteractionModal';
 
 // Definir tipo para arrays de rotación
 type RotationArray = [number, number, number];
@@ -1084,61 +1087,78 @@ function LoadingSpinner() {
 }
 
 // Componente contenedor
-function RobotModel() {
+function RobotInteractionManager() {
   const [isLoading, setIsLoading] = useState(true);
-  const [isRobotListening, setIsRobotListening] = useState(false);
-  const robotRef = useRef<RobotMethods>(null);
-  const currentMouseRef = useRef({ x: 0, y: 0 });
+  const robotAnimatedRef = useRef<RobotMethods>(null);
   const [isMounted, setIsMounted] = useState(false);
+  const [isInteractionModalOpen, setIsInteractionModalOpen] = useState(false);
 
   useEffect(() => {
-    // Establecer isMounted a true solo en el cliente después de la hidratación inicial
     setIsMounted(true);
   }, []);
+
+  const {
+    interactionState,
+    isRecording,
+    currentLanguage,
+    startListening,
+    stopListening,
+    stopSpeaking,
+    changeLanguage,
+    registerRobot,
+  } = useRobotInteraction({
+    initialLanguage: 'es',
+    robotSystemPrompt: undefined,
+    onStateChange: (newState) => {
+      console.log('RobotInteractionState changed:', newState);
+      if (newState === RobotInteractionState.IDLE && isRecording) {
+      }
+    },
+    onError: (error) => {
+      console.error('Error en useRobotInteraction desde el contenedor:', error);
+    }
+  });
+
+  useEffect(() => {
+    if (robotAnimatedRef.current) {
+      registerRobot(robotAnimatedRef.current);
+    }
+  }, [robotAnimatedRef, registerRobot, isLoading]);
 
   const handleModelLoaded = () => {
     setIsLoading(false);
   };
 
-  // Métodos para controlar las animaciones
-  const handleWave = () => {
-    if (robotRef.current) {
-      robotRef.current.startWaving();
+  const handleMicButtonClick = () => {
+    if (interactionState === RobotInteractionState.PROCESSING) return;
+
+    if (!isInteractionModalOpen) {
+      setIsInteractionModalOpen(true);
+      if (!isRecording && interactionState !== RobotInteractionState.LISTENING) {
+        startListening();
+      }
+    } else {
+      if (isRecording) {
+        stopListening();
+      } else {
+        startListening();
+      }
     }
   };
 
-  const handleApproachCamera = () => {
-    if (robotRef.current) {
-      robotRef.current.approachCamera();
+  const handleCloseModal = () => {
+    setIsInteractionModalOpen(false);
+    if (isRecording) {
+      stopListening();
+    }
+    if (interactionState === RobotInteractionState.SPEAKING) {
+      stopSpeaking();
     }
   };
 
-  const handleDance = () => {
-    if (robotRef.current) {
-      robotRef.current.danceMove();
-    }
-  };
-
-  const handleNodYes = () => {
-    if (robotRef.current) {
-      robotRef.current.nodYes();
-    }
-  };
-
-  const handleShakeLegs = () => {
-    if (robotRef.current) {
-      robotRef.current.shakeLegsTwist();
-    }
-  };
-
-  // Método para activar/desactivar el modo escucha
-  const toggleListening = () => {
-    setIsRobotListening(!isRobotListening);
-  };
-
-  const handlePointerMove = (event: any) => {
-    // No necesitamos actualizar currentMouseRef aquí ya que useThree().mouse lo hace automáticamente
-  };
+  if (!isMounted) {
+    return <div className="h-[450px] w-full" aria-hidden="true"><LoadingSpinner/></div>;
+  }
 
   return (
     <div className="h-[450px] w-full touch-none relative overflow-visible bg-transparent pointer-events-auto">
@@ -1152,7 +1172,6 @@ function RobotModel() {
         shadows 
         className="overflow-visible" 
         camera={{ position: [0, 0.5, 200], fov: 30 }}
-        onPointerMove={handlePointerMove}
         gl={{ alpha: true, antialias: true }}
         style={{ 
           position: 'absolute', 
@@ -1163,7 +1182,6 @@ function RobotModel() {
           zIndex: 5
         }}
       >
-        {/* Iluminación ajustada para evitar exceso de brillo */}
         <ambientLight intensity={0.6} />
         <directionalLight
           position={[5, 10, 7]}
@@ -1184,8 +1202,8 @@ function RobotModel() {
         <Suspense fallback={null}>
           <AnimatedRobotModel 
             onLoad={handleModelLoaded} 
-            isListening={isRobotListening}
-            ref={robotRef}
+            isListening={interactionState === RobotInteractionState.LISTENING}
+            ref={robotAnimatedRef}
           />
           <Environment files="/potsdamer_platz_1k.hdr" />
           <ContactShadows
@@ -1199,6 +1217,20 @@ function RobotModel() {
           />
         </Suspense>
       </Canvas>
+
+      <FloatingMicButton 
+        onClick={handleMicButtonClick} 
+        interactionState={interactionState} 
+        isRecording={isRecording}
+        disabled={isLoading}
+      />
+
+      <InteractionModal 
+        isOpen={isInteractionModalOpen} 
+        onClose={handleCloseModal} 
+        robotRef={robotAnimatedRef}
+        initialLanguage={currentLanguage}
+      />
     </div>
   );
 }
@@ -1206,4 +1238,4 @@ function RobotModel() {
 // Precargar el modelo
 useGLTF.preload('/ROBOT2.glb');
 
-export default RobotModel;
+export default RobotInteractionManager;
