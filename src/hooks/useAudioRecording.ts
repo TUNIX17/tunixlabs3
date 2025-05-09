@@ -139,24 +139,22 @@ export const useAudioRecording = ({
   }, [isRecording, isPaused, updateStateFromRecorder, onError]);
   
   // Detener grabación
-  const stopRecording = useCallback(async (): Promise<Blob | null> => {
-    if (!recorderRef.current || !isRecording) {
-      console.log('[useAudioRecording] stopRecording llamado pero no se estaba grabando.');
-      return null;
-    }
-    
+  const stopRecording = useCallback(async () => {
     try {
+      if (!recorderRef.current || !isRecording) {
+        return null;
+      }
+      
       const blob = await recorderRef.current.stop();
       setAudioBlob(blob);
       updateStateFromRecorder();
       return blob;
     } catch (error) {
-      const errorMsg = error instanceof Error ? error.message : 'Error al detener grabación';
-      setErrorMessage(errorMsg);
+      setErrorMessage(error instanceof Error ? error.message : 'Error al detener grabación');
       setIsRecording(false);
       
       if (onError) {
-        onError(new Error(errorMsg));
+        onError(error instanceof Error ? error : new Error('Error al detener grabación'));
       }
       
       return null;

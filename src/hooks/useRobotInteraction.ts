@@ -54,7 +54,7 @@ export const useRobotInteraction = ({
   // Servicio de traducción
   const translatorRef = useRef<Translator>(new Translator(initialLanguage));
   
-  // Reproductor de audio
+  // Reproductor de audio (se mantiene por si se necesita para otros audios que no sean TTS)
   const audioPlayerRef = useRef<AudioPlayer | null>(null);
   
   // Hook para grabación de audio
@@ -100,8 +100,8 @@ export const useRobotInteraction = ({
   // Hook para conversación con Groq
   const {
     generateResponseAndSpeech,
-    sendMessage: sendGroqMessage,
-    textToSpeech: convertTextToSpeechGroq,
+    sendMessage: sendGroqMessage, 
+    // textToSpeech: convertTextToSpeechGroq, // Ya no se usa directamente aquí
   } = useGroqConversation({
     initialSystemPrompt: robotSystemPrompt,
     onStart: () => {
@@ -125,29 +125,24 @@ export const useRobotInteraction = ({
     }
   });
   
-  // Inicializar reproductor de audio
+  // Inicializar reproductor de audio (para usos futuros, no para Web Speech API TTS)
   useEffect(() => {
     audioPlayerRef.current = new AudioPlayer({
       autoPlay: false,
       onPlay: () => {
-        setInteractionState(RobotInteractionState.SPEAKING);
-        
-        // Animar al robot hablando
-        if (robotRef.current) {
-          robotRef.current.startWaving();
-        }
+        // Este onPlay podría usarse si se reproduce un audio diferente al TTS
+        // setInteractionState(RobotInteractionState.SPEAKING);
+        // if (robotRef.current) robotRef.current.startWaving();
       },
       onEnded: () => {
-        setInteractionState(RobotInteractionState.IDLE);
-        
-        // Regresar al robot a posición normal
-        if (robotRef.current) {
-          robotRef.current.stepBackward();
-        }
+        // Este onEnded también, para audios no TTS
+        // setInteractionState(RobotInteractionState.IDLE);
+        // if (robotRef.current) robotRef.current.stepBackward();
       },
       onError: (error) => {
-        console.error('Error en reproducción de audio:', error);
-        setInteractionState(RobotInteractionState.ERROR);
+        console.error('Error en reproducción de audio (AudioPlayer):', error);
+        // No cambiar el estado general a ERROR aquí directamente si el error es solo del player
+        // y no de un flujo principal, a menos que sea crítico.
         if (onError) {
           if (error instanceof Error) {
             onError(error);
@@ -163,7 +158,7 @@ export const useRobotInteraction = ({
         audioPlayerRef.current.dispose();
       }
     };
-  }, [onError]);
+  }, [onError]); // Solo onError como dependencia, ya que los callbacks no cambian estados globales directamente.
   
   // Notificar cambios de estado
   useEffect(() => {
@@ -209,140 +204,199 @@ export const useRobotInteraction = ({
   
   // Método para detener escucha y procesar audio
   const stopListening = useCallback(async () => {
-    try {
-      console.log('[RobotInteraction] Intentando detener escucha...');
-      await stopRecording();
-      
-      // Añadir log para verificar el estado de audioBlob DESPUÉS de stopRecording
-      console.log('[RobotInteraction] stopRecording completado. ¿Existe audioBlob?', !!audioBlob, audioBlob ? `Tamaño: ${audioBlob.size}` : '');
+    console.log('[RobotInteraction] stopListening llamado. Estado actual de isRecording:', isRecording);
+    if (!isRecording) {
+      console.warn('[RobotInteraction] Se intentó detener la escucha (stopListening), pero no se estaba grabando (isRecording es false).');
+      return;
+    }
 
-      if (audioBlob && audioBlob.size > 0) { // Añadir verificación de tamaño > 0
+    try {
+      console.log('[RobotInteraction] Intentando detener escucha con stopRecording()...');
+      const currentAudioBlob = await stopRecording(); 
+      
+      console.log('[RobotInteraction] stopRecording completado. Blob recibido:', 
+                  currentAudioBlob ? `Tamaño: ${currentAudioBlob.size}` : 'null');
+
+      if (currentAudioBlob && currentAudioBlob.size > 0) {
         setInteractionState(RobotInteractionState.PROCESSING);
         if (robotRef.current) robotRef.current.nodYes();
         
-        // 1. Reconocimiento de voz (STT y detección de idioma)
-        const recognitionResult = await recognizeSpeech(audioBlob);
+        const recognitionResult = await recognizeSpeech(currentAudioBlob); 
         setUserMessage(recognitionResult.text);
         
-        let langToUse = currentLanguage; // Usar el idioma actual del hook (actualizado por onLanguageDetected)
-        if (recognitionResult.language && recognitionResult.language !== currentLanguage) {
-          // Si STT devuelve un idioma diferente y es confiable, podríamos considerarlo aquí.
-          // Por ahora, nos fiamos del currentLanguage que se actualiza vía onLanguageDetected.
-          // langToUse = recognitionResult.language;
-          // setCurrentLanguage(recognitionResult.language); // Esto ya lo hace useSpeechRecognition -> onLanguageDetected
-        }
-
-        if (!recognitionResult.text) {
-          const errorMsg = translatorRef.current.translate('voice.error.speech_recognition', langToUse);
-          setRobotResponse(errorMsg); // Mostrar error en UI
-          throw new Error(errorMsg);
-        }
-        
-        // 2. Generar respuesta del LLM y audio TTS usando el texto reconocido
-        // Se pasa langToUse que es el currentLanguage (actualizado por el detector de useSpeechRecognition)
-        const { responseText, responseAudioBlob } = await generateResponseAndSpeech(
-          recognitionResult.text, 
-          langToUse
-        );
-        
-        setRobotResponse(responseText);
-
-        if (responseAudioBlob && audioPlayerRef.current) {
-          await audioPlayerRef.current.loadFromBlob(responseAudioBlob); // Cargar primero
-          await audioPlayerRef.current.play(); // Luego reproducir
+        let langForThisInteraction = currentLanguage;
+        if (recognitionResult.language) {
+          if (recognitionResult.language !== currentLanguage) {
+            console.log(`[RobotInteraction] STT detectó un idioma (${recognitionResult.language}) diferente al actual (${currentLanguage}). Actualizando currentLanguage.`);
+            setCurrentLanguage(recognitionResult.language);
+          }
+          langForThisInteraction = recognitionResult.language;
         } else {
+          console.warn(`[RobotInteraction] STT no devolvió un idioma. Se usará el currentLanguage del hook: ${currentLanguage}`);
+        }
+
+        console.log(`[RobotInteraction] Idioma determinado para esta interacción (LLM y TTS): ${langForThisInteraction}`);
+
+        if (recognitionResult.text) {
+          // Generar respuesta del LLM y reproducir voz (TTS)
+          // Los callbacks de TTS manejarán los estados SPEAKING e IDLE y animaciones.
+          /* const responseText = */ await generateResponseAndSpeech( // responseText no es necesario aquí si onComplete de useGroqConversation ya lo establece.
+            recognitionResult.text, 
+            langForThisInteraction,
+            {
+              onStart: () => {
+                setInteractionState(RobotInteractionState.SPEAKING);
+                if (robotRef.current) robotRef.current.startWaving();
+              },
+              onEnd: () => {
+                setInteractionState(RobotInteractionState.IDLE);
+                if (robotRef.current) robotRef.current.stepBackward();
+              },
+              onError: (error) => {
+                console.error('[RobotInteraction] Error durante TTS (Web Speech API):', error);
+                setRobotResponse(prev => prev || 'Lo siento, tuve un problema al intentar hablar.');
+                setInteractionState(RobotInteractionState.ERROR);
+                if (robotRef.current) robotRef.current.stepBackward();
+                if (onError) {
+                  if (error instanceof Error) {
+                    onError(error);
+                  } else if (error instanceof SpeechSynthesisErrorEvent) {
+                    onError(new Error(`SpeechSynthesis Error: ${error.error} - ${error.utterance?.text.substring(0,30)}`));
+                  } else {
+                    onError(new Error(String(error)));
+                  }
+                }
+              }
+            }
+          );
+        } else {
+          console.log('[RobotInteraction] No se detectó texto del usuario (STT vacío). No se llamará al LLM ni TTS.');
+          setRobotResponse(translatorRef.current.translate('noUserSpeechDetected', currentLanguage));
           setInteractionState(RobotInteractionState.IDLE);
           if (robotRef.current) robotRef.current.stepBackward();
         }
       } else {
-        console.warn('[RobotInteraction] No se encontró audioBlob o estaba vacío después de detener la grabación. Volviendo a IDLE.');
-        setInteractionState(RobotInteractionState.IDLE);
-      }
-    } catch (error: any) {
-      console.error('Error en stopListening o procesamiento de voz:', error);
-      setRobotResponse(error.message || translatorRef.current.translate('robot.error.generic', currentLanguage));
-      setInteractionState(RobotInteractionState.ERROR);
-      if (onError) onError(error instanceof Error ? error : new Error(String(error)));
-    }
-  }, [audioBlob, stopRecording, recognizeSpeech, currentLanguage, generateResponseAndSpeech, robotRef, translatorRef, onError, setRobotResponse, setUserMessage, setInteractionState ]);
-  
-  // Método para enviar un mensaje de texto (mantiene su lógica original)
-  const sendTextMessage = useCallback(async (text: string) => {
-    if (!text.trim()) return;
-
-    setUserMessage(text);
-    setInteractionState(RobotInteractionState.PROCESSING);
-    if (robotRef.current) robotRef.current.nodYes();
-
-    try {
-      // Usar la función renombrada de useGroqConversation para obtener solo el texto
-      const responseText = await sendGroqMessage(text, currentLanguage);
-      setRobotResponse(responseText);
-
-      if (responseText && audioPlayerRef.current) {
-        const audioResponse = await convertTextToSpeechGroq(responseText, currentLanguage);
-        if (audioResponse) {
-          await audioPlayerRef.current.loadFromBlob(audioResponse); // Cargar primero
-          await audioPlayerRef.current.play(); // Luego reproducir
-        } else {
-          setInteractionState(RobotInteractionState.IDLE);
-          if (robotRef.current) robotRef.current.stepBackward();
-        }
-      } else {
+        console.warn('[RobotInteraction] No se obtuvo audioBlob o estaba vacío después de detener la grabación.');
+        setUserMessage(translatorRef.current.translate('noAudioRecordedError', currentLanguage));
         setInteractionState(RobotInteractionState.IDLE);
         if (robotRef.current) robotRef.current.stepBackward();
       }
     } catch (error: any) {
-      console.error('Error al enviar mensaje de texto:', error);
-      setRobotResponse(error.message || translatorRef.current.translate('robot.error.generic', currentLanguage));
+      console.error('[RobotInteraction] Error en stopListening:', error);
+      setRobotResponse(translatorRef.current.translate('generalErrorResponse', currentLanguage));
       setInteractionState(RobotInteractionState.ERROR);
+      if (robotRef.current) robotRef.current.stepBackward(); 
+      if (onError) {
+        if (error instanceof Error) {
+          onError(error);
+        } else {
+          onError(new Error(String(error)));
+        }
+      }
+    } 
+  }, [
+    isRecording, 
+    stopRecording, 
+    recognizeSpeech, 
+    generateResponseAndSpeech, 
+    currentLanguage, 
+    setCurrentLanguage, 
+    setUserMessage, 
+    setRobotResponse, 
+    setInteractionState, 
+    onError, 
+    robotRef,
+    translatorRef
+  ]);
+
+  // Método para enviar un mensaje de texto directamente (sin voz)
+  const sendTextMessage = useCallback(async (text: string, lang?: string) => {
+    if (!text.trim()) return;
+
+    const languageToUse = lang || currentLanguage;
+    setUserMessage(text);
+    setInteractionState(RobotInteractionState.PROCESSING);
+    if (robotRef.current) robotRef.current.approachCamera();
+
+    try {
+      // Solo obtener respuesta de texto, sin TTS automático para esta función.
+      const responseText = await sendGroqMessage(text, languageToUse);
+      setRobotResponse(responseText); 
+      
+      // Si se quisiera que hable aquí, se llamaría a textToSpeech explícitamente.
+      // Por ejemplo:
+      // if (responseText) {
+      //   await textToSpeech(responseText, languageToUse, {
+      //     onStart: () => { /* ... */ },
+      //     onEnd: () => { /* ... */ },
+      //     onError: () => { /* ... */ }
+      //   });
+      // }
+      
+      // Asumimos que después de enviar texto y recibir respuesta, volvemos a IDLE
+      // si no hay un flujo de voz explícito iniciado para la respuesta.
+      setInteractionState(RobotInteractionState.IDLE);
+      if (robotRef.current) robotRef.current.stepBackward();
+
+    } catch (error) {
+      console.error('Error en sendTextMessage:', error);
+      setRobotResponse(translatorRef.current.translate('generalErrorResponse', languageToUse));
+      setInteractionState(RobotInteractionState.ERROR);
+      if (robotRef.current) robotRef.current.stepBackward();
       if (onError) onError(error instanceof Error ? error : new Error(String(error)));
     }
-  }, [currentLanguage, sendGroqMessage, convertTextToSpeechGroq, robotRef, translatorRef, onError, setRobotResponse, setUserMessage, setInteractionState ]);
-  
-  // Método para detener habla
+  }, [
+    currentLanguage, 
+    sendGroqMessage, 
+    // textToSpeech, // Se podría añadir si se decide que sendTextMessage también hable
+    robotRef, 
+    translatorRef, 
+    onError, 
+    setRobotResponse, 
+    setUserMessage, 
+    setInteractionState 
+  ]);
+
+  // Método para detener habla (si es Web Speech API)
   const stopSpeaking = useCallback(() => {
-    if (audioPlayerRef.current && audioPlayerRef.current.getState().isPlaying) {
-      audioPlayerRef.current.stop();
-      setInteractionState(RobotInteractionState.IDLE);
+    if (typeof window !== 'undefined' && window.speechSynthesis && window.speechSynthesis.speaking) {
+      window.speechSynthesis.cancel();
+      console.log('[RobotInteraction] SpeechSynthesis cancelado.');
+      // El evento 'onend' de la utterance actual debería dispararse y manejar el cambio de estado a IDLE.
+      // Si no, forzar el estado aquí puede ser una opción, pero es mejor confiar en el evento.
+      // setInteractionState(RobotInteractionState.IDLE);
+      // if (robotRef.current) robotRef.current.stepBackward();
     }
+    // Si se estuviera usando AudioPlayer para algo, aquí iría audioPlayerRef.current?.stop();
   }, []);
-  
-  // Método para cambiar idioma manualmente
-  const changeLanguage = useCallback((language: string) => {
-    if (translatorRef.current.isLanguageSupported(language)) {
-      setCurrentLanguage(language);
-      translatorRef.current.setDefaultLanguage(language);
-    } else {
-      console.warn(`Idioma no soportado: ${language}`);
-    }
+
+  // Asignar la referencia del robot para control de animaciones
+  const assignRobotRef = useCallback((ref: RobotAnimations | null) => {
+    robotRef.current = ref;
   }, []);
-  
-  // Método para registrar el robot
-  const registerRobot = useCallback((robotAnimations: RobotAnimations) => {
-    robotRef.current = robotAnimations;
+
+  // Limpiar al desmontar
+  useEffect(() => {
+    return () => {
+      if (typeof window !== 'undefined' && window.speechSynthesis) {
+        window.speechSynthesis.cancel(); // Cancelar cualquier habla pendiente
+      }
+      audioPlayerRef.current?.dispose();
+    };
   }, []);
-  
-  // Traducir mensajes de la interfaz
-  const translate = useCallback((key: string): string => {
-    return translatorRef.current.translate(key, currentLanguage);
-  }, [currentLanguage]);
 
   return {
-    // Estado
     interactionState,
-    isRecording,
-    currentLanguage,
     userMessage,
     robotResponse,
-    
-    // Métodos principales
+    currentLanguage,
+    isRecording,
+    assignRobotRef,
     startListening,
     stopListening,
     sendTextMessage,
-    stopSpeaking,
-    changeLanguage,
-    registerRobot,
-    translate
+    stopSpeaking, // Exponer para control externo si es necesario
+    setCurrentLanguage, // Para cambiar idioma externamente si es necesario
+    // No es necesario exponer audioBlob ya que se maneja internamente
   };
 }; 

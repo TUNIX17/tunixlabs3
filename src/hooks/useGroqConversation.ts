@@ -2,7 +2,7 @@ import { useState, useCallback, useRef } from 'react';
 import { apiClient } from '../lib/groq/client';
 import { selectModelConfig } from '../lib/groq/models';
 import { useRateLimiter } from '../lib/groq/rate-limiter';
-import axios, { isAxiosError, AxiosError } from 'axios';
+import axios from 'axios';
 
 // Definición de tipos para la respuesta de Groq (Chat Completions)
 interface GroqChatCompletionChoice {
@@ -51,7 +51,23 @@ interface UseGroqConversationOptions {
 }
 
 export const useGroqConversation = ({
-  initialSystemPrompt = "Eres Tunix, un asistente virtual experto de Tunixlabs, una consultora líder en Inteligencia Artificial. Tu principal objetivo es ayudar a los usuarios a comprender cómo la IA puede transformar sus negocios y resolver sus desafíos. Proporciona información clara, precisa y útil sobre nuestros servicios de consultoría, que incluyen desarrollo de estrategias de IA, implementación de modelos de Machine Learning, LLMs, Computer Vision, procesamiento de lenguaje natural, y automatización inteligente. Responde profesionalmente, enfócate en soluciones y casos de uso relevantes para empresas. No inventes servicios ni capacidades que Tunixlabs no ofrece. Si la pregunta del usuario es ambigua o muy general, puedes hacer preguntas para clarificar sus necesidades y así ofrecer una respuesta más valiosa. Evita respuestas genéricas; adapta tus explicaciones a cómo la IA puede impactar positivamente los objetivos del usuario.",
+  initialSystemPrompt = `Eres Tunix, el asistente virtual experto de Tunixlabs. Tu ÚNICA función es representar a Tunixlabs, una consultora de IA en Chile.
+Nuestros servicios CLAVE son:
+1. Consultoría Estratégica en IA.
+2. Desarrollo de Software a Medida con IA (incluye Business Intelligence, Machine Learning, Deep Learning, NLP para chatbots/asistentes, Computer Vision).
+3. Automatización Inteligente de Procesos (RPA con IA).
+
+Tu objetivo es:
+- Explicar CÓMO estos servicios específicos de Tunixlabs pueden resolver problemas y potenciar negocios.
+- Ser profesional, preciso y enfocado en soluciones de IA de Tunixlabs.
+- Si una pregunta es ambigua, pide aclaraciones para ofrecer una respuesta relevante sobre NUESTROS servicios.
+
+REGLAS ESTRICTAS:
+- HABLA ÚNICAMENTE sobre Tunixlabs y los servicios listados.
+- NO inventes servicios, capacidades o información fuera de lo que Tunixlabs ofrece.
+- Si te preguntan algo NO RELACIONADO DIRECTAMENTE con nuestros servicios de IA o cómo aplicarlos, indica amablemente que tu especialización es sobre las soluciones de Tunixlabs y reorienta la conversación hacia cómo podemos ayudar con IA. NO respondas sobre temas generales.
+- Tu propósito NO es conversar sobre otros temas, solo sobre el valor que Tunixlabs aporta con IA.
+- **EVITA FORMATO ESPECIAL: No uses asteriscos (*), guiones bajos (_), ni ningún otro tipo de formato markdown (como negritas, cursivas o listas con viñetas) en tus respuestas. Escribe en texto plano continuo. Estos caracteres especiales son leídos literalmente por el sistema de voz (ej., diría 'asterisco') y confunden al usuario.`,
   maxHistoryLength = 10,
   onStart,
   onComplete,
@@ -111,10 +127,15 @@ export const useGroqConversation = ({
       // Actualizar configuración del modelo en caso de alto tráfico
       configRef.current = selectModelConfig(0, false);
       
-      // Actualizar system prompt si el lenguaje es diferente del español
-      if (language && language !== 'es' && language !== 'auto') {
+      // Actualizar system prompt basado en el idioma detectado
+      if (language && language.toLowerCase().startsWith('en')) {
+        systemPromptRef.current = `You are a friendly AI assistant named Tunix. You MUST respond in English. Your answers should be concise and helpful.`;
+      } else if (language && language !== 'es' && language !== 'auto') {
+        // Para otros idiomas (no 'en' ni 'es'), instruir en ese idioma.
+        // Esto asume que el LLM puede entender esta instrucción en varios idiomas.
         systemPromptRef.current = `Eres un asistente de IA amigable llamado Tunix. Debes responder en ${language}. Tus respuestas deben ser concisas y útiles.`;
       } else {
+        // Si el idioma es 'es', 'auto', o no definido, usar el prompt inicial en español.
         systemPromptRef.current = initialSystemPrompt;
       }
       
@@ -207,88 +228,172 @@ export const useGroqConversation = ({
     onError
   ]);
 
-  // Método para convertir texto a voz usando Groq vía el proxy
-  const textToSpeech = useCallback(async (text: string, language: string = 'es'): Promise<Blob | null> => {
-    if (!text.trim()) {
-      return null;
-    }
-    
-    // Verificar límites
-    if (!canMakeRequest) {
-      const errorMsg = `Límite de API alcanzado. Por favor, espera ${Math.ceil(waitTime / 1000)} segundos.`;
-      setError(errorMsg);
-      
-      if (onError) {
-        onError(new Error(errorMsg));
+  const speakWithWebSpeech = useCallback(async (
+    text: string, 
+    language: string,
+    callbacks: { onStart?: () => void; onEnd?: () => void; onError?: (e: SpeechSynthesisErrorEvent) => void }
+  ): Promise<void> => {
+    return new Promise((resolve, reject) => {
+      if (typeof window === 'undefined' || !window.speechSynthesis) {
+        console.warn('[TTS-WebSpeech] Web Speech API no está disponible.');
+        reject(new Error('Web Speech API no disponible'));
+        return;
       }
-      
-      return null;
-    }
-    
-    setIsProcessing(true);
-    setError(null);
-    
-    try {
-      // Registrar petición
-      trackRequest();
-      
-      // Seleccionar voz según idioma
-      let voice = 'es-male-1'; // Voz por defecto en español
-      
-      // Mapeo básico de idiomas a voces
-      if (language === 'en') {
-        voice = 'en-female-1';
-      } else if (language === 'ar') {
-        voice = 'ar-male-1';
-      }
-      
-      // Realizar petición a Groq para TTS vía el proxy
-      const response = await apiClient.post<ArrayBuffer>('', {
-        endpoint: '/audio/speech',
-        payload: {
-          model: configRef.current.textToSpeech,
-          input: text,
-          voice: voice,
-          response_format: 'mp3'
-        },
-        responseType: 'arraybuffer'
-      });
-      
-      // response.data ahora es de tipo ArrayBuffer
-      if (response.data && response.data.byteLength > 0) {
-        return new Blob([response.data], { type: 'audio/mpeg' });
-      } else {
-        setError('La respuesta de Text-to-Speech no contenía datos de audio válidos.');
-        if (onError) {
-          onError(new Error('La respuesta de Text-to-Speech no contenía datos de audio válidos.'));
-        }
-        return null;
-      }
-    } catch (error: any) {
-      let errorMessage = 'Error desconocido al convertir texto a voz';
-      if (error && error.response) {
-        const errorData = error.response.data;
-        const status = error.response.status;
-        errorMessage = errorData?.error?.message || errorData?.error || errorData?.message || error.message || 'Error en Text-to-Speech';
 
-        const retryAfterHeader = error.response.headers?.['retry-after'];
-        if (status === 429 && retryAfterHeader) {
-          const retrySeconds = parseInt(retryAfterHeader, 10);
-          if (!isNaN(retrySeconds)) {
-            signalRateLimitHit(retrySeconds);
-            errorMessage = `Demasiadas peticiones a TTS. Intenta de nuevo en ${retrySeconds} segundos. (Mensaje original: ${errorMessage})`;
-          }
-        }
-      } else if (error instanceof Error) {
-        errorMessage = error.message;
+      if (!text.trim()) {
+        console.warn('[TTS-WebSpeech] Texto vacío, no se reproducirá.');
+        resolve(); // Resuelve inmediatamente si no hay texto
+        return;
       }
-      setError(errorMessage);
-      if (onError) onError(new Error(errorMessage));
-      return null;
-    } finally {
-      setIsProcessing(false);
+
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = language;
+
+      // Lógica de selección de voz refinada:
+      const voices = window.speechSynthesis.getVoices();
+      let selectedVoice: SpeechSynthesisVoice | undefined = undefined;
+
+      if (voices.length > 0) {
+        // 1. Filtrar voces por el idioma base (ej. 'en' para 'en-US', 'en-GB')
+        const languageBase = language.split('-')[0];
+        const voicesForLanguage = voices.filter(voice => voice.lang.startsWith(languageBase));
+
+        if (voicesForLanguage.length > 0) {
+          // 2. De las voces del idioma, intentar encontrar una masculina
+          selectedVoice = voicesForLanguage.find(voice => voice.name.toLowerCase().includes('male'));
+          
+          // 3. Si no hay masculina para ese idioma, usar la primera voz disponible para ese idioma
+          if (!selectedVoice) {
+            selectedVoice = voicesForLanguage[0];
+            console.log(`[TTS-WebSpeech] No se encontró voz masculina para ${languageBase}, usando la primera disponible: ${selectedVoice.name}`);
+          }
+        } else {
+          console.warn(`[TTS-WebSpeech] No se encontraron voces para el idioma base ${languageBase}.`);
+          // 4. Fallback MUY genérico: intentar encontrar una voz que contenga el código de idioma (menos preciso)
+          // O simplemente confiar en que utterance.lang hará lo mejor posible.
+          // selectedVoice = voices.find(voice => voice.lang === language);
+          // if (!selectedVoice) {
+          //   selectedVoice = voices[0]; // Fallback a la primera voz del sistema si todo lo demás falla
+          //   if(selectedVoice) console.warn(`[TTS-WebSpeech] Usando voz por defecto del sistema: ${selectedVoice.name}`);
+          // }
+        }
+      }
+
+      if (selectedVoice) {
+        utterance.voice = selectedVoice;
+        console.log(`[TTS-WebSpeech] Usando voz: ${selectedVoice.name} (${selectedVoice.lang})`);
+      } else {
+        console.warn(`[TTS-WebSpeech] No se encontró voz específica para ${language}. Se usará la voz por defecto del navegador para el lang: ${utterance.lang}.`);
+      }
+      
+      // Ajustes para efecto robótico (Feedback: más rápida y aguda)
+      // Valores anteriores: pitch = 1.1, rate = 0.6
+      utterance.pitch = 1.3; // Más agudo.
+      utterance.rate = 0.8;  // Más rápido que 0.6, pero aún por debajo de lo normal.
+      utterance.volume = 1;  // Volumen máximo
+
+      utterance.onstart = () => {
+        console.log('[TTS-WebSpeech] Reproducción iniciada.');
+        if (callbacks.onStart) callbacks.onStart();
+      };
+
+      utterance.onend = () => {
+        console.log('[TTS-WebSpeech] Reproducción finalizada.');
+        if (callbacks.onEnd) callbacks.onEnd();
+        resolve();
+      };
+
+      utterance.onerror = (event) => {
+        console.error('[TTS-WebSpeech] Error en la reproducción:', event);
+        if (callbacks.onError) callbacks.onError(event);
+        reject(event.error || new Error(`Error en SpeechSynthesis: ${event.error}`));
+      };
+      
+      // Asegurarse de que las voces estén cargadas (especialmente en algunos navegadores)
+      if (voices.length === 0) {
+        window.speechSynthesis.onvoiceschanged = () => {
+          // Reintentar la selección de voz una vez que se carguen
+          const updatedVoices = window.speechSynthesis.getVoices();
+          selectedVoice = updatedVoices.find(voice => voice.lang.startsWith(language) && voice.name.toLowerCase().includes('male')) ||
+                          updatedVoices.find(voice => voice.lang.startsWith(language)) || 
+                          updatedVoices[0];
+          if (selectedVoice) {
+            utterance.voice = selectedVoice;
+            console.log(`[TTS-WebSpeech] (Voces cargadas) Usando voz: ${selectedVoice.name} (${selectedVoice.lang})`);
+          }
+          window.speechSynthesis.speak(utterance);
+        };
+      } else {
+        window.speechSynthesis.speak(utterance);
+      }
+    });
+  }, []);
+
+  // Método para convertir texto a voz
+  // Prioriza Web Speech API, luego podría intentar Groq (actualmente roto)
+  const textToSpeech = useCallback(async (
+    text: string, 
+    language: string = 'es',
+    callbacks: { onStart?: () => void; onEnd?: () => void; onError?: (e: any) => void }
+  ): Promise<void> => {
+    if (!text.trim()) {
+      if (callbacks.onEnd) callbacks.onEnd(); // Considerar si llamar onEnd o nada
+      return Promise.resolve();
     }
-  }, [canMakeRequest, waitTime, trackRequest, signalRateLimitHit, onError]);
+
+    try {
+      console.log(`[TTS] Intentando generar voz para: "${text.substring(0,50)}..." en idioma ${language} usando Web Speech API.`);
+      await speakWithWebSpeech(text, language, callbacks);
+      // Si speakWithWebSpeech se resuelve, significa que la reproducción se completó (o no se pudo iniciar pero se manejó).
+    } catch (webSpeechError) {
+      console.warn('[TTS] Web Speech API falló o no está disponible:', webSpeechError);
+      // Aquí podríamos intentar el fallback a Groq TTS si quisiéramos y si el idioma es inglés.
+      // Por ahora, como Groq TTS está roto, simplemente registramos el error y no hacemos más.
+      if (callbacks.onError) callbacks.onError(webSpeechError);
+      
+      // Opcional: Lógica de fallback a Groq TTS (actualmente deshabilitada porque está rota)
+      /*
+      if (language.toLowerCase().startsWith('en')) {
+        console.log('[TTS] Web Speech API falló. Intentando fallback a Groq TTS para inglés (actualmente roto)...');
+        setIsProcessing(true); // Asegurar que el estado de procesamiento se active para Groq
+        setError(null);
+        try {
+          trackRequest();
+          const modelToUse = 'playai-tts';
+          const selectedVoice = 'Fritz-PlayAI';
+          
+          const response = await apiClient.post<ArrayBuffer>('', {
+            endpoint: '/audio/speech',
+            payload: { model: modelToUse, voice: selectedVoice, input: text, response_format: "wav", speed: 1.0 },
+            isBlob: true
+          });
+
+          if (!response.data || response.data.byteLength === 0) {
+            throw new Error('Groq TTS devolvió audio vacío.');
+          }
+          
+          const audioBlob = new Blob([response.data], { type: 'audio/wav' });
+          // Aquí necesitaríamos una forma de reproducir este blob.
+          // Esta parte es compleja porque el AudioPlayer está en useRobotInteraction.
+          // Por simplicidad, y dado que está roto, no se implementa la reproducción del blob aquí.
+          console.log('[TTS] Groq TTS (fallback) generó un blob:', audioBlob);
+          // Idealmente, aquí se llamaría a una función que pueda reproducir el blob y disparar onStart/onEnd
+          if (callbacks.onStart) callbacks.onStart(); // Simulación
+          // ... lógica para reproducir y luego ...
+          if (callbacks.onEnd) callbacks.onEnd(); // Simulación
+          
+        } catch (groqError: any) {
+          console.error('[TTS] Fallback a Groq TTS también falló:', groqError);
+          if (callbacks.onError) callbacks.onError(groqError);
+        } finally {
+          setIsProcessing(false);
+        }
+      } else {
+        if (callbacks.onError) callbacks.onError(webSpeechError); // Llama a onError si no hay fallback
+      }
+      */
+    }
+  }, [speakWithWebSpeech /*, canMakeRequest, waitTime, trackRequest, signalRateLimitHit, apiClient */]); // Dependencias de Groq comentadas
 
   // Método para procesar audio para transcripción vía el proxy
   const processAudio = useCallback(async (audioBlob: Blob): Promise<{text: string, detectedLanguage: string | null}> => {
@@ -348,48 +453,24 @@ export const useGroqConversation = ({
     }
   }, [canMakeRequest, waitTime, trackRequest, signalRateLimitHit, configRef, onError]);
 
-  // Nueva función para obtener respuesta del LLM y el audio TTS, dado un texto de entrada.
+  // Método combinado para generar respuesta y luego reproducirla
   const generateResponseAndSpeech = useCallback(async (
-    inputText: string, 
-    language: string
-  ): Promise<{ responseText: string, responseAudioBlob: Blob | null }> => {
-    if (!inputText.trim()) {
-      throw new Error('El texto de entrada está vacío.');
-    }
-
-    // Marcar inicio de procesamiento para esta secuencia (LLM + TTS)
-    // El estado general de isProcessing ya podría estar activo por la transcripción.
-    // Se puede refinar esto si se necesita un control de estado más granular.
-    // setIsProcessing(true); // Comentado por ahora, ya que el flujo mayor lo controla.
-    // setError(null);
-
-    try {
-      // 1. Generar respuesta del LLM
-      const responseText = await sendMessage(inputText, language);
-      if (!responseText) {
-        throw new Error('No se pudo generar una respuesta de texto del LLM.');
+    message: string, 
+    language: string,
+    ttsCallbacks: { onStart?: () => void; onEnd?: () => void; onError?: (e: any) => void }
+  ): Promise<string> => {
+    const responseText = await sendMessage(message, language);
+    
+    if (responseText) {
+      try {
+        await textToSpeech(responseText, language, ttsCallbacks);
+      } catch (ttsError) {
+        console.error("[RobotInteraction] Error durante TTS en generateResponseAndSpeech:", ttsError);
+        // El error ya debería haber sido manejado por textToSpeech o speakWithWebSpeech a través de ttsCallbacks.onError
+        // No es necesario propagarlo más a menos que se quiera un manejo de error adicional aquí.
       }
-
-      // 2. Convertir respuesta a voz
-      const responseAudioBlob = await textToSpeech(responseText, language);
-      // No es un error crítico si TTS falla, el texto aún puede mostrarse.
-      if (!responseAudioBlob) {
-        console.warn('No se pudo generar audio para la respuesta del robot.');
-      }
-
-      return {
-        responseText,
-        responseAudioBlob
-      };
-    } catch (error) {
-      // El manejo de error ya se hace en sendMessage y textToSpeech, 
-      // que llaman a setError y onError.
-      // Aquí solo relanzamos para que el llamador (useRobotInteraction) sepa.
-      console.error('Error en generateResponseAndSpeech:', error);
-      throw error; // Relanzar para que useRobotInteraction lo maneje.
-    } finally {
-      // setIsProcessing(false); // Comentado por ahora.
     }
+    return responseText;
   }, [sendMessage, textToSpeech]);
 
   // Método para limpiar el historial

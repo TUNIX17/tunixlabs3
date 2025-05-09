@@ -4,13 +4,14 @@ Este documento describe el sistema de interacción por voz implementado para el 
 
 ## Características Principales
 
-- **Reconocimiento de voz multilingual**: Detecta automáticamente el idioma hablado por el usuario (vía API Groq o fallback local).
-- **Respuestas en el mismo idioma**: El robot responde en el idioma detectado.
+- **Reconocimiento de voz multilingual**: Detecta automáticamente el idioma hablado por el usuario (vía API Groq STT `whisper-large-v3` con `verbose_json`).
+- **Respuestas LLM en idioma detectado**: El LLM (`llama-3.1-8b-instant`) adapta su idioma de respuesta.
+- **Texto a Voz (TTS) con Web Speech API**: Se utiliza la API `window.speechSynthesis` del navegador para la generación de voz. Intenta seleccionar una voz masculina y aplica ajustes de tono (`pitch`) y velocidad (`rate`) para un efecto robótico. Es una alternativa gratuita y funcional al TTS de Groq.
+- **TTS de Groq (playai-tts) - PROBLEMA PERSISTENTE**: La generación de voz con Groq TTS (`playai-tts`) sigue devolviendo un buffer vacío para inglés y **NO SE UTILIZA** activamente.
 - **Animaciones sincronizadas**: El robot se anima en respuesta a las interacciones.
-- **Interacción por voz o texto**: Posible mediante botón flotante de micrófono o entrada de texto dentro de un modal.
-- **Visualización de audio**: Muestra visualmente las ondas de voz durante la grabación.
-- **Selección manual de idioma**: Permite cambiar manualmente el idioma de interacción.
-- **Seguridad de API Key**: La clave API de Groq se gestiona en el backend para mayor seguridad.
+- **Interacción simplificada por voz**: Se eliminó el modal. Interacción directa mediante botón flotante de micrófono.
+- **Visualización de audio**: Muestra visualmente las ondas de voz durante la grabación (usando `AudioVisualizer` autónomo).
+- **Seguridad de API Key**: La clave API de Groq (`GROQ_API_KEY`) se gestiona correctamente en el backend.
 
 ## Arquitectura del Sistema
 
@@ -18,25 +19,20 @@ El sistema está compuesto por los siguientes módulos:
 
 ### 1. Capa de Interfaz de Usuario (UI Layer)
 - **`RobotInteractionManager`**: Componente contenedor (en `src/app/inicio/components/RobotModel.tsx`) que gestiona el estado de la interacción, renderiza el robot 3D y los componentes de UI.
-- **`FloatingMicButton`**: Botón flotante (FAB) para iniciar/detener la interacción por voz y abrir el modal.
-- **`InteractionModal`**: Ventana modal que contiene el `VoiceController`.
-- **`VoiceController`**: Panel principal de interacción dentro del modal. Integra:
-    - **`AudioVisualizer`**: Visualización en tiempo real de las ondas de audio.
-    - **`LanguageIndicator`**: Selector de idioma con detección automática.
-    - **`ControlButtons`**: Controles para iniciar/detener grabación y reproducción (complementarios al FAB).
-    - **Área de Conversación**: Muestra mensajes de usuario y robot.
-    - **Entrada de Texto**: Para interacción escrita.
+- **`FloatingMicButton`**: Botón flotante (FAB) para iniciar/detener la interacción por voz.
+- **`AudioVisualizer`**: Se muestra condicionalmente durante la grabación.
+- **~~`InteractionModal`~~**: Eliminado.
+- **~~`VoiceController`~~**: Eliminado (su funcionalidad se integró o eliminó).
 
 ### 2. Capa de Lógica de Negocio (Business Logic Layer - Hooks)
-- **`useRobotInteraction`**: Hook principal que coordina todo el flujo de interacción, estados, animaciones y comunicación entre hooks.
-- **`useAudioRecording`**: Hook para la grabación de audio del usuario.
-- **`useSpeechRecognition`**: Hook para el reconocimiento de voz (STT) y detección de idioma, utilizando `SpeechRecognitionService`.
-- **`useGroqConversation`**: Hook para la comunicación con la API de Groq (LLM y TTS) a través de los endpoints de backend.
-- **`useRateLimiter`**: Hook simplificado para gestionar el estado de espera basado en la cabecera `retry-after` del backend.
+- **`useRobotInteraction`**: Hook principal que coordina todo el flujo, estados, animaciones y comunicación. Ahora integra la lógica de Web Speech API para TTS.
+- **`useAudioRecording`**: Hook para la grabación de audio.
+- **`useSpeechRecognition`**: Hook para el reconocimiento de voz (STT) usando `SpeechRecognitionService`. Detecta idioma usando la respuesta `verbose_json` de Groq STT o fallback local.
+- **`useGroqConversation`**: Hook para la comunicación con la API de Groq (LLM). La funcionalidad TTS de Groq ha sido reemplazada por una implementación de Web Speech API dentro de este hook. La llamada a Groq TTS se mantiene comentada como fallback opcional (actualmente roto).
 
 ### 3. Capa de Servicios (Service Layer)
 - **`AudioRecorder`**: (Asumido dentro de `useAudioRecording`) Clase para gestionar la grabación de audio del navegador.
-- **`AudioPlayer`**: Clase para gestionar la reproducción de respuestas de voz.
+- **`AudioPlayer`**: Clase para gestionar la reproducción de respuestas de voz. Su uso para TTS ha sido reemplazado por Web Speech API, pero se mantiene por si se necesita para otros tipos de audio.
 - **`SpeechRecognitionService`**: Servicio que realiza la transcripción llamando al endpoint `/api/transcribe-audio` (Groq STT) o usando Web Speech API como fallback.
 - **`LanguageDetector`**: Servicio para detectar idiomas en textos si la API STT no lo proporciona.
 - **`Translator`**: Servicio de traducción para mensajes del sistema/UI.
@@ -76,25 +72,27 @@ El sistema está compuesto por los siguientes módulos:
         - `useGroqConversation` envía la petición al proxy `/api/groq-proxy`.
         - El proxy llama a Groq Chat Completions de forma segura.
         - Se recibe la respuesta de texto del LLM.
-    - `generateResponseAndSpeech` llama a `textToSpeech(responseText, language)`.
-        - `useGroqConversation` envía la petición al proxy `/api/groq-proxy`.
-        - El proxy llama a Groq TTS de forma segura.
-        - Se recibe el `Blob` de audio de la respuesta.
+    - `generateResponseAndSpeech` llama a `textToSpeech(responseText, language, callbacks)`. 
+        - `useGroqConversation` ahora utiliza `window.speechSynthesis` (Web Speech API) para generar y reproducir la voz.
+        - Los `callbacks` pasados desde `useRobotInteraction` gestionan el inicio/fin de la locución y los errores.
+        - La llamada al proxy de Groq para TTS está desactivada/comentada debido a fallos persistentes.
 6.  **Respuesta del Robot**: 
     - Se actualiza la respuesta del robot en la UI.
-    - Si se generó audio, `AudioPlayer.loadFromBlob()` y luego `AudioPlayer.play()` lo reproducen.
-    - El estado cambia a `SPEAKING` (manejado por `AudioPlayer.onPlay`).
+    - La Web Speech API reproduce el audio directamente.
+    - El estado cambia a `SPEAKING` (manejado por el callback `onStart` de la Web Speech API).
     - El robot se anima mientras habla (`startWaving`).
-    - Al terminar el audio, el estado cambia a `IDLE` (manejado por `AudioPlayer.onEnded`).
+    - Al terminar el audio, el estado cambia a `IDLE` (manejado por el callback `onEnd` de la Web Speech API).
     - El robot regresa a su posición (`stepBackward`).
 
 ## Modelos de IA Utilizados
 
 El sistema utiliza varios modelos de IA de Groq:
 
--   **Conversación**: `llama-3.1-8b-instant` (estándar), `llama-3.3-70b-versatile` (alta calidad). El `initialSystemPrompt` está adaptado para Tunixlabs.
--   **Voz a texto**: `whisper-large-v3-turbo` (rápido), `whisper-large-v3` (preciso), accedidos vía endpoint de backend seguro.
--   **Texto a voz**: `playai-tts` (múltiples idiomas), accedido vía endpoint de backend seguro.
+-   **Conversación**: `llama-3.1-8b-instant` (estándar), accedido vía endpoint de backend seguro.
+-   **Voz a texto (STT)**: `whisper-large-v3` (con `response_format=verbose_json` para detección de idioma), accedido vía endpoint de backend seguro (`/api/transcribe-audio`).
+-   **Texto a voz (TTS)**: 
+    - **Principalmente `window.speechSynthesis` (Web Speech API)**: Se utiliza como la solución TTS por defecto, integrada en el frontend. Busca voces masculinas e intenta un efecto robótico.
+    - **Groq `playai-tts` (NO USADO)**: (voces en inglés como `Calum-PlayAI`, `Fritz-PlayAI`). **Actualmente NO FUNCIONA** - La API de Groq devuelve un buffer de audio vacío. Su lógica está comentada en el código.
 
 ## Gestión de Límites de API
 
@@ -106,49 +104,38 @@ El sistema implementa estrategias para gestionar los límites de la API de Groq:
 - **`useRateLimiter` (Cliente)**: Hook simplificado en el cliente que escucha la señal `signalRateLimitHit` (activada cuando se recibe un `retry-after` del backend) para actualizar un estado de espera (`waitTime`) y prevenir envíos inmediatos.
 - **Selección Dinámica de Modelos**: `useGroqConversation` aún puede usar `selectModelConfig` para ajustar parámetros como `maxResponseTokens` y `temperature` según el tráfico estimado (aunque la estimación de tráfico es ahora menos directa).
 - **Fallback Local STT**: `SpeechRecognitionService` puede usar Web Speech API si la llamada al backend de transcripción falla, aumentando la resiliencia (pero con menor precisión y soporte de idiomas).
+- **TTS**: 
+    - **Web Speech API**: La compatibilidad de idiomas y voces depende del navegador y sistema operativo del usuario. Se intenta seleccionar una voz para el idioma detectado (priorizando voces masculinas).
+    - **Groq `playai-tts` (NO USADO)**: Limitado a INGLÉS y actualmente ROTO.
 
-## Idiomas Soportados
-
-El sistema soporta detección y respuesta en los siguientes idiomas:
-
-- Español (es)
-- Inglés (en)
-- Francés (fr)
-- Alemán (de)
-- Italiano (it)
-- Portugués (pt)
-- Árabe (ar)
-- Chino (zh)
-- Japonés (ja)
-- Coreano (ko)
-- Ruso (ru)
-- Holandés (nl)
-- Polaco (pl)
-- Turco (tr)
+Los idiomas listados previamente (francés, alemán, etc.) funcionarían en STT y LLM. Para TTS con Web Speech API, dependerá de las voces instaladas en el sistema del usuario para esos idiomas.
 
 ## Estado del Proyecto
 
 ### Implementado
 - ✅ Estructura general del sistema (Frontend + Backend API Routes)
-- ✅ **Seguridad de API Key (Backend)**
-- ✅ **Flujo STT->LLM->TTS optimizado (sin doble transcripción)**
-- ✅ **Nueva UI con Botón Flotante y Modal de Interacción**
-- ✅ Grabación y reproducción de audio
-- ✅ Reconocimiento de voz (API Groq + Fallback local)
-- ✅ Detección de idiomas
-- ✅ Integración con API Groq (vía backend seguro)
-- ✅ Control de límites de API (basado en `retry-after`)
-- ✅ Animaciones básicas del robot
-- ✅ Interfaz de usuario (`VoiceController` dentro de modal)
+- ✅ **Seguridad de API Key (Backend)**: Corregido problema con `NEXT_PUBLIC_`.
+- ✅ **Flujo STT->LLM**: Optimizado y funcionando.
+- ✅ **Detección de Idioma STT**: Funcionando (usando `verbose_json`).
+- ✅ **Respuesta LLM adaptada al idioma**: Funcionando.
+- ✅ **Nueva UI SIN Modal**: Botón flotante controla inicio/fin de grabación.
+- ✅ Grabación de audio (infraestructura base).
+- ✅ Reconocimiento de voz (API Groq STT).
+- ✅ Integración con API Groq LLM (vía backend seguro).
+- ✅ **TTS con Web Speech API**: Implementado como solución principal. Intenta voz masculina con efecto robótico.
+- ✅ Control básico de límites de API (basado en `retry-after` del backend para Groq).
+- ✅ Animaciones básicas del robot sincronizadas con Web Speech API.
+- ✅ Visualizador de audio durante grabación.
 
-### Pendiente
-- ⏳ **Pruebas exhaustivas** (funcionales, de errores, de límites)
-- ⏳ Revisión y posible refactorización de `useAudioRecording.ts`.
-- ⏳ Resolver error persistente del linter en `useGroqConversation.ts`.
+### Problemas Actuales / Pendiente
+- ❗ **TTS de Groq ROTO**: La API de Groq (`playai-tts`) sigue devolviendo audio vacío. Se ha implementado Web Speech API como solución funcional.
+- ⚠️ **Calidad y Disponibilidad de Voces Web Speech API**: La calidad de la voz y la disponibilidad de voces masculinas/robóticas pueden variar significativamente entre navegadores y sistemas operativos. Los ajustes de `pitch` y `rate` son un intento de estandarización, pero el resultado final puede variar.
+- ⚠️ **Posible reproducción de voz de usuario**: Investigar si `AudioVisualizer` (al tomar control independiente del micrófono) causa que el usuario escuche su propia voz. Si es así, refactorizar manejo de audio o modificar `AudioVisualizer`.
+- ⏳ Pruebas exhaustivas (funcionales, de errores, de límites).
 - ⏳ Mejorar feedback de errores y estados de espera en la UI.
 - ⏳ Mejora de las animaciones del robot y transiciones de estado.
 - ⏳ Persistencia de conversaciones (opcional).
-- ⏳ Configuración personalizada de parámetros (ej. selección de voz TTS).
+- ⏳ Configuración personalizada de parámetros (ej. selección de voz TTS si se implementa alternativa).
 - ⏳ Optimización del rendimiento general.
 - ⏳ Mejora de accesibilidad (A11y).
 
@@ -178,8 +165,9 @@ El componente principal ahora es `RobotInteractionManager` (exportado desde `src
 ## Consideraciones Técnicas
 
 - El sistema requiere permisos de micrófono en el navegador.
-- El reconocimiento de voz (especialmente el fallback local) funciona mejor en ambientes con poco ruido.
-- Todas las funciones principales (STT, LLM, TTS) requieren conexión a internet para conectar a los endpoints de backend.
+- El reconocimiento de voz funciona mejor en ambientes con poco ruido.
+- STT y LLM requieren conexión a internet para conectar a los endpoints de backend.
+- **TTS actualmente no funciona (ver Estado del Proyecto)**.
 - La detección de idioma tiene una precisión variable.
 - El sistema se adapta a distintos dispositivos, incluyendo móviles (asegurar que el FAB y el Modal sean responsivos).
 

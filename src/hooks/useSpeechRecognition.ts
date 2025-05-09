@@ -48,56 +48,62 @@ export const useSpeechRecognition = ({
     
     setIsProcessing(true);
     setError(null);
-    
+    let resultFromService: SpeechRecognitionResult | null = null;
+
     try {
-      // Verificar si podemos hacer la petición a la API
       if (!canMakeRequest) {
         throw new Error(`Límite de API alcanzado. Inténtalo de nuevo en ${Math.ceil(waitTime / 1000)} segundos.`);
       }
       
-      // Usar reconocimiento basado en API
-      let result: SpeechRecognitionResult;
-      
+      let rawApiResult: any = null; // Para inspeccionar la respuesta cruda
       try {
-        // Registrar petición para el control de límites
         trackRequest();
-        
-        // Llamar al servicio de reconocimiento
-        result = await serviceRef.current!.recognizeAudio(audioBlob);
+        console.log('[SpeechRecognition] Intentando reconocimiento con serviceRef.current.recognizeAudio...');
+        resultFromService = await serviceRef.current!.recognizeAudio(audioBlob);
+        // Intenta loguear la respuesta cruda si tu servicio la puede exponer o si la capturas de otra forma
+        // console.log('[SpeechRecognition] Respuesta cruda de la API (si está disponible):', rawApiResult);
+        console.log('[SpeechRecognition] Resultado directo de recognizeAudio (API):', resultFromService);
       } catch (apiError) {
-        console.warn('Error en API de reconocimiento:', apiError);
-        
-        // Si falla la API, intentar reconocimiento local como fallback
-        console.info('Intentando reconocimiento local como fallback...');
-        result = await serviceRef.current!.recognizeAudioLocally(audioBlob);
+        console.warn('[SpeechRecognition] Error en API de reconocimiento (recognizeAudio):', apiError);
+        console.info('[SpeechRecognition] Intentando reconocimiento local como fallback...');
+        resultFromService = await serviceRef.current!.recognizeAudioLocally(audioBlob);
+        console.log('[SpeechRecognition] Resultado de recognizeAudioLocally (fallback):', resultFromService);
       }
       
-      // Guardar resultado
-      setText(result.text);
+      // Asegurarse de que resultFromService no sea null y tenga una estructura base
+      if (!resultFromService) {
+        console.error('[SpeechRecognition] Todos los intentos de reconocimiento fallaron o devolvieron null.');
+        throw new Error('No se pudo obtener resultado del servicio de reconocimiento.');
+      }
+
+      // Crear una copia para modificarla si es necesario, o usarla directamente
+      let finalResult: SpeechRecognitionResult = { ...resultFromService };
+
+      setText(finalResult.text);
       
-      // Detectar idioma si no lo proporcionó la API
-      if (!result.language && result.text) {
-        const detectionResult = languageDetectorRef.current!.detectLanguage(result.text);
-        result.language = detectionResult.detectedLanguage;
-        result.confidence = detectionResult.confidence;
+      if (!finalResult.language && finalResult.text) {
+        console.log('[SpeechRecognition] Idioma no proporcionado por STT, intentando detección local para el texto:', finalResult.text.substring(0, 50) + "...");
+        const detectionResult = languageDetectorRef.current!.detectLanguage(finalResult.text);
+        console.log('[SpeechRecognition] Resultado de LanguageDetector local:', detectionResult);
+        finalResult.language = detectionResult.detectedLanguage;
+        finalResult.confidence = detectionResult.confidence; // Actualizar confianza también
+      } else if (finalResult.language) {
+        console.log(`[SpeechRecognition] Idioma proporcionado directamente por STT: ${finalResult.language}`);
       }
       
-      // Actualizar idioma detectado
-      if (result.language) {
-        setDetectedLanguage(result.language);
-        
-        // Notificar idioma detectado
+      if (finalResult.language) {
+        setDetectedLanguage(finalResult.language);
         if (onLanguageDetected) {
-          onLanguageDetected(result.language);
+          onLanguageDetected(finalResult.language);
         }
       }
       
-      // Actualizar confianza
-      if (result.confidence !== undefined) {
-        setConfidence(result.confidence);
+      if (finalResult.confidence !== undefined) {
+        setConfidence(finalResult.confidence);
       }
       
-      return result;
+      console.log('[SpeechRecognition] Resultado final devuelto por recognizeSpeech:', finalResult);
+      return finalResult;
     } catch (error) {
       const errorMessage = error instanceof Error 
         ? error.message 

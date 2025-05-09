@@ -13,7 +13,7 @@ import {
 import * as THREE from 'three';
 import { useRobotInteraction, RobotInteractionState } from '../../../hooks/useRobotInteraction';
 import FloatingMicButton from '../../../components/VoiceInterface/FloatingMicButton';
-import InteractionModal from '../../../components/VoiceInterface/InteractionModal';
+import AudioVisualizer from '../../../components/VoiceInterface/AudioVisualizer';
 
 // Definir tipo para arrays de rotación
 type RotationArray = [number, number, number];
@@ -1091,7 +1091,6 @@ function RobotInteractionManager() {
   const [isLoading, setIsLoading] = useState(true);
   const robotAnimatedRef = useRef<RobotMethods>(null);
   const [isMounted, setIsMounted] = useState(false);
-  const [isInteractionModalOpen, setIsInteractionModalOpen] = useState(false);
 
   useEffect(() => {
     setIsMounted(true);
@@ -1099,20 +1098,21 @@ function RobotInteractionManager() {
 
   const {
     interactionState,
-    isRecording,
+    userMessage,
+    robotResponse,
     currentLanguage,
+    isRecording,
+    assignRobotRef,
     startListening,
     stopListening,
+    sendTextMessage,
     stopSpeaking,
-    changeLanguage,
-    registerRobot,
+    setCurrentLanguage,
   } = useRobotInteraction({
     initialLanguage: 'es',
     robotSystemPrompt: undefined,
     onStateChange: (newState) => {
       console.log('RobotInteractionState changed:', newState);
-      if (newState === RobotInteractionState.IDLE && isRecording) {
-      }
     },
     onError: (error) => {
       console.error('Error en useRobotInteraction desde el contenedor:', error);
@@ -1121,38 +1121,25 @@ function RobotInteractionManager() {
 
   useEffect(() => {
     if (robotAnimatedRef.current) {
-      registerRobot(robotAnimatedRef.current);
+      assignRobotRef(robotAnimatedRef.current);
     }
-  }, [robotAnimatedRef, registerRobot, isLoading]);
+  }, [robotAnimatedRef, assignRobotRef, isLoading]);
 
   const handleModelLoaded = () => {
     setIsLoading(false);
   };
 
   const handleMicButtonClick = () => {
+    if (isLoading) return;
     if (interactionState === RobotInteractionState.PROCESSING) return;
 
-    if (!isInteractionModalOpen) {
-      setIsInteractionModalOpen(true);
-      if (!isRecording && interactionState !== RobotInteractionState.LISTENING) {
-        startListening();
-      }
-    } else {
-      if (isRecording) {
-        stopListening();
-      } else {
-        startListening();
-      }
-    }
-  };
-
-  const handleCloseModal = () => {
-    setIsInteractionModalOpen(false);
-    if (isRecording) {
+    if (interactionState === RobotInteractionState.LISTENING) {
       stopListening();
-    }
-    if (interactionState === RobotInteractionState.SPEAKING) {
-      stopSpeaking();
+    } else {
+      if (interactionState === RobotInteractionState.SPEAKING) {
+        stopSpeaking();
+      }
+      startListening();
     }
   };
 
@@ -1164,73 +1151,82 @@ function RobotInteractionManager() {
     <div className="h-[450px] w-full touch-none relative overflow-visible bg-transparent pointer-events-auto">
       {isLoading && <LoadingSpinner />}
 
-      <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-10 max-w-xs bg-black/30 backdrop-blur-sm rounded-lg p-2 text-white text-center">
-        <h3 className="text-lg font-bold text-cyan-300">Hola soy Tunix</h3>
+      <div className="absolute inset-0 w-full h-full">
+        <Canvas 
+          shadows 
+          className="overflow-visible"
+          camera={{ position: [0, 0.5, 200], fov: 30 }}
+          gl={{ alpha: true, antialias: true }}
+          style={{ 
+            position: 'absolute', 
+            top: 0, 
+            left: 0, 
+            width: '100%', 
+            height: '100%',
+            zIndex: 5
+          }}
+        >
+          <ambientLight intensity={0.6} />
+          <directionalLight
+            position={[5, 10, 7]}
+            intensity={1.2}
+            castShadow
+            shadow-mapSize-width={1024}
+            shadow-mapSize-height={1024}
+            shadow-camera-far={50}
+            shadow-camera-left={-10}
+            shadow-camera-right={10}
+            shadow-camera-top={10}
+            shadow-camera-bottom={-10}
+            shadow-bias={-0.0005}
+          />
+          <spotLight position={[-5, 5, -5]} angle={0.2} penumbra={1} intensity={0.6} />
+          <pointLight position={[0, 5, 5]} intensity={0.3} color="#61dbfb" />
+          
+          <Suspense fallback={null}>
+            <AnimatedRobotModel 
+              onLoad={handleModelLoaded} 
+              isListening={interactionState === RobotInteractionState.LISTENING}
+              ref={robotAnimatedRef}
+            />
+            <Environment files="/potsdamer_platz_1k.hdr" />
+            <ContactShadows
+              position={[0, -1.51, 0]}
+              opacity={0.6}
+              scale={16}
+              blur={1.0}
+              far={6}
+              resolution={1024}
+              color="#000000"
+            />
+          </Suspense>
+        </Canvas>
+
+        <div 
+          className="absolute bottom-4 left-1/2 transform -translate-x-1/2 z-20 flex flex-col items-center space-y-2"
+          style={{ pointerEvents: 'auto' }}
+        >
+          {(interactionState === RobotInteractionState.LISTENING || isRecording) && (
+            <div className="w-full max-w-xs">
+              <AudioVisualizer width={200} height={40} barColor="#60A5FA" />
+            </div>
+          )}
+          <FloatingMicButton 
+            onClick={handleMicButtonClick} 
+            interactionState={interactionState} 
+            isRecording={isRecording}
+            disabled={isLoading || interactionState === RobotInteractionState.PROCESSING}
+          />
+        </div>
+
+        <div 
+          className="absolute top-4 left-1/2 transform -translate-x-1/2 z-10 max-w-xs bg-black/30 backdrop-blur-sm rounded-lg p-2 text-white text-center"
+          style={{ pointerEvents: 'none' }}
+        >
+          <h3 className="text-lg font-bold text-cyan-300">Hola soy Tunix</h3>
+        </div>
+
       </div>
-
-      <Canvas 
-        shadows 
-        className="overflow-visible" 
-        camera={{ position: [0, 0.5, 200], fov: 30 }}
-        gl={{ alpha: true, antialias: true }}
-        style={{ 
-          position: 'absolute', 
-          top: 0, 
-          left: 0, 
-          width: '100%', 
-          height: '100%',
-          zIndex: 5
-        }}
-      >
-        <ambientLight intensity={0.6} />
-        <directionalLight
-          position={[5, 10, 7]}
-          intensity={1.2}
-          castShadow
-          shadow-mapSize-width={1024}
-          shadow-mapSize-height={1024}
-          shadow-camera-far={50}
-          shadow-camera-left={-10}
-          shadow-camera-right={10}
-          shadow-camera-top={10}
-          shadow-camera-bottom={-10}
-          shadow-bias={-0.0005}
-        />
-        <spotLight position={[-5, 5, -5]} angle={0.2} penumbra={1} intensity={0.6} />
-        <pointLight position={[0, 5, 5]} intensity={0.3} color="#61dbfb" />
-        
-        <Suspense fallback={null}>
-          <AnimatedRobotModel 
-            onLoad={handleModelLoaded} 
-            isListening={interactionState === RobotInteractionState.LISTENING}
-            ref={robotAnimatedRef}
-          />
-          <Environment files="/potsdamer_platz_1k.hdr" />
-          <ContactShadows
-            position={[0, -1.51, 0]}
-            opacity={0.6}
-            scale={16}
-            blur={1.0}
-            far={6}
-            resolution={1024}
-            color="#000000"
-          />
-        </Suspense>
-      </Canvas>
-
-      <FloatingMicButton 
-        onClick={handleMicButtonClick} 
-        interactionState={interactionState} 
-        isRecording={isRecording}
-        disabled={isLoading}
-      />
-
-      <InteractionModal 
-        isOpen={isInteractionModalOpen} 
-        onClose={handleCloseModal} 
-        robotRef={robotAnimatedRef}
-        initialLanguage={currentLanguage}
-      />
     </div>
   );
 }

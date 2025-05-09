@@ -29,7 +29,9 @@ export async function POST(request: NextRequest) {
     groqFormData.append('model', model);
     // Aquí puedes añadir otros parámetros que acepte la API de transcripción de Groq, como 'language'
     // ej: groqFormData.append('language', 'es');
-    // ej: groqFormData.append('response_format', 'json'); // o 'verbose_json' para más detalles
+    groqFormData.append('response_format', 'verbose_json');
+
+    console.log(`[API Transcribe] Enviando a Groq STT. Modelo: ${model}, Formato: verbose_json`); // Log para confirmar
 
     const response = await axios.post(`${GROQ_API_URL}/audio/transcriptions`, groqFormData, {
       headers: {

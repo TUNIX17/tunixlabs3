@@ -171,39 +171,44 @@ export class AudioRecorder {
   }
 
   // Detener la grabación
-  public stop(): Promise<Blob | null> {
-    return new Promise((resolve) => {
+  public stop(): Promise<Blob> {
+    return new Promise((resolve, reject) => {
       if (!this.mediaRecorder || !this.state.isRecording) {
-        console.warn('[AudioRecorder] Se llamó a stop() pero no había grabación activa.');
-        resolve(null);
+        reject(new Error('No hay grabación activa'));
         return;
       }
       
       try {
+        // Limpiar el timeout si existe
         if (this.timeoutId) {
           clearTimeout(this.timeoutId);
           this.timeoutId = null;
         }
         
         const onStopHandler = () => {
+          if (this.state.audioBlob) {
+            resolve(this.state.audioBlob);
+          } else {
+            reject(new Error('No se pudo generar el audio'));
+          }
+          
+          // Limpiar el evento
           if (this.mediaRecorder) {
             this.mediaRecorder.removeEventListener('stop', onStopHandler);
           }
-          setTimeout(() => {
-            resolve(this.state.audioBlob);
-          }, 10);
         };
         
+        // Añadir listener para cuando se complete la grabación
         this.mediaRecorder.addEventListener('stop', onStopHandler);
+        
+        // Detener la grabación
         this.mediaRecorder.stop();
-
       } catch (error) {
         this.state = {
           ...this.state,
           errorMessage: error instanceof Error ? error.message : 'Error al detener grabación'
         };
-        console.error('[AudioRecorder] Error interno al intentar detener:', error);
-        resolve(null);
+        reject(error);
       }
     });
   }
