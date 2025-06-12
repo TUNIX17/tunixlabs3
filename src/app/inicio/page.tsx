@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { FiDatabase, FiActivity, FiUsers, FiBarChart2, FiCode, FiMessageCircle } from 'react-icons/fi';
+import { FiDatabase, FiActivity, FiUsers, FiBarChart2, FiCode, FiMessageCircle, FiEye, FiSettings } from 'react-icons/fi';
 import React from 'react';
 import dynamic from 'next/dynamic';
 
@@ -270,155 +270,167 @@ export default function HomePage() {
 
             <div className="mt-12">
               <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
-                {/* Tarjeta de Análisis de Datos */}
-                <div className="glass-card p-6 overflow-hidden rounded-xl relative group">
-                  <div className="absolute -right-20 -top-20 w-40 h-40 rounded-full bg-blue-100 group-hover:bg-blue-200 transition-colors duration-300"></div>
-                  <div className="h-12 w-12 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-md z-10 relative">
-                    <FiDatabase className="h-6 w-6 text-white" />
-                  </div>
-                  <h3 className="mt-5 text-lg font-semibold text-gray-900 group-hover:text-blue-600 transition-colors duration-300">Análisis de Datos</h3>
-                  <p className="mt-2 text-base text-gray-500">
-                    Convertimos tus datos en información valiosa para la toma de decisiones. Nuestros algoritmos avanzados detectan patrones y tendencias ocultas.
-                  </p>
-                  <div className="mt-4 flex justify-between items-center">
-                    <a href="#contacto" className="text-sm font-medium text-blue-600 hover:text-blue-700 flex items-center group">
-                      <span>Saber más</span>
-                      <svg className="ml-1 h-4 w-4 transform transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                      </svg>
-                    </a>
-                    <div className="h-8 w-8 rounded-full bg-blue-50 flex items-center justify-center text-blue-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                      <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                      </svg>
+                {/* Tarjeta de Desarrollos Web */}
+                <Link href="/servicios/desarrollos-web" passHref>
+                  <div className="glass-card p-6 overflow-hidden rounded-xl relative group cursor-pointer">
+                    <div className="absolute -right-20 -top-20 w-40 h-40 rounded-full bg-blue-100 group-hover:bg-blue-200 transition-colors duration-300"></div>
+                    <div className="h-12 w-12 bg-gradient-to-br from-blue-500 to-cyan-600 rounded-xl flex items-center justify-center shadow-md z-10 relative">
+                      <FiCode className="h-6 w-6 text-white" />
                     </div>
+                    <h3 className="text-2xl font-bold text-gray-900 mt-4">Desarrollos Web</h3>
+                    <p className="text-gray-600 mt-2">Creamos experiencias web interactivas y escalables, potenciadas con inteligencia artificial.</p>
+                    <span className="inline-flex items-center text-blue-600 hover:text-blue-800 transition-colors duration-300 mt-4">
+                      Saber más
+                      <svg className="ml-2 h-4 w-4 transform group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+                      </svg>
+                    </span>
                   </div>
-                </div>
+                </Link>
 
                 {/* Tarjeta de Machine Learning */}
-                <div className="glass-card p-6 overflow-hidden rounded-xl relative group">
-                  <div className="absolute -right-20 -top-20 w-40 h-40 rounded-full bg-indigo-100 group-hover:bg-indigo-200 transition-colors duration-300"></div>
-                  <div className="h-12 w-12 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center shadow-md z-10 relative">
-                    <FiActivity className="h-6 w-6 text-white" />
-                  </div>
-                  <h3 className="mt-5 text-lg font-semibold text-gray-900 group-hover:text-indigo-600 transition-colors duration-300">Machine Learning</h3>
-                  <p className="mt-2 text-base text-gray-500">
-                    Implementamos modelos predictivos que aprenden de tus datos para automatizar procesos y mejorar la eficiencia operativa.
-                  </p>
-                  <div className="mt-4 flex justify-between items-center">
-                    <a href="#contacto" className="text-sm font-medium text-indigo-600 hover:text-indigo-700 flex items-center group">
-                      <span>Saber más</span>
-                      <svg className="ml-1 h-4 w-4 transform transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                <Link href="/servicios/machine-learning" passHref>
+                  <div className="glass-card p-6 overflow-hidden rounded-xl relative group cursor-pointer">
+                    <div className="absolute -right-20 -top-20 w-40 h-40 rounded-full bg-indigo-100 group-hover:bg-indigo-200 transition-colors duration-300"></div>
+                    <div className="h-12 w-12 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center shadow-md z-10 relative">
+                      <FiActivity className="h-6 w-6 text-white" />
+                    </div>
+                    <h3 className="text-2xl font-bold text-gray-900 mt-4">Machine Learning</h3>
+                    <p className="text-gray-600 mt-2">Implementamos modelos predictivos que aprenden de tus datos para automatizar procesos y mejorar la eficiencia operativa.</p>
+                    <span className="inline-flex items-center text-indigo-600 hover:text-indigo-800 transition-colors duration-300 mt-4">
+                      Saber más
+                      <svg className="ml-2 h-4 w-4 transform group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
                       </svg>
-                    </a>
-                    <div className="h-8 w-8 rounded-full bg-indigo-50 flex items-center justify-center text-indigo-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                      <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                </svg>
-              </div>
+                    </span>
                   </div>
-                </div>
+                </Link>
 
                 {/* Tarjeta de Asistentes IA */}
-                <div className="glass-card p-6 overflow-hidden rounded-xl relative group">
-                  <div className="absolute -right-20 -top-20 w-40 h-40 rounded-full bg-green-100 group-hover:bg-green-200 transition-colors duration-300"></div>
-                  <div className="h-12 w-12 bg-gradient-to-br from-green-500 to-teal-600 rounded-xl flex items-center justify-center shadow-md z-10 relative">
-                    <FiUsers className="h-6 w-6 text-white" />
-                  </div>
-                  <h3 className="mt-5 text-lg font-semibold text-gray-900 group-hover:text-green-600 transition-colors duration-300">Asistentes IA</h3>
-              <p className="mt-2 text-base text-gray-500">
-                    Creamos asistentes virtuales inteligentes que mejoran la experiencia de tus clientes y optimizan la atención al cliente.
-                  </p>
-                  <div className="mt-4 flex justify-between items-center">
-                    <a href="#contacto" className="text-sm font-medium text-green-600 hover:text-green-700 flex items-center group">
-                      <span>Saber más</span>
-                      <svg className="ml-1 h-4 w-4 transform transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                      </svg>
-                    </a>
-                    <div className="h-8 w-8 rounded-full bg-green-50 flex items-center justify-center text-green-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                      <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                      </svg>
+                <Link href="/servicios/asistentes-ia" passHref>
+                  <div className="glass-card p-6 overflow-hidden rounded-xl relative group cursor-pointer">
+                    <div className="absolute -right-20 -top-20 w-40 h-40 rounded-full bg-green-100 group-hover:bg-green-200 transition-colors duration-300"></div>
+                    <div className="h-12 w-12 bg-gradient-to-br from-green-500 to-teal-600 rounded-xl flex items-center justify-center shadow-md z-10 relative">
+                      <FiUsers className="h-6 w-6 text-white" />
                     </div>
+                    <h3 className="text-2xl font-bold text-gray-900 mt-4">Asistentes IA</h3>
+                    <p className="text-gray-600 mt-2">Creamos asistentes virtuales inteligentes que mejoran la experiencia de tus clientes y optimizan la atención al cliente.</p>
+                    <span className="inline-flex items-center text-green-600 hover:text-green-800 transition-colors duration-300 mt-4">
+                      Saber más
+                      <svg className="ml-2 h-4 w-4 transform group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+                      </svg>
+                    </span>
                   </div>
-            </div>
+                </Link>
 
                 {/* Tarjeta de Business Intelligence */}
-                <div className="glass-card p-6 overflow-hidden rounded-xl relative group">
-                  <div className="absolute -right-20 -top-20 w-40 h-40 rounded-full bg-purple-100 group-hover:bg-purple-200 transition-colors duration-300"></div>
-                  <div className="h-12 w-12 bg-gradient-to-br from-purple-500 to-pink-600 rounded-xl flex items-center justify-center shadow-md z-10 relative">
-                    <FiBarChart2 className="h-6 w-6 text-white" />
-                  </div>
-                  <h3 className="mt-5 text-lg font-semibold text-gray-900 group-hover:text-purple-600 transition-colors duration-300">Business Intelligence</h3>
-                  <p className="mt-2 text-base text-gray-500">
-                    Desarrollamos dashboards interactivos y reportes automatizados para monitorear el rendimiento de tu negocio en tiempo real.
-                  </p>
-                  <div className="mt-4 flex justify-between items-center">
-                    <a href="#contacto" className="text-sm font-medium text-purple-600 hover:text-purple-700 flex items-center group">
-                      <span>Saber más</span>
-                      <svg className="ml-1 h-4 w-4 transform transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                <Link href="/servicios/business-intelligence" passHref>
+                  <div className="glass-card p-6 overflow-hidden rounded-xl relative group cursor-pointer">
+                    <div className="absolute -right-20 -top-20 w-40 h-40 rounded-full bg-purple-100 group-hover:bg-purple-200 transition-colors duration-300"></div>
+                    <div className="h-12 w-12 bg-gradient-to-br from-purple-500 to-pink-600 rounded-xl flex items-center justify-center shadow-md z-10 relative">
+                      <FiBarChart2 className="h-6 w-6 text-white" />
+                    </div>
+                    <h3 className="text-2xl font-bold text-gray-900 mt-4">Business Intelligence</h3>
+                    <p className="text-gray-600 mt-2">Desarrollamos dashboards interactivos y reportes automatizados para monitorear el rendimiento de tu negocio en tiempo real.</p>
+                    <span className="inline-flex items-center text-purple-600 hover:text-purple-800 transition-colors duration-300 mt-4">
+                      Saber más
+                      <svg className="ml-2 h-4 w-4 transform group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
                       </svg>
-                    </a>
-                    <div className="h-8 w-8 rounded-full bg-purple-50 flex items-center justify-center text-purple-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                      <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                </svg>
-              </div>
+                    </span>
                   </div>
-                </div>
+                </Link>
 
-                {/* Tarjeta de Desarrollo Personalizado */}
-                <div className="glass-card p-6 overflow-hidden rounded-xl relative group">
-                  <div className="absolute -right-20 -top-20 w-40 h-40 rounded-full bg-yellow-100 group-hover:bg-yellow-200 transition-colors duration-300"></div>
-                  <div className="h-12 w-12 bg-gradient-to-br from-yellow-500 to-amber-600 rounded-xl flex items-center justify-center shadow-md z-10 relative">
-                    <FiCode className="h-6 w-6 text-white" />
+                {/* Tarjeta de Visión Artificial */}
+                <Link href="/servicios/vision-artificial" passHref>
+                  <div className="glass-card p-6 overflow-hidden rounded-xl relative group cursor-pointer">
+                    <div className="absolute -right-20 -top-20 w-40 h-40 rounded-full bg-orange-100 group-hover:bg-orange-200 transition-colors duration-300"></div>
+                    <div className="h-12 w-12 bg-gradient-to-br from-orange-500 to-red-600 rounded-xl flex items-center justify-center shadow-md z-10 relative">
+                      <FiEye className="h-6 w-6 text-white" />
+                    </div>
+                    <h3 className="text-2xl font-bold text-gray-900 mt-4">Visión Artificial</h3>
+                    <p className="text-gray-600 mt-2">Desarrollamos sistemas de visión por computadora para el reconocimiento de imágenes, análisis de video y automatización de procesos visuales.</p>
+                    <span className="inline-flex items-center text-orange-600 hover:text-orange-800 transition-colors duration-300 mt-4">
+                      Saber más
+                      <svg className="ml-2 h-4 w-4 transform group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+                      </svg>
+                    </span>
                   </div>
-                  <h3 className="mt-5 text-lg font-semibold text-gray-900 group-hover:text-yellow-600 transition-colors duration-300">Desarrollo Personalizado</h3>
-              <p className="mt-2 text-base text-gray-500">
-                    Creamos soluciones a medida que se integran perfectamente con tus sistemas existentes y resuelven problemas específicos.
-                  </p>
-                  <div className="mt-4 flex justify-between items-center">
-                    <a href="#contacto" className="text-sm font-medium text-yellow-600 hover:text-yellow-700 flex items-center group">
-                      <span>Saber más</span>
-                      <svg className="ml-1 h-4 w-4 transform transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                      </svg>
-                    </a>
-                    <div className="h-8 w-8 rounded-full bg-yellow-50 flex items-center justify-center text-yellow-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                      <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                      </svg>
-            </div>
-          </div>
-        </div>
+                </Link>
 
                 {/* Tarjeta de Consultoría IA */}
-                <div className="glass-card p-6 overflow-hidden rounded-xl relative group">
-                  <div className="absolute -right-20 -top-20 w-40 h-40 rounded-full bg-red-100 group-hover:bg-red-200 transition-colors duration-300"></div>
-                  <div className="h-12 w-12 bg-gradient-to-br from-red-500 to-pink-600 rounded-xl flex items-center justify-center shadow-md z-10 relative">
-                    <FiMessageCircle className="h-6 w-6 text-white" />
-                  </div>
-                  <h3 className="mt-5 text-lg font-semibold text-gray-900 group-hover:text-red-600 transition-colors duration-300">Consultoría IA</h3>
-                  <p className="mt-2 text-base text-gray-500">
-                    Te asesoramos en la implementación de estrategias de IA que maximizan el retorno de inversión y minimizan riesgos.
-                  </p>
-                  <div className="mt-4 flex justify-between items-center">
-                    <a href="#contacto" className="text-sm font-medium text-red-600 hover:text-red-700 flex items-center group">
-                      <span>Saber más</span>
-                      <svg className="ml-1 h-4 w-4 transform transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                      </svg>
-                    </a>
-                    <div className="h-8 w-8 rounded-full bg-red-50 flex items-center justify-center text-red-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                      <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                      </svg>
+                <Link href="/servicios/consultoria-ia" passHref>
+                  <div className="glass-card p-6 overflow-hidden rounded-xl relative group cursor-pointer">
+                    <div className="absolute -right-20 -top-20 w-40 h-40 rounded-full bg-red-100 group-hover:bg-red-200 transition-colors duration-300"></div>
+                    <div className="h-12 w-12 bg-gradient-to-br from-red-500 to-pink-600 rounded-xl flex items-center justify-center shadow-md z-10 relative">
+                      <FiMessageCircle className="h-6 w-6 text-white" />
                     </div>
+                    <h3 className="text-2xl font-bold text-gray-900 mt-4">Consultoría IA</h3>
+                    <p className="text-gray-600 mt-2">Te asesoramos en la implementación de estrategias de IA que maximizan el retorno de inversión y minimizan riesgos.</p>
+                    <span className="inline-flex items-center text-red-600 hover:text-red-800 transition-colors duration-300 mt-4">
+                      Saber más
+                      <svg className="ml-2 h-4 w-4 transform group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+                      </svg>
+                    </span>
                   </div>
-                </div>
+                </Link>
+
+                {/* Tarjeta de RPA */}
+                <Link href="/servicios/rpa" passHref>
+                  <div className="glass-card p-6 overflow-hidden rounded-xl relative group cursor-pointer">
+                    <div className="absolute -right-20 -top-20 w-40 h-40 rounded-full bg-yellow-100 group-hover:bg-yellow-200 transition-colors duration-300"></div>
+                    <div className="h-12 w-12 bg-gradient-to-br from-yellow-500 to-orange-600 rounded-xl flex items-center justify-center shadow-md z-10 relative">
+                      <FiSettings className="h-6 w-6 text-white" />
+                    </div>
+                    <h3 className="text-2xl font-bold text-gray-900 mt-4">RPA con IA</h3>
+                    <p className="text-gray-600 mt-2">Automatiza tareas repetitivas y procesos administrativos con robots de software inteligentes impulsados por IA.</p>
+                    <span className="inline-flex items-center text-yellow-600 hover:text-yellow-800 transition-colors duration-300 mt-4">
+                      Saber más
+                      <svg className="ml-2 h-4 w-4 transform group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+                      </svg>
+                    </span>
+                  </div>
+                </Link>
+
+                {/* Tarjeta de Generación de Contenido con IA */}
+                <Link href="/servicios/generacion-contenido-ia" passHref>
+                  <div className="glass-card p-6 overflow-hidden rounded-xl relative group cursor-pointer">
+                    <div className="absolute -right-20 -top-20 w-40 h-40 rounded-full bg-pink-100 group-hover:bg-pink-200 transition-colors duration-300"></div>
+                    <div className="h-12 w-12 bg-gradient-to-br from-pink-500 to-red-600 rounded-xl flex items-center justify-center shadow-md z-10 relative">
+                      <FiMessageCircle className="h-6 w-6 text-white" />
+                    </div>
+                    <h3 className="text-2xl font-bold text-gray-900 mt-4">Generación de Contenido IA</h3>
+                    <p className="text-gray-600 mt-2">Crea textos, imágenes y videos personalizados mediante IA, optimizados para SEO y engagement.</p>
+                    <span className="inline-flex items-center text-pink-600 hover:text-pink-800 transition-colors duration-300 mt-4">
+                      Saber más
+                      <svg className="ml-2 h-4 w-4 transform group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+                      </svg>
+                    </span>
+                  </div>
+                </Link>
+
+                {/* Tarjeta de Automatización de Marketing y Ventas con IA */}
+                <Link href="/servicios/automatizacion-marketing-ia" passHref>
+                  <div className="glass-card p-6 overflow-hidden rounded-xl relative group cursor-pointer">
+                    <div className="absolute -right-20 -top-20 w-40 h-40 rounded-full bg-teal-100 group-hover:bg-teal-200 transition-colors duration-300"></div>
+                    <div className="h-12 w-12 bg-gradient-to-br from-teal-500 to-green-600 rounded-xl flex items-center justify-center shadow-md z-10 relative">
+                      <FiBarChart2 className="h-6 w-6 text-white" />
+                    </div>
+                    <h3 className="text-2xl font-bold text-gray-900 mt-4">Automatización Marketing IA</h3>
+                    <p className="text-gray-600 mt-2">Segmenta, personaliza y automatiza campañas de marketing y ventas con inteligencia artificial.</p>
+                    <span className="inline-flex items-center text-teal-600 hover:text-teal-800 transition-colors duration-300 mt-4">
+                      Saber más
+                      <svg className="ml-2 h-4 w-4 transform group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+                      </svg>
+                    </span>
+                  </div>
+                </Link>
             </div>
           </div>
         </div>
