@@ -1,114 +1,183 @@
 import React from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
-import { FiArrowLeft, FiActivity, FiSettings, FiBarChart2, FiDatabase, FiRefreshCcw, FiMessageCircle } from 'react-icons/fi';
+import { FiArrowLeft, FiCpu, FiZap, FiBarChart2, FiTrendingUp, FiCloud, FiDatabase, FiMessageCircle } from 'react-icons/fi';
+
+const beneficios = [
+  {
+    icon: <FiTrendingUp className="h-8 w-8 text-fuchsia-500" />, 
+    title: 'Predicción y Toma de Decisiones',
+    desc: 'Anticipa tendencias, demanda y comportamientos con modelos predictivos avanzados.'
+  },
+  {
+    icon: <FiZap className="h-8 w-8 text-fuchsia-500" />, 
+    title: 'Automatización Inteligente',
+    desc: 'Optimiza procesos, reduce errores y personaliza experiencias con IA adaptativa.'
+  },
+  {
+    icon: <FiBarChart2 className="h-8 w-8 text-fuchsia-500" />, 
+    title: 'Escalabilidad y Analítica Avanzada',
+    desc: 'Procesa grandes volúmenes de datos y escala soluciones de machine learning según tus necesidades.'
+  },
+];
+
+const tecnologias = [
+  {
+    icon: <FiCpu className="h-8 w-8 text-fuchsia-500" />,
+    title: 'Frameworks y Plataformas ML',
+    desc: 'TensorFlow, PyTorch, Scikit-learn, Keras, Azure ML, Google AI Platform, AWS SageMaker.'
+  },
+  {
+    icon: <FiDatabase className="h-8 w-8 text-fuchsia-500" />,
+    title: 'Gestión y Procesamiento de Datos',
+    desc: 'Big Data, Data Lakes, ETL, APIs, pipelines y almacenamiento eficiente para entrenamiento y despliegue.'
+  },
+  {
+    icon: <FiCloud className="h-8 w-8 text-fuchsia-500" />,
+    title: 'Integración y Despliegue',
+    desc: 'APIs, microservicios, ERPs, CRMs y dashboards para soluciones ML integradas y accesibles.'
+  },
+];
+
+const queOfrecemos = [
+  {
+    icon: <FiCpu className="h-10 w-10 text-fuchsia-500 mb-4" />,
+    title: 'Desarrollo de Modelos Predictivos',
+    desc: 'Creamos modelos de machine learning para predicción, clasificación, segmentación y recomendación.'
+  },
+  {
+    icon: <FiZap className="h-10 w-10 text-fuchsia-500 mb-4" />,
+    title: 'Automatización y Personalización',
+    desc: 'Soluciones de IA para automatizar procesos, personalizar experiencias y optimizar resultados.'
+  },
+  {
+    icon: <FiCloud className="h-10 w-10 text-fuchsia-500 mb-4" />,
+    title: 'Integración y Analítica ML',
+    desc: 'Despliegue de modelos, integración con sistemas y dashboards para monitoreo y toma de decisiones.'
+  },
+];
+
+const pasos = [
+  {
+    title: 'Diagnóstico y Objetivos',
+    desc: 'Analizamos tus datos, procesos y objetivos para definir casos de uso de machine learning de alto impacto.'
+  },
+  {
+    title: 'Desarrollo y Entrenamiento',
+    desc: 'Diseñamos, entrenamos y validamos modelos ML adaptados a tus necesidades.'
+  },
+  {
+    title: 'Implementación y Despliegue',
+    desc: 'Integramos y desplegamos los modelos en tus sistemas para uso real y escalable.'
+  },
+  {
+    title: 'Monitoreo y Optimización',
+    desc: 'Monitorizamos el desempeño, optimizamos y evolucionamos los modelos según resultados.'
+  },
+];
 
 const MachineLearningPage: React.FC = () => {
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 flex flex-col items-center pt-20 pb-16">
+    <div className="min-h-screen bg-gradient-to-br from-fuchsia-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-950 dark:to-fuchsia-900 text-gray-900 dark:text-gray-100 flex flex-col items-center pt-0 pb-0">
       <Head>
         <title>Machine Learning - TunixLabs</title>
-        <meta name="description" content="Implementamos modelos predictivos que aprenden de tus datos para automatizar procesos y mejorar la eficiencia operativa." />
-        <meta name="keywords" content="machine learning, aprendizaje automático, modelos predictivos, inteligencia artificial, automatización, eficiencia, datos, IA, TunixLabs" />
+        <meta name="description" content="Impulsa tu negocio con soluciones de machine learning: modelos predictivos, automatización inteligente, analítica avanzada e integración con tus sistemas." />
+        <meta name="keywords" content="machine learning, modelos predictivos, automatización inteligente, analítica avanzada, integración IA, TunixLabs" />
         <meta property="og:title" content="Machine Learning - TunixLabs" />
-        <meta property="og:description" content="Implementamos modelos predictivos que aprenden de tus datos para automatizar procesos y mejorar la eficiencia operativa." />
+        <meta property="og:description" content="Impulsa tu negocio con soluciones de machine learning: modelos predictivos, automatización inteligente, analítica avanzada e integración con tus sistemas." />
         <meta property="og:url" content="https://www.tunixlabs.com/servicios/machine-learning" />
         <meta property="og:type" content="website" />
         <link rel="canonical" href="https://www.tunixlabs.com/servicios/machine-learning" />
       </Head>
-
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
-        <Link href="/inicio" className="flex items-center text-blue-600 hover:text-blue-800 transition-colors duration-300 mb-8">
-          <FiArrowLeft className="h-5 w-5 mr-2" />
-          Volver a Servicios
-        </Link>
-
-        <div className="text-center mb-12">
-          <h1 className="text-5xl font-extrabold text-gray-900 dark:text-white sm:text-6xl animate-text-shimmer bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600">
-            Machine Learning Empresarial
+      {/* HERO */}
+      <section className="w-full bg-gradient-to-r from-fuchsia-600 via-purple-600 to-fuchsia-400 py-20 px-4 flex flex-col items-center relative overflow-hidden animate-fade-in">
+        <div className="absolute inset-0 pointer-events-none opacity-10 bg-[radial-gradient(circle_at_20%_20%,white,transparent_60%)]" />
+        <div className="max-w-4xl mx-auto text-center z-10">
+          <Link href="/inicio" className="inline-flex items-center text-white/80 hover:text-white transition-colors duration-300 mb-8">
+            <FiArrowLeft className="h-5 w-5 mr-2" />
+            Volver a Servicios
+          </Link>
+          <h1 className="text-5xl sm:text-6xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-white via-fuchsia-100 to-purple-200 animate-gradient-x drop-shadow-lg">
+            Machine Learning
           </h1>
-          <p className="mt-4 text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
-            Soluciones de machine learning a medida para potenciar tu negocio. Desarrollamos modelos predictivos, segmentación y optimización adaptados a tus necesidades. Gestionamos el ciclo completo (datos, entrenamiento, despliegue y monitoreo) con prácticas MLOps y resultados cuantificables.
+          <p className="mt-6 text-xl text-white/90 max-w-2xl mx-auto animate-fade-in-up">
+            Impulsa tu negocio con soluciones de machine learning: modelos predictivos, automatización inteligente, analítica avanzada e integración con tus sistemas. Transforma tus datos en resultados tangibles y escalables.
           </p>
-        </div>
-
-        <div className="bg-white dark:bg-gray-800 shadow-xl rounded-xl p-8 mb-12">
-          <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-6 border-b-2 border-indigo-500 pb-2">¿Qué ofrecemos?</h2>
-          <p className="text-lg text-center text-gray-700 dark:text-gray-300 mb-12 animate-fade-in-up">
-            Soluciones de machine learning a medida: modelos predictivos, automatización y optimización de procesos para tu negocio.
-          </p>
-          <div className="grid gap-8 md:grid-cols-3">
-            {/* Card 1 */}
-            <div className="group bg-white/90 dark:bg-gray-800/90 border border-indigo-100 dark:border-indigo-900 rounded-3xl shadow-lg p-8 flex flex-col items-center text-center hover:scale-105 hover:shadow-2xl transition-all duration-300 animate-fade-in-up">
-              <FiActivity className="h-10 w-10 text-indigo-500 mb-4" />
-              <h3 className="text-xl font-semibold mb-2 text-indigo-700 dark:text-indigo-300">Modelos Predictivos Personalizados</h3>
-              <p className="text-gray-700 dark:text-gray-300">Anticipa tendencias, demanda y comportamientos con modelos hechos a tu medida.</p>
-            </div>
-            {/* Card 2 */}
-            <div className="group bg-white/90 dark:bg-gray-800/90 border border-indigo-100 dark:border-indigo-900 rounded-3xl shadow-lg p-8 flex flex-col items-center text-center hover:scale-105 hover:shadow-2xl transition-all duration-300 animate-fade-in-up">
-              <FiSettings className="h-10 w-10 text-indigo-500 mb-4" />
-              <h3 className="text-xl font-semibold mb-2 text-indigo-700 dark:text-indigo-300">Automatización de Procesos</h3>
-              <p className="text-gray-700 dark:text-gray-300">Sistemas de ML que automatizan tareas repetitivas y optimizan recursos.</p>
-            </div>
-            {/* Card 3 */}
-            <div className="group bg-white/90 dark:bg-gray-800/90 border border-indigo-100 dark:border-indigo-900 rounded-3xl shadow-lg p-8 flex flex-col items-center text-center hover:scale-105 hover:shadow-2xl transition-all duration-300 animate-fade-in-up">
-              <FiBarChart2 className="h-10 w-10 text-indigo-500 mb-4" />
-              <h3 className="text-xl font-semibold mb-2 text-indigo-700 dark:text-indigo-300">Detección de Anomalías y Optimización</h3>
-              <p className="text-gray-700 dark:text-gray-300">Identifica fraudes, patrones inusuales y mejora la eficiencia operativa.</p>
-            </div>
+          <div className="mt-10 flex justify-center">
+            <Link href="/contacto" className="inline-flex items-center px-8 py-4 rounded-2xl text-lg font-semibold bg-gradient-to-r from-fuchsia-500 to-purple-500 hover:from-fuchsia-600 hover:to-purple-600 shadow-xl transition-all duration-300 text-white animate-bounce">
+              <FiMessageCircle className="h-6 w-6 mr-3" />
+              Solicita una consultoría en Machine Learning
+            </Link>
           </div>
         </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
-          <div className="bg-white dark:bg-gray-800 shadow-xl rounded-xl p-8">
-            <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-4 flex items-center">
-              <FiSettings className="h-6 w-6 text-yellow-500 mr-3" />
-              Aplicaciones Comunes
-            </h3>
-            <ul className="list-disc list-inside text-lg text-gray-700 dark:text-gray-300 space-y-2">
-              <li><span className="font-semibold text-yellow-600 dark:text-yellow-400">Comercio Electrónico:</span> Recomendaciones personalizadas de productos, optimización de precios en tiempo real y análisis de comportamiento de compra.</li>
-              <li><span className="font-semibold text-yellow-600 dark:text-yellow-400">Detección de Fraude:</span> Identificación de transacciones sospechosas y patrones anómalos en tiempo real para prevenir fraudes financieros y ciberataques.</li>
-              <li><span className="font-semibold text-yellow-600 dark:text-yellow-400">Mantenimiento Predictivo:</span> Anticipación de fallas en maquinaria y equipos industriales mediante el análisis de datos de sensores.</li>
-              <li><span className="font-semibold text-yellow-600 dark:text-yellow-400">Optimización de la Cadena de Suministro:</span> Predicción de la demanda de productos, optimización de rutas de entrega y gestión de inventarios para reducir costes y mejorar la eficiencia.</li>
-              <li><span className="font-semibold text-yellow-600 dark:text-yellow-400">Atención al Cliente:</span> Implementación de chatbots inteligentes para soporte 24/7, clasificación de consultas y mejora de la satisfacción del cliente.</li>
-              <li><span className="font-semibold text-yellow-600 dark:text-yellow-400">Análisis de Sentimiento:</span> Procesamiento de lenguaje natural para analizar opiniones en redes sociales y comentarios de clientes, obteniendo insights sobre la percepción de la marca.</li>
-              <li><span className="font-semibold text-yellow-600 dark:text-yellow-400">Recursos Humanos:</span> Predicción de rotación de personal, preselección de candidatos y análisis del desempeño para mejorar la retención de talento.</li>
-              <li><span className="font-semibold text-yellow-600 dark:text-yellow-400">Diagnóstico Médico Asistido por IA:</span> Análisis de imágenes médicas y registros de pacientes para apoyar diagnósticos tempranos y planes de tratamiento.</li>
-            </ul>
-          </div>
-          <div className="bg-white dark:bg-gray-800 shadow-xl rounded-xl p-8">
-            <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-4 flex items-center">
-              <FiDatabase className="h-6 w-6 text-green-500 mr-3" />
-              Tecnologías Clave
-            </h3>
-            <ul className="list-disc list-inside text-lg text-gray-700 dark:text-gray-300 space-y-2">
-              <li>TensorFlow y PyTorch para aprendizaje profundo.</li>
-              <li>Scikit-learn para machine learning clásico.</li>
-              <li>Keras y OpenCV para visión por computadora.</li>
-              <li>NLTK y SpaCy para procesamiento de lenguaje natural.</li>
-              <li>Plataformas en la nube: AWS Sagemaker, Google AI Platform, Azure ML.</li>
-            </ul>
-          </div>
+      </section>
+      {/* ¿Qué ofrecemos? */}
+      <section className="w-full max-w-6xl mx-auto px-4 py-20">
+        <h2 className="text-3xl sm:text-4xl font-bold text-center mb-4 text-fuchsia-700 dark:text-fuchsia-300 animate-fade-in-up">¿Qué ofrecemos?</h2>
+        <p className="text-lg text-center text-gray-700 dark:text-gray-300 mb-12 animate-fade-in-up">
+          Soluciones de machine learning para anticipar tendencias, automatizar procesos y personalizar experiencias. Modelos predictivos, integración y analítica avanzada para transformar tu negocio.
+        </p>
+        <div className="grid gap-8 md:grid-cols-3">
+          {queOfrecemos.map((item, i) => (
+            <div key={i} className="group bg-white/90 dark:bg-gray-800/90 border border-fuchsia-100 dark:border-fuchsia-900 rounded-3xl shadow-lg p-8 flex flex-col items-center text-center hover:scale-105 hover:shadow-2xl transition-all duration-300 animate-fade-in-up">
+              {item.icon}
+              <h3 className="text-xl font-semibold mb-2 text-fuchsia-700 dark:text-fuchsia-300">{item.title}</h3>
+              <p className="text-gray-700 dark:text-gray-300">{item.desc}</p>
+            </div>
+          ))}
         </div>
-
-        <div className="bg-white dark:bg-gray-800 shadow-xl rounded-xl p-8 mb-12">
-          <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-6 border-b-2 border-indigo-500 pb-2">Nuestro Enfoque</h2>
-          <ol className="list-decimal list-inside text-lg text-gray-700 dark:text-gray-300 space-y-3">
-            <li><span className="font-semibold text-indigo-600 dark:text-indigo-400">Definición del Problema y Recopilación de Datos:</span> Entendemos tus objetivos y recopilamos los datos necesarios para el entrenamiento del modelo.</li>
-            <li><span className="font-semibold text-indigo-600 dark:text-indigo-400">Preprocesamiento y Exploración de Datos:</span> Limpiamos, transformamos y analizamos tus datos para asegurar su calidad y relevancia.</li>
-            <li><span className="font-semibold text-indigo-600 dark:text-indigo-400">Diseño y Entrenamiento de Modelos:</span> Seleccionamos los algoritmos adecuados y entrenamos modelos robustos y eficientes.</li>
-            <li><span className="font-semibold text-indigo-600 dark:text-indigo-400">Evaluación y Optimización:</span> Validamos el rendimiento del modelo y lo ajustamos para lograr la máxima precisión y eficiencia.</li>
-            <li><span className="font-semibold text-indigo-600 dark:text-indigo-400">Implementación y Monitoreo:</span> Desplegamos el modelo en tu entorno de producción y lo monitoreamos continuamente para asegurar su rendimiento óptimo.</li>
+      </section>
+      {/* BENEFICIOS CLAVE */}
+      <section className="w-full max-w-6xl mx-auto px-4 py-20">
+        <h2 className="text-3xl sm:text-4xl font-bold text-center mb-12 text-fuchsia-700 dark:text-fuchsia-300 animate-fade-in-up">Beneficios Clave</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+          {beneficios.map((item, i) => (
+            <div key={i} className="group bg-white/90 dark:bg-gray-800/90 rounded-3xl shadow-lg p-8 flex flex-col items-center text-center border border-fuchsia-100 dark:border-fuchsia-900 hover:scale-105 hover:shadow-2xl transition-all duration-300 animate-fade-in-up">
+              <div className="mb-4">{item.icon}</div>
+              <h3 className="text-xl font-bold mb-2 text-fuchsia-700 dark:text-fuchsia-300">{item.title}</h3>
+              <p className="text-gray-700 dark:text-gray-300">{item.desc}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+      {/* TECNOLOGÍAS USADAS */}
+      <section className="w-full max-w-6xl mx-auto px-4 py-20">
+        <h2 className="text-3xl sm:text-4xl font-bold text-center mb-12 text-fuchsia-700 dark:text-fuchsia-300 animate-fade-in-up">Tecnologías Usadas</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+          {tecnologias.map((item, i) => (
+            <div key={i} className="group bg-white/90 dark:bg-gray-800/90 rounded-3xl shadow-lg p-8 flex flex-col items-center text-center border border-fuchsia-100 dark:border-fuchsia-900 hover:scale-105 hover:shadow-2xl transition-all duration-300 animate-fade-in-up">
+              <div className="mb-4">{item.icon}</div>
+              <h3 className="text-xl font-bold mb-2 text-fuchsia-700 dark:text-fuchsia-300">{item.title}</h3>
+              <p className="text-gray-700 dark:text-gray-300">{item.desc}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+      {/* NUESTRO PROCESO */}
+      <section className="w-full max-w-6xl mx-auto px-4 py-20">
+        <h2 className="text-3xl sm:text-4xl font-bold text-center mb-12 text-fuchsia-700 dark:text-fuchsia-300 animate-fade-in-up">Nuestro Proceso</h2>
+        <div className="flex flex-col md:flex-row md:justify-center md:items-start gap-8">
+          <ol className="flex-1 space-y-6">
+            {pasos.map((item, i) => (
+              <li key={i} className="flex items-start gap-4 animate-fade-in-up">
+                <span className="flex items-center justify-center h-10 w-10 rounded-full bg-fuchsia-100 dark:bg-fuchsia-900 text-fuchsia-700 dark:text-fuchsia-300 font-bold text-xl border-2 border-fuchsia-300 dark:border-fuchsia-700 mr-2">{i+1}</span>
+                <div>
+                  <h3 className="text-lg font-bold mb-1 text-fuchsia-700 dark:text-fuchsia-300">{item.title}</h3>
+                  <p className="text-gray-700 dark:text-gray-300">{item.desc}</p>
+                </div>
+              </li>
+            ))}
           </ol>
         </div>
-
-        <div className="text-center mt-12">
-          <Link href="/contacto" className="inline-flex items-center justify-center px-8 py-4 border border-transparent text-base font-medium rounded-md text-white bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 neon-border md:py-5 md:text-lg md:px-10 transition-all duration-300">
-            <FiMessageCircle className="h-6 w-6 mr-3" />
-            Optimiza tus operaciones con Machine Learning
-          </Link>
-        </div>
-      </div>
+      </section>
+      {/* CTA FINAL */}
+      <section className="w-full flex flex-col items-center py-16 bg-gradient-to-r from-fuchsia-100 via-purple-50 to-white dark:from-fuchsia-900 dark:via-gray-900 dark:to-gray-950 animate-fade-in">
+        <h2 className="text-2xl font-bold mb-6 text-fuchsia-700 dark:text-fuchsia-300">¿Listo para transformar tu negocio con Machine Learning?</h2>
+        <Link href="/contacto" className="inline-flex items-center px-8 py-4 rounded-2xl text-lg font-semibold bg-gradient-to-r from-fuchsia-500 to-purple-500 hover:from-fuchsia-600 hover:to-purple-600 shadow-xl transition-all duration-300 text-white animate-bounce">
+          <FiMessageCircle className="h-6 w-6 mr-3" />
+          Solicita una consultoría en Machine Learning
+        </Link>
+      </section>
     </div>
   );
 };
