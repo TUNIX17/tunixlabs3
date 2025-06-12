@@ -25,11 +25,11 @@ const Footer = () => {
                   Inicio
                 </Link>
               </li>
-              <li>
+              {/* <li>
                 <Link href="/curso7i" className="text-gray-300 hover:text-white">
                   Curso 7i
                 </Link>
-              </li>
+              </li> */}
             </ul>
           </div>
         </div>
