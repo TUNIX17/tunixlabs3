@@ -6,7 +6,6 @@
   "framework": "nextjs",
   "rewrites": [
     { "source": "/", "destination": "/inicio" },
-    { "source": "/inicio", "destination": "/inicio" },
-    { "source": "/curso7i", "destination": "/curso7i" }
+    { "source": "/inicio", "destination": "/inicio" }
   ]
 } 

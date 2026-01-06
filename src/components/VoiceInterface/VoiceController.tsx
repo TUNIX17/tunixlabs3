@@ -32,9 +32,8 @@ const VoiceController: React.FC<VoiceControllerProps> = ({
     stopListening,
     sendTextMessage,
     stopSpeaking,
-    changeLanguage,
-    registerRobot,
-    translate
+    setCurrentLanguage,
+    assignRobotRef
   } = useRobotInteraction({
     initialLanguage,
     onStateChange,
@@ -42,6 +41,21 @@ const VoiceController: React.FC<VoiceControllerProps> = ({
       console.error('Error en la interacción con el robot:', error);
     }
   });
+
+  // Alias para compatibilidad
+  const changeLanguage = setCurrentLanguage;
+  const registerRobot = assignRobotRef;
+
+  // Traducciones simples
+  const translations: Record<string, string> = {
+    'robot.greeting': 'Hola, soy Tunix. Haz clic en el microfono para hablar.',
+    'voice.stop_recording': 'Escuchando... Haz clic para detener.',
+    'robot.thinking': 'Procesando tu mensaje...',
+    'robot.error': 'Ocurrio un error. Intenta de nuevo.',
+    'voice.input_placeholder': 'Escribe tu mensaje...',
+    'voice.send': 'Enviar'
+  };
+  const translate = (key: string) => translations[key] || key;
 
   // Registrar el robot cuando el componente se monta
   useEffect(() => {

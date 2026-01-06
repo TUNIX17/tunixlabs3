@@ -1127,6 +1127,14 @@ function RobotInteractionManager() {
 
   const handleModelLoaded = () => {
     setIsLoading(false);
+
+    // Saludo automatico cuando termina de cargar
+    // Usamos un pequeño delay para asegurar que todo esté listo
+    setTimeout(() => {
+      if (robotAnimatedRef.current) {
+        robotAnimatedRef.current.startWaving();
+      }
+    }, 500);
   };
 
   const handleMicButtonClick = () => {
@@ -1219,11 +1227,18 @@ function RobotInteractionManager() {
           />
         </div>
 
-        <div 
-          className="absolute top-4 left-1/2 transform -translate-x-1/2 z-10 max-w-xs bg-black/30 backdrop-blur-sm rounded-lg p-2 text-white text-center"
+        <div
+          className="absolute top-4 left-1/2 transform -translate-x-1/2 z-10 max-w-sm bg-black/40 backdrop-blur-sm rounded-xl p-3 text-white text-center"
           style={{ pointerEvents: 'none' }}
         >
-          <h3 className="text-lg font-bold text-cyan-300">Hola soy Tunix</h3>
+          <h3 className="text-lg font-bold text-cyan-300">Hola, soy Tunix</h3>
+          <p className="text-xs text-gray-300 mt-1">
+            {interactionState === RobotInteractionState.IDLE && "Haz clic en el microfono para hablar conmigo"}
+            {interactionState === RobotInteractionState.LISTENING && "Te escucho... habla y luego haz clic para enviar"}
+            {interactionState === RobotInteractionState.PROCESSING && "Procesando tu mensaje..."}
+            {interactionState === RobotInteractionState.SPEAKING && "Respondiendo..."}
+            {interactionState === RobotInteractionState.ERROR && "Hubo un error, intenta de nuevo"}
+          </p>
         </div>
 
       </div>

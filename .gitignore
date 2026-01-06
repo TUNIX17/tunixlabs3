@@ -31,4 +31,26 @@ yarn-error.log*
 
 # typescript
 *.tsbuildinfo
-next-env.d.ts 
+next-env.d.ts
+
+# RAG System (Raggy)
+/vectordb/
+.raggy_deps_cache.json
+
+# Virtual Environment (symlink to shared .venv)
+# Note: .venv is a symlink, not ignored
+
+# Railway
+.railway/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Claude Code
+.claude/
+
+# Python Virtual Environment (symlink)
+.venv

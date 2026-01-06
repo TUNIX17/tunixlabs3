@@ -1,0 +1,70 @@
+# raggy_config.yaml - TunixLabs Platform Configuration
+# Optimized for AI Consulting + Interactive Robot + Treasury System
+
+# IMPORTANT: Only index docs folder for fast performance
+docs_dir: ./docs
+
+search:
+  hybrid_weight: 0.7  # Balance between semantic (0.7) and keyword (0.3) search
+  chunk_size: 1000
+  chunk_overlap: 200
+  rerank: true
+  show_scores: true
+  context_chars: 200
+  max_results: 5
+
+  # Domain-specific query expansions for TunixLabs project
+  expansions:
+    # === TunixLabs Core Terms ===
+    tunixlabs: ["tunixlabs", "tunix labs", "tunix", "consultoria ia", "ai consulting"]
+    robot: ["robot", "robot 3d", "avatar", "avatar 3d", "ready player me", "rpm", "interactive"]
+    voice: ["voice", "voz", "elevenlabs", "tts", "text to speech", "speech"]
+
+    # === Business Domain Terms ===
+    consulting: ["consulting", "consultoria", "servicios", "services", "ia", "ai", "automation"]
+    portfolio: ["portfolio", "proyectos", "projects", "casos", "cases", "trabajo"]
+    dashboard: ["dashboard", "panel", "admin", "administracion", "gestion"]
+
+    # === Technical Stack ===
+    nextjs: ["nextjs", "next.js", "next", "react", "frontend", "app router"]
+    threejs: ["threejs", "three.js", "three", "3d", "webgl", "r3f", "react three fiber", "drei"]
+    railway: ["railway", "deployment", "deploy", "hosting", "production"]
+    tailwind: ["tailwind", "tailwindcss", "css", "styling", "responsive"]
+
+    # === Architecture Patterns ===
+    component: ["component", "componente", "react", "tsx", "ui"]
+    api: ["api", "rest", "endpoint", "route", "backend"]
+    hook: ["hook", "hooks", "use", "custom hook", "react hook"]
+
+    # === Testing & Quality ===
+    test: ["test", "testing", "jest", "playwright", "e2e", "unit test", "tdd"]
+    typescript: ["typescript", "ts", "types", "typing", "type safety"]
+
+    # === UI/UX Terms ===
+    animation: ["animation", "animacion", "motion", "framer", "spring"]
+    responsive: ["responsive", "mobile", "tablet", "desktop", "breakpoint"]
+
+# Indexing configuration - ONLY DOCS FOLDER
+index:
+  # Only include markdown files in docs
+  include_patterns:
+    - "**/*.md"
+
+  # Exclude patterns
+  exclude_patterns:
+    - "../**"
+    - "node_modules/**"
+    - ".git/**"
+    - ".venv*/**"
+    - "dist/**"
+    - "build/**"
+    - ".next/**"
+
+# Model configuration for fast indexing
+model:
+  preset: fast  # Use fastest model for quick indexing
+
+# Performance settings
+performance:
+  batch_size: 100
+  max_workers: 4

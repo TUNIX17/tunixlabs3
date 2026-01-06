@@ -1,14 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
-import axios, { AxiosRequestConfig, ResponseType } from 'axios';
+import axios from 'axios';
 
-const GROQ_API_KEY = process.env.GROQ_API_KEY; // Debe estar configurada en tus variables de entorno del servidor
+const GROQ_API_KEY = process.env.GROQ_API_KEY;
 const GROQ_API_URL = 'https://api.groq.com/openai/v1';
+
+type ResponseType = 'arraybuffer' | 'blob' | 'document' | 'json' | 'text' | 'stream';
 
 interface ProxyRequestBody {
   endpoint: string;
-  payload: any;
-  method?: 'POST' | 'GET' | 'PUT' | 'DELETE'; // Opcional, por defecto POST
-  responseType?: ResponseType; // Opcional para especificar el tipo de respuesta esperada por axios
+  payload: unknown;
+  method?: 'POST' | 'GET' | 'PUT' | 'DELETE';
+  responseType?: ResponseType;
 }
 
 export async function POST(request: NextRequest) {
@@ -27,7 +29,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Endpoint no permitido a través del proxy.' }, { status: 403 });
     }
 
-    const axiosConfig: AxiosRequestConfig = {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const axiosConfig: any = {
       method: method,
       url: `${GROQ_API_URL}${endpoint}`,
       headers: {
@@ -40,18 +43,16 @@ export async function POST(request: NextRequest) {
     if (method === 'POST' || method === 'PUT') {
       axiosConfig.data = payload;
     } else if (method === 'GET' && payload) {
-      // Para GET, los parámetros suelen ir en la URL, pero si se envían como 'payload'
-      // axios los puede usar en 'params'. Asumimos que 'payload' es un objeto para params.
       axiosConfig.params = payload;
     }
-    
+
     const groqResponse = await axios(axiosConfig);
 
     if (responseType === 'arraybuffer' && endpoint === '/audio/speech') {
       // Para audio, devolver el buffer con el content-type correcto
       const headers = new Headers();
       headers.set('Content-Type', groqResponse.headers['content-type'] || 'audio/mpeg');
-      return new NextResponse(groqResponse.data, { status: 200, statusText: 'OK', headers });
+      return new NextResponse(groqResponse.data as ArrayBuffer, { status: 200, statusText: 'OK', headers });
     }
 
     return NextResponse.json(groqResponse.data, { status: groqResponse.status });
