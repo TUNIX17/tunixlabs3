@@ -5,17 +5,17 @@ import { FiArrowLeft, FiZap, FiBarChart2, FiTrendingUp, FiCloud, FiDatabase, FiM
 
 const beneficios = [
   {
-    icon: <FiTrendingUp className="h-8 w-8 text-orange-500" />, 
+    icon: <FiTrendingUp className="h-8 w-8" style={{ color: 'var(--neu-primary)' }} />,
     title: 'Automatización de Tareas Repetitivas',
     desc: 'Libera a tu equipo de tareas manuales y repetitivas, permitiendo que se enfoquen en actividades de mayor valor.'
   },
   {
-    icon: <FiZap className="h-8 w-8 text-orange-500" />, 
+    icon: <FiZap className="h-8 w-8" style={{ color: 'var(--neu-primary)' }} />,
     title: 'Reducción de Errores y Costos',
     desc: 'Minimiza errores humanos, reduce costos operativos y mejora la calidad de los procesos.'
   },
   {
-    icon: <FiBarChart2 className="h-8 w-8 text-orange-500" />, 
+    icon: <FiBarChart2 className="h-8 w-8" style={{ color: 'var(--neu-primary)' }} />,
     title: 'Eficiencia y Escalabilidad',
     desc: 'Aumenta la productividad, acelera tiempos de respuesta y escala procesos sin incrementar recursos.'
   },
@@ -23,17 +23,17 @@ const beneficios = [
 
 const tecnologias = [
   {
-    icon: <FiSettings className="h-8 w-8 text-orange-500" />,
+    icon: <FiSettings className="h-8 w-8" style={{ color: 'var(--neu-primary)' }} />,
     title: 'Plataformas RPA Líderes',
     desc: 'UiPath, Automation Anywhere, Blue Prism, Power Automate y bots personalizados.'
   },
   {
-    icon: <FiDatabase className="h-8 w-8 text-orange-500" />,
+    icon: <FiDatabase className="h-8 w-8" style={{ color: 'var(--neu-primary)' }} />,
     title: 'Integración de Sistemas',
     desc: 'APIs, ERPs, CRMs, legacy systems y conectores para automatización de punta a punta.'
   },
   {
-    icon: <FiCloud className="h-8 w-8 text-orange-500" />,
+    icon: <FiCloud className="h-8 w-8" style={{ color: 'var(--neu-primary)' }} />,
     title: 'Analítica y Orquestación',
     desc: 'Monitorización, analítica de procesos y orquestación centralizada para control y optimización.'
   },
@@ -41,17 +41,17 @@ const tecnologias = [
 
 const queOfrecemos = [
   {
-    icon: <FiZap className="h-10 w-10 text-orange-500 mb-4" />,
+    icon: <FiZap className="h-10 w-10" style={{ color: 'var(--neu-primary)' }} />,
     title: 'Automatización de Procesos de Negocio',
     desc: 'Identificamos, diseñamos y automatizamos procesos clave para maximizar eficiencia y ROI.'
   },
   {
-    icon: <FiSettings className="h-10 w-10 text-orange-500 mb-4" />,
+    icon: <FiSettings className="h-10 w-10" style={{ color: 'var(--neu-primary)' }} />,
     title: 'Desarrollo de Bots Personalizados',
     desc: 'Creamos robots de software adaptados a tus sistemas, reglas y necesidades específicas.'
   },
   {
-    icon: <FiCloud className="h-10 w-10 text-orange-500 mb-4" />,
+    icon: <FiCloud className="h-10 w-10" style={{ color: 'var(--neu-primary)' }} />,
     title: 'Integración y Soporte Continuo',
     desc: 'Integramos RPA con tus sistemas y brindamos soporte y optimización continua.'
   },
@@ -78,7 +78,7 @@ const pasos = [
 
 const RPAPage: React.FC = () => {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-yellow-50 dark:from-gray-900 dark:via-gray-950 dark:to-orange-900 text-gray-900 dark:text-gray-100 flex flex-col items-center pt-0 pb-0">
+    <div className="min-h-screen neu-bg" style={{ backgroundColor: 'var(--neu-bg)' }}>
       <Head>
         <title>RPA - Automatización Robótica de Procesos | TunixLabs</title>
         <meta name="description" content="Optimiza y automatiza procesos de negocio con RPA: bots, integración de sistemas, reducción de errores y eficiencia operativa." />
@@ -89,97 +89,140 @@ const RPAPage: React.FC = () => {
         <meta property="og:type" content="website" />
         <link rel="canonical" href="https://www.tunixlabs.com/servicios/rpa" />
       </Head>
-      {/* HERO */}
-      <section className="w-full bg-gradient-to-r from-orange-600 via-yellow-500 to-orange-400 py-20 px-4 flex flex-col items-center relative overflow-hidden animate-fade-in">
-        <div className="absolute inset-0 pointer-events-none opacity-10 bg-[radial-gradient(circle_at_20%_20%,white,transparent_60%)]" />
-        <div className="max-w-4xl mx-auto text-center z-10">
-          <Link href="/inicio" className="inline-flex items-center text-white/80 hover:text-white transition-colors duration-300 mb-8">
-            <FiArrowLeft className="h-5 w-5 mr-2" />
+
+      {/* HERO - Neumorphic Style */}
+      <section className="w-full py-16 sm:py-20 px-4 neu-bg relative overflow-hidden">
+        <div className="absolute -top-20 -right-20 w-80 h-80 rounded-full bg-indigo-300 mix-blend-multiply opacity-20 filter blur-3xl"></div>
+        <div className="absolute -bottom-20 -left-20 w-72 h-72 rounded-full bg-purple-300 mix-blend-multiply opacity-20 filter blur-3xl"></div>
+
+        <div className="max-w-4xl mx-auto text-center relative z-10">
+          <Link href="/inicio" className="neu-pressed inline-flex items-center px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 mb-8" style={{ color: '#718096' }}>
+            <FiArrowLeft className="h-4 w-4 mr-2" />
             Volver a Servicios
           </Link>
-          <h1 className="text-5xl sm:text-6xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-white via-yellow-100 to-orange-200 animate-gradient-x drop-shadow-lg">
+
+          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold neu-gradient-text mb-6">
             RPA - Automatización Robótica de Procesos
           </h1>
-          <p className="mt-6 text-xl text-white/90 max-w-2xl mx-auto animate-fade-in-up">
+
+          <p className="text-lg sm:text-xl max-w-2xl mx-auto mb-10" style={{ color: '#718096', lineHeight: '1.7' }}>
             Optimiza y automatiza procesos de negocio con RPA: bots, integración de sistemas, reducción de errores y eficiencia operativa. Escala tu productividad y transforma tu empresa con robots de software inteligentes.
           </p>
-          <div className="mt-10 flex justify-center">
-            <Link href="/contacto" className="inline-flex items-center px-8 py-4 rounded-2xl text-lg font-semibold bg-gradient-to-r from-orange-500 to-yellow-500 hover:from-orange-600 hover:to-yellow-600 shadow-xl transition-all duration-300 text-white animate-bounce">
-              <FiMessageCircle className="h-6 w-6 mr-3" />
-              Solicita una consultoría RPA gratuita
-            </Link>
-          </div>
+
+          <Link href="/contacto" className="neu-btn-primary inline-flex items-center">
+            <FiMessageCircle className="h-5 w-5 mr-2" />
+            Solicita una consultoría RPA gratuita
+          </Link>
         </div>
       </section>
-      {/* ¿Qué ofrecemos? */}
-      <section className="w-full max-w-6xl mx-auto px-4 py-20">
-        <h2 className="text-3xl sm:text-4xl font-bold text-center mb-4 text-orange-700 dark:text-orange-300 animate-fade-in-up">¿Qué ofrecemos?</h2>
-        <p className="text-lg text-center text-gray-700 dark:text-gray-300 mb-12 animate-fade-in-up">
+
+      {/* Que ofrecemos - Neumorphic */}
+      <section className="w-full max-w-6xl mx-auto px-4 py-16 sm:py-20">
+        <div className="text-center mb-12">
+          <span className="neu-pressed inline-block px-4 py-2 rounded-full text-sm font-semibold uppercase mb-4" style={{ color: 'var(--neu-primary)' }}>
+            Que ofrecemos
+          </span>
+          <h2 className="text-3xl sm:text-4xl font-bold neu-gradient-text">Soluciones RPA a Medida</h2>
+        </div>
+
+        <p className="text-lg text-center mb-12" style={{ color: '#718096' }}>
           Soluciones RPA para automatizar tareas, reducir errores y escalar procesos de negocio. Bots personalizados, integración de sistemas y soporte continuo para maximizar tu eficiencia.
         </p>
-        <div className="grid gap-8 md:grid-cols-3">
+
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {queOfrecemos.map((item, i) => (
-            <div key={i} className="group bg-white/90 dark:bg-gray-800/90 border border-orange-100 dark:border-orange-900 rounded-3xl shadow-lg p-8 flex flex-col items-center text-center hover:scale-105 hover:shadow-2xl transition-all duration-300 animate-fade-in-up">
-              {item.icon}
-              <h3 className="text-xl font-semibold mb-2 text-orange-700 dark:text-orange-300">{item.title}</h3>
-              <p className="text-gray-700 dark:text-gray-300">{item.desc}</p>
+            <div key={i} className="neu-raised p-6 rounded-2xl text-center transition-all duration-300 hover:-translate-y-1">
+              <div className="neu-service-icon mx-auto">{item.icon}</div>
+              <h3 className="text-lg font-bold mt-4 mb-2" style={{ color: '#2d3748' }}>{item.title}</h3>
+              <p className="text-sm" style={{ color: '#718096' }}>{item.desc}</p>
             </div>
           ))}
         </div>
       </section>
-      {/* BENEFICIOS CLAVE */}
-      <section className="w-full max-w-6xl mx-auto px-4 py-20">
-        <h2 className="text-3xl sm:text-4xl font-bold text-center mb-12 text-orange-700 dark:text-orange-300 animate-fade-in-up">Beneficios Clave</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+
+      {/* Beneficios - Neumorphic */}
+      <section className="w-full max-w-6xl mx-auto px-4 py-16 sm:py-20">
+        <div className="text-center mb-12">
+          <span className="neu-pressed inline-block px-4 py-2 rounded-full text-sm font-semibold uppercase mb-4" style={{ color: 'var(--neu-primary)' }}>
+            Beneficios
+          </span>
+          <h2 className="text-3xl sm:text-4xl font-bold neu-gradient-text">Beneficios Clave</h2>
+        </div>
+
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {beneficios.map((item, i) => (
-            <div key={i} className="group bg-white/90 dark:bg-gray-800/90 rounded-3xl shadow-lg p-8 flex flex-col items-center text-center border border-orange-100 dark:border-orange-900 hover:scale-105 hover:shadow-2xl transition-all duration-300 animate-fade-in-up">
-              <div className="mb-4">{item.icon}</div>
-              <h3 className="text-xl font-bold mb-2 text-orange-700 dark:text-orange-300">{item.title}</h3>
-              <p className="text-gray-700 dark:text-gray-300">{item.desc}</p>
+            <div key={i} className="neu-raised p-6 rounded-2xl text-center transition-all duration-300 hover:-translate-y-1">
+              <div className="neu-service-icon mx-auto">{item.icon}</div>
+              <h3 className="text-lg font-bold mt-4 mb-2" style={{ color: '#2d3748' }}>{item.title}</h3>
+              <p className="text-sm" style={{ color: '#718096' }}>{item.desc}</p>
             </div>
           ))}
         </div>
       </section>
-      {/* TECNOLOGÍAS USADAS */}
-      <section className="w-full max-w-6xl mx-auto px-4 py-20">
-        <h2 className="text-3xl sm:text-4xl font-bold text-center mb-12 text-orange-700 dark:text-orange-300 animate-fade-in-up">Tecnologías Usadas</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+
+      {/* Tecnologias - Neumorphic */}
+      <section className="w-full max-w-6xl mx-auto px-4 py-16 sm:py-20">
+        <div className="text-center mb-12">
+          <span className="neu-pressed inline-block px-4 py-2 rounded-full text-sm font-semibold uppercase mb-4" style={{ color: 'var(--neu-primary)' }}>
+            Tecnologias
+          </span>
+          <h2 className="text-3xl sm:text-4xl font-bold neu-gradient-text">Tecnologías Usadas</h2>
+        </div>
+
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {tecnologias.map((item, i) => (
-            <div key={i} className="group bg-white/90 dark:bg-gray-800/90 rounded-3xl shadow-lg p-8 flex flex-col items-center text-center border border-orange-100 dark:border-orange-900 hover:scale-105 hover:shadow-2xl transition-all duration-300 animate-fade-in-up">
-              <div className="mb-4">{item.icon}</div>
-              <h3 className="text-xl font-bold mb-2 text-orange-700 dark:text-orange-300">{item.title}</h3>
-              <p className="text-gray-700 dark:text-gray-300">{item.desc}</p>
+            <div key={i} className="neu-raised p-6 rounded-2xl text-center transition-all duration-300 hover:-translate-y-1">
+              <div className="neu-service-icon mx-auto">{item.icon}</div>
+              <h3 className="text-lg font-bold mt-4 mb-2" style={{ color: '#2d3748' }}>{item.title}</h3>
+              <p className="text-sm" style={{ color: '#718096' }}>{item.desc}</p>
             </div>
           ))}
         </div>
       </section>
-      {/* NUESTRO PROCESO */}
-      <section className="w-full max-w-6xl mx-auto px-4 py-20">
-        <h2 className="text-3xl sm:text-4xl font-bold text-center mb-12 text-orange-700 dark:text-orange-300 animate-fade-in-up">Nuestro Proceso</h2>
-        <div className="flex flex-col md:flex-row md:justify-center md:items-start gap-8">
-          <ol className="flex-1 space-y-6">
+
+      {/* Proceso - Neumorphic */}
+      <section className="w-full max-w-4xl mx-auto px-4 py-16 sm:py-20">
+        <div className="text-center mb-12">
+          <span className="neu-pressed inline-block px-4 py-2 rounded-full text-sm font-semibold uppercase mb-4" style={{ color: 'var(--neu-primary)' }}>
+            Proceso
+          </span>
+          <h2 className="text-3xl sm:text-4xl font-bold neu-gradient-text">Nuestro Proceso</h2>
+        </div>
+
+        <div className="neu-raised p-6 sm:p-8 rounded-2xl">
+          <ol className="space-y-6">
             {pasos.map((item, i) => (
-              <li key={i} className="flex items-start gap-4 animate-fade-in-up">
-                <span className="flex items-center justify-center h-10 w-10 rounded-full bg-orange-100 dark:bg-orange-900 text-orange-700 dark:text-orange-300 font-bold text-xl border-2 border-orange-300 dark:border-orange-700 mr-2">{i+1}</span>
+              <li key={i} className="flex items-start gap-4">
+                <span className="neu-service-icon flex-shrink-0" style={{ width: '48px', height: '48px', margin: 0, fontSize: '1.25rem', fontWeight: 'bold', color: 'var(--neu-primary)' }}>
+                  {i + 1}
+                </span>
                 <div>
-                  <h3 className="text-lg font-bold mb-1 text-orange-700 dark:text-orange-300">{item.title}</h3>
-                  <p className="text-gray-700 dark:text-gray-300">{item.desc}</p>
+                  <h3 className="text-lg font-bold mb-1" style={{ color: '#2d3748' }}>{item.title}</h3>
+                  <p className="text-sm" style={{ color: '#718096' }}>{item.desc}</p>
                 </div>
               </li>
             ))}
           </ol>
         </div>
       </section>
-      {/* CTA FINAL */}
-      <section className="w-full flex flex-col items-center py-16 bg-gradient-to-r from-orange-100 via-yellow-50 to-white dark:from-orange-900 dark:via-gray-900 dark:to-gray-950 animate-fade-in">
-        <h2 className="text-2xl font-bold mb-6 text-orange-700 dark:text-orange-300">¿Listo para escalar tu eficiencia con RPA?</h2>
-        <Link href="/contacto" className="inline-flex items-center px-8 py-4 rounded-2xl text-lg font-semibold bg-gradient-to-r from-orange-500 to-yellow-500 hover:from-orange-600 hover:to-yellow-600 shadow-xl transition-all duration-300 text-white animate-bounce">
-          <FiMessageCircle className="h-6 w-6 mr-3" />
-          Solicita una consultoría RPA gratuita
-        </Link>
+
+      {/* CTA Final - Neumorphic */}
+      <section className="w-full py-16 sm:py-20 px-4 neu-bg">
+        <div className="max-w-4xl mx-auto text-center">
+          <h2 className="text-2xl sm:text-3xl font-bold mb-6 neu-gradient-text">Listo para escalar tu eficiencia con RPA?</h2>
+          <Link href="/contacto" className="neu-btn-primary inline-flex items-center">
+            <FiMessageCircle className="h-5 w-5 mr-2" />
+            Solicita una consultoría RPA gratuita
+          </Link>
+        </div>
       </section>
+
+      {/* Footer */}
+      <footer className="py-8 neu-bg text-center" style={{ color: '#718096' }}>
+        <p>&copy; 2026 TunixLabs. Todos los derechos reservados.</p>
+      </footer>
     </div>
   );
 };
 
-export default RPAPage; 
+export default RPAPage;

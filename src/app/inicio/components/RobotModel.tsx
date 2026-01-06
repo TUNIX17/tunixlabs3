@@ -1201,7 +1201,7 @@ function RobotInteractionManager() {
   }
 
   return (
-    <div className="h-full w-full touch-none relative overflow-hidden bg-transparent pointer-events-auto" style={{ minHeight: '420px' }}>
+    <div className="h-full w-full touch-none relative overflow-hidden bg-transparent pointer-events-auto" style={{ minHeight: 'min(420px, 85vw)' }}>
       {isLoading && <LoadingSpinner />}
 
       <div className="absolute inset-0 w-full h-full flex items-center justify-center">

@@ -5,181 +5,212 @@ import { FiArrowLeft, FiEye, FiZap, FiBarChart2, FiTrendingUp, FiCloud, FiDataba
 
 const beneficios = [
   {
-    icon: <FiTrendingUp className="h-8 w-8 text-sky-500" />, 
-    title: 'Automatización y Precisión',
-    desc: 'Automatiza inspecciones, controles de calidad y monitoreo visual con precisión superior y reducción de errores.'
+    icon: <FiTrendingUp className="h-8 w-8" style={{ color: 'var(--neu-primary)' }} />,
+    title: 'Automatizacion y Precision',
+    desc: 'Automatiza inspecciones, controles de calidad y monitoreo visual con precision superior y reduccion de errores.'
   },
   {
-    icon: <FiZap className="h-8 w-8 text-sky-500" />, 
-    title: 'Analítica Visual Avanzada',
-    desc: 'Extrae insights de imágenes y videos en tiempo real para optimizar procesos y tomar decisiones informadas.'
+    icon: <FiZap className="h-8 w-8" style={{ color: 'var(--neu-primary)' }} />,
+    title: 'Analitica Visual Avanzada',
+    desc: 'Extrae insights de imagenes y videos en tiempo real para optimizar procesos y tomar decisiones informadas.'
   },
   {
-    icon: <FiBarChart2 className="h-8 w-8 text-sky-500" />, 
+    icon: <FiBarChart2 className="h-8 w-8" style={{ color: 'var(--neu-primary)' }} />,
     title: 'Escalabilidad y Eficiencia',
-    desc: 'Procesa grandes volúmenes de datos visuales, escalando operaciones sin incrementar recursos.'
+    desc: 'Procesa grandes volumenes de datos visuales, escalando operaciones sin incrementar recursos.'
   },
 ];
 
 const tecnologias = [
   {
-    icon: <FiEye className="h-8 w-8 text-sky-500" />,
+    icon: <FiEye className="h-8 w-8" style={{ color: 'var(--neu-primary)' }} />,
     title: 'Redes Neuronales y Deep Learning',
-    desc: 'TensorFlow, PyTorch, OpenCV, YOLO, Detectron2 y modelos de visión artificial de última generación.'
+    desc: 'TensorFlow, PyTorch, OpenCV, YOLO, Detectron2 y modelos de vision artificial de ultima generacion.'
   },
   {
-    icon: <FiDatabase className="h-8 w-8 text-sky-500" />,
+    icon: <FiDatabase className="h-8 w-8" style={{ color: 'var(--neu-primary)' }} />,
     title: 'Procesamiento y Almacenamiento',
-    desc: 'Big Data, Data Lakes, GPUs, APIs y pipelines para gestión eficiente de imágenes y video.'
+    desc: 'Big Data, Data Lakes, GPUs, APIs y pipelines para gestion eficiente de imagenes y video.'
   },
   {
-    icon: <FiCloud className="h-8 w-8 text-sky-500" />,
-    title: 'Integración y Analítica',
-    desc: 'APIs, ERPs, CRMs, sistemas industriales y dashboards para visualización y control.'
+    icon: <FiCloud className="h-8 w-8" style={{ color: 'var(--neu-primary)' }} />,
+    title: 'Integracion y Analitica',
+    desc: 'APIs, ERPs, CRMs, sistemas industriales y dashboards para visualizacion y control.'
   },
 ];
 
 const queOfrecemos = [
   {
-    icon: <FiEye className="h-10 w-10 text-sky-500 mb-4" />,
-    title: 'Reconocimiento de Imágenes y Video',
-    desc: 'Identificación, clasificación y seguimiento automático de objetos, personas y patrones.'
+    icon: <FiEye className="h-10 w-10" style={{ color: 'var(--neu-primary)' }} />,
+    title: 'Reconocimiento de Imagenes y Video',
+    desc: 'Identificacion, clasificacion y seguimiento automatico de objetos, personas y patrones.'
   },
   {
-    icon: <FiZap className="h-10 w-10 text-sky-500 mb-4" />,
-    title: 'Automatización de Inspección y Control',
+    icon: <FiZap className="h-10 w-10" style={{ color: 'var(--neu-primary)' }} />,
+    title: 'Automatizacion de Inspeccion y Control',
     desc: 'Soluciones para control de calidad, seguridad, monitoreo y procesos industriales.'
   },
   {
-    icon: <FiCloud className="h-10 w-10 text-sky-500 mb-4" />,
-    title: 'Analítica Visual y Dashboards',
-    desc: 'Visualización de resultados, alertas inteligentes y analítica avanzada para toma de decisiones.'
+    icon: <FiCloud className="h-10 w-10" style={{ color: 'var(--neu-primary)' }} />,
+    title: 'Analitica Visual y Dashboards',
+    desc: 'Visualizacion de resultados, alertas inteligentes y analitica avanzada para toma de decisiones.'
   },
 ];
 
 const pasos = [
-  {
-    title: 'Diagnóstico y Objetivos',
-    desc: 'Analizamos procesos y necesidades para definir casos de uso de visión artificial de alto impacto.'
-  },
-  {
-    title: 'Desarrollo y Entrenamiento',
-    desc: 'Diseñamos, entrenamos e integramos modelos de visión artificial en tus sistemas.'
-  },
-  {
-    title: 'Implementación y Pruebas',
-    desc: 'Integramos, probamos y ajustamos la solución en entornos reales para máxima precisión.'
-  },
-  {
-    title: 'Monitoreo y Optimización',
-    desc: 'Monitorizamos el desempeño, optimizamos y escalamos la solución según resultados.'
-  },
+  { title: 'Diagnostico y Objetivos', desc: 'Analizamos procesos y necesidades para definir casos de uso de vision artificial de alto impacto.' },
+  { title: 'Desarrollo y Entrenamiento', desc: 'Disenamos, entrenamos e integramos modelos de vision artificial en tus sistemas.' },
+  { title: 'Implementacion y Pruebas', desc: 'Integramos, probamos y ajustamos la solucion en entornos reales para maxima precision.' },
+  { title: 'Monitoreo y Optimizacion', desc: 'Monitorizamos el desempeno, optimizamos y escalamos la solucion segun resultados.' },
 ];
 
 const VisionArtificialPage: React.FC = () => {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-sky-50 via-white to-blue-50 dark:from-gray-900 dark:via-gray-950 dark:to-sky-900 text-gray-900 dark:text-gray-100 flex flex-col items-center pt-0 pb-0">
+    <div className="min-h-screen neu-bg" style={{ backgroundColor: 'var(--neu-bg)' }}>
       <Head>
-        <title>Visión Artificial - TunixLabs</title>
-        <meta name="description" content="Impulsa la eficiencia y precisión de tu empresa con soluciones de visión artificial: reconocimiento de imágenes, automatización de inspección y analítica visual avanzada." />
-        <meta name="keywords" content="visión artificial, computer vision, reconocimiento de imágenes, deep learning, automatización de inspección, analítica visual, TunixLabs" />
-        <meta property="og:title" content="Visión Artificial - TunixLabs" />
-        <meta property="og:description" content="Impulsa la eficiencia y precisión de tu empresa con soluciones de visión artificial: reconocimiento de imágenes, automatización de inspección y analítica visual avanzada." />
+        <title>Vision Artificial - TunixLabs</title>
+        <meta name="description" content="Impulsa la eficiencia y precision de tu empresa con soluciones de vision artificial: reconocimiento de imagenes, automatizacion de inspeccion y analitica visual avanzada." />
+        <meta name="keywords" content="vision artificial, computer vision, reconocimiento de imagenes, deep learning, automatizacion de inspeccion, analitica visual, TunixLabs" />
+        <meta property="og:title" content="Vision Artificial - TunixLabs" />
+        <meta property="og:description" content="Impulsa la eficiencia y precision de tu empresa con soluciones de vision artificial: reconocimiento de imagenes, automatizacion de inspeccion y analitica visual avanzada." />
         <meta property="og:url" content="https://www.tunixlabs.com/servicios/vision-artificial" />
         <meta property="og:type" content="website" />
         <link rel="canonical" href="https://www.tunixlabs.com/servicios/vision-artificial" />
       </Head>
-      {/* HERO */}
-      <section className="w-full bg-gradient-to-r from-sky-600 via-blue-600 to-sky-400 py-20 px-4 flex flex-col items-center relative overflow-hidden animate-fade-in">
-        <div className="absolute inset-0 pointer-events-none opacity-10 bg-[radial-gradient(circle_at_20%_20%,white,transparent_60%)]" />
-        <div className="max-w-4xl mx-auto text-center z-10">
-          <Link href="/inicio" className="inline-flex items-center text-white/80 hover:text-white transition-colors duration-300 mb-8">
-            <FiArrowLeft className="h-5 w-5 mr-2" />
+
+      {/* HERO - Neumorphic Style */}
+      <section className="w-full py-16 sm:py-20 px-4 neu-bg relative overflow-hidden">
+        <div className="absolute -top-20 -right-20 w-80 h-80 rounded-full bg-indigo-300 mix-blend-multiply opacity-20 filter blur-3xl"></div>
+        <div className="absolute -bottom-20 -left-20 w-72 h-72 rounded-full bg-purple-300 mix-blend-multiply opacity-20 filter blur-3xl"></div>
+
+        <div className="max-w-4xl mx-auto text-center relative z-10">
+          <Link href="/inicio" className="neu-pressed inline-flex items-center px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 mb-8" style={{ color: '#718096' }}>
+            <FiArrowLeft className="h-4 w-4 mr-2" />
             Volver a Servicios
           </Link>
-          <h1 className="text-5xl sm:text-6xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-white via-sky-100 to-blue-200 animate-gradient-x drop-shadow-lg">
-            Visión Artificial
+
+          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold neu-gradient-text mb-6">
+            Vision Artificial
           </h1>
-          <p className="mt-6 text-xl text-white/90 max-w-2xl mx-auto animate-fade-in-up">
-            Impulsa la eficiencia y precisión de tu empresa con soluciones de visión artificial: reconocimiento de imágenes, automatización de inspección y analítica visual avanzada. Transforma tus procesos con inteligencia visual de última generación.
+
+          <p className="text-lg sm:text-xl max-w-2xl mx-auto mb-10" style={{ color: '#718096', lineHeight: '1.7' }}>
+            Impulsa la eficiencia y precision de tu empresa con soluciones de vision artificial: reconocimiento de imagenes, automatizacion de inspeccion y analitica visual avanzada. Transforma tus procesos con inteligencia visual de ultima generacion.
           </p>
-          <div className="mt-10 flex justify-center">
-            <Link href="/contacto" className="inline-flex items-center px-8 py-4 rounded-2xl text-lg font-semibold bg-gradient-to-r from-sky-500 to-blue-500 hover:from-sky-600 hover:to-blue-600 shadow-xl transition-all duration-300 text-white animate-bounce">
-              <FiMessageCircle className="h-6 w-6 mr-3" />
-              Solicita una consultoría en Visión Artificial
-            </Link>
-          </div>
+
+          <Link href="/contacto" className="neu-btn-primary inline-flex items-center">
+            <FiMessageCircle className="h-5 w-5 mr-2" />
+            Solicita una consultoria en Vision Artificial
+          </Link>
         </div>
       </section>
-      {/* ¿Qué ofrecemos? */}
-      <section className="w-full max-w-6xl mx-auto px-4 py-20">
-        <h2 className="text-3xl sm:text-4xl font-bold text-center mb-4 text-sky-700 dark:text-sky-300 animate-fade-in-up">¿Qué ofrecemos?</h2>
-        <p className="text-lg text-center text-gray-700 dark:text-gray-300 mb-12 animate-fade-in-up">
-          Soluciones de visión artificial para automatizar inspecciones, extraer insights visuales y optimizar procesos. Reconocimiento de imágenes, analítica avanzada y dashboards para transformar tu negocio.
+
+      {/* Que ofrecemos - Neumorphic */}
+      <section className="w-full max-w-6xl mx-auto px-4 py-16 sm:py-20">
+        <div className="text-center mb-12">
+          <span className="neu-pressed inline-block px-4 py-2 rounded-full text-sm font-semibold uppercase mb-4" style={{ color: 'var(--neu-primary)' }}>
+            Que ofrecemos
+          </span>
+          <h2 className="text-3xl sm:text-4xl font-bold neu-gradient-text">Soluciones de Vision Artificial</h2>
+        </div>
+
+        <p className="text-lg text-center mb-12" style={{ color: '#718096' }}>
+          Soluciones de vision artificial para automatizar inspecciones, extraer insights visuales y optimizar procesos. Reconocimiento de imagenes, analitica avanzada y dashboards para transformar tu negocio.
         </p>
-        <div className="grid gap-8 md:grid-cols-3">
+
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {queOfrecemos.map((item, i) => (
-            <div key={i} className="group bg-white/90 dark:bg-gray-800/90 border border-sky-100 dark:border-sky-900 rounded-3xl shadow-lg p-8 flex flex-col items-center text-center hover:scale-105 hover:shadow-2xl transition-all duration-300 animate-fade-in-up">
-              {item.icon}
-              <h3 className="text-xl font-semibold mb-2 text-sky-700 dark:text-sky-300">{item.title}</h3>
-              <p className="text-gray-700 dark:text-gray-300">{item.desc}</p>
+            <div key={i} className="neu-raised p-6 rounded-2xl text-center transition-all duration-300 hover:-translate-y-1">
+              <div className="neu-service-icon mx-auto">{item.icon}</div>
+              <h3 className="text-lg font-bold mt-4 mb-2" style={{ color: '#2d3748' }}>{item.title}</h3>
+              <p className="text-sm" style={{ color: '#718096' }}>{item.desc}</p>
             </div>
           ))}
         </div>
       </section>
-      {/* BENEFICIOS CLAVE */}
-      <section className="w-full max-w-6xl mx-auto px-4 py-20">
-        <h2 className="text-3xl sm:text-4xl font-bold text-center mb-12 text-sky-700 dark:text-sky-300 animate-fade-in-up">Beneficios Clave</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+
+      {/* Beneficios - Neumorphic */}
+      <section className="w-full max-w-6xl mx-auto px-4 py-16 sm:py-20">
+        <div className="text-center mb-12">
+          <span className="neu-pressed inline-block px-4 py-2 rounded-full text-sm font-semibold uppercase mb-4" style={{ color: 'var(--neu-primary)' }}>
+            Beneficios
+          </span>
+          <h2 className="text-3xl sm:text-4xl font-bold neu-gradient-text">Beneficios Clave</h2>
+        </div>
+
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {beneficios.map((item, i) => (
-            <div key={i} className="group bg-white/90 dark:bg-gray-800/90 rounded-3xl shadow-lg p-8 flex flex-col items-center text-center border border-sky-100 dark:border-sky-900 hover:scale-105 hover:shadow-2xl transition-all duration-300 animate-fade-in-up">
-              <div className="mb-4">{item.icon}</div>
-              <h3 className="text-xl font-bold mb-2 text-sky-700 dark:text-sky-300">{item.title}</h3>
-              <p className="text-gray-700 dark:text-gray-300">{item.desc}</p>
+            <div key={i} className="neu-raised p-6 rounded-2xl text-center transition-all duration-300 hover:-translate-y-1">
+              <div className="neu-service-icon mx-auto">{item.icon}</div>
+              <h3 className="text-lg font-bold mt-4 mb-2" style={{ color: '#2d3748' }}>{item.title}</h3>
+              <p className="text-sm" style={{ color: '#718096' }}>{item.desc}</p>
             </div>
           ))}
         </div>
       </section>
-      {/* TECNOLOGÍAS USADAS */}
-      <section className="w-full max-w-6xl mx-auto px-4 py-20">
-        <h2 className="text-3xl sm:text-4xl font-bold text-center mb-12 text-sky-700 dark:text-sky-300 animate-fade-in-up">Tecnologías Usadas</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+
+      {/* Tecnologias - Neumorphic */}
+      <section className="w-full max-w-6xl mx-auto px-4 py-16 sm:py-20">
+        <div className="text-center mb-12">
+          <span className="neu-pressed inline-block px-4 py-2 rounded-full text-sm font-semibold uppercase mb-4" style={{ color: 'var(--neu-primary)' }}>
+            Tecnologias
+          </span>
+          <h2 className="text-3xl sm:text-4xl font-bold neu-gradient-text">Tecnologias Usadas</h2>
+        </div>
+
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {tecnologias.map((item, i) => (
-            <div key={i} className="group bg-white/90 dark:bg-gray-800/90 rounded-3xl shadow-lg p-8 flex flex-col items-center text-center border border-sky-100 dark:border-sky-900 hover:scale-105 hover:shadow-2xl transition-all duration-300 animate-fade-in-up">
-              <div className="mb-4">{item.icon}</div>
-              <h3 className="text-xl font-bold mb-2 text-sky-700 dark:text-sky-300">{item.title}</h3>
-              <p className="text-gray-700 dark:text-gray-300">{item.desc}</p>
+            <div key={i} className="neu-raised p-6 rounded-2xl text-center transition-all duration-300 hover:-translate-y-1">
+              <div className="neu-service-icon mx-auto">{item.icon}</div>
+              <h3 className="text-lg font-bold mt-4 mb-2" style={{ color: '#2d3748' }}>{item.title}</h3>
+              <p className="text-sm" style={{ color: '#718096' }}>{item.desc}</p>
             </div>
           ))}
         </div>
       </section>
-      {/* NUESTRO PROCESO */}
-      <section className="w-full max-w-6xl mx-auto px-4 py-20">
-        <h2 className="text-3xl sm:text-4xl font-bold text-center mb-12 text-sky-700 dark:text-sky-300 animate-fade-in-up">Nuestro Proceso</h2>
-        <div className="flex flex-col md:flex-row md:justify-center md:items-start gap-8">
-          <ol className="flex-1 space-y-6">
+
+      {/* Proceso - Neumorphic */}
+      <section className="w-full max-w-4xl mx-auto px-4 py-16 sm:py-20">
+        <div className="text-center mb-12">
+          <span className="neu-pressed inline-block px-4 py-2 rounded-full text-sm font-semibold uppercase mb-4" style={{ color: 'var(--neu-primary)' }}>
+            Proceso
+          </span>
+          <h2 className="text-3xl sm:text-4xl font-bold neu-gradient-text">Nuestro Proceso</h2>
+        </div>
+
+        <div className="neu-raised p-6 sm:p-8 rounded-2xl">
+          <ol className="space-y-6">
             {pasos.map((item, i) => (
-              <li key={i} className="flex items-start gap-4 animate-fade-in-up">
-                <span className="flex items-center justify-center h-10 w-10 rounded-full bg-sky-100 dark:bg-sky-900 text-sky-700 dark:text-sky-300 font-bold text-xl border-2 border-sky-300 dark:border-sky-700 mr-2">{i+1}</span>
+              <li key={i} className="flex items-start gap-4">
+                <span className="neu-service-icon flex-shrink-0" style={{ width: '48px', height: '48px', margin: 0, fontSize: '1.25rem', fontWeight: 'bold', color: 'var(--neu-primary)' }}>
+                  {i + 1}
+                </span>
                 <div>
-                  <h3 className="text-lg font-bold mb-1 text-sky-700 dark:text-sky-300">{item.title}</h3>
-                  <p className="text-gray-700 dark:text-gray-300">{item.desc}</p>
+                  <h3 className="text-lg font-bold mb-1" style={{ color: '#2d3748' }}>{item.title}</h3>
+                  <p className="text-sm" style={{ color: '#718096' }}>{item.desc}</p>
                 </div>
               </li>
             ))}
           </ol>
         </div>
       </section>
-      {/* CTA FINAL */}
-      <section className="w-full flex flex-col items-center py-16 bg-gradient-to-r from-sky-100 via-blue-50 to-white dark:from-sky-900 dark:via-gray-900 dark:to-gray-950 animate-fade-in">
-        <h2 className="text-2xl font-bold mb-6 text-sky-700 dark:text-sky-300">¿Listo para transformar tu empresa con Visión Artificial?</h2>
-        <Link href="/contacto" className="inline-flex items-center px-8 py-4 rounded-2xl text-lg font-semibold bg-gradient-to-r from-sky-500 to-blue-500 hover:from-sky-600 hover:to-blue-600 shadow-xl transition-all duration-300 text-white animate-bounce">
-          <FiMessageCircle className="h-6 w-6 mr-3" />
-          Solicita una consultoría en Visión Artificial
-        </Link>
+
+      {/* CTA Final - Neumorphic */}
+      <section className="w-full py-16 sm:py-20 px-4 neu-bg">
+        <div className="max-w-4xl mx-auto text-center">
+          <h2 className="text-2xl sm:text-3xl font-bold mb-6 neu-gradient-text">Listo para transformar tu empresa con Vision Artificial?</h2>
+          <Link href="/contacto" className="neu-btn-primary inline-flex items-center">
+            <FiMessageCircle className="h-5 w-5 mr-2" />
+            Solicita una consultoria en Vision Artificial
+          </Link>
+        </div>
       </section>
+
+      {/* Footer */}
+      <footer className="py-8 neu-bg text-center" style={{ color: '#718096' }}>
+        <p>&copy; 2026 TunixLabs. Todos los derechos reservados.</p>
+      </footer>
     </div>
   );
 };
 
-export default VisionArtificialPage; 
+export default VisionArtificialPage;

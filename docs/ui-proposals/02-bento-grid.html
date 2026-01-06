@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TunixLabs - Propuesta Bento Grid 2026</title>
+    <style>
+        :root {
+            --bg-dark: #0a0a0f;
+            --bg-card: #12121a;
+            --bg-card-hover: #1a1a25;
+            --border-color: rgba(255, 255, 255, 0.08);
+            --primary: #6366f1;
+            --primary-light: #818cf8;
+            --accent-cyan: #22d3ee;
+            --accent-purple: #a855f7;
+            --accent-pink: #ec4899;
+            --text-white: #ffffff;
+            --text-gray: #94a3b8;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-white);
+            min-height: 100vh;
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(10, 10, 15, 0.8);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border-color);
+            z-index: 1000;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary), var(--accent-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            color: var(--text-gray);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: var(--text-white);
+        }
+
+        .nav-btn {
+            padding: 0.6rem 1.5rem;
+            background: linear-gradient(135deg, var(--primary), var(--accent-purple));
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .nav-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(99, 102, 241, 0.3);
+        }
+
+        /* Main Container */
+        main {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 6rem 2rem 4rem;
+        }
+
+        /* Bento Grid Layout */
+        .bento-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            grid-template-rows: auto;
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .bento-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            padding: 2rem;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.4s ease;
+        }
+
+        .bento-card:hover {
+            background: var(--bg-card-hover);
+            transform: translateY(-5px);
+            border-color: rgba(99, 102, 241, 0.3);
+        }
+
+        /* Hero Card - Large */
+        .bento-hero {
+            grid-column: span 2;
+            grid-row: span 2;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(168, 85, 247, 0.1));
+        }
+
+        .bento-hero h1 {
+            font-size: 3rem;
+            line-height: 1.1;
+            margin-bottom: 1.5rem;
+        }
+
+        .bento-hero h1 span {
+            background: linear-gradient(135deg, var(--primary-light), var(--accent-cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .bento-hero p {
+            color: var(--text-gray);
+            font-size: 1.1rem;
+            line-height: 1.7;
+            margin-bottom: 2rem;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn-primary {
+            padding: 0.8rem 2rem;
+            background: linear-gradient(135deg, var(--primary), var(--accent-purple));
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary:hover {
+            box-shadow: 0 10px 30px rgba(99, 102, 241, 0.4);
+        }
+
+        .btn-outline {
+            padding: 0.8rem 2rem;
+            background: transparent;
+            color: white;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-outline:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        /* Robot Card */
+        .bento-robot {
+            grid-column: span 2;
+            grid-row: span 2;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: radial-gradient(circle at center, rgba(99, 102, 241, 0.15), transparent);
+        }
+
+        .robot-circle {
+            width: 280px;
+            height: 280px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(168, 85, 247, 0.2));
+            border: 2px solid rgba(99, 102, 241, 0.3);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            animation: pulse 3s ease-in-out infinite;
+        }
+
+        .robot-circle span {
+            font-size: 8rem;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.05); opacity: 0.9; }
+        }
+
+        /* Service Cards */
+        .bento-service {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .service-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .icon-blue { background: linear-gradient(135deg, rgba(34, 211, 238, 0.2), rgba(34, 211, 238, 0.05)); }
+        .icon-purple { background: linear-gradient(135deg, rgba(168, 85, 247, 0.2), rgba(168, 85, 247, 0.05)); }
+        .icon-pink { background: linear-gradient(135deg, rgba(236, 72, 153, 0.2), rgba(236, 72, 153, 0.05)); }
+        .icon-green { background: linear-gradient(135deg, rgba(34, 197, 94, 0.2), rgba(34, 197, 94, 0.05)); }
+
+        .bento-service h3 {
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .bento-service p {
+            color: var(--text-gray);
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        /* Stats Card - Wide */
+        .bento-stats {
+            grid-column: span 2;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            background: linear-gradient(90deg, rgba(34, 211, 238, 0.05), rgba(236, 72, 153, 0.05));
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .stat-label {
+            color: var(--text-gray);
+            font-size: 0.9rem;
+            margin-top: 0.25rem;
+        }
+
+        /* Feature Card - Tall */
+        .bento-feature {
+            grid-row: span 2;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .feature-visual {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 1rem 0;
+        }
+
+        .feature-bars {
+            display: flex;
+            align-items: flex-end;
+            gap: 0.5rem;
+            height: 120px;
+        }
+
+        .bar {
+            width: 20px;
+            border-radius: 4px;
+            animation: grow 2s ease-in-out infinite;
+        }
+
+        .bar:nth-child(1) { height: 40%; background: var(--accent-cyan); animation-delay: 0s; }
+        .bar:nth-child(2) { height: 60%; background: var(--primary); animation-delay: 0.2s; }
+        .bar:nth-child(3) { height: 80%; background: var(--accent-purple); animation-delay: 0.4s; }
+        .bar:nth-child(4) { height: 100%; background: var(--accent-pink); animation-delay: 0.6s; }
+        .bar:nth-child(5) { height: 70%; background: var(--primary-light); animation-delay: 0.8s; }
+
+        @keyframes grow {
+            0%, 100% { transform: scaleY(1); }
+            50% { transform: scaleY(0.8); }
+        }
+
+        /* Contact Card - Wide */
+        .bento-contact {
+            grid-column: span 3;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(168, 85, 247, 0.05));
+        }
+
+        .contact-text h3 {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .contact-text p {
+            color: var(--text-gray);
+        }
+
+        /* Testimonial Card */
+        .bento-testimonial {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .testimonial-quote {
+            font-style: italic;
+            color: var(--text-gray);
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+
+        .testimonial-author {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .author-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--accent-purple));
+        }
+
+        .author-name {
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .author-role {
+            font-size: 0.8rem;
+            color: var(--text-gray);
+        }
+
+        /* Footer */
+        footer {
+            padding: 3rem 2rem;
+            text-align: center;
+            color: var(--text-gray);
+            border-top: 1px solid var(--border-color);
+            margin-top: 4rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .bento-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .bento-hero, .bento-robot {
+                grid-column: span 2;
+            }
+            .bento-stats, .bento-contact {
+                grid-column: span 2;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .bento-grid {
+                grid-template-columns: 1fr;
+            }
+            .bento-hero, .bento-robot, .bento-stats, .bento-contact, .bento-feature {
+                grid-column: span 1;
+                grid-row: span 1;
+            }
+            .bento-hero h1 {
+                font-size: 2rem;
+            }
+            .nav-links {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav>
+        <div class="logo">TunixLabs</div>
+        <div class="nav-links">
+            <a href="#">Inicio</a>
+            <a href="#">Servicios</a>
+            <a href="#">Casos</a>
+            <a href="#">Nosotros</a>
+            <a href="#">Contacto</a>
+        </div>
+        <button class="nav-btn">Comenzar</button>
+    </nav>
+
+    <!-- Main Content -->
+    <main>
+        <div class="bento-grid">
+            <!-- Hero Card -->
+            <div class="bento-card bento-hero">
+                <h1>Soluciones de <span>Inteligencia Artificial</span> para tu negocio</h1>
+                <p>En TunixLabs, transformamos tu empresa con tecnologia de vanguardia. Nuestras soluciones de IA estan disenadas para impulsar tu crecimiento.</p>
+                <div class="hero-buttons">
+                    <button class="btn-primary">Contactar</button>
+                    <button class="btn-outline">Ver Servicios</button>
+                </div>
+            </div>
+
+            <!-- Robot Card -->
+            <div class="bento-card bento-robot">
+                <div class="robot-circle">
+                    <span>&#129302;</span>
+                </div>
+            </div>
+
+            <!-- Service Cards -->
+            <div class="bento-card bento-service">
+                <div class="service-icon icon-blue">&#128187;</div>
+                <h3>Desarrollos Web</h3>
+                <p>Experiencias web interactivas potenciadas con IA.</p>
+            </div>
+
+            <div class="bento-card bento-service">
+                <div class="service-icon icon-purple">&#129504;</div>
+                <h3>Machine Learning</h3>
+                <p>Modelos predictivos que aprenden de tus datos.</p>
+            </div>
+
+            <!-- Stats Card -->
+            <div class="bento-card bento-stats">
+                <div class="stat">
+                    <div class="stat-value">150+</div>
+                    <div class="stat-label">Proyectos</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value">98%</div>
+                    <div class="stat-label">Satisfaccion</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value">24/7</div>
+                    <div class="stat-label">Soporte</div>
+                </div>
+            </div>
+
+            <!-- Feature Card - Analytics -->
+            <div class="bento-card bento-feature">
+                <div>
+                    <div class="service-icon icon-green">&#128200;</div>
+                    <h3>Business Intelligence</h3>
+                </div>
+                <div class="feature-visual">
+                    <div class="feature-bars">
+                        <div class="bar"></div>
+                        <div class="bar"></div>
+                        <div class="bar"></div>
+                        <div class="bar"></div>
+                        <div class="bar"></div>
+                    </div>
+                </div>
+                <p>Dashboards interactivos para monitorear tu negocio en tiempo real.</p>
+            </div>
+
+            <div class="bento-card bento-service">
+                <div class="service-icon icon-pink">&#128172;</div>
+                <h3>Asistentes IA</h3>
+                <p>Asistentes virtuales inteligentes 24/7.</p>
+            </div>
+
+            <div class="bento-card bento-service">
+                <div class="service-icon icon-blue">&#128065;</div>
+                <h3>Vision Artificial</h3>
+                <p>Reconocimiento y analisis de imagenes.</p>
+            </div>
+
+            <!-- Contact Card -->
+            <div class="bento-card bento-contact">
+                <div class="contact-text">
+                    <h3>Listo para empezar?</h3>
+                    <p>Contactanos hoy para una consulta gratuita</p>
+                </div>
+                <button class="btn-primary">Enviar Mensaje</button>
+            </div>
+
+            <!-- Testimonial Card -->
+            <div class="bento-card bento-testimonial">
+                <p class="testimonial-quote">"TunixLabs transformo completamente nuestra forma de trabajar con IA."</p>
+                <div class="testimonial-author">
+                    <div class="author-avatar"></div>
+                    <div>
+                        <div class="author-name">Maria Garcia</div>
+                        <div class="author-role">CEO, TechCorp</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2026 TunixLabs. Todos los derechos reservados.</p>
+        <p style="margin-top: 0.5rem; font-size: 0.875rem;">Propuesta UI: Bento Grid Layout 2026</p>
+    </footer>
+</body>
+</html>

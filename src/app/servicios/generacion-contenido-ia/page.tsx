@@ -1,21 +1,21 @@
 import React from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
-import { FiArrowLeft, FiMessageCircle, FiEdit, FiImage, FiSearch, FiZap, FiLayers, FiTrendingUp, FiBarChart2, FiCloud, FiDatabase } from 'react-icons/fi';
+import { FiArrowLeft, FiMessageCircle, FiEdit, FiImage, FiSearch, FiZap, FiTrendingUp, FiBarChart2, FiCloud, FiDatabase } from 'react-icons/fi';
 
 const beneficios = [
   {
-    icon: <FiTrendingUp className="h-8 w-8 text-pink-500" />, 
+    icon: <FiTrendingUp className="h-8 w-8" style={{ color: 'var(--neu-primary)' }} />,
     title: 'Ahorro de Tiempo y Recursos',
     desc: 'Automatiza la creación de textos, imágenes y videos, reduciendo el esfuerzo manual y acelerando la producción de campañas.'
   },
   {
-    icon: <FiZap className="h-8 w-8 text-pink-500" />, 
+    icon: <FiZap className="h-8 w-8" style={{ color: 'var(--neu-primary)' }} />,
     title: 'Consistencia y Escalabilidad',
     desc: 'Genera contenido coherente y adaptado a múltiples canales y audiencias, manteniendo la calidad a gran escala.'
   },
   {
-    icon: <FiBarChart2 className="h-8 w-8 text-pink-500" />, 
+    icon: <FiBarChart2 className="h-8 w-8" style={{ color: 'var(--neu-primary)' }} />,
     title: 'Optimización SEO y Engagement',
     desc: 'Crea textos e imágenes optimizados para buscadores y maximiza la interacción con tu audiencia.'
   },
@@ -23,17 +23,17 @@ const beneficios = [
 
 const tecnologias = [
   {
-    icon: <FiCloud className="h-8 w-8 text-pink-500" />,
+    icon: <FiCloud className="h-8 w-8" style={{ color: 'var(--neu-primary)' }} />,
     title: 'Plataformas Generativas',
     desc: 'OpenAI GPT, DALL·E, Midjourney, Jasper, Copy.ai para generación de texto e imágenes personalizadas.'
   },
   {
-    icon: <FiDatabase className="h-8 w-8 text-pink-500" />,
+    icon: <FiDatabase className="h-8 w-8" style={{ color: 'var(--neu-primary)' }} />,
     title: 'Integraciones de CMS y Automatización',
     desc: 'WordPress, Contentful, HubSpot, Shopify y APIs para publicación y gestión automatizada de contenido.'
   },
   {
-    icon: <FiZap className="h-8 w-8 text-pink-500" />,
+    icon: <FiZap className="h-8 w-8" style={{ color: 'var(--neu-primary)' }} />,
     title: 'Herramientas de Optimización',
     desc: 'SurferSEO, Grammarly, Google Analytics y sistemas de analítica para mejorar calidad y resultados.'
   },
@@ -41,17 +41,17 @@ const tecnologias = [
 
 const queOfrecemos = [
   {
-    icon: <FiEdit className="h-10 w-10 text-pink-500 mb-4" />,
+    icon: <FiEdit className="h-10 w-10" style={{ color: 'var(--neu-primary)' }} />,
     title: 'Copywriting y Creatividad Automática',
     desc: 'Textos para blogs, productos, emails y campañas, adaptados a tu tono, objetivos y SEO.'
   },
   {
-    icon: <FiImage className="h-10 w-10 text-pink-500 mb-4" />,
+    icon: <FiImage className="h-10 w-10" style={{ color: 'var(--neu-primary)' }} />,
     title: 'Imágenes y Videos Personalizados',
     desc: 'Recursos visuales únicos y creativos para campañas, redes sociales y branding.'
   },
   {
-    icon: <FiSearch className="h-10 w-10 text-pink-500 mb-4" />,
+    icon: <FiSearch className="h-10 w-10" style={{ color: 'var(--neu-primary)' }} />,
     title: 'Optimización SEO con IA',
     desc: 'Contenido optimizado para buscadores, análisis de palabras clave y tendencias para mayor visibilidad.'
   },
@@ -74,7 +74,7 @@ const pasos = [
 
 const GeneracionContenidoIAPage: React.FC = () => {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-pink-50 via-white to-red-50 dark:from-gray-900 dark:via-gray-950 dark:to-pink-900 text-gray-900 dark:text-gray-100 flex flex-col items-center pt-0 pb-0">
+    <div className="min-h-screen neu-bg" style={{ backgroundColor: 'var(--neu-bg)' }}>
       <Head>
         <title>Generación de Contenido con IA - TunixLabs</title>
         <meta name="description" content="Crea textos, imágenes y videos personalizados mediante IA, optimizados para SEO, engagement y resultados de negocio. Automatiza y escala tu marketing de contenidos." />
@@ -85,97 +85,139 @@ const GeneracionContenidoIAPage: React.FC = () => {
         <meta property="og:type" content="website" />
         <link rel="canonical" href="https://www.tunixlabs.com/servicios/generacion-contenido-ia" />
       </Head>
-      {/* HERO */}
-      <section className="w-full bg-gradient-to-r from-pink-600 via-red-500 to-pink-400 py-20 px-4 flex flex-col items-center relative overflow-hidden animate-fade-in">
-        <div className="absolute inset-0 pointer-events-none opacity-10 bg-[radial-gradient(circle_at_20%_20%,white,transparent_60%)]" />
-        <div className="max-w-4xl mx-auto text-center z-10">
-          <Link href="/inicio" className="inline-flex items-center text-white/80 hover:text-white transition-colors duration-300 mb-8">
-          <FiArrowLeft className="h-5 w-5 mr-2" />
-          Volver a Servicios
-        </Link>
-          <h1 className="text-5xl sm:text-6xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-white via-pink-100 to-red-200 animate-gradient-x drop-shadow-lg">
+
+      {/* HERO - Neumorphic Style */}
+      <section className="w-full py-16 sm:py-20 px-4 neu-bg relative overflow-hidden">
+        <div className="absolute -top-20 -right-20 w-80 h-80 rounded-full bg-indigo-300 mix-blend-multiply opacity-20 filter blur-3xl"></div>
+        <div className="absolute -bottom-20 -left-20 w-72 h-72 rounded-full bg-purple-300 mix-blend-multiply opacity-20 filter blur-3xl"></div>
+
+        <div className="max-w-4xl mx-auto text-center relative z-10">
+          <Link href="/inicio" className="neu-pressed inline-flex items-center px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 mb-8" style={{ color: '#718096' }}>
+            <FiArrowLeft className="h-4 w-4 mr-2" />
+            Volver a Servicios
+          </Link>
+
+          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold neu-gradient-text mb-6">
             Generación de Contenido con IA
           </h1>
-          <p className="mt-6 text-xl text-white/90 max-w-2xl mx-auto animate-fade-in-up">
+
+          <p className="text-lg sm:text-xl max-w-2xl mx-auto mb-10" style={{ color: '#718096', lineHeight: '1.7' }}>
             Impulsa tu marketing y comunicación con generación de contenido inteligente. Automatiza la creación de textos, imágenes y videos personalizados, optimizados para SEO, engagement y resultados de negocio. Escala tu estrategia de contenidos con IA generativa y creatividad a gran escala.
           </p>
-          <div className="mt-10 flex justify-center">
-            <Link href="/contacto" className="inline-flex items-center px-8 py-4 rounded-2xl text-lg font-semibold bg-gradient-to-r from-pink-500 to-red-500 hover:from-pink-600 hover:to-red-600 shadow-xl transition-all duration-300 text-white animate-bounce">
-            <FiMessageCircle className="h-6 w-6 mr-3" />
+
+          <Link href="/contacto" className="neu-btn-primary inline-flex items-center">
+            <FiMessageCircle className="h-5 w-5 mr-2" />
             Automatiza tu contenido con IA
           </Link>
         </div>
-      </div>
       </section>
-      {/* ¿Qué ofrecemos? */}
-      <section className="w-full max-w-6xl mx-auto px-4 py-20">
-        <h2 className="text-3xl sm:text-4xl font-bold text-center mb-4 text-pink-700 dark:text-pink-300 animate-fade-in-up">¿Qué ofrecemos?</h2>
-        <p className="text-lg text-center text-gray-700 dark:text-gray-300 mb-12 animate-fade-in-up">
+
+      {/* Que ofrecemos - Neumorphic */}
+      <section className="w-full max-w-6xl mx-auto px-4 py-16 sm:py-20">
+        <div className="text-center mb-12">
+          <span className="neu-pressed inline-block px-4 py-2 rounded-full text-sm font-semibold uppercase mb-4" style={{ color: 'var(--neu-primary)' }}>
+            Que ofrecemos
+          </span>
+          <h2 className="text-3xl sm:text-4xl font-bold neu-gradient-text">Contenido Inteligente a Medida</h2>
+        </div>
+        <p className="text-lg text-center mb-12" style={{ color: '#718096' }}>
           Generación de contenido automatizado y personalizado con IA: textos, imágenes y videos adaptados a tu marca, objetivos y canales. Integramos creatividad, automatización y optimización SEO para maximizar el impacto de tu comunicación.
         </p>
-        <div className="grid gap-8 md:grid-cols-3">
+
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {queOfrecemos.map((item, i) => (
-            <div key={i} className="group bg-white/90 dark:bg-gray-800/90 border border-pink-100 dark:border-pink-900 rounded-3xl shadow-lg p-8 flex flex-col items-center text-center hover:scale-105 hover:shadow-2xl transition-all duration-300 animate-fade-in-up">
-              {item.icon}
-              <h3 className="text-xl font-semibold mb-2 text-pink-700 dark:text-pink-300">{item.title}</h3>
-              <p className="text-gray-700 dark:text-gray-300">{item.desc}</p>
+            <div key={i} className="neu-raised p-6 rounded-2xl text-center transition-all duration-300 hover:-translate-y-1">
+              <div className="neu-service-icon mx-auto">{item.icon}</div>
+              <h3 className="text-lg font-bold mt-4 mb-2" style={{ color: '#2d3748' }}>{item.title}</h3>
+              <p className="text-sm" style={{ color: '#718096' }}>{item.desc}</p>
             </div>
           ))}
         </div>
       </section>
-      {/* BENEFICIOS CLAVE */}
-      <section className="w-full max-w-6xl mx-auto px-4 py-20">
-        <h2 className="text-3xl sm:text-4xl font-bold text-center mb-12 text-pink-700 dark:text-pink-300 animate-fade-in-up">Beneficios Clave</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+
+      {/* Beneficios - Neumorphic */}
+      <section className="w-full max-w-6xl mx-auto px-4 py-16 sm:py-20">
+        <div className="text-center mb-12">
+          <span className="neu-pressed inline-block px-4 py-2 rounded-full text-sm font-semibold uppercase mb-4" style={{ color: 'var(--neu-primary)' }}>
+            Beneficios
+          </span>
+          <h2 className="text-3xl sm:text-4xl font-bold neu-gradient-text">Beneficios Clave</h2>
+        </div>
+
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {beneficios.map((item, i) => (
-            <div key={i} className="group bg-white/90 dark:bg-gray-800/90 rounded-3xl shadow-lg p-8 flex flex-col items-center text-center border border-pink-100 dark:border-pink-900 hover:scale-105 hover:shadow-2xl transition-all duration-300 animate-fade-in-up">
-              <div className="mb-4">{item.icon}</div>
-              <h3 className="text-xl font-bold mb-2 text-pink-700 dark:text-pink-300">{item.title}</h3>
-              <p className="text-gray-700 dark:text-gray-300">{item.desc}</p>
+            <div key={i} className="neu-raised p-6 rounded-2xl text-center transition-all duration-300 hover:-translate-y-1">
+              <div className="neu-service-icon mx-auto">{item.icon}</div>
+              <h3 className="text-lg font-bold mt-4 mb-2" style={{ color: '#2d3748' }}>{item.title}</h3>
+              <p className="text-sm" style={{ color: '#718096' }}>{item.desc}</p>
             </div>
           ))}
         </div>
       </section>
-      {/* TECNOLOGÍAS USADAS */}
-      <section className="w-full max-w-6xl mx-auto px-4 py-20">
-        <h2 className="text-3xl sm:text-4xl font-bold text-center mb-12 text-pink-700 dark:text-pink-300 animate-fade-in-up">Tecnologías Usadas</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+
+      {/* Tecnologias - Neumorphic */}
+      <section className="w-full max-w-6xl mx-auto px-4 py-16 sm:py-20">
+        <div className="text-center mb-12">
+          <span className="neu-pressed inline-block px-4 py-2 rounded-full text-sm font-semibold uppercase mb-4" style={{ color: 'var(--neu-primary)' }}>
+            Tecnologias
+          </span>
+          <h2 className="text-3xl sm:text-4xl font-bold neu-gradient-text">Tecnologías Usadas</h2>
+        </div>
+
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {tecnologias.map((item, i) => (
-            <div key={i} className="group bg-white/90 dark:bg-gray-800/90 rounded-3xl shadow-lg p-8 flex flex-col items-center text-center border border-pink-100 dark:border-pink-900 hover:scale-105 hover:shadow-2xl transition-all duration-300 animate-fade-in-up">
-              <div className="mb-4">{item.icon}</div>
-              <h3 className="text-xl font-bold mb-2 text-pink-700 dark:text-pink-300">{item.title}</h3>
-              <p className="text-gray-700 dark:text-gray-300">{item.desc}</p>
+            <div key={i} className="neu-raised p-6 rounded-2xl text-center transition-all duration-300 hover:-translate-y-1">
+              <div className="neu-service-icon mx-auto">{item.icon}</div>
+              <h3 className="text-lg font-bold mt-4 mb-2" style={{ color: '#2d3748' }}>{item.title}</h3>
+              <p className="text-sm" style={{ color: '#718096' }}>{item.desc}</p>
             </div>
           ))}
         </div>
       </section>
-      {/* NUESTRO PROCESO */}
-      <section className="w-full max-w-6xl mx-auto px-4 py-20">
-        <h2 className="text-3xl sm:text-4xl font-bold text-center mb-12 text-pink-700 dark:text-pink-300 animate-fade-in-up">Nuestro Proceso</h2>
-        <div className="flex flex-col md:flex-row md:justify-center md:items-start gap-8">
-          <ol className="flex-1 space-y-6">
+
+      {/* Proceso - Neumorphic */}
+      <section className="w-full max-w-4xl mx-auto px-4 py-16 sm:py-20">
+        <div className="text-center mb-12">
+          <span className="neu-pressed inline-block px-4 py-2 rounded-full text-sm font-semibold uppercase mb-4" style={{ color: 'var(--neu-primary)' }}>
+            Proceso
+          </span>
+          <h2 className="text-3xl sm:text-4xl font-bold neu-gradient-text">Nuestro Proceso</h2>
+        </div>
+
+        <div className="neu-raised p-6 sm:p-8 rounded-2xl">
+          <ol className="space-y-6">
             {pasos.map((item, i) => (
-              <li key={i} className="flex items-start gap-4 animate-fade-in-up">
-                <span className="flex items-center justify-center h-10 w-10 rounded-full bg-pink-100 dark:bg-pink-900 text-pink-700 dark:text-pink-300 font-bold text-xl border-2 border-pink-300 dark:border-pink-700 mr-2">{i+1}</span>
+              <li key={i} className="flex items-start gap-4">
+                <span className="neu-service-icon flex-shrink-0" style={{ width: '48px', height: '48px', margin: 0, fontSize: '1.25rem', fontWeight: 'bold', color: 'var(--neu-primary)' }}>
+                  {i + 1}
+                </span>
                 <div>
-                  <h3 className="text-lg font-bold mb-1 text-pink-700 dark:text-pink-300">{item.title}</h3>
-                  <p className="text-gray-700 dark:text-gray-300">{item.desc}</p>
+                  <h3 className="text-lg font-bold mb-1" style={{ color: '#2d3748' }}>{item.title}</h3>
+                  <p className="text-sm" style={{ color: '#718096' }}>{item.desc}</p>
                 </div>
               </li>
             ))}
           </ol>
         </div>
       </section>
-      {/* CTA FINAL */}
-      <section className="w-full flex flex-col items-center py-16 bg-gradient-to-r from-pink-100 via-red-50 to-white dark:from-pink-900 dark:via-gray-900 dark:to-gray-950 animate-fade-in">
-        <h2 className="text-2xl font-bold mb-6 text-pink-700 dark:text-pink-300">¿Listo para crear contenido a escala?</h2>
-        <Link href="/contacto" className="inline-flex items-center px-8 py-4 rounded-2xl text-lg font-semibold bg-gradient-to-r from-pink-500 to-red-500 hover:from-pink-600 hover:to-red-600 shadow-xl transition-all duration-300 text-white animate-bounce">
-          <FiMessageCircle className="h-6 w-6 mr-3" />
-          Solicita una demo gratuita
-        </Link>
+
+      {/* CTA Final - Neumorphic */}
+      <section className="w-full py-16 sm:py-20 px-4 neu-bg">
+        <div className="max-w-4xl mx-auto text-center">
+          <h2 className="text-2xl sm:text-3xl font-bold mb-6 neu-gradient-text">Listo para crear contenido a escala?</h2>
+          <Link href="/contacto" className="neu-btn-primary inline-flex items-center">
+            <FiMessageCircle className="h-5 w-5 mr-2" />
+            Solicita una demo gratuita
+          </Link>
+        </div>
       </section>
+
+      {/* Footer */}
+      <footer className="py-8 neu-bg text-center" style={{ color: '#718096' }}>
+        <p>&copy; 2026 TunixLabs. Todos los derechos reservados.</p>
+      </footer>
     </div>
   );
 };
 
-export default GeneracionContenidoIAPage; 
+export default GeneracionContenidoIAPage;

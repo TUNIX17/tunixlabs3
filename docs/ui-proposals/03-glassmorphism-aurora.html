@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TunixLabs - Propuesta Glassmorphism + Aurora 2026</title>
+    <style>
+        :root {
+            --glass-bg: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --text-white: #ffffff;
+            --text-light: rgba(255, 255, 255, 0.8);
+            --text-muted: rgba(255, 255, 255, 0.6);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
+            min-height: 100vh;
+            overflow-x: hidden;
+            color: var(--text-white);
+        }
+
+        /* Aurora Background */
+        .aurora-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            z-index: -2;
+        }
+
+        .aurora-layer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .aurora-blob {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            animation: aurora 15s ease-in-out infinite;
+        }
+
+        .blob-1 {
+            width: 600px;
+            height: 600px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            top: -200px;
+            left: -100px;
+            opacity: 0.6;
+        }
+
+        .blob-2 {
+            width: 500px;
+            height: 500px;
+            background: linear-gradient(135deg, #f093fb, #f5576c);
+            top: 50%;
+            right: -150px;
+            opacity: 0.5;
+            animation-delay: -5s;
+        }
+
+        .blob-3 {
+            width: 450px;
+            height: 450px;
+            background: linear-gradient(135deg, #4facfe, #00f2fe);
+            bottom: -100px;
+            left: 30%;
+            opacity: 0.5;
+            animation-delay: -10s;
+        }
+
+        .blob-4 {
+            width: 350px;
+            height: 350px;
+            background: linear-gradient(135deg, #43e97b, #38f9d7);
+            top: 40%;
+            left: 10%;
+            opacity: 0.4;
+            animation-delay: -7s;
+        }
+
+        @keyframes aurora {
+            0%, 100% {
+                transform: translate(0, 0) scale(1) rotate(0deg);
+            }
+            25% {
+                transform: translate(50px, -30px) scale(1.1) rotate(5deg);
+            }
+            50% {
+                transform: translate(-30px, 50px) scale(0.9) rotate(-5deg);
+            }
+            75% {
+                transform: translate(-50px, -20px) scale(1.05) rotate(3deg);
+            }
+        }
+
+        /* Glass Styles */
+        .glass {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+        }
+
+        .glass-strong {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 1rem;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 0.8rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 3rem;
+            z-index: 1000;
+            border-radius: 100px;
+        }
+
+        .logo {
+            font-size: 1.4rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #fff, rgba(255,255,255,0.7));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: var(--text-white);
+        }
+
+        .nav-btn {
+            padding: 0.6rem 1.5rem;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 100px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .nav-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        /* Main Container */
+        main {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 8rem 2rem 4rem;
+        }
+
+        /* Hero Section */
+        .hero {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+            min-height: 80vh;
+        }
+
+        .hero-content h1 {
+            font-size: 4rem;
+            line-height: 1.1;
+            margin-bottom: 1.5rem;
+            font-weight: 700;
+        }
+
+        .hero-content h1 .gradient-text {
+            background: linear-gradient(135deg, #667eea, #f093fb, #4facfe);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: textShimmer 3s linear infinite;
+        }
+
+        @keyframes textShimmer {
+            0% { background-position: 0% center; }
+            100% { background-position: 200% center; }
+        }
+
+        .hero-content p {
+            font-size: 1.2rem;
+            color: var(--text-light);
+            line-height: 1.8;
+            margin-bottom: 2.5rem;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn-primary {
+            padding: 1rem 2.5rem;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 100px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 10px 40px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 50px rgba(102, 126, 234, 0.5);
+        }
+
+        .btn-glass {
+            padding: 1rem 2.5rem;
+            background: var(--glass-bg);
+            color: white;
+            border: 1px solid var(--glass-border);
+            border-radius: 100px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s;
+        }
+
+        .btn-glass:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Robot Container */
+        .hero-visual {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .robot-container {
+            position: relative;
+            width: 400px;
+            height: 400px;
+        }
+
+        .robot-glass {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .robot-glow {
+            position: absolute;
+            width: 320px;
+            height: 320px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(102, 126, 234, 0.4), transparent);
+            filter: blur(40px);
+        }
+
+        .robot-icon {
+            font-size: 10rem;
+            z-index: 1;
+            filter: drop-shadow(0 0 30px rgba(102, 126, 234, 0.5));
+        }
+
+        .orbit-ring {
+            position: absolute;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            animation: spin 20s linear infinite;
+        }
+
+        .orbit-1 { width: 450px; height: 450px; }
+        .orbit-2 { width: 500px; height: 500px; animation-direction: reverse; animation-duration: 25s; }
+
+        .orbit-dot {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: linear-gradient(135deg, #4facfe, #00f2fe);
+            border-radius: 50%;
+            box-shadow: 0 0 20px rgba(79, 172, 254, 0.8);
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        /* Services Section */
+        .services {
+            padding: 6rem 0;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        .section-label {
+            display: inline-block;
+            padding: 0.5rem 1.5rem;
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--text-light);
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            margin-bottom: 1rem;
+            border-radius: 100px;
+        }
+
+        .section-title {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .section-subtitle {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+        }
+
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+        }
+
+        .service-card {
+            padding: 2.5rem;
+            text-align: center;
+            transition: all 0.4s ease;
+        }
+
+        .service-card:hover {
+            transform: translateY(-10px);
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .service-icon {
+            width: 70px;
+            height: 70px;
+            margin: 0 auto 1.5rem;
+            border-radius: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 2rem;
+            background: linear-gradient(135deg, rgba(255,255,255,0.2), rgba(255,255,255,0.05));
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .service-card h3 {
+            font-size: 1.3rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .service-card p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        /* Stats Section */
+        .stats {
+            padding: 3rem;
+            margin: 4rem 0;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 2rem;
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 3rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #4facfe, #f093fb);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .stat-label {
+            color: var(--text-muted);
+            font-size: 1rem;
+            margin-top: 0.5rem;
+        }
+
+        /* Contact Section */
+        .contact {
+            padding: 4rem 0;
+        }
+
+        .contact-card {
+            max-width: 700px;
+            margin: 0 auto;
+            padding: 3rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--text-light);
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 1rem 1.5rem;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            color: white;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+
+        .form-group input::placeholder,
+        .form-group textarea::placeholder {
+            color: var(--text-muted);
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: rgba(102, 126, 234, 0.5);
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+
+        /* Footer */
+        footer {
+            padding: 3rem 2rem;
+            text-align: center;
+            color: var(--text-muted);
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .hero {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+            .hero-visual {
+                order: -1;
+            }
+            .services-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .hero-content h1 {
+                font-size: 2.5rem;
+            }
+            .services-grid {
+                grid-template-columns: 1fr;
+            }
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            .nav-links {
+                display: none;
+            }
+            nav {
+                width: calc(100% - 2rem);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Aurora Background -->
+    <div class="aurora-bg"></div>
+    <div class="aurora-layer">
+        <div class="aurora-blob blob-1"></div>
+        <div class="aurora-blob blob-2"></div>
+        <div class="aurora-blob blob-3"></div>
+        <div class="aurora-blob blob-4"></div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="glass">
+        <div class="logo">TunixLabs</div>
+        <div class="nav-links">
+            <a href="#">Inicio</a>
+            <a href="#">Servicios</a>
+            <a href="#">Nosotros</a>
+            <a href="#">Contacto</a>
+        </div>
+        <button class="nav-btn">Comenzar</button>
+    </nav>
+
+    <!-- Main Content -->
+    <main>
+        <!-- Hero Section -->
+        <section class="hero">
+            <div class="hero-content">
+                <h1>Soluciones de <span class="gradient-text">Inteligencia Artificial</span> para tu negocio</h1>
+                <p>En TunixLabs, transformamos tu empresa con tecnologia de vanguardia. Nuestras soluciones de IA estan disenadas para impulsar tu crecimiento y optimizar tus procesos.</p>
+                <div class="hero-buttons">
+                    <button class="btn-primary">Contactar</button>
+                    <button class="btn-glass">Ver Servicios</button>
+                </div>
+            </div>
+            <div class="hero-visual">
+                <div class="robot-container">
+                    <div class="orbit-ring orbit-1">
+                        <div class="orbit-dot" style="top: 0; left: 50%; transform: translateX(-50%);"></div>
+                    </div>
+                    <div class="orbit-ring orbit-2">
+                        <div class="orbit-dot" style="bottom: 0; left: 50%; transform: translateX(-50%);"></div>
+                    </div>
+                    <div class="robot-glass glass">
+                        <div class="robot-glow"></div>
+                        <span class="robot-icon">&#129302;</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Services Section -->
+        <section class="services">
+            <div class="section-header">
+                <span class="section-label glass">Nuestros Servicios</span>
+                <h2 class="section-title">Soluciones de IA para cada necesidad</h2>
+                <p class="section-subtitle">Impulsando tu negocio con tecnologia de vanguardia</p>
+            </div>
+
+            <div class="services-grid">
+                <div class="service-card glass">
+                    <div class="service-icon">&#128187;</div>
+                    <h3>Desarrollos Web</h3>
+                    <p>Experiencias web interactivas y escalables, potenciadas con inteligencia artificial.</p>
+                </div>
+                <div class="service-card glass">
+                    <div class="service-icon">&#129504;</div>
+                    <h3>Machine Learning</h3>
+                    <p>Modelos predictivos que aprenden de tus datos para automatizar procesos.</p>
+                </div>
+                <div class="service-card glass">
+                    <div class="service-icon">&#128172;</div>
+                    <h3>Asistentes IA</h3>
+                    <p>Asistentes virtuales inteligentes que mejoran la experiencia del cliente.</p>
+                </div>
+                <div class="service-card glass">
+                    <div class="service-icon">&#128200;</div>
+                    <h3>Business Intelligence</h3>
+                    <p>Dashboards interactivos y reportes para monitorear tu negocio.</p>
+                </div>
+                <div class="service-card glass">
+                    <div class="service-icon">&#128065;</div>
+                    <h3>Vision Artificial</h3>
+                    <p>Sistemas de vision por computadora para analisis de imagenes.</p>
+                </div>
+                <div class="service-card glass">
+                    <div class="service-icon">&#128736;</div>
+                    <h3>RPA con IA</h3>
+                    <p>Automatiza tareas repetitivas con robots de software inteligentes.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Stats Section -->
+        <section class="stats glass-strong">
+            <div class="stats-grid">
+                <div class="stat">
+                    <div class="stat-value">150+</div>
+                    <div class="stat-label">Proyectos Completados</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value">98%</div>
+                    <div class="stat-label">Clientes Satisfechos</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value">24/7</div>
+                    <div class="stat-label">Soporte Continuo</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value">5+</div>
+                    <div class="stat-label">Anos Experiencia</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Contact Section -->
+        <section class="contact">
+            <div class="section-header">
+                <span class="section-label glass">Contacto</span>
+                <h2 class="section-title">Transforma tu negocio con IA</h2>
+                <p class="section-subtitle">Contactanos hoy para una consulta gratuita</p>
+            </div>
+
+            <div class="contact-card glass-strong">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Nombre</label>
+                        <input type="text" placeholder="Tu nombre">
+                    </div>
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" placeholder="tu@email.com">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Asunto</label>
+                    <input type="text" placeholder="Como podemos ayudarte?">
+                </div>
+                <div class="form-group">
+                    <label>Mensaje</label>
+                    <textarea rows="4" placeholder="Cuentanos sobre tu proyecto"></textarea>
+                </div>
+                <button class="btn-primary" style="width: 100%; margin-top: 1rem;">Enviar Mensaje</button>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2026 TunixLabs. Todos los derechos reservados.</p>
+        <p style="margin-top: 0.5rem; font-size: 0.875rem;">Propuesta UI: Glassmorphism + Aurora 2026</p>
+    </footer>
+</body>
+</html>

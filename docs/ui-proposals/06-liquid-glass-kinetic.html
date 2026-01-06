@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TunixLabs - Propuesta Liquid Glass + Kinetic Typography 2026</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+        :root {
+            --bg-primary: #f8fafc;
+            --bg-glass: rgba(255, 255, 255, 0.7);
+            --border-glass: rgba(255, 255, 255, 0.5);
+            --text-dark: #0f172a;
+            --text-muted: #64748b;
+            --primary: #3b82f6;
+            --primary-dark: #1d4ed8;
+            --accent-violet: #8b5cf6;
+            --accent-pink: #ec4899;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-dark);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Liquid Background */
+        .liquid-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .liquid-blob {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(100px);
+            opacity: 0.6;
+            animation: liquidMove 25s ease-in-out infinite;
+        }
+
+        .blob-1 {
+            width: 800px;
+            height: 800px;
+            background: linear-gradient(135deg, #dbeafe, #c7d2fe);
+            top: -300px;
+            left: -200px;
+        }
+
+        .blob-2 {
+            width: 600px;
+            height: 600px;
+            background: linear-gradient(135deg, #fce7f3, #f5d0fe);
+            top: 40%;
+            right: -200px;
+            animation-delay: -8s;
+        }
+
+        .blob-3 {
+            width: 500px;
+            height: 500px;
+            background: linear-gradient(135deg, #cffafe, #a5f3fc);
+            bottom: -100px;
+            left: 30%;
+            animation-delay: -15s;
+        }
+
+        @keyframes liquidMove {
+            0%, 100% {
+                transform: translate(0, 0) scale(1) rotate(0deg);
+                border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+            }
+            25% {
+                transform: translate(50px, -80px) scale(1.1) rotate(45deg);
+                border-radius: 30% 60% 70% 40% / 50% 60% 30% 60%;
+            }
+            50% {
+                transform: translate(-60px, 60px) scale(0.9) rotate(90deg);
+                border-radius: 50% 60% 30% 60% / 30% 60% 70% 40%;
+            }
+            75% {
+                transform: translate(40px, -30px) scale(1.05) rotate(135deg);
+                border-radius: 60% 40% 60% 40% / 70% 30% 50% 60%;
+            }
+        }
+
+        /* Liquid Glass Effect */
+        .liquid-glass {
+            background: var(--bg-glass);
+            backdrop-filter: blur(40px) saturate(180%);
+            -webkit-backdrop-filter: blur(40px) saturate(180%);
+            border: 1px solid var(--border-glass);
+            border-radius: 24px;
+            box-shadow:
+                0 4px 30px rgba(0, 0, 0, 0.05),
+                inset 0 1px 0 rgba(255, 255, 255, 0.6);
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 1rem;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 0.75rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 3rem;
+            z-index: 1000;
+            border-radius: 100px;
+        }
+
+        .logo {
+            font-size: 1.3rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary), var(--accent-violet));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: var(--text-dark);
+        }
+
+        .nav-btn {
+            padding: 0.6rem 1.5rem;
+            background: linear-gradient(135deg, var(--primary), var(--accent-violet));
+            color: white;
+            border: none;
+            border-radius: 100px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .nav-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(59, 130, 246, 0.3);
+        }
+
+        /* Main Container */
+        main {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 8rem 2rem 4rem;
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 90vh;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 4rem;
+        }
+
+        .hero-content {
+            flex: 1;
+            max-width: 650px;
+        }
+
+        /* Kinetic Typography */
+        .kinetic-title {
+            font-size: 4.5rem;
+            font-weight: 800;
+            line-height: 1.05;
+            margin-bottom: 1.5rem;
+            letter-spacing: -0.03em;
+        }
+
+        .kinetic-word {
+            display: inline-block;
+            animation: wordFloat 3s ease-in-out infinite;
+        }
+
+        .kinetic-word:nth-child(2) { animation-delay: 0.1s; }
+        .kinetic-word:nth-child(3) { animation-delay: 0.2s; }
+        .kinetic-word:nth-child(4) { animation-delay: 0.3s; }
+
+        @keyframes wordFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+
+        .gradient-text {
+            background: linear-gradient(135deg, var(--primary), var(--accent-violet), var(--accent-pink));
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: gradientShift 4s ease infinite;
+        }
+
+        @keyframes gradientShift {
+            0%, 100% { background-position: 0% center; }
+            50% { background-position: 100% center; }
+        }
+
+        /* Variable Font Animation */
+        .variable-text {
+            font-weight: 300;
+            animation: weightShift 3s ease-in-out infinite alternate;
+        }
+
+        @keyframes weightShift {
+            0% { font-weight: 300; }
+            100% { font-weight: 700; }
+        }
+
+        .hero p {
+            font-size: 1.25rem;
+            color: var(--text-muted);
+            line-height: 1.8;
+            margin-bottom: 2.5rem;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn-liquid {
+            padding: 1rem 2.5rem;
+            background: linear-gradient(135deg, var(--primary), var(--accent-violet));
+            color: white;
+            border: none;
+            border-radius: 100px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-liquid::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .btn-liquid:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 15px 40px rgba(59, 130, 246, 0.4);
+        }
+
+        .btn-liquid:hover::after {
+            width: 300px;
+            height: 300px;
+        }
+
+        .btn-glass {
+            padding: 1rem 2.5rem;
+            background: var(--bg-glass);
+            backdrop-filter: blur(20px);
+            color: var(--text-dark);
+            border: 1px solid var(--border-glass);
+            border-radius: 100px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-glass:hover {
+            background: rgba(255, 255, 255, 0.9);
+            transform: translateY(-3px);
+        }
+
+        /* Robot Visual */
+        .hero-visual {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .robot-liquid {
+            width: 400px;
+            height: 400px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        .robot-glass {
+            width: 320px;
+            height: 320px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            animation: floatRotate 8s ease-in-out infinite;
+            position: relative;
+        }
+
+        .robot-glass::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(139, 92, 246, 0.1));
+            animation: morphShape 8s ease-in-out infinite;
+        }
+
+        @keyframes floatRotate {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            25% { transform: translateY(-20px) rotate(5deg); }
+            50% { transform: translateY(-10px) rotate(-3deg); }
+            75% { transform: translateY(-25px) rotate(3deg); }
+        }
+
+        @keyframes morphShape {
+            0%, 100% { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; }
+            25% { border-radius: 30% 60% 70% 40% / 50% 60% 30% 60%; }
+            50% { border-radius: 50% 60% 30% 60% / 30% 60% 70% 40%; }
+            75% { border-radius: 60% 40% 60% 40% / 70% 30% 50% 60%; }
+        }
+
+        .robot-icon {
+            font-size: 10rem;
+            z-index: 1;
+            filter: drop-shadow(0 10px 30px rgba(59, 130, 246, 0.3));
+        }
+
+        /* Orbit rings */
+        .orbit {
+            position: absolute;
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            border-radius: 50%;
+            animation: spinOrbit 15s linear infinite;
+        }
+
+        .orbit-1 { width: 380px; height: 380px; }
+        .orbit-2 { width: 440px; height: 440px; animation-direction: reverse; animation-duration: 20s; }
+
+        .orbit-dot {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            top: -6px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .dot-blue { background: linear-gradient(135deg, var(--primary), #60a5fa); box-shadow: 0 0 20px rgba(59, 130, 246, 0.5); }
+        .dot-violet { background: linear-gradient(135deg, var(--accent-violet), #a78bfa); box-shadow: 0 0 20px rgba(139, 92, 246, 0.5); }
+
+        @keyframes spinOrbit {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        /* Services Section */
+        .services {
+            padding: 8rem 0;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        .section-title {
+            font-size: 3rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            margin-bottom: 1rem;
+        }
+
+        .section-subtitle {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+        }
+
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+        }
+
+        .service-card {
+            padding: 2.5rem;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .service-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.1);
+        }
+
+        .service-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 16px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(139, 92, 246, 0.1));
+        }
+
+        .service-card h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+        }
+
+        .service-card p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        /* Stats Section */
+        .stats {
+            padding: 4rem;
+            margin: 4rem 0;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 2rem;
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 3.5rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            background: linear-gradient(135deg, var(--primary), var(--accent-violet));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: countUp 2s ease-out;
+        }
+
+        @keyframes countUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .stat-label {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            margin-top: 0.5rem;
+        }
+
+        /* Contact Section */
+        .contact {
+            padding: 6rem 0;
+        }
+
+        .contact-card {
+            max-width: 700px;
+            margin: 0 auto;
+            padding: 3rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--text-dark);
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 1rem 1.5rem;
+            background: rgba(255, 255, 255, 0.8);
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            border-radius: 12px;
+            font-size: 1rem;
+            color: var(--text-dark);
+            transition: all 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+        }
+
+        .form-group input::placeholder,
+        .form-group textarea::placeholder {
+            color: var(--text-muted);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+
+        /* Footer */
+        footer {
+            padding: 3rem 2rem;
+            text-align: center;
+            color: var(--text-muted);
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .hero {
+                flex-direction: column;
+                text-align: center;
+            }
+            .hero-visual {
+                order: -1;
+            }
+            .kinetic-title {
+                font-size: 3rem;
+            }
+            .services-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .kinetic-title {
+                font-size: 2.5rem;
+            }
+            .services-grid {
+                grid-template-columns: 1fr;
+            }
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            .nav-links {
+                display: none;
+            }
+            nav {
+                width: calc(100% - 2rem);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Liquid Background -->
+    <div class="liquid-bg">
+        <div class="liquid-blob blob-1"></div>
+        <div class="liquid-blob blob-2"></div>
+        <div class="liquid-blob blob-3"></div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="liquid-glass">
+        <div class="logo">TunixLabs</div>
+        <div class="nav-links">
+            <a href="#">Inicio</a>
+            <a href="#">Servicios</a>
+            <a href="#">Nosotros</a>
+            <a href="#">Contacto</a>
+        </div>
+        <button class="nav-btn">Comenzar</button>
+    </nav>
+
+    <!-- Main Content -->
+    <main>
+        <!-- Hero Section -->
+        <section class="hero">
+            <div class="hero-content">
+                <h1 class="kinetic-title">
+                    <span class="kinetic-word">Soluciones</span>
+                    <span class="kinetic-word">de</span>
+                    <span class="kinetic-word gradient-text">Inteligencia</span>
+                    <span class="kinetic-word gradient-text">Artificial</span>
+                    <span class="kinetic-word variable-text">para tu negocio</span>
+                </h1>
+                <p>Transformamos tu empresa con tecnologia de vanguardia. Nuestras soluciones de IA estan disenadas para impulsar tu crecimiento y optimizar tus procesos.</p>
+                <div class="hero-buttons">
+                    <button class="btn-liquid">Contactar</button>
+                    <button class="btn-glass">Ver Servicios</button>
+                </div>
+            </div>
+            <div class="hero-visual">
+                <div class="robot-liquid">
+                    <div class="orbit orbit-1">
+                        <div class="orbit-dot dot-blue"></div>
+                    </div>
+                    <div class="orbit orbit-2">
+                        <div class="orbit-dot dot-violet"></div>
+                    </div>
+                    <div class="robot-glass liquid-glass">
+                        <span class="robot-icon">&#129302;</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Services Section -->
+        <section class="services">
+            <div class="section-header">
+                <h2 class="section-title">Nuestros Servicios</h2>
+                <p class="section-subtitle">Soluciones de IA para cada necesidad empresarial</p>
+            </div>
+
+            <div class="services-grid">
+                <div class="service-card liquid-glass">
+                    <div class="service-icon">&#128187;</div>
+                    <h3>Desarrollos Web</h3>
+                    <p>Experiencias web interactivas y escalables potenciadas con inteligencia artificial.</p>
+                </div>
+                <div class="service-card liquid-glass">
+                    <div class="service-icon">&#129504;</div>
+                    <h3>Machine Learning</h3>
+                    <p>Modelos predictivos que aprenden de tus datos para automatizar procesos.</p>
+                </div>
+                <div class="service-card liquid-glass">
+                    <div class="service-icon">&#128172;</div>
+                    <h3>Asistentes IA</h3>
+                    <p>Asistentes virtuales inteligentes para mejorar la experiencia del cliente.</p>
+                </div>
+                <div class="service-card liquid-glass">
+                    <div class="service-icon">&#128200;</div>
+                    <h3>Business Intelligence</h3>
+                    <p>Dashboards interactivos y reportes automatizados en tiempo real.</p>
+                </div>
+                <div class="service-card liquid-glass">
+                    <div class="service-icon">&#128065;</div>
+                    <h3>Vision Artificial</h3>
+                    <p>Sistemas de vision por computadora para analisis de imagenes.</p>
+                </div>
+                <div class="service-card liquid-glass">
+                    <div class="service-icon">&#128736;</div>
+                    <h3>RPA con IA</h3>
+                    <p>Automatizacion de tareas repetitivas con robots inteligentes.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Stats Section -->
+        <section class="stats liquid-glass">
+            <div class="stats-grid">
+                <div class="stat">
+                    <div class="stat-value">150+</div>
+                    <div class="stat-label">Proyectos Completados</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value">98%</div>
+                    <div class="stat-label">Clientes Satisfechos</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value">24/7</div>
+                    <div class="stat-label">Soporte Continuo</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value">5+</div>
+                    <div class="stat-label">Anos Experiencia</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Contact Section -->
+        <section class="contact">
+            <div class="section-header">
+                <h2 class="section-title">Contacto</h2>
+                <p class="section-subtitle">Transforma tu negocio con IA</p>
+            </div>
+
+            <div class="contact-card liquid-glass">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Nombre</label>
+                        <input type="text" placeholder="Tu nombre">
+                    </div>
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" placeholder="tu@email.com">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Asunto</label>
+                    <input type="text" placeholder="Como podemos ayudarte?">
+                </div>
+                <div class="form-group">
+                    <label>Mensaje</label>
+                    <textarea rows="4" placeholder="Cuentanos sobre tu proyecto"></textarea>
+                </div>
+                <button class="btn-liquid" style="width: 100%;">Enviar Mensaje</button>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2026 TunixLabs. Todos los derechos reservados.</p>
+        <p style="margin-top: 0.5rem; font-size: 0.875rem;">Propuesta UI: Liquid Glass + Kinetic Typography 2026</p>
+    </footer>
+</body>
+</html>

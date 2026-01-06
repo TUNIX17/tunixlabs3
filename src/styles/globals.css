@@ -628,11 +628,12 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
+  width: 100%;
 }
 
 .neu-robot-avatar {
-  width: 420px;
-  height: 420px;
+  width: min(420px, 85vw);
+  height: min(420px, 85vw);
   border-radius: 50%;
   background: var(--neu-bg);
   box-shadow:
@@ -650,8 +651,8 @@ body {
 .neu-robot-avatar::before {
   content: '';
   position: absolute;
-  width: 360px;
-  height: 360px;
+  width: calc(min(420px, 85vw) - 60px);
+  height: calc(min(420px, 85vw) - 60px);
   border-radius: 50%;
   background: linear-gradient(145deg, #e8edf5, #d4dbe8);
   box-shadow:
@@ -673,27 +674,68 @@ body {
 }
 
 /* Responsive Neumorphic Robot */
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
   .neu-robot-avatar {
-    width: 320px;
-    height: 320px;
+    width: min(380px, 80vw);
+    height: min(380px, 80vw);
+    box-shadow:
+      15px 15px 30px var(--neu-shadow-dark),
+      -15px -15px 30px var(--neu-shadow-light),
+      inset 0 0 60px rgba(99, 102, 241, 0.1);
   }
 
   .neu-robot-avatar::before {
-    width: 270px;
-    height: 270px;
+    width: calc(min(380px, 80vw) - 50px);
+    height: calc(min(380px, 80vw) - 50px);
+  }
+}
+
+@media (max-width: 768px) {
+  .neu-robot-avatar {
+    width: min(340px, 80vw);
+    height: min(340px, 80vw);
+    box-shadow:
+      12px 12px 24px var(--neu-shadow-dark),
+      -12px -12px 24px var(--neu-shadow-light),
+      inset 0 0 50px rgba(99, 102, 241, 0.1);
+  }
+
+  .neu-robot-avatar::before {
+    width: calc(min(340px, 80vw) - 45px);
+    height: calc(min(340px, 80vw) - 45px);
+    box-shadow:
+      inset 6px 6px 12px var(--neu-shadow-dark),
+      inset -6px -6px 12px var(--neu-shadow-light);
   }
 }
 
 @media (max-width: 480px) {
   .neu-robot-avatar {
-    width: 280px;
-    height: 280px;
+    width: min(300px, 85vw);
+    height: min(300px, 85vw);
+    box-shadow:
+      10px 10px 20px var(--neu-shadow-dark),
+      -10px -10px 20px var(--neu-shadow-light),
+      inset 0 0 40px rgba(99, 102, 241, 0.1);
   }
 
   .neu-robot-avatar::before {
-    width: 230px;
-    height: 230px;
+    width: calc(min(300px, 85vw) - 40px);
+    height: calc(min(300px, 85vw) - 40px);
+    box-shadow:
+      inset 5px 5px 10px var(--neu-shadow-dark),
+      inset -5px -5px 10px var(--neu-shadow-light);
+  }
+}
+
+/* Responsive Neumorphic Buttons */
+@media (max-width: 640px) {
+  .neu-btn-primary,
+  .neu-btn-secondary {
+    padding: 0.875rem 2rem;
+    font-size: 0.9rem;
+    width: 100%;
+    text-align: center;
   }
 }
 

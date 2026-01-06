@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TunixLabs - Propuesta 3D Immersive 2026</title>
+    <style>
+        :root {
+            --bg-dark: #050510;
+            --bg-gradient: linear-gradient(135deg, #0a0a1a 0%, #1a0a2e 50%, #0a1a2e 100%);
+            --primary: #7c3aed;
+            --primary-light: #a78bfa;
+            --accent-cyan: #06b6d4;
+            --accent-pink: #ec4899;
+            --text-white: #ffffff;
+            --text-gray: #a0aec0;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-white);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* 3D Scene Background */
+        .scene-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--bg-gradient);
+            z-index: -2;
+        }
+
+        .stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: -1;
+        }
+
+        .star {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle 3s ease-in-out infinite;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
+
+        /* Floating 3D shapes */
+        .floating-shapes {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: -1;
+            perspective: 1000px;
+        }
+
+        .shape {
+            position: absolute;
+            animation: float3d 20s ease-in-out infinite;
+        }
+
+        .cube {
+            width: 60px;
+            height: 60px;
+            transform-style: preserve-3d;
+            animation: rotate3d 15s linear infinite;
+        }
+
+        .cube-face {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            border: 1px solid rgba(124, 58, 237, 0.3);
+            background: rgba(124, 58, 237, 0.05);
+        }
+
+        .cube-face:nth-child(1) { transform: rotateY(0deg) translateZ(30px); }
+        .cube-face:nth-child(2) { transform: rotateY(90deg) translateZ(30px); }
+        .cube-face:nth-child(3) { transform: rotateY(180deg) translateZ(30px); }
+        .cube-face:nth-child(4) { transform: rotateY(-90deg) translateZ(30px); }
+        .cube-face:nth-child(5) { transform: rotateX(90deg) translateZ(30px); }
+        .cube-face:nth-child(6) { transform: rotateX(-90deg) translateZ(30px); }
+
+        @keyframes rotate3d {
+            from { transform: rotateX(0deg) rotateY(0deg); }
+            to { transform: rotateX(360deg) rotateY(360deg); }
+        }
+
+        @keyframes float3d {
+            0%, 100% { transform: translateY(0) translateZ(0); }
+            25% { transform: translateY(-50px) translateZ(100px); }
+            50% { transform: translateY(30px) translateZ(-50px); }
+            75% { transform: translateY(-20px) translateZ(50px); }
+        }
+
+        .sphere {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%, rgba(6, 182, 212, 0.4), transparent);
+            border: 1px solid rgba(6, 182, 212, 0.3);
+            box-shadow: 0 0 40px rgba(6, 182, 212, 0.2);
+        }
+
+        .ring {
+            width: 120px;
+            height: 120px;
+            border: 2px solid rgba(236, 72, 153, 0.3);
+            border-radius: 50%;
+            animation: spinRing 10s linear infinite;
+        }
+
+        @keyframes spinRing {
+            from { transform: rotateX(70deg) rotateZ(0deg); }
+            to { transform: rotateX(70deg) rotateZ(360deg); }
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            padding: 1.5rem 3rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(5, 5, 16, 0.7);
+            backdrop-filter: blur(20px);
+            z-index: 1000;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary-light), var(--accent-cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2.5rem;
+        }
+
+        .nav-links a {
+            color: var(--text-gray);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--primary), var(--accent-cyan));
+            transition: width 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: var(--text-white);
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        .nav-btn {
+            padding: 0.7rem 1.8rem;
+            background: linear-gradient(135deg, var(--primary), var(--accent-pink));
+            color: white;
+            border: none;
+            border-radius: 100px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 20px rgba(124, 58, 237, 0.4);
+        }
+
+        .nav-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(124, 58, 237, 0.5);
+        }
+
+        /* Main Container */
+        main {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 8rem 2rem 4rem;
+            position: relative;
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 90vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            position: relative;
+        }
+
+        .hero-content {
+            max-width: 900px;
+            z-index: 1;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1.2rem;
+            background: rgba(124, 58, 237, 0.2);
+            border: 1px solid rgba(124, 58, 237, 0.3);
+            border-radius: 100px;
+            font-size: 0.8rem;
+            color: var(--primary-light);
+            margin-bottom: 2rem;
+        }
+
+        .hero-badge span {
+            width: 8px;
+            height: 8px;
+            background: var(--accent-cyan);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .hero h1 {
+            font-size: 5rem;
+            font-weight: 700;
+            line-height: 1.1;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(135deg, #fff 0%, #a0aec0 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero h1 .gradient {
+            background: linear-gradient(135deg, var(--primary-light), var(--accent-cyan), var(--accent-pink));
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: shimmer 3s linear infinite;
+        }
+
+        @keyframes shimmer {
+            0% { background-position: 0% center; }
+            100% { background-position: 200% center; }
+        }
+
+        .hero p {
+            font-size: 1.3rem;
+            color: var(--text-gray);
+            margin-bottom: 3rem;
+            line-height: 1.8;
+        }
+
+        .hero-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+        }
+
+        .btn-glow {
+            padding: 1rem 2.5rem;
+            background: linear-gradient(135deg, var(--primary), var(--accent-pink));
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s;
+        }
+
+        .btn-glow::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn-glow:hover::before {
+            left: 100%;
+        }
+
+        .btn-glow:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(124, 58, 237, 0.5);
+        }
+
+        .btn-outline-glow {
+            padding: 1rem 2.5rem;
+            background: transparent;
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-outline-glow:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.5);
+        }
+
+        /* 3D Robot */
+        .robot-3d {
+            position: absolute;
+            right: -100px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 500px;
+            height: 500px;
+            perspective: 1000px;
+        }
+
+        .robot-sphere {
+            width: 300px;
+            height: 300px;
+            margin: auto;
+            border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%, rgba(124, 58, 237, 0.6), rgba(6, 182, 212, 0.3), transparent);
+            border: 1px solid rgba(124, 58, 237, 0.4);
+            box-shadow:
+                0 0 60px rgba(124, 58, 237, 0.3),
+                inset 0 0 60px rgba(6, 182, 212, 0.2);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            animation: floatRobot 6s ease-in-out infinite;
+            position: relative;
+        }
+
+        .robot-sphere::after {
+            content: '';
+            position: absolute;
+            width: 350px;
+            height: 350px;
+            border: 1px dashed rgba(124, 58, 237, 0.3);
+            border-radius: 50%;
+            animation: spinSlow 20s linear infinite;
+        }
+
+        .robot-emoji {
+            font-size: 8rem;
+            filter: drop-shadow(0 0 30px rgba(124, 58, 237, 0.5));
+        }
+
+        @keyframes floatRobot {
+            0%, 100% { transform: translateY(0) rotateY(0deg); }
+            50% { transform: translateY(-30px) rotateY(10deg); }
+        }
+
+        @keyframes spinSlow {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        /* Services Section */
+        .services {
+            padding: 8rem 0;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 5rem;
+        }
+
+        .section-title {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .section-subtitle {
+            color: var(--text-gray);
+            font-size: 1.1rem;
+        }
+
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+        }
+
+        .service-card {
+            padding: 2.5rem;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 24px;
+            transition: all 0.4s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .service-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--primary), var(--accent-cyan));
+            transform: scaleX(0);
+            transition: transform 0.4s;
+        }
+
+        .service-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            background: rgba(255, 255, 255, 0.05);
+            box-shadow: 0 20px 50px rgba(124, 58, 237, 0.2);
+        }
+
+        .service-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .service-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 16px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(135deg, rgba(124, 58, 237, 0.2), rgba(6, 182, 212, 0.2));
+            border: 1px solid rgba(124, 58, 237, 0.3);
+        }
+
+        .service-card h3 {
+            font-size: 1.3rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .service-card p {
+            color: var(--text-gray);
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        /* CTA Section */
+        .cta {
+            padding: 6rem 0;
+            text-align: center;
+        }
+
+        .cta-card {
+            padding: 4rem;
+            background: linear-gradient(135deg, rgba(124, 58, 237, 0.2), rgba(6, 182, 212, 0.1));
+            border: 1px solid rgba(124, 58, 237, 0.3);
+            border-radius: 32px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cta-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(124, 58, 237, 0.1), transparent 50%);
+            animation: rotateBg 10s linear infinite;
+        }
+
+        @keyframes rotateBg {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .cta h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            position: relative;
+        }
+
+        .cta p {
+            color: var(--text-gray);
+            font-size: 1.1rem;
+            margin-bottom: 2rem;
+            position: relative;
+        }
+
+        /* Footer */
+        footer {
+            padding: 3rem 2rem;
+            text-align: center;
+            color: var(--text-gray);
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .hero h1 {
+                font-size: 3.5rem;
+            }
+            .robot-3d {
+                display: none;
+            }
+            .services-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+            .services-grid {
+                grid-template-columns: 1fr;
+            }
+            .nav-links {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Background -->
+    <div class="scene-bg"></div>
+
+    <div class="stars">
+        <script>
+            for(let i = 0; i < 100; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 100 + '%';
+                star.style.animationDelay = Math.random() * 3 + 's';
+                document.querySelector('.stars').appendChild(star);
+            }
+        </script>
+    </div>
+
+    <div class="floating-shapes">
+        <div class="shape cube" style="top: 20%; left: 10%;">
+            <div class="cube-face"></div>
+            <div class="cube-face"></div>
+            <div class="cube-face"></div>
+            <div class="cube-face"></div>
+            <div class="cube-face"></div>
+            <div class="cube-face"></div>
+        </div>
+        <div class="shape sphere" style="top: 60%; left: 5%; animation-delay: -5s;"></div>
+        <div class="shape ring" style="top: 30%; right: 15%; animation-delay: -3s;"></div>
+        <div class="shape sphere" style="bottom: 20%; right: 10%; width: 50px; height: 50px;"></div>
+    </div>
+
+    <!-- Navigation -->
+    <nav>
+        <div class="logo">TunixLabs</div>
+        <div class="nav-links">
+            <a href="#">Inicio</a>
+            <a href="#">Servicios</a>
+            <a href="#">Nosotros</a>
+            <a href="#">Contacto</a>
+        </div>
+        <button class="nav-btn">Comenzar</button>
+    </nav>
+
+    <!-- Main Content -->
+    <main>
+        <!-- Hero Section -->
+        <section class="hero">
+            <div class="hero-content">
+                <div class="hero-badge">
+                    <span></span>
+                    Innovacion en IA
+                </div>
+                <h1>Soluciones de <span class="gradient">Inteligencia Artificial</span> para tu negocio</h1>
+                <p>Transformamos tu empresa con tecnologia de vanguardia. Nuestras soluciones de IA estan disenadas para impulsar tu crecimiento y optimizar tus procesos.</p>
+                <div class="hero-buttons">
+                    <button class="btn-glow">Contactar</button>
+                    <button class="btn-outline-glow">Ver Servicios</button>
+                </div>
+            </div>
+            <div class="robot-3d">
+                <div class="robot-sphere">
+                    <span class="robot-emoji">&#129302;</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Services Section -->
+        <section class="services">
+            <div class="section-header">
+                <h2 class="section-title">Nuestros Servicios</h2>
+                <p class="section-subtitle">Soluciones de IA para cada necesidad empresarial</p>
+            </div>
+
+            <div class="services-grid">
+                <div class="service-card">
+                    <div class="service-icon">&#128187;</div>
+                    <h3>Desarrollos Web</h3>
+                    <p>Experiencias web interactivas y escalables potenciadas con inteligencia artificial.</p>
+                </div>
+                <div class="service-card">
+                    <div class="service-icon">&#129504;</div>
+                    <h3>Machine Learning</h3>
+                    <p>Modelos predictivos que aprenden de tus datos para automatizar procesos.</p>
+                </div>
+                <div class="service-card">
+                    <div class="service-icon">&#128172;</div>
+                    <h3>Asistentes IA</h3>
+                    <p>Asistentes virtuales inteligentes para mejorar la experiencia del cliente.</p>
+                </div>
+                <div class="service-card">
+                    <div class="service-icon">&#128200;</div>
+                    <h3>Business Intelligence</h3>
+                    <p>Dashboards interactivos y reportes automatizados en tiempo real.</p>
+                </div>
+                <div class="service-card">
+                    <div class="service-icon">&#128065;</div>
+                    <h3>Vision Artificial</h3>
+                    <p>Sistemas de vision por computadora para analisis de imagenes.</p>
+                </div>
+                <div class="service-card">
+                    <div class="service-icon">&#128736;</div>
+                    <h3>RPA con IA</h3>
+                    <p>Automatizacion de tareas repetitivas con robots inteligentes.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- CTA Section -->
+        <section class="cta">
+            <div class="cta-card">
+                <h2>Listo para transformar tu negocio?</h2>
+                <p>Contactanos hoy para una consulta gratuita</p>
+                <button class="btn-glow">Comenzar Ahora</button>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2026 TunixLabs. Todos los derechos reservados.</p>
+        <p style="margin-top: 0.5rem; font-size: 0.875rem;">Propuesta UI: 3D Immersive 2026</p>
+    </footer>
+</body>
+</html>
