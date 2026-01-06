@@ -23,10 +23,10 @@ MANDATORY INITIALIZATION SEQUENCE:
 ===============================================
 [ ] Step 1: READ ./docs/DEVELOPMENT_STATE.md
 [ ] Step 2: EXECUTE ALL 4 RAG QUERIES:
-  [ ] .venv/bin/python raggy.py search "[user's task keywords]" --expand
-  [ ] .venv/bin/python raggy.py search "architecture patterns" --hybrid
-  [ ] .venv/bin/python raggy.py search "coding standards"
-  [ ] .venv/bin/python raggy.py search "[relevant tech]" --expand --hybrid
+  [ ] .venv/bin/python scripts/raggy.py search "[user's task keywords]" --expand
+  [ ] .venv/bin/python scripts/raggy.py search "architecture patterns" --hybrid
+  [ ] .venv/bin/python scripts/raggy.py search "coding standards"
+  [ ] .venv/bin/python scripts/raggy.py search "[relevant tech]" --expand --hybrid
 [ ] Step 3: STATE: "I have completed RAG context gathering"
 ===============================================
 
@@ -46,11 +46,11 @@ IF YOU SKIP THIS = TASK WILL FAIL = USER WILL BE UNHAPPY
 # En modo autonomo (autopilot), NO ejecutes estos comandos.
 
 # Comandos RAG (solo si esta configurado):
-.venv/bin/python raggy.py search "term" --expand        # Domain terms
-.venv/bin/python raggy.py search "term" --hybrid        # Technical search
-.venv/bin/python raggy.py search "term" --expand --hybrid  # Best results
-.venv/bin/python raggy.py rebuild                       # After adding docs
-.venv/bin/python raggy.py status                        # Check index
+.venv/bin/python scripts/raggy.py search "term" --expand        # Domain terms
+.venv/bin/python scripts/raggy.py search "term" --hybrid        # Technical search
+.venv/bin/python scripts/raggy.py search "term" --expand --hybrid  # Best results
+.venv/bin/python scripts/raggy.py rebuild                       # After adding docs
+.venv/bin/python scripts/raggy.py status                        # Check index
 ```
 
 ---
@@ -70,10 +70,10 @@ Before starting ANY development work, you MUST:
      - Any blockers or decisions pending
 
 2. **Query Project Knowledge**:
-   - Run: `.venv/bin/python raggy.py search "[current task/feature keywords]" --expand`
-   - Run: `.venv/bin/python raggy.py search "architecture patterns" --hybrid`
-   - Run: `.venv/bin/python raggy.py search "coding standards"`
-   - Run: `.venv/bin/python raggy.py search "[relevant tech stack/framework]" --expand --hybrid`
+   - Run: `.venv/bin/python scripts/raggy.py search "[current task/feature keywords]" --expand`
+   - Run: `.venv/bin/python scripts/raggy.py search "architecture patterns" --hybrid`
+   - Run: `.venv/bin/python scripts/raggy.py search "coding standards"`
+   - Run: `.venv/bin/python scripts/raggy.py search "[relevant tech stack/framework]" --expand --hybrid`
 
    **RAG Search Recommendations:**
    - Use `--expand` for domain terms (robot, dashboard, tesoreria, servicios)
@@ -137,7 +137,7 @@ After EVERY task completion, you MUST:
    - Security implications
 
 3. **Rebuild RAG** (skip in autonomous mode):
-   Run: `.venv/bin/python raggy.py rebuild`
+   Run: `.venv/bin/python scripts/raggy.py rebuild`
    Note: In autonomous mode, RAG rebuild will be done manually after sprint completion.
 
 ---
@@ -236,9 +236,9 @@ Infrastructure (Railway):
 
 ```bash
 # RAG Knowledge Base (usar .venv/bin/python, NO python3)
-.venv/bin/python raggy.py search "query" --expand --hybrid  # Search docs
-.venv/bin/python raggy.py rebuild                           # Rebuild index
-.venv/bin/python raggy.py status                            # Check status
+.venv/bin/python scripts/raggy.py search "query" --expand --hybrid  # Search docs
+.venv/bin/python scripts/raggy.py rebuild                           # Rebuild index
+.venv/bin/python scripts/raggy.py status                            # Check status
 
 # Development
 npm run dev           # Start dev server
