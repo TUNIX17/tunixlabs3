@@ -58,6 +58,8 @@ export interface RobotMethods {
   danceMove: () => void;
   nodYes: () => void;
   shakeLegsTwist: () => void;
+  startThinking: () => void;
+  stopThinking: () => void;
   
   // // Métodos de control (Eliminados temporalmente para coincidir con la implementación actual)
   // setPosition: (position: Partial<RobotPosition>) => void;

@@ -13,6 +13,8 @@ interface RobotAnimations {
   danceMove: () => void;
   nodYes: () => void;
   shakeLegsTwist: () => void;
+  startThinking: () => void;
+  stopThinking: () => void;
 }
 
 // Estados de interacción con el robot
@@ -100,16 +102,16 @@ export const useRobotInteraction = ({
   // Hook para conversación con Groq
   const {
     generateResponseAndSpeech,
-    sendMessage: sendGroqMessage, 
+    sendMessage: sendGroqMessage,
     // textToSpeech: convertTextToSpeechGroq, // Ya no se usa directamente aquí
   } = useGroqConversation({
     initialSystemPrompt: robotSystemPrompt,
     onStart: () => {
       setInteractionState(RobotInteractionState.PROCESSING);
-      
-      // Animar robot pensando
+
+      // Animar robot pensando con la nueva animación
       if (robotRef.current) {
-        robotRef.current.approachCamera();
+        robotRef.current.startThinking();
       }
     },
     onComplete: (response) => {
@@ -241,12 +243,15 @@ export const useRobotInteraction = ({
           // Generar respuesta del LLM y reproducir voz (TTS)
           // Los callbacks de TTS manejarán los estados SPEAKING e IDLE y animaciones.
           /* const responseText = */ await generateResponseAndSpeech( // responseText no es necesario aquí si onComplete de useGroqConversation ya lo establece.
-            recognitionResult.text, 
+            recognitionResult.text,
             langForThisInteraction,
             {
               onStart: () => {
                 setInteractionState(RobotInteractionState.SPEAKING);
-                if (robotRef.current) robotRef.current.startWaving();
+                if (robotRef.current) {
+                  robotRef.current.stopThinking(); // Detener animación de pensando
+                  robotRef.current.startWaving();
+                }
               },
               onEnd: () => {
                 setInteractionState(RobotInteractionState.IDLE);
@@ -256,7 +261,10 @@ export const useRobotInteraction = ({
                 console.error('[RobotInteraction] Error durante TTS (Web Speech API):', error);
                 setRobotResponse(prev => prev || 'Lo siento, tuve un problema al intentar hablar.');
                 setInteractionState(RobotInteractionState.ERROR);
-                if (robotRef.current) robotRef.current.stepBackward();
+                if (robotRef.current) {
+                  robotRef.current.stopThinking(); // Asegurar que thinking se detenga
+                  robotRef.current.stepBackward();
+                }
                 if (onError) {
                   if (error instanceof Error) {
                     onError(error);

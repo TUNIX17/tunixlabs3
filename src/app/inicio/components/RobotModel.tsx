@@ -2,9 +2,9 @@
 
 import React, { useRef, useState, Suspense, forwardRef, useImperativeHandle, useEffect } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import { 
-  Environment, 
-  ContactShadows, 
+import {
+  Environment,
+  ContactShadows,
   useGLTF,
   Sky,
   useTexture,
@@ -14,6 +14,24 @@ import * as THREE from 'three';
 import { useRobotInteraction, RobotInteractionState } from '../../../hooks/useRobotInteraction';
 import FloatingMicButton from '../../../components/VoiceInterface/FloatingMicButton';
 import AudioVisualizer from '../../../components/VoiceInterface/AudioVisualizer';
+
+// Importar sistema de animaciones
+import {
+  presetToEulers,
+  ARM_RESTING_ROTATIONS,
+  LEG_RESTING_ROTATIONS,
+  WAVE_ROTATIONS,
+  NOD_YES_ROTATIONS,
+  THINKING_ROTATIONS,
+  DANCE_ROTATIONS,
+  SHAKE_LEGS_ROTATIONS,
+  APPROACH_ROTATIONS,
+  ANIMATION_CONFIGS,
+  IDLE_PARAMS,
+  CURSOR_TRACKING,
+  LISTENING_PARAMS,
+} from '../../../lib/animation';
+import { easeInOutQuad, easeOutBack } from '../../../lib/animation/easingFunctions';
 
 // Definir tipo para arrays de rotación
 type RotationArray = [number, number, number];
@@ -28,7 +46,9 @@ interface RobotMethods {
   stepBackward: () => void;
   danceMove: () => void;
   nodYes: () => void;
-  shakeLegsTwist: () => void; 
+  shakeLegsTwist: () => void;
+  startThinking: () => void;
+  stopThinking: () => void;
 }
 
 // Componente que carga el modelo GLB y aplica animaciones
@@ -46,6 +66,11 @@ const AnimatedRobotModel = forwardRef<RobotMethods, { onLoad?: () => void; isLis
     const [isDancing, setIsDancing] = useState(false);
     const [isNoddingYes, setIsNoddingYes] = useState(false);
     const [isShakingLegs, setIsShakingLegs] = useState(false);
+    const [isThinking, setIsThinking] = useState(false);
+
+    // Flag para optimización: indica si alguna animación está activa
+    const hasActiveAnimation = isWaving || isApproaching || isSteppingBack ||
+                               isDancing || isNoddingYes || isShakingLegs || isThinking;
     
     // Referencias para tiempos de inicio de animaciones
     const waveTimerRef = useRef<NodeJS.Timeout | null>(null);
@@ -59,6 +84,7 @@ const AnimatedRobotModel = forwardRef<RobotMethods, { onLoad?: () => void; isLis
     const nodStartTimeRef = useRef<number>(0);
     const shakeLegsTimerRef = useRef<NodeJS.Timeout | null>(null);
     const shakeLegsStartTimeRef = useRef<number>(0);
+    const thinkingStartTimeRef = useRef<number>(0);
 
     // Usamos el valor de la prop si está definido, o false por defecto
     const isListeningState = isListening !== undefined ? isListening : false;
@@ -90,184 +116,53 @@ const AnimatedRobotModel = forwardRef<RobotMethods, { onLoad?: () => void; isLis
     const mouse = useThree((state) => state.mouse);
     const targetMouse = useRef(new THREE.Vector2());
 
-    // Rotaciones objetivo para la pose de reposo de los brazos (en radianes)
-    // Ronda 10 de prueba: Pose de reposo completa con X,Y en hombros y flexión de codo.
-    const targetArmRestingRotations = {
-      shoulder_left: new THREE.Euler(
-        THREE.MathUtils.degToRad(10),    // Ligeramente adelante
-        THREE.MathUtils.degToRad(10),    // Ligeramente separado
-        THREE.MathUtils.degToRad(-160)   // Brazos abajo
-      ),
-      shoulder_right: new THREE.Euler(
-        THREE.MathUtils.degToRad(10),    // Ligeramente adelante
-        THREE.MathUtils.degToRad(-10),   // Ligeramente separado (simétrico)
-        THREE.MathUtils.degToRad(160)    // Brazos abajo (simétrico)
-      ),
-      arm_left_top: new THREE.Euler(
-        THREE.MathUtils.degToRad(0),
-        THREE.MathUtils.degToRad(0),
-        THREE.MathUtils.degToRad(0)
-      ),
-      arm_right_top: new THREE.Euler(
-        THREE.MathUtils.degToRad(0),
-        THREE.MathUtils.degToRad(0),
-        THREE.MathUtils.degToRad(0)
-      ),
-      arm_left_bot: new THREE.Euler(
-        THREE.MathUtils.degToRad(25),    // Flexión de codo aumentada ligeramente
-        THREE.MathUtils.degToRad(0),
-        THREE.MathUtils.degToRad(0)
-      ),
-      arm_right_bot: new THREE.Euler(
-        THREE.MathUtils.degToRad(25),    // Flexión de codo aumentada ligeramente
-        THREE.MathUtils.degToRad(0),
-        THREE.MathUtils.degToRad(0)
-      ),
-    };
+    // Rotaciones desde presets (convertidas a Euler una sola vez)
+    const targetArmRestingRotations = React.useMemo(
+      () => presetToEulers(ARM_RESTING_ROTATIONS),
+      []
+    );
 
-    // Rotaciones objetivo para la pose de reposo de las piernas
-    const targetLegRestingRotations = {
-      leg_left_top: new THREE.Euler(
-        THREE.MathUtils.degToRad(5),     // Ligera rotación hacia adelante
-        THREE.MathUtils.degToRad(2),     // Ligera separación
-        THREE.MathUtils.degToRad(-180)   // Piernas abajo (basado en rig.txt)
-      ),
-      leg_right_top: new THREE.Euler(
-        THREE.MathUtils.degToRad(5),     // Ligera rotación hacia adelante (simétrico)
-        THREE.MathUtils.degToRad(-2),    // Ligera separación (simétrico)
-        THREE.MathUtils.degToRad(-180)   // Piernas abajo (basado en rig.txt)
-      ),
-      leg_left_bot: new THREE.Euler(
-        THREE.MathUtils.degToRad(10),    // Flexión en la rodilla
-        THREE.MathUtils.degToRad(0),
-        THREE.MathUtils.degToRad(0)
-      ),
-      leg_right_bot: new THREE.Euler(
-        THREE.MathUtils.degToRad(10),    // Flexión en la rodilla (simétrico)
-        THREE.MathUtils.degToRad(0),
-        THREE.MathUtils.degToRad(0)
-      ),
-      leg_left_foot: new THREE.Euler(
-        THREE.MathUtils.degToRad(-5),    // Ligera flexión del pie hacia abajo
-        THREE.MathUtils.degToRad(0),
-        THREE.MathUtils.degToRad(0)
-      ),
-      leg_right_foot: new THREE.Euler(
-        THREE.MathUtils.degToRad(-5),    // Ligera flexión del pie hacia abajo (simétrico)
-        THREE.MathUtils.degToRad(0),
-        THREE.MathUtils.degToRad(0)
-      ),
-    };
+    const targetLegRestingRotations = React.useMemo(
+      () => presetToEulers(LEG_RESTING_ROTATIONS),
+      []
+    );
 
-    // Definir rotaciones objetivo para el saludo con la mano
-    const targetWaveRotations = {
-      shoulder_right: new THREE.Euler(
-        THREE.MathUtils.degToRad(-15),    // Brazo elevado al frente
-        THREE.MathUtils.degToRad(-20),    // Ligeramente separado
-        THREE.MathUtils.degToRad(40)      // Parcialmente elevado (basado en rig.txt)
-      ),
-      arm_right_top: new THREE.Euler(
-        THREE.MathUtils.degToRad(5),     // Ligera inclinación según rig.txt
-        THREE.MathUtils.degToRad(5),     // Ligera rotación
-        THREE.MathUtils.degToRad(0)
-      ),
-      arm_right_bot: new THREE.Euler(
-        THREE.MathUtils.degToRad(70),     // Codo flexionado para saludar (eje X según rig.txt)
-        THREE.MathUtils.degToRad(0),
-        THREE.MathUtils.degToRad(0)
-      ),
-    };
+    const targetWaveRotations = React.useMemo(
+      () => presetToEulers(WAVE_ROTATIONS),
+      []
+    );
 
-    // Rotaciones objetivo para movimiento de cabeza asintiendo "sí"
-    const targetNodYesRotations = {
-      head: new THREE.Euler(
-        THREE.MathUtils.degToRad(-20),  // Bajar cabeza
-        THREE.MathUtils.degToRad(0), 
-        THREE.MathUtils.degToRad(0)
-      ),
-      neck: new THREE.Euler(
-        THREE.MathUtils.degToRad(-10),  // Bajar cuello
-        THREE.MathUtils.degToRad(0),
-        THREE.MathUtils.degToRad(0)
-      ),
-    };
+    const targetNodYesRotations = React.useMemo(
+      () => presetToEulers(NOD_YES_ROTATIONS),
+      []
+    );
 
-    // Rotaciones objetivo para el baile (movimiento rítmico)
-    const targetDanceRotations = {
-      body_top1: new THREE.Euler(
-        THREE.MathUtils.degToRad(0),
-        THREE.MathUtils.degToRad(0),
-        THREE.MathUtils.degToRad(5)  // Ligera inclinación lateral del torso
-      ),
-      shoulder_left: new THREE.Euler(
-        THREE.MathUtils.degToRad(15),
-        THREE.MathUtils.degToRad(20),
-        THREE.MathUtils.degToRad(-130)  // Brazo hacia arriba y afuera
-      ),
-      shoulder_right: new THREE.Euler(
-        THREE.MathUtils.degToRad(15),
-        THREE.MathUtils.degToRad(-20),
-        THREE.MathUtils.degToRad(130)  // Brazo hacia arriba y afuera (simétrico)
-      ),
-      arm_left_bot: new THREE.Euler(
-        THREE.MathUtils.degToRad(60),  // Codos flexionados
-        THREE.MathUtils.degToRad(0),
-        THREE.MathUtils.degToRad(0)
-      ),
-      arm_right_bot: new THREE.Euler(
-        THREE.MathUtils.degToRad(60),  // Codos flexionados (simétrico)
-        THREE.MathUtils.degToRad(0),
-        THREE.MathUtils.degToRad(0)
-      ),
-      leg_left_top: new THREE.Euler(
-        THREE.MathUtils.degToRad(15),  // Pierna ligeramente levantada
-        THREE.MathUtils.degToRad(0),
-        THREE.MathUtils.degToRad(-180)
-      ),
-      leg_right_top: new THREE.Euler(
-        THREE.MathUtils.degToRad(5),   // Otra pierna apoyando el peso
-        THREE.MathUtils.degToRad(0),
-        THREE.MathUtils.degToRad(-180)
-      ),
-    };
+    const targetDanceRotations = React.useMemo(
+      () => presetToEulers(DANCE_ROTATIONS),
+      []
+    );
 
-    // Rotaciones para agitar las piernas con "twist"
-    const targetShakeLegsRotations = {
-      leg_left_top: new THREE.Euler(
-        THREE.MathUtils.degToRad(10),    // Ligera elevación
-        THREE.MathUtils.degToRad(0),
-        THREE.MathUtils.degToRad(-160)   // Girar ligeramente la pierna
-      ),
-      leg_right_top: new THREE.Euler(
-        THREE.MathUtils.degToRad(10),    // Ligera elevación
-        THREE.MathUtils.degToRad(0),
-        THREE.MathUtils.degToRad(-200)   // Girar en dirección opuesta
-      ),
-      leg_left_bot: new THREE.Euler(
-        THREE.MathUtils.degToRad(45),    // Mayor flexión en rodilla
-        THREE.MathUtils.degToRad(0),
-        THREE.MathUtils.degToRad(10)     // Ligera rotación
-      ),
-      leg_right_bot: new THREE.Euler(
-        THREE.MathUtils.degToRad(45),    // Mayor flexión en rodilla
-        THREE.MathUtils.degToRad(0),
-        THREE.MathUtils.degToRad(-10)    // Rotación opuesta
-      ),
-      leg_left_foot: new THREE.Euler(
-        THREE.MathUtils.degToRad(-20),   // Punta del pie hacia abajo
-        THREE.MathUtils.degToRad(10),    // Ligera rotación
-        THREE.MathUtils.degToRad(0)
-      ),
-      leg_right_foot: new THREE.Euler(
-        THREE.MathUtils.degToRad(-20),   // Punta del pie hacia abajo
-        THREE.MathUtils.degToRad(-10),   // Rotación opuesta
-        THREE.MathUtils.degToRad(0)
-      ),
-    };
+    const targetShakeLegsRotations = React.useMemo(
+      () => presetToEulers(SHAKE_LEGS_ROTATIONS),
+      []
+    );
+
+    // Rotaciones para animación "Thinking"
+    const targetThinkingRotations = React.useMemo(
+      () => presetToEulers(THINKING_ROTATIONS),
+      []
+    );
+
+    // Rotaciones para animación "Approach"
+    const targetApproachRotations = React.useMemo(
+      () => presetToEulers(APPROACH_ROTATIONS),
+      []
+    );
 
     React.useEffect(() => {
       if (scene && onLoad) {
-        scene.position.set(0, -1.5, 0);
+        // Posición ajustada para centrar en el círculo neumórfico
+        scene.position.set(0, -0.8, 0);
         scene.rotation.set(0, 0, 0);
         
         // Guardar la posición original para los movimientos de acercamiento
@@ -311,65 +206,85 @@ const AnimatedRobotModel = forwardRef<RobotMethods, { onLoad?: () => void; isLis
     }, [scene, onLoad]);
 
     useFrame((state, delta) => {
-      targetMouse.current.lerp(mouse, 0.1);
-      const time = state.clock.getElapsedTime();
-
-      // 1. Animación de Respiración Sutil en body_top1
-      if (bodyTop1Ref.current && initialRotations.current.body_top1) {
-        const breathCycle = Math.sin(time * 0.7) * 0.01;
-        bodyTop1Ref.current.rotation.x = initialRotations.current.body_top1.x + breathCycle;
-        bodyTop1Ref.current.rotation.y = initialRotations.current.body_top1.y + Math.cos(time * 0.5) * 0.005;
+      // Optimización: Actualizar mouse solo si ha cambiado significativamente
+      const mouseDelta = Math.abs(mouse.x - targetMouse.current.x) + Math.abs(mouse.y - targetMouse.current.y);
+      if (mouseDelta > 0.001) {
+        targetMouse.current.lerp(mouse, 0.1);
       }
 
-      // 2. Animación Idle Sutil para el Torso Superior
-      if (bodyTop2Ref.current && initialRotations.current.body_top2) {
-        const idleSway = Math.sin(time * 0.3) * 0.005; // Oscilación sutil en eje X
-        const idleTwist = Math.cos(time * 0.2) * 0.003; // Oscilación sutil en eje Z
-        
+      const time = state.clock.getElapsedTime();
+
+      // Skip animaciones específicas si estamos en thinking (tiene prioridad sobre idle)
+      const skipIdleAnimations = isThinking;
+
+      // 1. Animación de Respiración Sutil en body_top1 (usando parámetros configurables)
+      if (!skipIdleAnimations && bodyTop1Ref.current && initialRotations.current.body_top1) {
+        const { frequency, amplitudeX, amplitudeY } = IDLE_PARAMS.breath;
+        const breathCycle = Math.sin(time * frequency) * amplitudeX;
+        bodyTop1Ref.current.rotation.x = initialRotations.current.body_top1.x + breathCycle;
+        bodyTop1Ref.current.rotation.y = initialRotations.current.body_top1.y + Math.cos(time * (frequency * 0.7)) * amplitudeY;
+      }
+
+      // 2. Animación Idle Sutil para el Torso Superior (usando parámetros configurables)
+      if (!skipIdleAnimations && bodyTop2Ref.current && initialRotations.current.body_top2) {
+        const { frequencyX, frequencyZ, amplitudeX, amplitudeZ } = IDLE_PARAMS.bodySway;
+        const idleSway = Math.sin(time * frequencyX) * amplitudeX;
+        const idleTwist = Math.cos(time * frequencyZ) * amplitudeZ;
+
         // Guardar la rotación Y actual (que incluye el seguimiento del cursor)
         const currentRotationY = bodyTop2Ref.current.rotation.y;
-        
+
         // Aplicar oscilaciones sutiles en X y Z
         bodyTop2Ref.current.rotation.x = initialRotations.current.body_top2.x + idleSway;
         bodyTop2Ref.current.rotation.z = initialRotations.current.body_top2.z + idleTwist;
-        
+
         // Restaurar la rotación Y (para no interferir con el seguimiento del cursor)
         bodyTop2Ref.current.rotation.y = currentRotationY;
       }
 
       // 3. Seguimiento del Cursor con Cabeza, Cuello y Torso Superior
-      const mouseX = targetMouse.current.x;
-      const mouseY = targetMouse.current.y;
+      // Skip si thinking está activo (tiene su propia animación de cabeza)
+      if (!isThinking) {
+        const mouseX = targetMouse.current.x;
+        const mouseY = targetMouse.current.y;
 
-      // Factores adicionales para la animación de "escuchar"
-      const listeningHeadTilt = isListeningState ? Math.sin(time * 1.5) * 0.05 : 0; // Inclinación lateral (eje Z)
-      const listeningNeckTilt = isListeningState ? Math.sin(time * 1.5) * 0.03 : 0; // Inclinación lateral (eje Z)
+        // Factores adicionales para la animación de "escuchar" (usando parámetros configurables)
+        const listeningHeadTilt = isListeningState
+          ? Math.sin(time * LISTENING_PARAMS.headTilt.frequency) * LISTENING_PARAMS.headTilt.amplitude
+          : 0;
+        const listeningNeckTilt = isListeningState
+          ? Math.sin(time * LISTENING_PARAMS.neckTilt.frequency) * LISTENING_PARAMS.neckTilt.amplitude
+          : 0;
 
-      if (headRef.current && initialRotations.current.head) {
-        const targetRotationY = initialRotations.current.head.y + mouseX * 0.5;
-        const targetRotationX = initialRotations.current.head.x - mouseY * 0.3;
-        const targetRotationZ = initialRotations.current.head.z + listeningHeadTilt;
-        headRef.current.rotation.y = THREE.MathUtils.lerp(headRef.current.rotation.y, targetRotationY, 0.05);
-        headRef.current.rotation.x = THREE.MathUtils.lerp(headRef.current.rotation.x, targetRotationX, 0.05);
-        headRef.current.rotation.z = THREE.MathUtils.lerp(headRef.current.rotation.z, targetRotationZ, 0.05);
+        if (headRef.current && initialRotations.current.head) {
+          const { sensitivityX, sensitivityY, lerpFactor: headLerp } = CURSOR_TRACKING.head;
+          const targetRotationY = initialRotations.current.head.y + mouseX * sensitivityX;
+          const targetRotationX = initialRotations.current.head.x - mouseY * sensitivityY;
+          const targetRotationZ = initialRotations.current.head.z + listeningHeadTilt;
+          headRef.current.rotation.y = THREE.MathUtils.lerp(headRef.current.rotation.y, targetRotationY, headLerp);
+          headRef.current.rotation.x = THREE.MathUtils.lerp(headRef.current.rotation.x, targetRotationX, headLerp);
+          headRef.current.rotation.z = THREE.MathUtils.lerp(headRef.current.rotation.z, targetRotationZ, headLerp);
+        }
+
+        if (neckRef.current && initialRotations.current.neck) {
+          const { sensitivityX, sensitivityY, lerpFactor: neckLerp } = CURSOR_TRACKING.neck;
+          const targetRotationY = initialRotations.current.neck.y + mouseX * sensitivityX;
+          const targetRotationX = initialRotations.current.neck.x - mouseY * sensitivityY;
+          const targetRotationZ = initialRotations.current.neck.z + listeningNeckTilt;
+          neckRef.current.rotation.y = THREE.MathUtils.lerp(neckRef.current.rotation.y, targetRotationY, neckLerp);
+          neckRef.current.rotation.x = THREE.MathUtils.lerp(neckRef.current.rotation.x, targetRotationX, neckLerp);
+          neckRef.current.rotation.z = THREE.MathUtils.lerp(neckRef.current.rotation.z, targetRotationZ, neckLerp);
+        }
+
+        if (bodyTop2Ref.current && initialRotations.current.body_top2) {
+          const { sensitivityX, lerpFactor: bodyLerp } = CURSOR_TRACKING.bodyTop2;
+          const targetRotationY = initialRotations.current.body_top2.y + targetMouse.current.x * sensitivityX;
+          bodyTop2Ref.current.rotation.y = THREE.MathUtils.lerp(bodyTop2Ref.current.rotation.y, targetRotationY, bodyLerp);
+        }
       }
 
-      if (neckRef.current && initialRotations.current.neck) {
-        const targetRotationY = initialRotations.current.neck.y + mouseX * 0.3;
-        const targetRotationX = initialRotations.current.neck.x - mouseY * 0.15;
-        const targetRotationZ = initialRotations.current.neck.z + listeningNeckTilt;
-        neckRef.current.rotation.y = THREE.MathUtils.lerp(neckRef.current.rotation.y, targetRotationY, 0.07);
-        neckRef.current.rotation.x = THREE.MathUtils.lerp(neckRef.current.rotation.x, targetRotationX, 0.07);
-        neckRef.current.rotation.z = THREE.MathUtils.lerp(neckRef.current.rotation.z, targetRotationZ, 0.07);
-      }
-
-      if (bodyTop2Ref.current && initialRotations.current.body_top2) {
-        const targetRotationY = initialRotations.current.body_top2.y + mouseX * 0.1;
-        bodyTop2Ref.current.rotation.y = THREE.MathUtils.lerp(bodyTop2Ref.current.rotation.y, targetRotationY, 0.09);
-      }
-
-      // 4. Animación de Brazos 
-      const lerpFactor = 0.05; // Suavidad de la transición a la pose de reposo
+      // 4. Animación de Brazos
+      const lerpFactor = ANIMATION_CONFIGS.idle.lerpFactor;
 
       if (isWaving) {
         // Tiempo transcurrido desde que empezó el saludo
@@ -860,6 +775,118 @@ const AnimatedRobotModel = forwardRef<RobotMethods, { onLoad?: () => void; isLis
         }
       }
 
+      // Nueva animación: Thinking (Pensando)
+      if (isThinking) {
+        const thinkingElapsedTime = time - thinkingStartTimeRef.current;
+        const thinkingConfig = ANIMATION_CONFIGS.thinking;
+        const oscillation = thinkingConfig.oscillation!;
+
+        // Oscilación sutil para el efecto "pensando"
+        const thinkCycle = Math.sin(thinkingElapsedTime * oscillation.frequency) * oscillation.amplitude;
+        const secondaryCycle = Math.cos(thinkingElapsedTime * 0.5) * 0.05;
+
+        // Cabeza ladeada mirando hacia arriba
+        if (headRef.current && targetThinkingRotations.head) {
+          headRef.current.rotation.x = THREE.MathUtils.lerp(
+            headRef.current.rotation.x,
+            targetThinkingRotations.head.x + thinkCycle,
+            thinkingConfig.lerpFactor
+          );
+          headRef.current.rotation.y = THREE.MathUtils.lerp(
+            headRef.current.rotation.y,
+            targetThinkingRotations.head.y + secondaryCycle,
+            thinkingConfig.lerpFactor
+          );
+          headRef.current.rotation.z = THREE.MathUtils.lerp(
+            headRef.current.rotation.z,
+            targetThinkingRotations.head.z,
+            thinkingConfig.lerpFactor
+          );
+        }
+
+        // Cuello acompaña el movimiento
+        if (neckRef.current && targetThinkingRotations.neck) {
+          neckRef.current.rotation.x = THREE.MathUtils.lerp(
+            neckRef.current.rotation.x,
+            targetThinkingRotations.neck.x + (thinkCycle * 0.5),
+            thinkingConfig.lerpFactor
+          );
+          neckRef.current.rotation.y = THREE.MathUtils.lerp(
+            neckRef.current.rotation.y,
+            targetThinkingRotations.neck.y + (secondaryCycle * 0.5),
+            thinkingConfig.lerpFactor
+          );
+        }
+
+        // Brazo derecho en posición "mano en barbilla"
+        if (shoulderRightRef.current && targetThinkingRotations.shoulder_right) {
+          shoulderRightRef.current.rotation.x = THREE.MathUtils.lerp(
+            shoulderRightRef.current.rotation.x,
+            targetThinkingRotations.shoulder_right.x,
+            thinkingConfig.lerpFactor
+          );
+          shoulderRightRef.current.rotation.y = THREE.MathUtils.lerp(
+            shoulderRightRef.current.rotation.y,
+            targetThinkingRotations.shoulder_right.y,
+            thinkingConfig.lerpFactor
+          );
+          shoulderRightRef.current.rotation.z = THREE.MathUtils.lerp(
+            shoulderRightRef.current.rotation.z,
+            targetThinkingRotations.shoulder_right.z,
+            thinkingConfig.lerpFactor
+          );
+        }
+
+        if (armRightBotRef.current && targetThinkingRotations.arm_right_bot) {
+          armRightBotRef.current.rotation.x = THREE.MathUtils.lerp(
+            armRightBotRef.current.rotation.x,
+            targetThinkingRotations.arm_right_bot.x + (thinkCycle * 0.2),
+            thinkingConfig.lerpFactor
+          );
+        }
+
+        // Brazo izquierdo cruzado
+        if (shoulderLeftRef.current && targetThinkingRotations.shoulder_left) {
+          shoulderLeftRef.current.rotation.x = THREE.MathUtils.lerp(
+            shoulderLeftRef.current.rotation.x,
+            targetThinkingRotations.shoulder_left.x,
+            thinkingConfig.lerpFactor
+          );
+          shoulderLeftRef.current.rotation.y = THREE.MathUtils.lerp(
+            shoulderLeftRef.current.rotation.y,
+            targetThinkingRotations.shoulder_left.y,
+            thinkingConfig.lerpFactor
+          );
+          shoulderLeftRef.current.rotation.z = THREE.MathUtils.lerp(
+            shoulderLeftRef.current.rotation.z,
+            targetThinkingRotations.shoulder_left.z,
+            thinkingConfig.lerpFactor
+          );
+        }
+
+        if (armLeftBotRef.current && targetThinkingRotations.arm_left_bot) {
+          armLeftBotRef.current.rotation.x = THREE.MathUtils.lerp(
+            armLeftBotRef.current.rotation.x,
+            targetThinkingRotations.arm_left_bot.x,
+            thinkingConfig.lerpFactor
+          );
+        }
+
+        // Cuerpo ligeramente inclinado
+        if (bodyTop1Ref.current && targetThinkingRotations.body_top1) {
+          bodyTop1Ref.current.rotation.x = THREE.MathUtils.lerp(
+            bodyTop1Ref.current.rotation.x,
+            targetThinkingRotations.body_top1.x,
+            thinkingConfig.lerpFactor
+          );
+          bodyTop1Ref.current.rotation.z = THREE.MathUtils.lerp(
+            bodyTop1Ref.current.rotation.z,
+            targetThinkingRotations.body_top1.z + (secondaryCycle * 0.3),
+            thinkingConfig.lerpFactor
+          );
+        }
+      }
+
     });
 
     // Función de alivio (easing) para movimientos más naturales
@@ -1040,14 +1067,30 @@ const AnimatedRobotModel = forwardRef<RobotMethods, { onLoad?: () => void; isLis
       if (shakeLegsTimerRef.current) {
         clearTimeout(shakeLegsTimerRef.current);
       }
-      
+
       setIsShakingLegs(true);
       shakeLegsStartTimeRef.current = performance.now() / 1000;
-      
+
       shakeLegsTimerRef.current = setTimeout(() => {
         setIsShakingLegs(false);
         shakeLegsTimerRef.current = null;
       }, 2500);
+    };
+
+    // Método para iniciar animación de "pensando"
+    const startThinking = () => {
+      // Cancelar otras animaciones que podrían interferir
+      if (isWaving) setIsWaving(false);
+      if (isDancing) setIsDancing(false);
+      if (isNoddingYes) setIsNoddingYes(false);
+
+      setIsThinking(true);
+      thinkingStartTimeRef.current = performance.now() / 1000;
+    };
+
+    // Método para detener animación de "pensando"
+    const stopThinking = () => {
+      setIsThinking(false);
     };
 
     // Exponemos métodos a través de la ref usando useImperativeHandle
@@ -1057,7 +1100,9 @@ const AnimatedRobotModel = forwardRef<RobotMethods, { onLoad?: () => void; isLis
       stepBackward,
       danceMove,
       nodYes,
-      shakeLegsTwist
+      shakeLegsTwist,
+      startThinking,
+      stopThinking
     }));
 
     // Limpiar timers en desmontaje
@@ -1152,24 +1197,24 @@ function RobotInteractionManager() {
   };
 
   if (!isMounted) {
-    return <div className="h-[450px] w-full" aria-hidden="true"><LoadingSpinner/></div>;
+    return <div className="h-full w-full flex items-center justify-center" style={{ minHeight: '420px' }} aria-hidden="true"><LoadingSpinner/></div>;
   }
 
   return (
-    <div className="h-[450px] w-full touch-none relative overflow-visible bg-transparent pointer-events-auto">
+    <div className="h-full w-full touch-none relative overflow-hidden bg-transparent pointer-events-auto" style={{ minHeight: '420px' }}>
       {isLoading && <LoadingSpinner />}
 
-      <div className="absolute inset-0 w-full h-full">
-        <Canvas 
-          shadows 
+      <div className="absolute inset-0 w-full h-full flex items-center justify-center">
+        <Canvas
+          shadows
           className="overflow-visible"
-          camera={{ position: [0, 0.5, 200], fov: 30 }}
+          camera={{ position: [0, 0, 5.5], fov: 35 }}
           gl={{ alpha: true, antialias: true }}
-          style={{ 
-            position: 'absolute', 
-            top: 0, 
-            left: 0, 
-            width: '100%', 
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            width: '100%',
             height: '100%',
             zIndex: 5
           }}
@@ -1210,31 +1255,33 @@ function RobotInteractionManager() {
           </Suspense>
         </Canvas>
 
-        <div 
-          className="absolute bottom-4 left-1/2 transform -translate-x-1/2 z-20 flex flex-col items-center space-y-2"
+        {/* Mic Button - Positioned at bottom of circle */}
+        <div
+          className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-20 flex flex-col items-center space-y-2"
           style={{ pointerEvents: 'auto' }}
         >
           {(interactionState === RobotInteractionState.LISTENING || isRecording) && (
             <div className="w-full max-w-xs">
-              <AudioVisualizer width={200} height={40} barColor="#60A5FA" />
+              <AudioVisualizer width={160} height={30} barColor="#6366f1" />
             </div>
           )}
-          <FloatingMicButton 
-            onClick={handleMicButtonClick} 
-            interactionState={interactionState} 
+          <FloatingMicButton
+            onClick={handleMicButtonClick}
+            interactionState={interactionState}
             isRecording={isRecording}
             disabled={isLoading || interactionState === RobotInteractionState.PROCESSING}
           />
         </div>
 
+        {/* Robot Name Badge - Top of circle */}
         <div
-          className="absolute top-4 left-1/2 transform -translate-x-1/2 z-10 max-w-sm bg-black/40 backdrop-blur-sm rounded-xl p-3 text-white text-center"
+          className="absolute top-6 left-1/2 transform -translate-x-1/2 z-10 max-w-[280px] neu-pressed rounded-xl px-4 py-2 text-center"
           style={{ pointerEvents: 'none' }}
         >
-          <h3 className="text-lg font-bold text-cyan-300">Hola, soy Tunix</h3>
-          <p className="text-xs text-gray-300 mt-1">
+          <h3 className="text-base font-bold neu-gradient-text">Hola, soy Tunix</h3>
+          <p className="text-xs mt-1" style={{ color: '#718096' }}>
             {interactionState === RobotInteractionState.IDLE && "Haz clic en el microfono para hablar conmigo"}
-            {interactionState === RobotInteractionState.LISTENING && "Te escucho... habla y luego haz clic para enviar"}
+            {interactionState === RobotInteractionState.LISTENING && "Te escucho... habla y haz clic para enviar"}
             {interactionState === RobotInteractionState.PROCESSING && "Procesando tu mensaje..."}
             {interactionState === RobotInteractionState.SPEAKING && "Respondiendo..."}
             {interactionState === RobotInteractionState.ERROR && "Hubo un error, intenta de nuevo"}

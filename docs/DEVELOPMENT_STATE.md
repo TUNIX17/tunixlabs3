@@ -29,7 +29,7 @@ TunixLabs es una plataforma web de consultoria en IA con:
 
 ### In Progress
 - [ ] Voice system integration (ElevenLabs/Groq)
-- [ ] 3D Avatar enhancement
+- [x] 3D Avatar enhancement - Phase 1 Quick Wins completado
 - [ ] Configurar variables de entorno en Railway
 
 ### Pending
@@ -159,8 +159,82 @@ Para configurar: `railway variables --set KEY=value`
 
 ---
 
-## RECENT CHANGES (2026-01-06)
+## RECENT CHANGES (2026-01-05)
 
+### Animation System Refactor - Phase 2: Architecture
+
+1. **AnimationMachine** - Máquina de estados (`src/lib/animation/AnimationMachine.ts`)
+   - 11 estados de animación definidos (IDLE, WAVING, THINKING, etc.)
+   - Sistema de prioridades (0-10)
+   - Transiciones permitidas configurables
+   - Blending automático entre estados
+   - Métodos: `transitionTo()`, `send()`, `update()`
+
+2. **AnimationQueue** - Cola de animaciones (`src/lib/animation/AnimationQueue.ts`)
+   - Cola con prioridades (mayor primero)
+   - Soporte para animaciones interrumpibles
+   - Secuencias de animaciones
+   - Callbacks: onStart, onComplete, onInterrupt
+   - Métodos: `enqueue()`, `interruptWith()`, `pause()`, `resume()`
+
+3. **BoneController** - Control de huesos (`src/lib/animation/BoneController.ts`)
+   - Registro centralizado de huesos
+   - Grupos de huesos predefinidos (head, torso, arms, legs, etc.)
+   - Blending global y por hueso
+   - Rotaciones objetivo con lerp configurable
+   - Métodos: `setTargetRotation()`, `updateGroup()`, `resetAll()`
+
+4. **useRobotAnimations Hook** - Integración (`src/lib/animation/useRobotAnimations.ts`)
+   - Integra Machine + Queue + BoneController
+   - API simplificada para animaciones
+   - Funciones de aplicación de animaciones modulares
+   - Método `update()` para useFrame
+
+### Files Created in Phase 2
+- `src/lib/animation/AnimationMachine.ts` (~320 líneas)
+- `src/lib/animation/AnimationQueue.ts` (~280 líneas)
+- `src/lib/animation/BoneController.ts` (~350 líneas)
+- `src/lib/animation/useRobotAnimations.ts` (~450 líneas)
+
+---
+
+### Animation System Refactor - Quick Wins Phase 1
+1. **Rotation Presets Extracted** - Creado `src/lib/animation/rotationPresets.ts`
+   - Todas las rotaciones de animaciones externalizadas
+   - Configuraciones de idle, wave, dance, nodYes, shakeLegs, approach
+   - Parámetros de cursor tracking y listening configurables
+   - `ANIMATION_CONFIGS` para duraciones y lerp factors
+
+2. **Easing Functions Library** - Creado `src/lib/animation/easingFunctions.ts`
+   - 28 funciones de easing disponibles (linear, quad, cubic, expo, back, elastic, bounce, sine, circ)
+   - `easingMap` para selección dinámica por nombre
+
+3. **New Thinking Animation** - Agregada animación de "pensando"
+   - Robot pone mano en barbilla, cabeza ladeada mirando arriba
+   - Brazo izquierdo cruzado, cuerpo ligeramente inclinado
+   - Oscilación sutil para efecto natural
+   - `startThinking()` y `stopThinking()` métodos expuestos
+
+4. **useFrame Optimization**
+   - Early returns para evitar cálculos innecesarios
+   - Mouse delta check para updates selectivos
+   - Skip de animaciones idle cuando thinking activo
+   - Parámetros de configuración centralizados (no hardcoded)
+
+5. **Integration with useRobotInteraction**
+   - `startThinking()` se llama en estado PROCESSING
+   - `stopThinking()` se llama al iniciar SPEAKING o en ERROR
+   - Tipos actualizados en `robot.ts`
+
+### Files Modified/Created
+- `src/lib/animation/rotationPresets.ts` (NEW)
+- `src/lib/animation/easingFunctions.ts` (NEW)
+- `src/lib/animation/index.ts` (NEW)
+- `src/app/inicio/components/RobotModel.tsx` (MODIFIED)
+- `src/hooks/useRobotInteraction.ts` (MODIFIED)
+- `src/types/robot.ts` (MODIFIED)
+
+### Previous Changes (2026-01-06)
 1. **Fix axios types** - Corregido import de AxiosRequestConfig
 2. **Railway config** - Agregado nixpacks.toml y railway.json
 3. **Moved Python files** - raggy.py y configs movidos a scripts/

@@ -171,89 +171,68 @@ export default function HomePage() {
   }, []);
 
   return (
-    <div className="min-h-screen relative overflow-hidden bg-gray-50" style={{backgroundColor: '#f9fafb'}}>
-      {/* Neural Network Background */}
+    <div className="min-h-screen relative overflow-hidden neu-bg" style={{backgroundColor: 'var(--neu-bg)'}}>
+      {/* Neural Network Background - Sutil */}
       <canvas
         ref={canvasRef}
-        className="absolute inset-0 z-0 opacity-70"
+        className="absolute inset-0 z-0 opacity-30"
       />
-
-      {/* Background elements */}
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="particle-1"></div>
-        <div className="particle-2"></div>
-        <div className="particle-3"></div>
-        <div className="absolute top-1/3 left-1/4">
-          <div className="relative w-4 h-4">
-            <div className="particle-orbit-1"></div>
-            <div className="particle-orbit-2"></div>
-            <div className="particle-orbit-3"></div>
-          </div>
-        </div>
-        <div className="absolute top-2/3 right-1/4">
-          <div className="relative w-4 h-4">
-            <div className="particle-orbit-1"></div>
-            <div className="particle-orbit-2"></div>
-            <div className="particle-orbit-3"></div>
-          </div>
-        </div>
-      </div>
 
       {/* Parallax Wrapper */}
       <div className="parallax-wrapper">
-      {/* Hero Section */}
+      {/* Hero Section - Neumorphic Style */}
         <section className="relative pt-20 pb-32 overflow-hidden">
-          <div className="absolute -top-10 right-0 w-96 h-96 bg-blue-500 rounded-full mix-blend-multiply opacity-10 filter blur-3xl animate-pulse-slow"></div>
-          <div className="absolute top-40 -left-10 w-80 h-80 bg-purple-500 rounded-full mix-blend-multiply opacity-10 filter blur-3xl animate-pulse-slow animation-delay-1000"></div>
-          
+          {/* Decorative blurred shapes */}
+          <div className="absolute -top-10 right-0 w-96 h-96 bg-indigo-400 rounded-full mix-blend-multiply opacity-10 filter blur-3xl animate-pulse-slow"></div>
+          <div className="absolute top-40 -left-10 w-80 h-80 bg-purple-400 rounded-full mix-blend-multiply opacity-10 filter blur-3xl animate-pulse-slow animation-delay-1000"></div>
+
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-            <div className="lg:grid lg:grid-cols-12 lg:gap-8">
+            <div className="lg:grid lg:grid-cols-12 lg:gap-8 items-center">
+              {/* Content Column */}
               <div className="sm:text-center md:max-w-2xl md:mx-auto lg:col-span-6 lg:text-left">
-                <div className="mt-20">
-                  <h1 className="text-4xl tracking-tight font-extrabold text-gray-900 sm:text-5xl md:text-6xl lg:text-5xl xl:text-6xl">
+                <div className="mt-16 lg:mt-20">
+                  <h1 className="text-4xl tracking-tight font-extrabold sm:text-5xl md:text-6xl lg:text-5xl xl:text-6xl" style={{color: '#2d3748'}}>
                     <span className="block">Soluciones de</span>
-                    <span className="block bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-500 animate-text-shimmer">
+                    <span className="block neu-gradient-text">
                       Inteligencia Artificial
                     </span>
                     <span className="block">para tu negocio</span>
-            </h1>
-                  <p className="mt-3 text-base text-gray-500 sm:mt-5 sm:text-xl lg:text-lg xl:text-xl">
-                    En TunixLabs, transformamos tu empresa con tecnología de vanguardia. Nuestras soluciones de IA están diseñadas para impulsar tu crecimiento y optimizar tus procesos.
+                  </h1>
+                  <p className="mt-3 text-base sm:mt-5 sm:text-xl lg:text-lg xl:text-xl" style={{color: '#718096', lineHeight: '1.7'}}>
+                    En TunixLabs, transformamos tu empresa con tecnologia de vanguardia. Nuestras soluciones de IA estan disenadas para impulsar tu crecimiento y optimizar tus procesos.
                   </p>
                   <div className="mt-8 sm:max-w-lg sm:mx-auto sm:text-center lg:text-left lg:mx-0">
-                    <div className="mt-5 sm:mt-8 sm:flex sm:justify-center lg:justify-start">
-                      <div className="rounded-md shadow">
-                        <a href="#contacto" className="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 neon-border md:py-4 md:text-lg md:px-10 transition-all duration-300">
-                          Contactar
-                        </a>
-                      </div>
-                      <div className="mt-3 sm:mt-0 sm:ml-3">
-                        <a href="#servicios" className="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-blue-700 glass md:py-4 md:text-lg md:px-10 transition-all duration-300">
-                          Servicios
-                        </a>
-                      </div>
+                    <div className="mt-5 sm:mt-8 flex flex-col sm:flex-row sm:justify-center lg:justify-start gap-4">
+                      <button className="neu-btn-primary">
+                        Contactar
+                      </button>
+                      <button className="neu-btn-secondary">
+                        Ver Servicios
+                      </button>
                     </div>
                   </div>
                 </div>
               </div>
-              <div className="mt-12 relative sm:max-w-lg sm:mx-auto lg:mt-0 lg:max-w-none lg:mx-0 lg:col-span-6 lg:flex lg:items-center">
-                <div className="relative mx-auto w-full">
-                  <div className="rounded-lg overflow-visible">
-                    <div className="relative block w-full overflow-visible">
-                      <div className="w-full h-80 relative">
-                        {/* Robot 3D interactivo */}
-                        <RobotModel />
-                        
-                        {/* Partículas flotantes */}
-                        <FloatingParticles count={20} />
-                      </div>
+
+              {/* Robot Column - Neumorphic Circle */}
+              <div className="mt-12 relative sm:mx-auto lg:mt-0 lg:col-span-6 lg:flex lg:items-center lg:justify-center">
+                <div className="neu-robot-container">
+                  <div className="neu-robot-avatar">
+                    {/* Robot 3D Canvas Wrapper */}
+                    <div className="robot-canvas-wrapper">
+                      <RobotModel />
                     </div>
                   </div>
                 </div>
+
+                {/* Floating Particles around the circle */}
+                <div className="absolute inset-0 pointer-events-none">
+                  <FloatingParticles count={15} />
+                </div>
+              </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
 
         {/* Servicios Section */}
         <section id="servicios" className="py-16 bg-gray-50">
