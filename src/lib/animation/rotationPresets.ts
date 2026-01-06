@@ -136,6 +136,98 @@ export const APPROACH_ROTATIONS: BoneRotationPreset = {
 };
 
 // ============================================
+// ANIMACIÓN: EMOCIONADO (EXCITED) - NUEVO
+// ============================================
+export const EXCITED_ROTATIONS: BoneRotationPreset = {
+  // Cabeza ligeramente hacia arriba con movimiento
+  head: { x: -15, y: 0, z: 0 },
+  neck: { x: -10, y: 0, z: 0 },
+  // Cuerpo erguido con energía
+  body_top1: { x: -5, y: 0, z: 0 },
+  body_top2: { x: 0, y: 0, z: 0 },
+  // Brazos arriba en celebración
+  shoulder_left: { x: -30, y: 30, z: -60 },
+  shoulder_right: { x: -30, y: -30, z: 60 },
+  arm_left_top: { x: 0, y: 0, z: 0 },
+  arm_right_top: { x: 0, y: 0, z: 0 },
+  arm_left_bot: { x: 45, y: 0, z: 0 },
+  arm_right_bot: { x: 45, y: 0, z: 0 },
+  // Piernas con ligero rebote
+  leg_left_top: { x: 10, y: 5, z: -180 },
+  leg_right_top: { x: 10, y: -5, z: -180 },
+  leg_left_bot: { x: 15, y: 0, z: 0 },
+  leg_right_bot: { x: 15, y: 0, z: 0 },
+};
+
+// ============================================
+// ANIMACIÓN: CONFUNDIDO (CONFUSED) - NUEVO
+// ============================================
+export const CONFUSED_ROTATIONS: BoneRotationPreset = {
+  // Cabeza ladeada con expresión de duda
+  head: { x: 5, y: 20, z: 15 },
+  neck: { x: 0, y: 10, z: 8 },
+  // Cuerpo ligeramente inclinado
+  body_top1: { x: 0, y: 0, z: 3 },
+  body_top2: { x: 0, y: 5, z: 0 },
+  // Hombros encogidos
+  shoulder_left: { x: -10, y: 15, z: -140 },
+  shoulder_right: { x: -10, y: -15, z: 140 },
+  // Brazos en posición de "no sé"
+  arm_left_bot: { x: 40, y: 0, z: 20 },
+  arm_right_bot: { x: 40, y: 0, z: -20 },
+};
+
+// ============================================
+// ANIMACIÓN: DESPEDIDA (GOODBYE) - NUEVO
+// ============================================
+export const GOODBYE_ROTATIONS: BoneRotationPreset = {
+  // Cabeza asintiendo suavemente
+  head: { x: -10, y: 0, z: 0 },
+  neck: { x: -5, y: 0, z: 0 },
+  // Brazo derecho extendido para despedirse
+  shoulder_right: { x: -20, y: -30, z: 30 },
+  arm_right_top: { x: 0, y: 0, z: 0 },
+  arm_right_bot: { x: 90, y: 0, z: 0 },
+  // Brazo izquierdo relajado
+  shoulder_left: { x: 10, y: 10, z: -160 },
+  arm_left_bot: { x: 25, y: 0, z: 0 },
+  // Cuerpo ligeramente inclinado hacia adelante (cortesía)
+  body_top1: { x: 8, y: 0, z: 0 },
+};
+
+// ============================================
+// VARIACIONES DE IDLE - NUEVO
+// ============================================
+export const IDLE_VARIATION_LOOK_AROUND: BoneRotationPreset = {
+  head: { x: 0, y: 30, z: 0 },
+  neck: { x: 0, y: 15, z: 0 },
+};
+
+export const IDLE_VARIATION_STRETCH: BoneRotationPreset = {
+  head: { x: -20, y: 0, z: 0 },
+  neck: { x: -10, y: 0, z: 0 },
+  body_top1: { x: -10, y: 0, z: 0 },
+  shoulder_left: { x: -40, y: 20, z: -120 },
+  shoulder_right: { x: -40, y: -20, z: 120 },
+  arm_left_bot: { x: 10, y: 0, z: 0 },
+  arm_right_bot: { x: 10, y: 0, z: 0 },
+};
+
+export const IDLE_VARIATION_WEIGHT_SHIFT: BoneRotationPreset = {
+  body_top1: { x: 0, y: 0, z: 5 },
+  body_top2: { x: 0, y: 3, z: 3 },
+  leg_left_top: { x: 8, y: 0, z: -180 },
+  leg_right_top: { x: 2, y: 0, z: -180 },
+  leg_left_bot: { x: 5, y: 0, z: 0 },
+  leg_right_bot: { x: 15, y: 0, z: 0 },
+};
+
+export const IDLE_VARIATION_HEAD_TILT: BoneRotationPreset = {
+  head: { x: 5, y: 0, z: 10 },
+  neck: { x: 3, y: 0, z: 5 },
+};
+
+// ============================================
 // CONFIGURACIÓN DE ANIMACIONES
 // ============================================
 export interface AnimationConfig {
@@ -179,6 +271,39 @@ export const ANIMATION_CONFIGS: Record<string, AnimationConfig> = {
     duration: 2500,
     lerpFactor: 0.15,
     oscillation: { frequency: 8, amplitude: 0.6 },
+  },
+  excited: {
+    duration: 2000,
+    lerpFactor: 0.12,
+    oscillation: { frequency: 8, amplitude: 0.4 },
+  },
+  confused: {
+    duration: 2000,
+    lerpFactor: 0.08,
+    oscillation: { frequency: 2, amplitude: 0.15 },
+  },
+  goodbye: {
+    duration: 3000,
+    lerpFactor: 0.1,
+    oscillation: { frequency: 4, amplitude: 0.25 },
+  },
+  idleLookAround: {
+    duration: 3000,
+    lerpFactor: 0.04,
+    oscillation: { frequency: 0.5, amplitude: 0.3 },
+  },
+  idleStretch: {
+    duration: 2500,
+    lerpFactor: 0.06,
+  },
+  idleWeightShift: {
+    duration: 4000,
+    lerpFactor: 0.03,
+  },
+  idleHeadTilt: {
+    duration: 2000,
+    lerpFactor: 0.08,
+    oscillation: { frequency: 1.5, amplitude: 0.2 },
   },
   thinking: {
     duration: 0, // Continua mientras esté en estado PROCESSING

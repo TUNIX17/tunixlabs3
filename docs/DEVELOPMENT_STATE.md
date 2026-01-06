@@ -161,6 +161,30 @@ Para configurar: `railway variables --set KEY=value`
 
 ## RECENT CHANGES (2026-01-05)
 
+### Animation System Refactor - Phase 3: New Animations
+
+1. **Nuevas Animaciones de Emoción**
+   - `EXCITED_ROTATIONS` - Brazos arriba celebrando, rebote energético
+   - `CONFUSED_ROTATIONS` - Cabeza ladeada, hombros encogidos
+   - `GOODBYE_ROTATIONS` - Brazo despidiéndose, reverencia sutil
+
+2. **Variaciones de Idle** (para más naturalidad)
+   - `IDLE_VARIATION_LOOK_AROUND` - Mira alrededor
+   - `IDLE_VARIATION_STRETCH` - Estiramiento
+   - `IDLE_VARIATION_WEIGHT_SHIFT` - Cambio de peso entre piernas
+   - `IDLE_VARIATION_HEAD_TILT` - Ladea la cabeza
+
+3. **AnimationMachine Actualizada**
+   - 7 nuevos estados: EXCITED, CONFUSED, GOODBYE, IDLE_LOOK_AROUND, IDLE_STRETCH, IDLE_WEIGHT_SHIFT, IDLE_HEAD_TILT
+   - Prioridades configuradas (idle variations = 1, emociones = 3-5)
+   - Transiciones permitidas actualizadas
+   - Nuevos eventos de animación
+
+4. **useRobotAnimations Actualizado**
+   - Nuevos métodos: startExcited(), startConfused(), startGoodbye()
+   - Variaciones idle: startIdleLookAround(), startIdleStretch(), startIdleWeightShift(), startIdleHeadTilt()
+   - Funciones de aplicación para cada nueva animación
+
 ### Animation System Refactor - Phase 2: Architecture
 
 1. **AnimationMachine** - Máquina de estados (`src/lib/animation/AnimationMachine.ts`)

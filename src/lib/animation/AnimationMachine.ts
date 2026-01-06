@@ -18,18 +18,35 @@ export enum AnimationState {
   LISTENING = 'listening',
   SPEAKING = 'speaking',
   ERROR = 'error',
+  // Nuevos estados de emoción
+  EXCITED = 'excited',
+  CONFUSED = 'confused',
+  GOODBYE = 'goodbye',
+  // Variaciones de idle
+  IDLE_LOOK_AROUND = 'idle_look_around',
+  IDLE_STRETCH = 'idle_stretch',
+  IDLE_WEIGHT_SHIFT = 'idle_weight_shift',
+  IDLE_HEAD_TILT = 'idle_head_tilt',
 }
 
 // Prioridades de animación (mayor número = mayor prioridad)
 export const ANIMATION_PRIORITIES: Record<AnimationState, number> = {
   [AnimationState.IDLE]: 0,
+  // Variaciones de idle tienen prioridad baja (solo cuando está inactivo)
+  [AnimationState.IDLE_LOOK_AROUND]: 1,
+  [AnimationState.IDLE_STRETCH]: 1,
+  [AnimationState.IDLE_WEIGHT_SHIFT]: 1,
+  [AnimationState.IDLE_HEAD_TILT]: 1,
   [AnimationState.LISTENING]: 2,
   [AnimationState.WAVING]: 3,
   [AnimationState.NODDING]: 3,
   [AnimationState.SHAKING_LEGS]: 3,
+  [AnimationState.CONFUSED]: 3,
   [AnimationState.DANCING]: 4,
+  [AnimationState.EXCITED]: 4,
   [AnimationState.APPROACHING]: 5,
   [AnimationState.STEPPING_BACK]: 5,
+  [AnimationState.GOODBYE]: 5,
   [AnimationState.THINKING]: 6,
   [AnimationState.SPEAKING]: 7,
   [AnimationState.ERROR]: 10,
@@ -46,23 +63,35 @@ export const ALLOWED_TRANSITIONS: Partial<Record<AnimationState, AnimationState[
     AnimationState.THINKING,
     AnimationState.LISTENING,
     AnimationState.SPEAKING,
+    AnimationState.EXCITED,
+    AnimationState.CONFUSED,
+    AnimationState.GOODBYE,
+    AnimationState.IDLE_LOOK_AROUND,
+    AnimationState.IDLE_STRETCH,
+    AnimationState.IDLE_WEIGHT_SHIFT,
+    AnimationState.IDLE_HEAD_TILT,
     AnimationState.ERROR,
   ],
   [AnimationState.LISTENING]: [
     AnimationState.IDLE,
     AnimationState.THINKING,
     AnimationState.SPEAKING,
+    AnimationState.CONFUSED,
     AnimationState.ERROR,
   ],
   [AnimationState.THINKING]: [
     AnimationState.IDLE,
     AnimationState.SPEAKING,
+    AnimationState.EXCITED,
+    AnimationState.CONFUSED,
     AnimationState.ERROR,
     AnimationState.STEPPING_BACK,
   ],
   [AnimationState.SPEAKING]: [
     AnimationState.IDLE,
     AnimationState.STEPPING_BACK,
+    AnimationState.EXCITED,
+    AnimationState.GOODBYE,
     AnimationState.ERROR,
   ],
   [AnimationState.WAVING]: [
@@ -78,9 +107,11 @@ export const ALLOWED_TRANSITIONS: Partial<Record<AnimationState, AnimationState[
   [AnimationState.STEPPING_BACK]: [
     AnimationState.IDLE,
     AnimationState.APPROACHING,
+    AnimationState.GOODBYE,
   ],
   [AnimationState.DANCING]: [
     AnimationState.IDLE,
+    AnimationState.EXCITED,
     AnimationState.ERROR,
   ],
   [AnimationState.NODDING]: [
@@ -90,8 +121,50 @@ export const ALLOWED_TRANSITIONS: Partial<Record<AnimationState, AnimationState[
   [AnimationState.SHAKING_LEGS]: [
     AnimationState.IDLE,
   ],
+  [AnimationState.EXCITED]: [
+    AnimationState.IDLE,
+    AnimationState.DANCING,
+    AnimationState.WAVING,
+    AnimationState.ERROR,
+  ],
+  [AnimationState.CONFUSED]: [
+    AnimationState.IDLE,
+    AnimationState.THINKING,
+    AnimationState.NODDING,
+    AnimationState.ERROR,
+  ],
+  [AnimationState.GOODBYE]: [
+    AnimationState.IDLE,
+    AnimationState.WAVING,
+    AnimationState.ERROR,
+  ],
+  // Variaciones de idle pueden volver a idle o a cualquier acción
+  [AnimationState.IDLE_LOOK_AROUND]: [
+    AnimationState.IDLE,
+    AnimationState.THINKING,
+    AnimationState.LISTENING,
+    AnimationState.IDLE_HEAD_TILT,
+  ],
+  [AnimationState.IDLE_STRETCH]: [
+    AnimationState.IDLE,
+    AnimationState.THINKING,
+    AnimationState.LISTENING,
+  ],
+  [AnimationState.IDLE_WEIGHT_SHIFT]: [
+    AnimationState.IDLE,
+    AnimationState.THINKING,
+    AnimationState.LISTENING,
+    AnimationState.IDLE_LOOK_AROUND,
+  ],
+  [AnimationState.IDLE_HEAD_TILT]: [
+    AnimationState.IDLE,
+    AnimationState.THINKING,
+    AnimationState.LISTENING,
+    AnimationState.IDLE_WEIGHT_SHIFT,
+  ],
   [AnimationState.ERROR]: [
     AnimationState.IDLE,
+    AnimationState.CONFUSED,
   ],
 };
 
@@ -108,6 +181,15 @@ export const BLEND_DURATIONS: Partial<Record<AnimationState, number>> = {
   [AnimationState.LISTENING]: 200,
   [AnimationState.SPEAKING]: 250,
   [AnimationState.ERROR]: 100,
+  // Nuevas animaciones
+  [AnimationState.EXCITED]: 200,
+  [AnimationState.CONFUSED]: 300,
+  [AnimationState.GOODBYE]: 350,
+  // Variaciones de idle - transiciones más suaves
+  [AnimationState.IDLE_LOOK_AROUND]: 500,
+  [AnimationState.IDLE_STRETCH]: 600,
+  [AnimationState.IDLE_WEIGHT_SHIFT]: 700,
+  [AnimationState.IDLE_HEAD_TILT]: 400,
 };
 
 // Eventos que pueden disparar transiciones
@@ -121,6 +203,13 @@ export type AnimationEvent =
   | { type: 'START_THINKING' }
   | { type: 'START_LISTENING' }
   | { type: 'START_SPEAKING' }
+  | { type: 'START_EXCITED' }
+  | { type: 'START_CONFUSED' }
+  | { type: 'START_GOODBYE' }
+  | { type: 'START_IDLE_LOOK_AROUND' }
+  | { type: 'START_IDLE_STRETCH' }
+  | { type: 'START_IDLE_WEIGHT_SHIFT' }
+  | { type: 'START_IDLE_HEAD_TILT' }
   | { type: 'ANIMATION_COMPLETE' }
   | { type: 'ERROR' }
   | { type: 'RESET' };
@@ -136,6 +225,13 @@ const EVENT_TO_STATE: Record<string, AnimationState> = {
   START_THINKING: AnimationState.THINKING,
   START_LISTENING: AnimationState.LISTENING,
   START_SPEAKING: AnimationState.SPEAKING,
+  START_EXCITED: AnimationState.EXCITED,
+  START_CONFUSED: AnimationState.CONFUSED,
+  START_GOODBYE: AnimationState.GOODBYE,
+  START_IDLE_LOOK_AROUND: AnimationState.IDLE_LOOK_AROUND,
+  START_IDLE_STRETCH: AnimationState.IDLE_STRETCH,
+  START_IDLE_WEIGHT_SHIFT: AnimationState.IDLE_WEIGHT_SHIFT,
+  START_IDLE_HEAD_TILT: AnimationState.IDLE_HEAD_TILT,
   ERROR: AnimationState.ERROR,
   RESET: AnimationState.IDLE,
 };

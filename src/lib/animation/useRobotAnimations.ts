@@ -18,6 +18,13 @@ import {
   DANCE_ROTATIONS,
   SHAKE_LEGS_ROTATIONS,
   APPROACH_ROTATIONS,
+  EXCITED_ROTATIONS,
+  CONFUSED_ROTATIONS,
+  GOODBYE_ROTATIONS,
+  IDLE_VARIATION_LOOK_AROUND,
+  IDLE_VARIATION_STRETCH,
+  IDLE_VARIATION_WEIGHT_SHIFT,
+  IDLE_VARIATION_HEAD_TILT,
   ANIMATION_CONFIGS,
   IDLE_PARAMS,
   CURSOR_TRACKING,
@@ -59,6 +66,15 @@ export interface UseRobotAnimationsReturn {
   stopThinking: () => void;
   startListening: () => void;
   stopListening: () => void;
+  // Nuevas animaciones
+  startExcited: () => void;
+  startConfused: () => void;
+  startGoodbye: () => void;
+  // Variaciones de idle
+  startIdleLookAround: () => void;
+  startIdleStretch: () => void;
+  startIdleWeightShift: () => void;
+  startIdleHeadTilt: () => void;
 
   // Métodos de control
   reset: () => void;
@@ -132,6 +148,14 @@ export function useRobotAnimations(
       dance: presetToEulers(DANCE_ROTATIONS),
       shakeLegs: presetToEulers(SHAKE_LEGS_ROTATIONS),
       approach: presetToEulers(APPROACH_ROTATIONS),
+      // Nuevos presets
+      excited: presetToEulers(EXCITED_ROTATIONS),
+      confused: presetToEulers(CONFUSED_ROTATIONS),
+      goodbye: presetToEulers(GOODBYE_ROTATIONS),
+      idleLookAround: presetToEulers(IDLE_VARIATION_LOOK_AROUND),
+      idleStretch: presetToEulers(IDLE_VARIATION_STRETCH),
+      idleWeightShift: presetToEulers(IDLE_VARIATION_WEIGHT_SHIFT),
+      idleHeadTilt: presetToEulers(IDLE_VARIATION_HEAD_TILT),
     }),
     []
   );
@@ -225,6 +249,71 @@ export function useRobotAnimations(
     }
   }, [machine]);
 
+  // Nuevas animaciones
+  const startExcited = useCallback(() => {
+    if (machine.transitionTo(AnimationState.EXCITED)) {
+      animationStartTimeRef.current = performance.now() / 1000;
+      setTimeout(() => {
+        machine.send({ type: 'ANIMATION_COMPLETE' });
+      }, ANIMATION_CONFIGS.excited.duration);
+    }
+  }, [machine]);
+
+  const startConfused = useCallback(() => {
+    if (machine.transitionTo(AnimationState.CONFUSED)) {
+      animationStartTimeRef.current = performance.now() / 1000;
+      setTimeout(() => {
+        machine.send({ type: 'ANIMATION_COMPLETE' });
+      }, ANIMATION_CONFIGS.confused.duration);
+    }
+  }, [machine]);
+
+  const startGoodbye = useCallback(() => {
+    if (machine.transitionTo(AnimationState.GOODBYE)) {
+      animationStartTimeRef.current = performance.now() / 1000;
+      setTimeout(() => {
+        machine.send({ type: 'ANIMATION_COMPLETE' });
+      }, ANIMATION_CONFIGS.goodbye.duration);
+    }
+  }, [machine]);
+
+  // Variaciones de idle
+  const startIdleLookAround = useCallback(() => {
+    if (machine.transitionTo(AnimationState.IDLE_LOOK_AROUND)) {
+      animationStartTimeRef.current = performance.now() / 1000;
+      setTimeout(() => {
+        machine.send({ type: 'ANIMATION_COMPLETE' });
+      }, ANIMATION_CONFIGS.idleLookAround.duration);
+    }
+  }, [machine]);
+
+  const startIdleStretch = useCallback(() => {
+    if (machine.transitionTo(AnimationState.IDLE_STRETCH)) {
+      animationStartTimeRef.current = performance.now() / 1000;
+      setTimeout(() => {
+        machine.send({ type: 'ANIMATION_COMPLETE' });
+      }, ANIMATION_CONFIGS.idleStretch.duration);
+    }
+  }, [machine]);
+
+  const startIdleWeightShift = useCallback(() => {
+    if (machine.transitionTo(AnimationState.IDLE_WEIGHT_SHIFT)) {
+      animationStartTimeRef.current = performance.now() / 1000;
+      setTimeout(() => {
+        machine.send({ type: 'ANIMATION_COMPLETE' });
+      }, ANIMATION_CONFIGS.idleWeightShift.duration);
+    }
+  }, [machine]);
+
+  const startIdleHeadTilt = useCallback(() => {
+    if (machine.transitionTo(AnimationState.IDLE_HEAD_TILT)) {
+      animationStartTimeRef.current = performance.now() / 1000;
+      setTimeout(() => {
+        machine.send({ type: 'ANIMATION_COMPLETE' });
+      }, ANIMATION_CONFIGS.idleHeadTilt.duration);
+    }
+  }, [machine]);
+
   const reset = useCallback(() => {
     machine.reset();
     queue.clear();
@@ -272,6 +361,36 @@ export function useRobotAnimations(
           applyShakeLegsAnimation(boneController, rotationPresets, elapsedTime);
           break;
 
+        case AnimationState.EXCITED:
+          applyExcitedAnimation(boneController, rotationPresets, elapsedTime);
+          break;
+
+        case AnimationState.CONFUSED:
+          applyConfusedAnimation(boneController, rotationPresets, elapsedTime);
+          break;
+
+        case AnimationState.GOODBYE:
+          applyGoodbyeAnimation(boneController, rotationPresets, elapsedTime);
+          break;
+
+        case AnimationState.IDLE_LOOK_AROUND:
+          applyIdleLookAroundAnimation(boneController, rotationPresets, elapsedTime);
+          applyIdleAnimation(boneController, rotationPresets, time, mouseX, mouseY, false, true);
+          break;
+
+        case AnimationState.IDLE_STRETCH:
+          applyIdleStretchAnimation(boneController, rotationPresets, elapsedTime);
+          break;
+
+        case AnimationState.IDLE_WEIGHT_SHIFT:
+          applyIdleWeightShiftAnimation(boneController, rotationPresets, elapsedTime);
+          break;
+
+        case AnimationState.IDLE_HEAD_TILT:
+          applyIdleHeadTiltAnimation(boneController, rotationPresets, elapsedTime);
+          applyIdleAnimation(boneController, rotationPresets, time, mouseX, mouseY, false, true);
+          break;
+
         case AnimationState.APPROACHING:
         case AnimationState.STEPPING_BACK:
           // Estas animaciones afectan posición, manejadas externamente
@@ -311,6 +430,15 @@ export function useRobotAnimations(
     stopThinking,
     startListening,
     stopListening,
+    // Nuevas animaciones
+    startExcited,
+    startConfused,
+    startGoodbye,
+    // Variaciones de idle
+    startIdleLookAround,
+    startIdleStretch,
+    startIdleWeightShift,
+    startIdleHeadTilt,
     reset,
     registerScene,
     update,
@@ -563,6 +691,208 @@ function applyShakeLegsAnimation(
   });
 }
 
+// ============================================
+// NUEVAS ANIMACIONES
+// ============================================
+
+function applyExcitedAnimation(
+  controller: BoneController,
+  presets: ReturnType<typeof getPresets>,
+  elapsedTime: number
+): void {
+  const config = ANIMATION_CONFIGS.excited;
+  const oscillation = config.oscillation!;
+  const bounce = Math.abs(Math.sin(elapsedTime * oscillation.frequency)) * oscillation.amplitude;
+  const wiggle = Math.sin(elapsedTime * 6) * 0.15;
+
+  Object.entries(presets.excited).forEach(([name, euler]) => {
+    const boneName = name as BoneName;
+    let targetEuler = euler.clone();
+    const isLeft = boneName.includes('left');
+
+    if (boneName === 'head') {
+      targetEuler.x += bounce * 0.3;
+      targetEuler.z = wiggle * 0.3;
+    } else if (boneName === 'body_top1') {
+      targetEuler.x -= bounce * 0.2;
+      targetEuler.y = wiggle * 0.2;
+    } else if (boneName.includes('shoulder')) {
+      targetEuler.z += (isLeft ? -bounce : bounce) * 0.4;
+      targetEuler.x += bounce * 0.2;
+    } else if (boneName.includes('bot') && boneName.includes('arm')) {
+      targetEuler.x += (isLeft ? bounce : -bounce) * 0.3;
+    } else if (boneName.includes('leg_') && boneName.includes('top')) {
+      targetEuler.x += bounce * 0.15;
+    }
+
+    controller.setTargetRotation(boneName, targetEuler, { lerpFactor: config.lerpFactor });
+  });
+}
+
+function applyConfusedAnimation(
+  controller: BoneController,
+  presets: ReturnType<typeof getPresets>,
+  elapsedTime: number
+): void {
+  const config = ANIMATION_CONFIGS.confused;
+  const oscillation = config.oscillation!;
+  const tilt = Math.sin(elapsedTime * oscillation.frequency) * oscillation.amplitude;
+  const shrug = Math.sin(elapsedTime * 1.5) * 0.08;
+
+  Object.entries(presets.confused).forEach(([name, euler]) => {
+    const boneName = name as BoneName;
+    let targetEuler = euler.clone();
+    const isLeft = boneName.includes('left');
+
+    if (boneName === 'head') {
+      targetEuler.z += tilt;
+      targetEuler.y += shrug;
+    } else if (boneName === 'neck') {
+      targetEuler.z += tilt * 0.5;
+    } else if (boneName.includes('shoulder')) {
+      // Hombros encogiéndose alternadamente
+      targetEuler.z += (isLeft ? shrug : -shrug) * 2;
+      targetEuler.x += shrug;
+    } else if (boneName.includes('bot') && boneName.includes('arm')) {
+      targetEuler.z += (isLeft ? shrug : -shrug) * 1.5;
+    }
+
+    controller.setTargetRotation(boneName, targetEuler, { lerpFactor: config.lerpFactor });
+  });
+}
+
+function applyGoodbyeAnimation(
+  controller: BoneController,
+  presets: ReturnType<typeof getPresets>,
+  elapsedTime: number
+): void {
+  const config = ANIMATION_CONFIGS.goodbye;
+  const oscillation = config.oscillation!;
+  const wave = Math.sin(elapsedTime * oscillation.frequency) * oscillation.amplitude;
+  const nod = Math.sin(elapsedTime * 2) * 0.08;
+
+  Object.entries(presets.goodbye).forEach(([name, euler]) => {
+    const boneName = name as BoneName;
+    let targetEuler = euler.clone();
+
+    if (boneName === 'head') {
+      targetEuler.x += nod;
+    } else if (boneName === 'arm_right_bot') {
+      // Movimiento de despedida con la mano
+      targetEuler.z = wave;
+    } else if (boneName === 'shoulder_right') {
+      targetEuler.y += wave * 0.3;
+    } else if (boneName === 'body_top1') {
+      // Ligera reverencia
+      targetEuler.x += nod * 0.5;
+    }
+
+    controller.setTargetRotation(boneName, targetEuler, { lerpFactor: config.lerpFactor });
+  });
+}
+
+// ============================================
+// VARIACIONES DE IDLE
+// ============================================
+
+function applyIdleLookAroundAnimation(
+  controller: BoneController,
+  presets: ReturnType<typeof getPresets>,
+  elapsedTime: number
+): void {
+  const config = ANIMATION_CONFIGS.idleLookAround;
+  const oscillation = config.oscillation!;
+  const look = Math.sin(elapsedTime * oscillation.frequency) * oscillation.amplitude;
+
+  Object.entries(presets.idleLookAround).forEach(([name, euler]) => {
+    const boneName = name as BoneName;
+    let targetEuler = euler.clone();
+
+    if (boneName === 'head') {
+      targetEuler.y = euler.y * (0.5 + look);
+    } else if (boneName === 'neck') {
+      targetEuler.y = euler.y * (0.5 + look * 0.7);
+    }
+
+    controller.setTargetRotation(boneName, targetEuler, { lerpFactor: config.lerpFactor });
+  });
+}
+
+function applyIdleStretchAnimation(
+  controller: BoneController,
+  presets: ReturnType<typeof getPresets>,
+  elapsedTime: number
+): void {
+  const config = ANIMATION_CONFIGS.idleStretch;
+  // Smooth stretch progress (0 to 1 and back)
+  const progress = Math.sin(elapsedTime * 0.8) * 0.5 + 0.5;
+
+  Object.entries(presets.idleStretch).forEach(([name, euler]) => {
+    const boneName = name as BoneName;
+    const initial = controller.getBoneState(boneName)?.initialRotation;
+    if (!initial) return;
+
+    // Interpolar entre posición inicial y stretch
+    const targetEuler = new THREE.Euler(
+      initial.x + (euler.x - initial.x) * progress,
+      initial.y + (euler.y - initial.y) * progress,
+      initial.z + (euler.z - initial.z) * progress
+    );
+
+    controller.setTargetRotation(boneName, targetEuler, { lerpFactor: config.lerpFactor });
+  });
+}
+
+function applyIdleWeightShiftAnimation(
+  controller: BoneController,
+  presets: ReturnType<typeof getPresets>,
+  elapsedTime: number
+): void {
+  const config = ANIMATION_CONFIGS.idleWeightShift;
+  // Smooth weight shift (left to right)
+  const shift = Math.sin(elapsedTime * 0.5) * 0.5 + 0.5;
+
+  Object.entries(presets.idleWeightShift).forEach(([name, euler]) => {
+    const boneName = name as BoneName;
+    const isLeft = boneName.includes('left');
+    let targetEuler = euler.clone();
+
+    if (boneName.includes('body')) {
+      targetEuler.z = euler.z * (shift * 2 - 1);
+    } else if (boneName.includes('leg')) {
+      // Peso en una pierna u otra
+      const weight = isLeft ? shift : 1 - shift;
+      targetEuler.x = euler.x * (0.5 + weight * 0.5);
+    }
+
+    controller.setTargetRotation(boneName, targetEuler, { lerpFactor: config.lerpFactor });
+  });
+}
+
+function applyIdleHeadTiltAnimation(
+  controller: BoneController,
+  presets: ReturnType<typeof getPresets>,
+  elapsedTime: number
+): void {
+  const config = ANIMATION_CONFIGS.idleHeadTilt;
+  const oscillation = config.oscillation!;
+  const tilt = Math.sin(elapsedTime * oscillation.frequency) * oscillation.amplitude;
+
+  Object.entries(presets.idleHeadTilt).forEach(([name, euler]) => {
+    const boneName = name as BoneName;
+    let targetEuler = euler.clone();
+
+    if (boneName === 'head') {
+      targetEuler.z = euler.z + tilt;
+      targetEuler.x = euler.x + tilt * 0.3;
+    } else if (boneName === 'neck') {
+      targetEuler.z = euler.z + tilt * 0.6;
+    }
+
+    controller.setTargetRotation(boneName, targetEuler, { lerpFactor: config.lerpFactor });
+  });
+}
+
 // Helper type para presets
 function getPresets() {
   return {
@@ -574,5 +904,12 @@ function getPresets() {
     dance: presetToEulers(DANCE_ROTATIONS),
     shakeLegs: presetToEulers(SHAKE_LEGS_ROTATIONS),
     approach: presetToEulers(APPROACH_ROTATIONS),
+    excited: presetToEulers(EXCITED_ROTATIONS),
+    confused: presetToEulers(CONFUSED_ROTATIONS),
+    goodbye: presetToEulers(GOODBYE_ROTATIONS),
+    idleLookAround: presetToEulers(IDLE_VARIATION_LOOK_AROUND),
+    idleStretch: presetToEulers(IDLE_VARIATION_STRETCH),
+    idleWeightShift: presetToEulers(IDLE_VARIATION_WEIGHT_SHIFT),
+    idleHeadTilt: presetToEulers(IDLE_VARIATION_HEAD_TILT),
   };
 }
