@@ -1,7 +1,7 @@
 # TunixLabs - Development State
 
-**Last Updated:** 2025-01-05
-**Current Phase:** Initial Setup
+**Last Updated:** 2026-01-06
+**Current Phase:** Deployment Complete
 **Sprint:** 0 - Configuration
 
 ---
@@ -19,21 +19,44 @@ TunixLabs es una plataforma web de consultoria en IA con:
 - [x] Repository cloned from GitHub
 - [x] Claude Code configuration adapted
 - [x] .venv symlink configured (shared with SchwagerDigital)
-- [x] Raggy RAG system configured
+- [x] Raggy RAG system configured (moved to scripts/)
 - [x] Agile command configured
 - [x] Initial documentation structure
+- [x] **Railway deployment successful**
+- [x] Fix tipos de axios en groq-proxy
+- [x] Configuración nixpacks.toml para Node.js
+- [x] railway.json configurado
 
 ### In Progress
-- [ ] npm dependencies installation
-- [ ] Railway deployment configuration
-- [ ] Voice system integration (ElevenLabs)
+- [ ] Voice system integration (ElevenLabs/Groq)
 - [ ] 3D Avatar enhancement
+- [ ] Configurar variables de entorno en Railway
 
 ### Pending
 - [ ] PRD document creation
 - [ ] Sprint 1 planning
 - [ ] Testing setup (Jest + Playwright)
 - [ ] CI/CD pipeline
+- [ ] Conectar dominio tunixlabs.com
+
+---
+
+## DEPLOYMENT INFO
+
+### Railway Production
+- **URL:** https://tunixlabs3-production.up.railway.app
+- **Project:** TunixWEB
+- **Service:** tunixlabs3
+- **Environment:** production
+- **Status:** ✅ Online
+
+### Deploy Commands
+```bash
+railway up --detach    # Deploy manual
+railway logs -n 50     # Ver logs
+railway variables      # Ver variables
+railway domain         # Configurar dominio
+```
 
 ---
 
@@ -48,18 +71,19 @@ TunixLabs es una plataforma web de consultoria en IA con:
 **Implementation:** Symlink `.venv -> /home/tunix/Escritorio/SchwagerDigital/.venv`
 
 ### 2. RAG System (Raggy)
-**Decision:** Copiar raggy.py y adaptar configuracion
+**Decision:** Mover raggy.py a scripts/ para evitar detección de Python en Railway
 **Rationale:**
-- Sistema probado en EnglishAI
-- Soporta busquedas bilingues
-- Integrado con Claude Code workflow
+- Railway detectaba Python y fallaba el build
+- Mantener archivos de desarrollo separados
+**Implementation:** `scripts/raggy.py`, `scripts/raggy_config.yaml`
 
 ### 3. Railway Deployment
-**Decision:** Frontend y Backend en Railway
+**Decision:** Frontend y Backend en Railway con Nixpacks
 **Rationale:**
 - Integracion con PostgreSQL managed
 - Deploys automaticos desde GitHub
 - Variables de entorno seguras
+**Implementation:** `nixpacks.toml` + `railway.json`
 
 ---
 
@@ -67,30 +91,36 @@ TunixLabs es una plataforma web de consultoria en IA con:
 
 ```yaml
 Frontend:
-  Framework: Next.js 13+ (App Router)
+  Framework: Next.js 13.5.11 (App Router)
   Language: TypeScript
   Styling: Tailwind CSS
   3D: React Three Fiber + Drei
 
 Backend:
-  API: Next.js API Routes / Express
-  Database: PostgreSQL (Railway)
+  API: Next.js API Routes
+  Database: PostgreSQL (Railway) - pendiente
+  Proxy: /api/groq-proxy para TTS
 
 Services:
-  Voice: ElevenLabs API
+  Voice: Groq API (vía proxy)
   Avatar: Ready Player Me
   Hosting: Railway
-  Domain: tunixlabs.com
+  Domain: tunixlabs.com (pendiente DNS)
 ```
 
 ---
 
 ## ENVIRONMENT VARIABLES
 
-Required for development:
+### Configuradas (Railway auto)
+- RAILWAY_ENVIRONMENT
+- RAILWAY_PUBLIC_DOMAIN
+- PORT (auto)
+
+### Pendientes de configurar
 ```bash
-# Voice System
-ELEVENLABS_API_KEY=
+# Voice System (para /api/groq-proxy)
+GROQ_API_KEY=
 
 # Future: Database
 DATABASE_URL=
@@ -99,37 +129,48 @@ DATABASE_URL=
 AUTH_SECRET=
 ```
 
+Para configurar: `railway variables --set KEY=value`
+
 ---
 
 ## NEXT STEPS
 
 1. **Immediate:**
-   - Run `npm install` to install dependencies
-   - Create `.env.local` with required variables
-   - Test development server with `npm run dev`
+   - Configurar GROQ_API_KEY en Railway para sistema de voz
+   - Probar interacción con robot 3D en producción
 
 2. **Short-term:**
-   - Create PRD document for voice system
-   - Run `/agile` to generate sprint plan
-   - Set up Railway project
+   - Conectar dominio tunixlabs.com
+   - Agregar PostgreSQL en Railway
+   - Implementar sistema de autenticación
 
 3. **Medium-term:**
-   - Implement voice integration
    - Enhance 3D avatar interactions
-   - Add authentication to treasury
+   - Treasury system for Curso 7i
+   - Testing setup
 
 ---
 
 ## BLOCKERS
 
-- [ ] Need ElevenLabs API key for voice testing
-- [ ] Railway project needs to be created
+- [x] ~~Railway project needs to be created~~ ✅ Completado
+- [ ] Need GROQ_API_KEY for voice testing in production
 - [ ] Domain DNS configuration pending
+
+---
+
+## RECENT CHANGES (2026-01-06)
+
+1. **Fix axios types** - Corregido import de AxiosRequestConfig
+2. **Railway config** - Agregado nixpacks.toml y railway.json
+3. **Moved Python files** - raggy.py y configs movidos a scripts/
+4. **Successful deploy** - Sitio online en Railway
 
 ---
 
 ## NOTES
 
 - El .venv compartido ya tiene las dependencias de Raggy instaladas
-- Usar `.venv/bin/python raggy.py` para comandos RAG
-- Railway deployment se configura via CLI o dashboard
+- Usar `.venv/bin/python scripts/raggy.py` para comandos RAG
+- Railway hace deploy automático al push a main
+- Para deploy manual: `railway up --detach`
