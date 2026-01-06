@@ -1,0 +1,14 @@
+# Forzar uso de Node.js para Next.js
+# Ignorar archivos Python (raggy.py es solo para desarrollo local)
+
+[phases.setup]
+nixPkgs = ["nodejs_22", "npm"]
+
+[phases.install]
+cmds = ["npm ci"]
+
+[phases.build]
+cmds = ["npm run build"]
+
+[start]
+cmd = "npm run start"
