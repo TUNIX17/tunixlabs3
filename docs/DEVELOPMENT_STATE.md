@@ -161,6 +161,29 @@ Para configurar: `railway variables --set KEY=value`
 
 ## RECENT CHANGES (2026-01-05)
 
+### Animation System Refactor - Phase 4: Integration
+
+1. **RobotModel.tsx Actualizado**
+   - Imports de nuevos presets (EXCITED, CONFUSED, GOODBYE)
+   - 3 nuevos estados: isExcited, isConfused, isGoodbye
+   - Timer refs para control de duración
+   - Lógica completa en useFrame para cada animación
+
+2. **Nuevos Métodos Expuestos**
+   - `startExcited()` - Animación de celebración con rebote energético
+   - `startConfused()` - Animación de duda con hombros encogidos
+   - `startGoodbye()` - Animación de despedida con reverencia
+
+3. **Tipos Actualizados**
+   - `RobotMethods` interface en RobotModel.tsx
+   - `RobotMethods` interface en types/robot.ts
+
+4. **Características de las Animaciones**
+   - Cada animación tiene oscilación configurable
+   - Transiciones suaves con lerp
+   - Cancelación automática de animaciones conflictivas
+   - Cleanup de timers en desmontaje
+
 ### Animation System Refactor - Phase 3: New Animations
 
 1. **Nuevas Animaciones de Emoción**

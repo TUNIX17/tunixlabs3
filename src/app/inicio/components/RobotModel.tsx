@@ -26,6 +26,9 @@ import {
   DANCE_ROTATIONS,
   SHAKE_LEGS_ROTATIONS,
   APPROACH_ROTATIONS,
+  EXCITED_ROTATIONS,
+  CONFUSED_ROTATIONS,
+  GOODBYE_ROTATIONS,
   ANIMATION_CONFIGS,
   IDLE_PARAMS,
   CURSOR_TRACKING,
@@ -49,6 +52,10 @@ interface RobotMethods {
   shakeLegsTwist: () => void;
   startThinking: () => void;
   stopThinking: () => void;
+  // Nuevas animaciones de emoción
+  startExcited: () => void;
+  startConfused: () => void;
+  startGoodbye: () => void;
 }
 
 // Componente que carga el modelo GLB y aplica animaciones
@@ -67,10 +74,15 @@ const AnimatedRobotModel = forwardRef<RobotMethods, { onLoad?: () => void; isLis
     const [isNoddingYes, setIsNoddingYes] = useState(false);
     const [isShakingLegs, setIsShakingLegs] = useState(false);
     const [isThinking, setIsThinking] = useState(false);
+    // Nuevos estados de animación
+    const [isExcited, setIsExcited] = useState(false);
+    const [isConfused, setIsConfused] = useState(false);
+    const [isGoodbye, setIsGoodbye] = useState(false);
 
     // Flag para optimización: indica si alguna animación está activa
     const hasActiveAnimation = isWaving || isApproaching || isSteppingBack ||
-                               isDancing || isNoddingYes || isShakingLegs || isThinking;
+                               isDancing || isNoddingYes || isShakingLegs || isThinking ||
+                               isExcited || isConfused || isGoodbye;
     
     // Referencias para tiempos de inicio de animaciones
     const waveTimerRef = useRef<NodeJS.Timeout | null>(null);
@@ -85,6 +97,13 @@ const AnimatedRobotModel = forwardRef<RobotMethods, { onLoad?: () => void; isLis
     const shakeLegsTimerRef = useRef<NodeJS.Timeout | null>(null);
     const shakeLegsStartTimeRef = useRef<number>(0);
     const thinkingStartTimeRef = useRef<number>(0);
+    // Nuevos timer refs
+    const excitedTimerRef = useRef<NodeJS.Timeout | null>(null);
+    const excitedStartTimeRef = useRef<number>(0);
+    const confusedTimerRef = useRef<NodeJS.Timeout | null>(null);
+    const confusedStartTimeRef = useRef<number>(0);
+    const goodbyeTimerRef = useRef<NodeJS.Timeout | null>(null);
+    const goodbyeStartTimeRef = useRef<number>(0);
 
     // Usamos el valor de la prop si está definido, o false por defecto
     const isListeningState = isListening !== undefined ? isListening : false;
@@ -156,6 +175,22 @@ const AnimatedRobotModel = forwardRef<RobotMethods, { onLoad?: () => void; isLis
     // Rotaciones para animación "Approach"
     const targetApproachRotations = React.useMemo(
       () => presetToEulers(APPROACH_ROTATIONS),
+      []
+    );
+
+    // Rotaciones para nuevas animaciones
+    const targetExcitedRotations = React.useMemo(
+      () => presetToEulers(EXCITED_ROTATIONS),
+      []
+    );
+
+    const targetConfusedRotations = React.useMemo(
+      () => presetToEulers(CONFUSED_ROTATIONS),
+      []
+    );
+
+    const targetGoodbyeRotations = React.useMemo(
+      () => presetToEulers(GOODBYE_ROTATIONS),
       []
     );
 
@@ -887,6 +922,259 @@ const AnimatedRobotModel = forwardRef<RobotMethods, { onLoad?: () => void; isLis
         }
       }
 
+      // Nueva animación: Excited (Emocionado)
+      if (isExcited) {
+        const excitedElapsedTime = time - excitedStartTimeRef.current;
+        const excitedConfig = ANIMATION_CONFIGS.excited;
+        const oscillation = excitedConfig.oscillation!;
+
+        // Rebote energético y movimiento de celebración
+        const bounce = Math.abs(Math.sin(excitedElapsedTime * oscillation.frequency)) * oscillation.amplitude;
+        const wiggle = Math.sin(excitedElapsedTime * 6) * 0.15;
+
+        // Cabeza con movimiento alegre
+        if (headRef.current && targetExcitedRotations.head) {
+          headRef.current.rotation.x = THREE.MathUtils.lerp(
+            headRef.current.rotation.x,
+            targetExcitedRotations.head.x + (bounce * 0.3),
+            excitedConfig.lerpFactor
+          );
+          headRef.current.rotation.z = wiggle * 0.3;
+        }
+
+        // Cuerpo con rebote
+        if (bodyTop1Ref.current && targetExcitedRotations.body_top1) {
+          bodyTop1Ref.current.rotation.x = THREE.MathUtils.lerp(
+            bodyTop1Ref.current.rotation.x,
+            targetExcitedRotations.body_top1.x - (bounce * 0.2),
+            excitedConfig.lerpFactor
+          );
+          bodyTop1Ref.current.rotation.y = wiggle * 0.2;
+        }
+
+        // Brazos arriba en celebración
+        if (shoulderLeftRef.current && targetExcitedRotations.shoulder_left) {
+          shoulderLeftRef.current.rotation.x = THREE.MathUtils.lerp(
+            shoulderLeftRef.current.rotation.x,
+            targetExcitedRotations.shoulder_left.x + (bounce * 0.2),
+            excitedConfig.lerpFactor
+          );
+          shoulderLeftRef.current.rotation.z = THREE.MathUtils.lerp(
+            shoulderLeftRef.current.rotation.z,
+            targetExcitedRotations.shoulder_left.z - (bounce * 0.4),
+            excitedConfig.lerpFactor
+          );
+        }
+
+        if (shoulderRightRef.current && targetExcitedRotations.shoulder_right) {
+          shoulderRightRef.current.rotation.x = THREE.MathUtils.lerp(
+            shoulderRightRef.current.rotation.x,
+            targetExcitedRotations.shoulder_right.x + (bounce * 0.2),
+            excitedConfig.lerpFactor
+          );
+          shoulderRightRef.current.rotation.z = THREE.MathUtils.lerp(
+            shoulderRightRef.current.rotation.z,
+            targetExcitedRotations.shoulder_right.z + (bounce * 0.4),
+            excitedConfig.lerpFactor
+          );
+        }
+
+        // Codos flexionados
+        if (armLeftBotRef.current && targetExcitedRotations.arm_left_bot) {
+          armLeftBotRef.current.rotation.x = THREE.MathUtils.lerp(
+            armLeftBotRef.current.rotation.x,
+            targetExcitedRotations.arm_left_bot.x + (bounce * 0.3),
+            excitedConfig.lerpFactor
+          );
+        }
+
+        if (armRightBotRef.current && targetExcitedRotations.arm_right_bot) {
+          armRightBotRef.current.rotation.x = THREE.MathUtils.lerp(
+            armRightBotRef.current.rotation.x,
+            targetExcitedRotations.arm_right_bot.x - (bounce * 0.3),
+            excitedConfig.lerpFactor
+          );
+        }
+      }
+
+      // Nueva animación: Confused (Confundido)
+      if (isConfused) {
+        const confusedElapsedTime = time - confusedStartTimeRef.current;
+        const confusedConfig = ANIMATION_CONFIGS.confused;
+        const oscillation = confusedConfig.oscillation!;
+
+        const tilt = Math.sin(confusedElapsedTime * oscillation.frequency) * oscillation.amplitude;
+        const shrug = Math.sin(confusedElapsedTime * 1.5) * 0.08;
+
+        // Cabeza ladeada con expresión de duda
+        if (headRef.current && targetConfusedRotations.head) {
+          headRef.current.rotation.x = THREE.MathUtils.lerp(
+            headRef.current.rotation.x,
+            targetConfusedRotations.head.x,
+            confusedConfig.lerpFactor
+          );
+          headRef.current.rotation.y = THREE.MathUtils.lerp(
+            headRef.current.rotation.y,
+            targetConfusedRotations.head.y + shrug,
+            confusedConfig.lerpFactor
+          );
+          headRef.current.rotation.z = THREE.MathUtils.lerp(
+            headRef.current.rotation.z,
+            targetConfusedRotations.head.z + tilt,
+            confusedConfig.lerpFactor
+          );
+        }
+
+        if (neckRef.current && targetConfusedRotations.neck) {
+          neckRef.current.rotation.z = THREE.MathUtils.lerp(
+            neckRef.current.rotation.z,
+            targetConfusedRotations.neck.z + (tilt * 0.5),
+            confusedConfig.lerpFactor
+          );
+        }
+
+        // Hombros encogiéndose
+        if (shoulderLeftRef.current && targetConfusedRotations.shoulder_left) {
+          shoulderLeftRef.current.rotation.x = THREE.MathUtils.lerp(
+            shoulderLeftRef.current.rotation.x,
+            targetConfusedRotations.shoulder_left.x + shrug,
+            confusedConfig.lerpFactor
+          );
+          shoulderLeftRef.current.rotation.z = THREE.MathUtils.lerp(
+            shoulderLeftRef.current.rotation.z,
+            targetConfusedRotations.shoulder_left.z + (shrug * 2),
+            confusedConfig.lerpFactor
+          );
+        }
+
+        if (shoulderRightRef.current && targetConfusedRotations.shoulder_right) {
+          shoulderRightRef.current.rotation.x = THREE.MathUtils.lerp(
+            shoulderRightRef.current.rotation.x,
+            targetConfusedRotations.shoulder_right.x + shrug,
+            confusedConfig.lerpFactor
+          );
+          shoulderRightRef.current.rotation.z = THREE.MathUtils.lerp(
+            shoulderRightRef.current.rotation.z,
+            targetConfusedRotations.shoulder_right.z - (shrug * 2),
+            confusedConfig.lerpFactor
+          );
+        }
+
+        // Brazos en posición de "no sé"
+        if (armLeftBotRef.current && targetConfusedRotations.arm_left_bot) {
+          armLeftBotRef.current.rotation.x = THREE.MathUtils.lerp(
+            armLeftBotRef.current.rotation.x,
+            targetConfusedRotations.arm_left_bot.x,
+            confusedConfig.lerpFactor
+          );
+          armLeftBotRef.current.rotation.z = THREE.MathUtils.lerp(
+            armLeftBotRef.current.rotation.z,
+            targetConfusedRotations.arm_left_bot.z + (shrug * 1.5),
+            confusedConfig.lerpFactor
+          );
+        }
+
+        if (armRightBotRef.current && targetConfusedRotations.arm_right_bot) {
+          armRightBotRef.current.rotation.x = THREE.MathUtils.lerp(
+            armRightBotRef.current.rotation.x,
+            targetConfusedRotations.arm_right_bot.x,
+            confusedConfig.lerpFactor
+          );
+          armRightBotRef.current.rotation.z = THREE.MathUtils.lerp(
+            armRightBotRef.current.rotation.z,
+            targetConfusedRotations.arm_right_bot.z - (shrug * 1.5),
+            confusedConfig.lerpFactor
+          );
+        }
+      }
+
+      // Nueva animación: Goodbye (Despedida)
+      if (isGoodbye) {
+        const goodbyeElapsedTime = time - goodbyeStartTimeRef.current;
+        const goodbyeConfig = ANIMATION_CONFIGS.goodbye;
+        const oscillation = goodbyeConfig.oscillation!;
+
+        const wave = Math.sin(goodbyeElapsedTime * oscillation.frequency) * oscillation.amplitude;
+        const nod = Math.sin(goodbyeElapsedTime * 2) * 0.08;
+
+        // Cabeza asintiendo suavemente
+        if (headRef.current && targetGoodbyeRotations.head) {
+          headRef.current.rotation.x = THREE.MathUtils.lerp(
+            headRef.current.rotation.x,
+            targetGoodbyeRotations.head.x + nod,
+            goodbyeConfig.lerpFactor
+          );
+        }
+
+        if (neckRef.current && targetGoodbyeRotations.neck) {
+          neckRef.current.rotation.x = THREE.MathUtils.lerp(
+            neckRef.current.rotation.x,
+            targetGoodbyeRotations.neck.x + (nod * 0.5),
+            goodbyeConfig.lerpFactor
+          );
+        }
+
+        // Cuerpo con ligera reverencia
+        if (bodyTop1Ref.current && targetGoodbyeRotations.body_top1) {
+          bodyTop1Ref.current.rotation.x = THREE.MathUtils.lerp(
+            bodyTop1Ref.current.rotation.x,
+            targetGoodbyeRotations.body_top1.x + (nod * 0.5),
+            goodbyeConfig.lerpFactor
+          );
+        }
+
+        // Brazo derecho despidiéndose
+        if (shoulderRightRef.current && targetGoodbyeRotations.shoulder_right) {
+          shoulderRightRef.current.rotation.x = THREE.MathUtils.lerp(
+            shoulderRightRef.current.rotation.x,
+            targetGoodbyeRotations.shoulder_right.x,
+            goodbyeConfig.lerpFactor
+          );
+          shoulderRightRef.current.rotation.y = THREE.MathUtils.lerp(
+            shoulderRightRef.current.rotation.y,
+            targetGoodbyeRotations.shoulder_right.y + (wave * 0.3),
+            goodbyeConfig.lerpFactor
+          );
+          shoulderRightRef.current.rotation.z = THREE.MathUtils.lerp(
+            shoulderRightRef.current.rotation.z,
+            targetGoodbyeRotations.shoulder_right.z,
+            goodbyeConfig.lerpFactor
+          );
+        }
+
+        if (armRightBotRef.current && targetGoodbyeRotations.arm_right_bot) {
+          armRightBotRef.current.rotation.x = THREE.MathUtils.lerp(
+            armRightBotRef.current.rotation.x,
+            targetGoodbyeRotations.arm_right_bot.x,
+            goodbyeConfig.lerpFactor
+          );
+          // Movimiento de despedida con la mano
+          armRightBotRef.current.rotation.z = wave;
+        }
+
+        // Brazo izquierdo relajado
+        if (shoulderLeftRef.current && targetGoodbyeRotations.shoulder_left) {
+          shoulderLeftRef.current.rotation.x = THREE.MathUtils.lerp(
+            shoulderLeftRef.current.rotation.x,
+            targetGoodbyeRotations.shoulder_left.x,
+            goodbyeConfig.lerpFactor
+          );
+          shoulderLeftRef.current.rotation.z = THREE.MathUtils.lerp(
+            shoulderLeftRef.current.rotation.z,
+            targetGoodbyeRotations.shoulder_left.z,
+            goodbyeConfig.lerpFactor
+          );
+        }
+
+        if (armLeftBotRef.current && targetGoodbyeRotations.arm_left_bot) {
+          armLeftBotRef.current.rotation.x = THREE.MathUtils.lerp(
+            armLeftBotRef.current.rotation.x,
+            targetGoodbyeRotations.arm_left_bot.x,
+            goodbyeConfig.lerpFactor
+          );
+        }
+      }
+
     });
 
     // Función de alivio (easing) para movimientos más naturales
@@ -1093,6 +1381,62 @@ const AnimatedRobotModel = forwardRef<RobotMethods, { onLoad?: () => void; isLis
       setIsThinking(false);
     };
 
+    // Método para iniciar animación de "emocionado"
+    const startExcited = () => {
+      if (excitedTimerRef.current) {
+        clearTimeout(excitedTimerRef.current);
+      }
+
+      // Cancelar otras animaciones que podrían interferir
+      if (isThinking) setIsThinking(false);
+      if (isConfused) setIsConfused(false);
+
+      setIsExcited(true);
+      excitedStartTimeRef.current = performance.now() / 1000;
+
+      excitedTimerRef.current = setTimeout(() => {
+        setIsExcited(false);
+        excitedTimerRef.current = null;
+      }, ANIMATION_CONFIGS.excited.duration);
+    };
+
+    // Método para iniciar animación de "confundido"
+    const startConfused = () => {
+      if (confusedTimerRef.current) {
+        clearTimeout(confusedTimerRef.current);
+      }
+
+      // Cancelar otras animaciones que podrían interferir
+      if (isExcited) setIsExcited(false);
+
+      setIsConfused(true);
+      confusedStartTimeRef.current = performance.now() / 1000;
+
+      confusedTimerRef.current = setTimeout(() => {
+        setIsConfused(false);
+        confusedTimerRef.current = null;
+      }, ANIMATION_CONFIGS.confused.duration);
+    };
+
+    // Método para iniciar animación de "despedida"
+    const startGoodbye = () => {
+      if (goodbyeTimerRef.current) {
+        clearTimeout(goodbyeTimerRef.current);
+      }
+
+      // Cancelar otras animaciones que podrían interferir
+      if (isWaving) setIsWaving(false);
+      if (isExcited) setIsExcited(false);
+
+      setIsGoodbye(true);
+      goodbyeStartTimeRef.current = performance.now() / 1000;
+
+      goodbyeTimerRef.current = setTimeout(() => {
+        setIsGoodbye(false);
+        goodbyeTimerRef.current = null;
+      }, ANIMATION_CONFIGS.goodbye.duration);
+    };
+
     // Exponemos métodos a través de la ref usando useImperativeHandle
     useImperativeHandle(ref, () => ({
       startWaving,
@@ -1102,7 +1446,11 @@ const AnimatedRobotModel = forwardRef<RobotMethods, { onLoad?: () => void; isLis
       nodYes,
       shakeLegsTwist,
       startThinking,
-      stopThinking
+      stopThinking,
+      // Nuevas animaciones
+      startExcited,
+      startConfused,
+      startGoodbye,
     }));
 
     // Limpiar timers en desmontaje
@@ -1114,6 +1462,9 @@ const AnimatedRobotModel = forwardRef<RobotMethods, { onLoad?: () => void; isLis
         if (danceTimerRef.current) clearTimeout(danceTimerRef.current);
         if (nodTimerRef.current) clearTimeout(nodTimerRef.current);
         if (shakeLegsTimerRef.current) clearTimeout(shakeLegsTimerRef.current);
+        if (excitedTimerRef.current) clearTimeout(excitedTimerRef.current);
+        if (confusedTimerRef.current) clearTimeout(confusedTimerRef.current);
+        if (goodbyeTimerRef.current) clearTimeout(goodbyeTimerRef.current);
       };
     }, []);
 
@@ -1208,7 +1559,7 @@ function RobotInteractionManager() {
         <Canvas
           shadows
           className="overflow-visible"
-          camera={{ position: [0, 0, 5.5], fov: 35 }}
+          camera={{ position: [0, 0.5, 200], fov: 30 }}
           gl={{ alpha: true, antialias: true }}
           style={{
             position: 'absolute',

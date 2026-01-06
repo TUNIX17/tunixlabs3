@@ -51,7 +51,7 @@ export interface RobotAnimationKeyframe {
 }
 
 export interface RobotMethods {
-  // Métodos de animación
+  // Métodos de animación básicos
   startWaving: () => void;
   approachCamera: () => void;
   stepBackward: () => void;
@@ -60,20 +60,10 @@ export interface RobotMethods {
   shakeLegsTwist: () => void;
   startThinking: () => void;
   stopThinking: () => void;
-  
-  // // Métodos de control (Eliminados temporalmente para coincidir con la implementación actual)
-  // setPosition: (position: Partial<RobotPosition>) => void;
-  // setRotation: (rotation: Partial<RobotRotation>) => void;
-  // setScale: (scale: Partial<RobotScale>) => void;
-  // resetTransform: () => void;
-  
-  // // Métodos de estado (Eliminados temporalmente)
-  // setActive: (active: boolean) => void;
-  // isActive: () => boolean;
-  
-  // // Métodos de partes (Eliminados temporalmente)
-  // movePart: (part: RobotPart, transform: Partial<RobotTransform>) => void;
-  // resetPart: (part: RobotPart) => void;
+  // Nuevas animaciones de emoción (Fase 4)
+  startExcited: () => void;
+  startConfused: () => void;
+  startGoodbye: () => void;
 }
 
 export enum RobotMood {
