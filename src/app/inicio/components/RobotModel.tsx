@@ -280,8 +280,9 @@ const AnimatedRobotModel = forwardRef<RobotMethods, { onLoad?: () => void; isLis
       // 3. Seguimiento del Cursor con Cabeza, Cuello y Torso Superior
       // Skip si thinking está activo (tiene su propia animación de cabeza)
       if (!isThinking) {
-        const mouseX = targetMouse.current.x;
-        const mouseY = targetMouse.current.y;
+        // Clamping del mouse para evitar rotaciones extremas al hacer scroll
+        const mouseX = THREE.MathUtils.clamp(targetMouse.current.x, -1, 1);
+        const mouseY = THREE.MathUtils.clamp(targetMouse.current.y, -1, 1);
 
         // Factores adicionales para la animación de "escuchar" (usando parámetros configurables)
         const listeningHeadTilt = isListeningState
@@ -1606,37 +1607,40 @@ function RobotInteractionManager() {
           </Suspense>
         </Canvas>
 
-        {/* Mic Button - Positioned at bottom of circle */}
+        {/* Bottom Section - Message + Mic Button aligned together */}
         <div
-          className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-20 flex flex-col items-center space-y-2"
+          className="absolute bottom-4 left-1/2 transform -translate-x-1/2 z-20 flex flex-col items-center gap-3"
           style={{ pointerEvents: 'auto' }}
         >
+          {/* Robot Name Badge - Above mic button */}
+          <div
+            className="max-w-[280px] neu-pressed rounded-xl px-4 py-2 text-center"
+            style={{ pointerEvents: 'none' }}
+          >
+            <h3 className="text-base font-bold neu-gradient-text">Hola, soy Tunix</h3>
+            <p className="text-xs mt-1" style={{ color: '#718096' }}>
+              {interactionState === RobotInteractionState.IDLE && "Haz clic en el microfono para hablar conmigo"}
+              {interactionState === RobotInteractionState.LISTENING && "Te escucho... habla y haz clic para enviar"}
+              {interactionState === RobotInteractionState.PROCESSING && "Procesando tu mensaje..."}
+              {interactionState === RobotInteractionState.SPEAKING && "Respondiendo..."}
+              {interactionState === RobotInteractionState.ERROR && "Hubo un error, intenta de nuevo"}
+            </p>
+          </div>
+
+          {/* Audio Visualizer */}
           {(interactionState === RobotInteractionState.LISTENING || isRecording) && (
             <div className="w-full max-w-xs">
               <AudioVisualizer width={160} height={30} barColor="#6366f1" />
             </div>
           )}
+
+          {/* Mic Button */}
           <FloatingMicButton
             onClick={handleMicButtonClick}
             interactionState={interactionState}
             isRecording={isRecording}
             disabled={isLoading || interactionState === RobotInteractionState.PROCESSING}
           />
-        </div>
-
-        {/* Robot Name Badge - Top of circle */}
-        <div
-          className="absolute top-6 left-1/2 transform -translate-x-1/2 z-10 max-w-[280px] neu-pressed rounded-xl px-4 py-2 text-center"
-          style={{ pointerEvents: 'none' }}
-        >
-          <h3 className="text-base font-bold neu-gradient-text">Hola, soy Tunix</h3>
-          <p className="text-xs mt-1" style={{ color: '#718096' }}>
-            {interactionState === RobotInteractionState.IDLE && "Haz clic en el microfono para hablar conmigo"}
-            {interactionState === RobotInteractionState.LISTENING && "Te escucho... habla y haz clic para enviar"}
-            {interactionState === RobotInteractionState.PROCESSING && "Procesando tu mensaje..."}
-            {interactionState === RobotInteractionState.SPEAKING && "Respondiendo..."}
-            {interactionState === RobotInteractionState.ERROR && "Hubo un error, intenta de nuevo"}
-          </p>
         </div>
 
       </div>
