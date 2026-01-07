@@ -1607,40 +1607,42 @@ function RobotInteractionManager() {
           </Suspense>
         </Canvas>
 
-        {/* Bottom Section - Message + Mic Button aligned together */}
+        {/* Bottom Section - Message + Mic Button in row */}
         <div
-          className="absolute bottom-4 left-1/2 transform -translate-x-1/2 z-20 flex flex-col items-center gap-3"
+          className="absolute bottom-4 left-1/2 transform -translate-x-1/2 z-20 flex flex-col items-center gap-2"
           style={{ pointerEvents: 'auto' }}
         >
-          {/* Robot Name Badge - Above mic button */}
-          <div
-            className="max-w-[280px] neu-pressed rounded-xl px-4 py-2 text-center"
-            style={{ pointerEvents: 'none' }}
-          >
-            <h3 className="text-base font-bold neu-gradient-text">Hola, soy Tunix</h3>
-            <p className="text-xs mt-1" style={{ color: '#718096' }}>
-              {interactionState === RobotInteractionState.IDLE && "Haz clic en el microfono para hablar conmigo"}
-              {interactionState === RobotInteractionState.LISTENING && "Te escucho... habla y haz clic para enviar"}
-              {interactionState === RobotInteractionState.PROCESSING && "Procesando tu mensaje..."}
-              {interactionState === RobotInteractionState.SPEAKING && "Respondiendo..."}
-              {interactionState === RobotInteractionState.ERROR && "Hubo un error, intenta de nuevo"}
-            </p>
-          </div>
-
-          {/* Audio Visualizer */}
+          {/* Audio Visualizer - Above the row when listening */}
           {(interactionState === RobotInteractionState.LISTENING || isRecording) && (
-            <div className="w-full max-w-xs">
-              <AudioVisualizer width={160} height={30} barColor="#6366f1" />
+            <div className="mb-1">
+              <AudioVisualizer width={140} height={25} barColor="var(--neu-primary)" />
             </div>
           )}
 
-          {/* Mic Button */}
-          <FloatingMicButton
-            onClick={handleMicButtonClick}
-            interactionState={interactionState}
-            isRecording={isRecording}
-            disabled={isLoading || interactionState === RobotInteractionState.PROCESSING}
-          />
+          {/* Row: Message + Mic Button */}
+          <div className="flex items-center gap-3">
+            {/* Message Badge - Left of mic */}
+            <div
+              className="neu-pressed rounded-xl px-4 py-2 text-center"
+              style={{ pointerEvents: 'none' }}
+            >
+              <p className="text-sm font-medium" style={{ color: '#4a5568' }}>
+                {interactionState === RobotInteractionState.IDLE && "Habla conmigo"}
+                {interactionState === RobotInteractionState.LISTENING && "Te escucho..."}
+                {interactionState === RobotInteractionState.PROCESSING && "Pensando..."}
+                {interactionState === RobotInteractionState.SPEAKING && "Respondiendo..."}
+                {interactionState === RobotInteractionState.ERROR && "Intenta de nuevo"}
+              </p>
+            </div>
+
+            {/* Mic Button */}
+            <FloatingMicButton
+              onClick={handleMicButtonClick}
+              interactionState={interactionState}
+              isRecording={isRecording}
+              disabled={isLoading || interactionState === RobotInteractionState.PROCESSING}
+            />
+          </div>
         </div>
 
       </div>
