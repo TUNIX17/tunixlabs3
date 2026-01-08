@@ -1,7 +1,9 @@
 import { useState, useCallback, useRef } from 'react';
 import { apiClient } from '../lib/groq/client';
+import { cerebrasClient } from '../lib/cerebras/client';
 import { selectModelConfig } from '../lib/groq/models';
 import { useRateLimiter } from '../lib/groq/rate-limiter';
+import { getCommercialPrompt } from '../lib/agent';
 import axios from 'axios';
 
 // Definición de tipos para la respuesta de Groq (Chat Completions)
@@ -51,28 +53,14 @@ interface UseGroqConversationOptions {
 }
 
 export const useGroqConversation = ({
-  initialSystemPrompt = `Eres Tunix, el asistente virtual experto de Tunixlabs. Tu ÚNICA función es representar a Tunixlabs, una consultora de IA en Chile.
-Nuestros servicios CLAVE son:
-1. Consultoría Estratégica en IA.
-2. Desarrollo de Software a Medida con IA (incluye Business Intelligence, Machine Learning, Deep Learning, NLP para chatbots/asistentes, Computer Vision).
-3. Automatización Inteligente de Procesos (RPA con IA).
-
-Tu objetivo es:
-- Explicar CÓMO estos servicios específicos de Tunixlabs pueden resolver problemas y potenciar negocios.
-- Ser profesional, preciso y enfocado en soluciones de IA de Tunixlabs.
-- Si una pregunta es ambigua, pide aclaraciones para ofrecer una respuesta relevante sobre NUESTROS servicios.
-
-REGLAS ESTRICTAS:
-- HABLA ÚNICAMENTE sobre Tunixlabs y los servicios listados.
-- NO inventes servicios, capacidades o información fuera de lo que Tunixlabs ofrece.
-- Si te preguntan algo NO RELACIONADO DIRECTAMENTE con nuestros servicios de IA o cómo aplicarlos, indica amablemente que tu especialización es sobre las soluciones de Tunixlabs y reorienta la conversación hacia cómo podemos ayudar con IA. NO respondas sobre temas generales.
-- Tu propósito NO es conversar sobre otros temas, solo sobre el valor que Tunixlabs aporta con IA.
-- **EVITA FORMATO ESPECIAL: No uses asteriscos (*), guiones bajos (_), ni ningún otro tipo de formato markdown (como negritas, cursivas o listas con viñetas) en tus respuestas. Escribe en texto plano continuo. Estos caracteres especiales son leídos literalmente por el sistema de voz (ej., diría 'asterisco') y confunden al usuario.`,
+  initialSystemPrompt,
   maxHistoryLength = 10,
   onStart,
   onComplete,
   onError
 }: UseGroqConversationOptions = {}) => {
+  // Usar prompt comercial por defecto si no se proporciona uno
+  const defaultPrompt = initialSystemPrompt || getCommercialPrompt('es');
   // Estados principales
   const [isProcessing, setIsProcessing] = useState(false);
   const [currentResponse, setCurrentResponse] = useState('');
@@ -80,11 +68,11 @@ REGLAS ESTRICTAS:
   
   // Historial de mensajes
   const [history, setHistory] = useState<ConversationMessage[]>([
-    { role: 'system', content: initialSystemPrompt }
+    { role: 'system', content: defaultPrompt }
   ]);
-  
+
   // Mantener referencia al system prompt actual
-  const systemPromptRef = useRef<string>(initialSystemPrompt);
+  const systemPromptRef = useRef<string>(defaultPrompt);
   
   // Límites de API
   const { canMakeRequest, waitTime, trackRequest, signalRateLimitHit } = useRateLimiter();
@@ -128,15 +116,11 @@ REGLAS ESTRICTAS:
       configRef.current = selectModelConfig(0, false);
       
       // Actualizar system prompt basado en el idioma detectado
-      if (language && language.toLowerCase().startsWith('en')) {
-        systemPromptRef.current = `You are a friendly AI assistant named Tunix. You MUST respond in English. Your answers should be concise and helpful.`;
-      } else if (language && language !== 'es' && language !== 'auto') {
-        // Para otros idiomas (no 'en' ni 'es'), instruir en ese idioma.
-        // Esto asume que el LLM puede entender esta instrucción en varios idiomas.
-        systemPromptRef.current = `Eres un asistente de IA amigable llamado Tunix. Debes responder en ${language}. Tus respuestas deben ser concisas y útiles.`;
+      // Usar el sistema de prompts comerciales
+      if (language) {
+        systemPromptRef.current = getCommercialPrompt(language);
       } else {
-        // Si el idioma es 'es', 'auto', o no definido, usar el prompt inicial en español.
-        systemPromptRef.current = initialSystemPrompt;
+        systemPromptRef.current = defaultPrompt;
       }
       
       // Crear mensajes para la conversación
@@ -158,11 +142,12 @@ REGLAS ESTRICTAS:
       // Limitar cantidad de mensajes para no exceder tokens
       const limitedMessages = recentMessages.slice(-maxHistoryLength);
       
-      // Realizar petición a Groq vía el proxy, especificando el tipo de respuesta esperado
-      const response = await apiClient.post<GroqChatCompletionResponse>('', {
+      // Realizar petición a Cerebras para LLM (gratis, 6x más rápido que Groq)
+      // La API de Cerebras es compatible con OpenAI
+      const response = await cerebrasClient.post<GroqChatCompletionResponse>('', {
         endpoint: '/chat/completions',
         payload: {
-          model: configRef.current.conversation,
+          model: configRef.current.conversation, // llama-3.3-70b
           messages: limitedMessages,
           temperature: configRef.current.temperature,
           max_tokens: configRef.current.maxResponseTokens,
@@ -216,13 +201,13 @@ REGLAS ESTRICTAS:
       setIsProcessing(false);
     }
   }, [
-    canMakeRequest, 
-    waitTime, 
-    trackRequest, 
-    signalRateLimitHit, 
-    history, 
-    maxHistoryLength, 
-    initialSystemPrompt,
+    canMakeRequest,
+    waitTime,
+    trackRequest,
+    signalRateLimitHit,
+    history,
+    maxHistoryLength,
+    defaultPrompt,
     onStart,
     onComplete,
     onError

@@ -2,8 +2,12 @@ import { useState, useCallback, useRef, useEffect } from 'react';
 import { useAudioRecording } from './useAudioRecording';
 import { useSpeechRecognition } from './useSpeechRecognition';
 import { useGroqConversation } from './useGroqConversation';
+import { useVAD } from './useVAD';
 import { Translator } from '../lib/language/translator';
 import { AudioPlayer } from '../lib/audio/player';
+import { ConversationSession, DEFAULT_SESSION_CONFIG } from '../lib/conversation';
+import { AgentStateTracker, ConversationPhase, getAgentPromptCache } from '../lib/agent';
+import { BARGEIN_VAD_CONFIG } from '../lib/audio/vadConfig';
 
 // Interfaz para las animaciones del robot
 interface RobotAnimations {
@@ -17,14 +21,41 @@ interface RobotAnimations {
   stopThinking: () => void;
 }
 
-// Estados de interacción con el robot
+// Estados de interaccion con el robot - ACTUALIZADO
 export enum RobotInteractionState {
-  IDLE = 'idle',
-  LISTENING = 'listening',
-  PROCESSING = 'processing',
-  SPEAKING = 'speaking',
+  IDLE = 'idle',                        // No en conversacion
+  LISTENING = 'listening',              // VAD activo, esperando voz
+  LISTENING_ACTIVE = 'listening_active', // Usuario hablando, grabando
+  PROCESSING = 'processing',            // Procesando STT/LLM
+  SPEAKING = 'speaking',                // Robot hablando (TTS)
   ERROR = 'error'
 }
+
+// Configuracion de conversacion continua
+export interface ContinuousConversationConfig {
+  /** Habilitar conversacion continua (hands-free) */
+  enabled: boolean;
+  /** Auto-restart listening despues de que robot habla */
+  autoRestartListening: boolean;
+  /** Timeout de idle para terminar sesion (ms) */
+  idleTimeoutMs: number;
+  /** Timeout de listening sin voz (ms) */
+  listenTimeoutMs: number;
+  /** Habilitar barge-in (interrumpir al robot) */
+  bargeInEnabled: boolean;
+  /** Tiempo minimo hablando antes de permitir barge-in (ms) */
+  minSpeakingTimeBeforeBargeIn: number;
+}
+
+// Configuracion por defecto
+const DEFAULT_CONTINUOUS_CONFIG: ContinuousConversationConfig = {
+  enabled: true,
+  autoRestartListening: true,
+  idleTimeoutMs: 60000,
+  listenTimeoutMs: 30000,
+  bargeInEnabled: true,
+  minSpeakingTimeBeforeBargeIn: 1000
+};
 
 // Opciones para el hook
 interface UseRobotInteractionOptions {
@@ -32,34 +63,78 @@ interface UseRobotInteractionOptions {
   robotSystemPrompt?: string;
   onStateChange?: (state: RobotInteractionState) => void;
   onError?: (error: Error) => void;
+  onSessionEnd?: () => void;
+  onLeadCaptured?: (leadData: any) => void;
+  continuousConfig?: Partial<ContinuousConversationConfig>;
 }
 
 export const useRobotInteraction = ({
   initialLanguage = 'es',
-  robotSystemPrompt = "Eres Tunix, un asistente de inteligencia artificial amigable que ayuda a resolver dudas sobre tecnología e IA. Responde de manera concisa y amigable.",
+  robotSystemPrompt,
   onStateChange,
-  onError
+  onError,
+  onSessionEnd,
+  onLeadCaptured,
+  continuousConfig = {}
 }: UseRobotInteractionOptions = {}) => {
-  // Estado principal de interacción
+  // Merge config
+  const config: ContinuousConversationConfig = {
+    ...DEFAULT_CONTINUOUS_CONFIG,
+    ...continuousConfig
+  };
+
+  // Estado principal de interaccion
   const [interactionState, setInteractionState] = useState<RobotInteractionState>(RobotInteractionState.IDLE);
-  
+
   // Idioma actual
   const [currentLanguage, setCurrentLanguage] = useState<string>(initialLanguage);
-  
-  // Estado de la conversación
+
+  // Estado de la conversacion
   const [userMessage, setUserMessage] = useState<string>('');
   const [robotResponse, setRobotResponse] = useState<string>('');
-  
-  // Referencia a las funciones de animación del robot
+
+  // Estado de sesion continua
+  const [isSessionActive, setIsSessionActive] = useState<boolean>(false);
+  const [currentPhase, setCurrentPhase] = useState<ConversationPhase>(ConversationPhase.GREETING);
+
+  // Referencia a las funciones de animacion del robot
   const robotRef = useRef<RobotAnimations | null>(null);
-  
-  // Servicio de traducción
+
+  // Servicio de traduccion
   const translatorRef = useRef<Translator>(new Translator(initialLanguage));
-  
-  // Reproductor de audio (se mantiene por si se necesita para otros audios que no sean TTS)
+
+  // Reproductor de audio
   const audioPlayerRef = useRef<AudioPlayer | null>(null);
-  
-  // Hook para grabación de audio
+
+  // Session manager para timeouts y control de sesion
+  const sessionRef = useRef<ConversationSession | null>(null);
+
+  // Agent state tracker para fases de conversacion
+  const agentStateRef = useRef<AgentStateTracker | null>(null);
+
+  // Timestamp de inicio de speaking (para barge-in)
+  const speakingStartTimeRef = useRef<number | null>(null);
+
+  // Flag para controlar auto-restart
+  const shouldAutoRestartRef = useRef<boolean>(true);
+
+  // Obtener prompt cache
+  const promptCache = getAgentPromptCache();
+
+  // Obtener system prompt (comercial o custom)
+  const getSystemPrompt = useCallback(() => {
+    if (robotSystemPrompt) {
+      return robotSystemPrompt;
+    }
+    // Usar prompt comercial con contexto
+    if (agentStateRef.current) {
+      const context = agentStateRef.current.getContextForPrompt();
+      return promptCache.getFullPrompt(currentLanguage, context);
+    }
+    return promptCache.getBasePrompt(currentLanguage);
+  }, [robotSystemPrompt, currentLanguage, promptCache]);
+
+  // Hook para grabacion de audio
   const {
     isRecording,
     audioBlob,
@@ -67,17 +142,14 @@ export const useRobotInteraction = ({
     stopRecording,
     resetRecording
   } = useAudioRecording({
-    maxDurationMs: 30000, // 30 segundos máximo
+    maxDurationMs: 30000,
     onError: (error) => {
-      console.error('Error en grabación:', error);
+      console.error('Error en grabacion:', error);
       setInteractionState(RobotInteractionState.ERROR);
-      
-      if (onError) {
-        onError(error);
-      }
+      if (onError) onError(error);
     }
   });
-  
+
   // Hook para reconocimiento de voz
   const {
     recognizeSpeech,
@@ -87,237 +159,433 @@ export const useRobotInteraction = ({
     onLanguageDetected: (language) => {
       if (language && language !== currentLanguage) {
         setCurrentLanguage(language);
+        agentStateRef.current?.setLanguage(language);
       }
     },
     onError: (error) => {
       console.error('Error en reconocimiento de voz:', error);
       setInteractionState(RobotInteractionState.ERROR);
-      
-      if (onError) {
-        onError(error);
-      }
+      if (onError) onError(error);
     }
   });
-  
-  // Hook para conversación con Groq
+
+  // Hook para VAD (Voice Activity Detection)
+  const {
+    isListening: vadIsListening,
+    isSpeaking: vadIsSpeaking,
+    currentVolume,
+    startVAD,
+    stopVAD,
+    setThreshold,
+    updateConfig: updateVADConfig
+  } = useVAD({
+    preset: 'default',
+    onSpeechStart: () => {
+      console.log('[RobotInteraction] VAD: Speech detectado');
+
+      // Si estamos en SPEAKING y barge-in esta habilitado
+      if (interactionState === RobotInteractionState.SPEAKING && config.bargeInEnabled) {
+        if (canBargeIn()) {
+          handleBargeIn();
+          return;
+        }
+      }
+
+      // Si estamos en LISTENING, transicionar a LISTENING_ACTIVE
+      if (interactionState === RobotInteractionState.LISTENING) {
+        setInteractionState(RobotInteractionState.LISTENING_ACTIVE);
+        startRecordingForVAD();
+      }
+    },
+    onSpeechEnd: (duration) => {
+      console.log('[RobotInteraction] VAD: Speech terminado, duracion:', duration, 'ms');
+
+      // Si estamos grabando, procesar el audio
+      if (interactionState === RobotInteractionState.LISTENING_ACTIVE && isRecording) {
+        processRecordedAudio();
+      }
+    },
+    onError: (error) => {
+      console.error('[RobotInteraction] VAD error:', error);
+    }
+  });
+
+  // Hook para conversacion con LLM
   const {
     generateResponseAndSpeech,
     sendMessage: sendGroqMessage,
-    // textToSpeech: convertTextToSpeechGroq, // Ya no se usa directamente aquí
+    updateSystemPrompt
   } = useGroqConversation({
-    initialSystemPrompt: robotSystemPrompt,
+    initialSystemPrompt: getSystemPrompt(),
     onStart: () => {
       setInteractionState(RobotInteractionState.PROCESSING);
-
-      // Animar robot pensando con la nueva animación
       if (robotRef.current) {
         robotRef.current.startThinking();
       }
     },
     onComplete: (response) => {
       setRobotResponse(response);
+      // Actualizar estado del agente
+      if (agentStateRef.current) {
+        agentStateRef.current.incrementTurn();
+        // Sugerir siguiente fase
+        const nextPhase = agentStateRef.current.suggestNextPhase();
+        if (nextPhase) {
+          agentStateRef.current.updatePhase(nextPhase);
+          setCurrentPhase(nextPhase);
+        }
+      }
     },
     onError: (error) => {
-      console.error('Error en conversación:', error);
+      console.error('Error en conversacion:', error);
       setInteractionState(RobotInteractionState.ERROR);
-      
-      if (onError) {
-        onError(error);
-      }
+      if (onError) onError(error);
     }
   });
-  
-  // Inicializar reproductor de audio (para usos futuros, no para Web Speech API TTS)
+
+  // Inicializar reproductor de audio
   useEffect(() => {
     audioPlayerRef.current = new AudioPlayer({
       autoPlay: false,
-      onPlay: () => {
-        // Este onPlay podría usarse si se reproduce un audio diferente al TTS
-        // setInteractionState(RobotInteractionState.SPEAKING);
-        // if (robotRef.current) robotRef.current.startWaving();
-      },
-      onEnded: () => {
-        // Este onEnded también, para audios no TTS
-        // setInteractionState(RobotInteractionState.IDLE);
-        // if (robotRef.current) robotRef.current.stepBackward();
-      },
       onError: (error) => {
-        console.error('Error en reproducción de audio (AudioPlayer):', error);
-        // No cambiar el estado general a ERROR aquí directamente si el error es solo del player
-        // y no de un flujo principal, a menos que sea crítico.
+        console.error('Error en reproduccion de audio:', error);
         if (onError) {
-          if (error instanceof Error) {
-            onError(error);
-          } else {
-            onError(new Error(String(error)));
-          }
+          onError(error instanceof Error ? error : new Error(String(error)));
         }
       }
     });
-    
+
     return () => {
       if (audioPlayerRef.current) {
         audioPlayerRef.current.dispose();
       }
     };
-  }, [onError]); // Solo onError como dependencia, ya que los callbacks no cambian estados globales directamente.
-  
+  }, [onError]);
+
+  // Inicializar session y agent state cuando se activa conversacion continua
+  useEffect(() => {
+    if (config.enabled && !sessionRef.current) {
+      sessionRef.current = new ConversationSession({
+        autoRestartListening: config.autoRestartListening,
+        idleTimeoutMs: config.idleTimeoutMs,
+        listenTimeoutMs: config.listenTimeoutMs,
+        minSpeakingTimeBeforeBargeIn: config.minSpeakingTimeBeforeBargeIn
+      });
+
+      sessionRef.current.onEvent((event) => {
+        console.log('[RobotInteraction] Session event:', event);
+        if (event === 'session_end' || event === 'idle_timeout' || event === 'listen_timeout') {
+          handleSessionEnd();
+        }
+      });
+    }
+
+    if (!agentStateRef.current) {
+      agentStateRef.current = new AgentStateTracker(currentLanguage);
+    }
+
+    return () => {
+      sessionRef.current?.dispose();
+      sessionRef.current = null;
+    };
+  }, [config.enabled]);
+
   // Notificar cambios de estado
   useEffect(() => {
     if (onStateChange) {
       onStateChange(interactionState);
     }
   }, [interactionState, onStateChange]);
-  
+
   // Actualizar idioma cuando se detecta uno nuevo
   useEffect(() => {
     if (detectedLanguage && detectedLanguage !== currentLanguage) {
       setCurrentLanguage(detectedLanguage);
+      promptCache.invalidate(); // Invalidar cache cuando cambia idioma
     }
-  }, [detectedLanguage, currentLanguage]);
-  
-  // Método para iniciar interacción por voz
+  }, [detectedLanguage, currentLanguage, promptCache]);
+
+  // Verificar si se puede hacer barge-in
+  const canBargeIn = useCallback((): boolean => {
+    if (!config.bargeInEnabled || !speakingStartTimeRef.current) {
+      return false;
+    }
+    const speakingDuration = Date.now() - speakingStartTimeRef.current;
+    return speakingDuration >= config.minSpeakingTimeBeforeBargeIn;
+  }, [config.bargeInEnabled, config.minSpeakingTimeBeforeBargeIn]);
+
+  // Manejar barge-in (interrupcion del usuario)
+  const handleBargeIn = useCallback(() => {
+    console.log('[RobotInteraction] Barge-in activado');
+
+    // 1. Cancelar TTS inmediatamente
+    if (typeof window !== 'undefined' && window.speechSynthesis) {
+      window.speechSynthesis.cancel();
+    }
+
+    // 2. Detener animaciones de hablar
+    if (robotRef.current) {
+      robotRef.current.stepBackward();
+    }
+
+    speakingStartTimeRef.current = null;
+
+    // 3. Transicionar a listening_active (ya detecto voz)
+    setInteractionState(RobotInteractionState.LISTENING_ACTIVE);
+
+    // 4. Empezar a grabar la interrupcion
+    startRecordingForVAD();
+
+    // Registrar actividad
+    sessionRef.current?.recordActivity();
+  }, []);
+
+  // Iniciar grabacion cuando VAD detecta voz
+  const startRecordingForVAD = useCallback(async () => {
+    try {
+      resetRecording();
+      await startRecording();
+      sessionRef.current?.stopListening(); // Detener listen timer
+    } catch (error) {
+      console.error('[RobotInteraction] Error iniciando grabacion:', error);
+    }
+  }, [startRecording, resetRecording]);
+
+  // Procesar audio grabado cuando VAD detecta silencio
+  const processRecordedAudio = useCallback(async () => {
+    try {
+      const currentAudioBlob = await stopRecording();
+
+      if (!currentAudioBlob || currentAudioBlob.size === 0) {
+        console.warn('[RobotInteraction] Audio blob vacio');
+        // Volver a listening si auto-restart
+        if (shouldAutoRestartRef.current && sessionRef.current?.shouldAutoRestart()) {
+          setInteractionState(RobotInteractionState.LISTENING);
+          sessionRef.current?.startListening();
+        } else {
+          setInteractionState(RobotInteractionState.IDLE);
+        }
+        return;
+      }
+
+      setInteractionState(RobotInteractionState.PROCESSING);
+      if (robotRef.current) robotRef.current.nodYes();
+
+      // Reconocer speech
+      const recognitionResult = await recognizeSpeech(currentAudioBlob);
+      setUserMessage(recognitionResult.text);
+
+      // Actualizar idioma
+      let langForThisInteraction = currentLanguage;
+      if (recognitionResult.language) {
+        if (recognitionResult.language !== currentLanguage) {
+          setCurrentLanguage(recognitionResult.language);
+          agentStateRef.current?.setLanguage(recognitionResult.language);
+        }
+        langForThisInteraction = recognitionResult.language;
+      }
+
+      if (recognitionResult.text) {
+        // Extraer info del lead
+        if (agentStateRef.current) {
+          const extractedInfo = agentStateRef.current.extractLeadInfo(recognitionResult.text);
+          if (Object.keys(extractedInfo).length > 0) {
+            agentStateRef.current.updateLeadData(extractedInfo);
+            onLeadCaptured?.(agentStateRef.current.getLeadData());
+          }
+        }
+
+        // Actualizar system prompt con contexto
+        updateSystemPrompt(getSystemPrompt());
+
+        // Generar respuesta y hablar
+        await generateResponseAndSpeech(
+          recognitionResult.text,
+          langForThisInteraction,
+          {
+            onStart: () => {
+              setInteractionState(RobotInteractionState.SPEAKING);
+              speakingStartTimeRef.current = Date.now();
+              sessionRef.current?.startSpeaking();
+
+              if (robotRef.current) {
+                robotRef.current.stopThinking();
+                robotRef.current.startWaving();
+              }
+
+              // En modo barge-in, mantener VAD activo con threshold mas alto
+              if (config.bargeInEnabled) {
+                updateVADConfig(BARGEIN_VAD_CONFIG);
+              }
+            },
+            onEnd: () => {
+              speakingStartTimeRef.current = null;
+              sessionRef.current?.stopSpeaking();
+
+              if (robotRef.current) robotRef.current.stepBackward();
+
+              // Auto-restart listening si esta habilitado
+              if (shouldAutoRestartRef.current && config.autoRestartListening && sessionRef.current?.shouldAutoRestart()) {
+                console.log('[RobotInteraction] Auto-restart listening');
+                setInteractionState(RobotInteractionState.LISTENING);
+                sessionRef.current?.startListening();
+                // Restaurar VAD config normal
+                updateVADConfig({ volumeThreshold: 0.015 });
+              } else {
+                setInteractionState(RobotInteractionState.IDLE);
+              }
+            },
+            onError: (error) => {
+              console.error('[RobotInteraction] Error durante TTS:', error);
+              speakingStartTimeRef.current = null;
+              setRobotResponse(prev => prev || 'Lo siento, tuve un problema al hablar.');
+              setInteractionState(RobotInteractionState.ERROR);
+
+              if (robotRef.current) {
+                robotRef.current.stopThinking();
+                robotRef.current.stepBackward();
+              }
+
+              if (onError) {
+                onError(error instanceof Error ? error : new Error(String(error)));
+              }
+            }
+          }
+        );
+
+        // Registrar turno
+        sessionRef.current?.recordTurn();
+      } else {
+        console.log('[RobotInteraction] No se detecto texto');
+        setRobotResponse(translatorRef.current.translate('noUserSpeechDetected', currentLanguage));
+
+        // Auto-restart listening
+        if (shouldAutoRestartRef.current && config.autoRestartListening) {
+          setInteractionState(RobotInteractionState.LISTENING);
+          sessionRef.current?.startListening();
+        } else {
+          setInteractionState(RobotInteractionState.IDLE);
+        }
+      }
+    } catch (error: any) {
+      console.error('[RobotInteraction] Error procesando audio:', error);
+      setRobotResponse(translatorRef.current.translate('generalErrorResponse', currentLanguage));
+      setInteractionState(RobotInteractionState.ERROR);
+
+      if (robotRef.current) robotRef.current.stepBackward();
+      if (onError) onError(error instanceof Error ? error : new Error(String(error)));
+    }
+  }, [
+    stopRecording,
+    recognizeSpeech,
+    generateResponseAndSpeech,
+    updateSystemPrompt,
+    getSystemPrompt,
+    currentLanguage,
+    config.autoRestartListening,
+    config.bargeInEnabled,
+    updateVADConfig,
+    onError,
+    onLeadCaptured
+  ]);
+
+  // Manejar fin de sesion
+  const handleSessionEnd = useCallback(() => {
+    console.log('[RobotInteraction] Sesion terminada');
+
+    stopVAD();
+
+    if (isRecording) {
+      stopRecording();
+    }
+
+    if (typeof window !== 'undefined' && window.speechSynthesis) {
+      window.speechSynthesis.cancel();
+    }
+
+    setInteractionState(RobotInteractionState.IDLE);
+    setIsSessionActive(false);
+    shouldAutoRestartRef.current = false;
+
+    if (robotRef.current) robotRef.current.stepBackward();
+
+    // Notificar lead capturado al final de sesion
+    if (agentStateRef.current) {
+      const leadData = agentStateRef.current.getLeadData();
+      if (Object.keys(leadData).length > 0) {
+        onLeadCaptured?.(leadData);
+      }
+    }
+
+    onSessionEnd?.();
+  }, [stopVAD, isRecording, stopRecording, onSessionEnd, onLeadCaptured]);
+
+  // Metodo para iniciar interaccion por voz (modo continuo)
   const startListening = useCallback(async () => {
     try {
       // Limpiar estado anterior
       setUserMessage('');
       setRobotResponse('');
       resetRecording();
-      
+
+      // Iniciar sesion si no esta activa
+      if (!sessionRef.current?.isActive()) {
+        sessionRef.current?.startSession();
+        agentStateRef.current?.reset(currentLanguage);
+        setCurrentPhase(ConversationPhase.GREETING);
+      }
+
+      setIsSessionActive(true);
+      shouldAutoRestartRef.current = true;
+
       // Actualizar estado a escuchando
       setInteractionState(RobotInteractionState.LISTENING);
-      
-      // Animar al robot escuchando
+
+      // Animar al robot
       if (robotRef.current) {
         robotRef.current.approachCamera();
       }
-      
-      // Iniciar grabación
-      await startRecording();
+
+      // Iniciar VAD
+      await startVAD();
+
+      // Iniciar listen timer
+      sessionRef.current?.startListening();
+
     } catch (error) {
       console.error('Error al iniciar escucha:', error);
       setInteractionState(RobotInteractionState.ERROR);
-      
       if (onError && error instanceof Error) {
         onError(error);
       }
     }
-  }, [startRecording, resetRecording, onError]);
-  
-  // Método para detener escucha y procesar audio
+  }, [startVAD, resetRecording, currentLanguage, onError]);
+
+  // Metodo para detener escucha manualmente
   const stopListening = useCallback(async () => {
-    console.log('[RobotInteraction] stopListening llamado. Estado actual de isRecording:', isRecording);
-    if (!isRecording) {
-      console.warn('[RobotInteraction] Se intentó detener la escucha (stopListening), pero no se estaba grabando (isRecording es false).');
-      return;
+    console.log('[RobotInteraction] stopListening manual');
+
+    shouldAutoRestartRef.current = false;
+
+    // Si estamos grabando activamente, procesar el audio
+    if (interactionState === RobotInteractionState.LISTENING_ACTIVE && isRecording) {
+      await processRecordedAudio();
+    } else {
+      // Detener VAD y volver a IDLE
+      stopVAD();
+      setInteractionState(RobotInteractionState.IDLE);
+      if (robotRef.current) robotRef.current.stepBackward();
     }
+  }, [interactionState, isRecording, processRecordedAudio, stopVAD]);
 
-    try {
-      console.log('[RobotInteraction] Intentando detener escucha con stopRecording()...');
-      const currentAudioBlob = await stopRecording(); 
-      
-      console.log('[RobotInteraction] stopRecording completado. Blob recibido:', 
-                  currentAudioBlob ? `Tamaño: ${currentAudioBlob.size}` : 'null');
+  // Metodo para terminar sesion completamente
+  const endSession = useCallback(() => {
+    console.log('[RobotInteraction] endSession llamado');
+    sessionRef.current?.endSession();
+    handleSessionEnd();
+  }, [handleSessionEnd]);
 
-      if (currentAudioBlob && currentAudioBlob.size > 0) {
-        setInteractionState(RobotInteractionState.PROCESSING);
-        if (robotRef.current) robotRef.current.nodYes();
-        
-        const recognitionResult = await recognizeSpeech(currentAudioBlob); 
-        setUserMessage(recognitionResult.text);
-        
-        let langForThisInteraction = currentLanguage;
-        if (recognitionResult.language) {
-          if (recognitionResult.language !== currentLanguage) {
-            console.log(`[RobotInteraction] STT detectó un idioma (${recognitionResult.language}) diferente al actual (${currentLanguage}). Actualizando currentLanguage.`);
-            setCurrentLanguage(recognitionResult.language);
-          }
-          langForThisInteraction = recognitionResult.language;
-        } else {
-          console.warn(`[RobotInteraction] STT no devolvió un idioma. Se usará el currentLanguage del hook: ${currentLanguage}`);
-        }
-
-        console.log(`[RobotInteraction] Idioma determinado para esta interacción (LLM y TTS): ${langForThisInteraction}`);
-
-        if (recognitionResult.text) {
-          // Generar respuesta del LLM y reproducir voz (TTS)
-          // Los callbacks de TTS manejarán los estados SPEAKING e IDLE y animaciones.
-          /* const responseText = */ await generateResponseAndSpeech( // responseText no es necesario aquí si onComplete de useGroqConversation ya lo establece.
-            recognitionResult.text,
-            langForThisInteraction,
-            {
-              onStart: () => {
-                setInteractionState(RobotInteractionState.SPEAKING);
-                if (robotRef.current) {
-                  robotRef.current.stopThinking(); // Detener animación de pensando
-                  robotRef.current.startWaving();
-                }
-              },
-              onEnd: () => {
-                setInteractionState(RobotInteractionState.IDLE);
-                if (robotRef.current) robotRef.current.stepBackward();
-              },
-              onError: (error) => {
-                console.error('[RobotInteraction] Error durante TTS (Web Speech API):', error);
-                setRobotResponse(prev => prev || 'Lo siento, tuve un problema al intentar hablar.');
-                setInteractionState(RobotInteractionState.ERROR);
-                if (robotRef.current) {
-                  robotRef.current.stopThinking(); // Asegurar que thinking se detenga
-                  robotRef.current.stepBackward();
-                }
-                if (onError) {
-                  if (error instanceof Error) {
-                    onError(error);
-                  } else if (error instanceof SpeechSynthesisErrorEvent) {
-                    onError(new Error(`SpeechSynthesis Error: ${error.error} - ${error.utterance?.text.substring(0,30)}`));
-                  } else {
-                    onError(new Error(String(error)));
-                  }
-                }
-              }
-            }
-          );
-        } else {
-          console.log('[RobotInteraction] No se detectó texto del usuario (STT vacío). No se llamará al LLM ni TTS.');
-          setRobotResponse(translatorRef.current.translate('noUserSpeechDetected', currentLanguage));
-          setInteractionState(RobotInteractionState.IDLE);
-          if (robotRef.current) robotRef.current.stepBackward();
-        }
-      } else {
-        console.warn('[RobotInteraction] No se obtuvo audioBlob o estaba vacío después de detener la grabación.');
-        setUserMessage(translatorRef.current.translate('noAudioRecordedError', currentLanguage));
-        setInteractionState(RobotInteractionState.IDLE);
-        if (robotRef.current) robotRef.current.stepBackward();
-      }
-    } catch (error: any) {
-      console.error('[RobotInteraction] Error en stopListening:', error);
-      setRobotResponse(translatorRef.current.translate('generalErrorResponse', currentLanguage));
-      setInteractionState(RobotInteractionState.ERROR);
-      if (robotRef.current) robotRef.current.stepBackward(); 
-      if (onError) {
-        if (error instanceof Error) {
-          onError(error);
-        } else {
-          onError(new Error(String(error)));
-        }
-      }
-    } 
-  }, [
-    isRecording, 
-    stopRecording, 
-    recognizeSpeech, 
-    generateResponseAndSpeech, 
-    currentLanguage, 
-    setCurrentLanguage, 
-    setUserMessage, 
-    setRobotResponse, 
-    setInteractionState, 
-    onError, 
-    robotRef,
-    translatorRef
-  ]);
-
-  // Método para enviar un mensaje de texto directamente (sin voz)
+  // Metodo para enviar un mensaje de texto directamente
   const sendTextMessage = useCallback(async (text: string, lang?: string) => {
     if (!text.trim()) return;
 
@@ -327,22 +595,21 @@ export const useRobotInteraction = ({
     if (robotRef.current) robotRef.current.approachCamera();
 
     try {
-      // Solo obtener respuesta de texto, sin TTS automático para esta función.
+      // Actualizar system prompt
+      updateSystemPrompt(getSystemPrompt());
+
       const responseText = await sendGroqMessage(text, languageToUse);
-      setRobotResponse(responseText); 
-      
-      // Si se quisiera que hable aquí, se llamaría a textToSpeech explícitamente.
-      // Por ejemplo:
-      // if (responseText) {
-      //   await textToSpeech(responseText, languageToUse, {
-      //     onStart: () => { /* ... */ },
-      //     onEnd: () => { /* ... */ },
-      //     onError: () => { /* ... */ }
-      //   });
-      // }
-      
-      // Asumimos que después de enviar texto y recibir respuesta, volvemos a IDLE
-      // si no hay un flujo de voz explícito iniciado para la respuesta.
+      setRobotResponse(responseText);
+
+      // Registrar turno
+      if (agentStateRef.current) {
+        agentStateRef.current.incrementTurn();
+        const extractedInfo = agentStateRef.current.extractLeadInfo(text);
+        if (Object.keys(extractedInfo).length > 0) {
+          agentStateRef.current.updateLeadData(extractedInfo);
+        }
+      }
+
       setInteractionState(RobotInteractionState.IDLE);
       if (robotRef.current) robotRef.current.stepBackward();
 
@@ -353,32 +620,18 @@ export const useRobotInteraction = ({
       if (robotRef.current) robotRef.current.stepBackward();
       if (onError) onError(error instanceof Error ? error : new Error(String(error)));
     }
-  }, [
-    currentLanguage, 
-    sendGroqMessage, 
-    // textToSpeech, // Se podría añadir si se decide que sendTextMessage también hable
-    robotRef, 
-    translatorRef, 
-    onError, 
-    setRobotResponse, 
-    setUserMessage, 
-    setInteractionState 
-  ]);
+  }, [currentLanguage, sendGroqMessage, updateSystemPrompt, getSystemPrompt, onError]);
 
-  // Método para detener habla (si es Web Speech API)
+  // Metodo para detener habla
   const stopSpeaking = useCallback(() => {
     if (typeof window !== 'undefined' && window.speechSynthesis && window.speechSynthesis.speaking) {
       window.speechSynthesis.cancel();
-      console.log('[RobotInteraction] SpeechSynthesis cancelado.');
-      // El evento 'onend' de la utterance actual debería dispararse y manejar el cambio de estado a IDLE.
-      // Si no, forzar el estado aquí puede ser una opción, pero es mejor confiar en el evento.
-      // setInteractionState(RobotInteractionState.IDLE);
-      // if (robotRef.current) robotRef.current.stepBackward();
+      console.log('[RobotInteraction] SpeechSynthesis cancelado');
+      speakingStartTimeRef.current = null;
     }
-    // Si se estuviera usando AudioPlayer para algo, aquí iría audioPlayerRef.current?.stop();
   }, []);
 
-  // Asignar la referencia del robot para control de animaciones
+  // Asignar la referencia del robot
   const assignRobotRef = useCallback((ref: RobotAnimations | null) => {
     robotRef.current = ref;
   }, []);
@@ -387,24 +640,43 @@ export const useRobotInteraction = ({
   useEffect(() => {
     return () => {
       if (typeof window !== 'undefined' && window.speechSynthesis) {
-        window.speechSynthesis.cancel(); // Cancelar cualquier habla pendiente
+        window.speechSynthesis.cancel();
       }
+      stopVAD();
+      sessionRef.current?.dispose();
       audioPlayerRef.current?.dispose();
     };
-  }, []);
+  }, [stopVAD]);
 
   return {
+    // Estado
     interactionState,
     userMessage,
     robotResponse,
     currentLanguage,
     isRecording,
+
+    // Estado de sesion continua
+    isSessionActive,
+    currentPhase,
+    currentVolume,
+    vadIsListening,
+    vadIsSpeaking,
+
+    // Metodos principales
     assignRobotRef,
     startListening,
     stopListening,
+    endSession,
     sendTextMessage,
-    stopSpeaking, // Exponer para control externo si es necesario
-    setCurrentLanguage, // Para cambiar idioma externamente si es necesario
-    // No es necesario exponer audioBlob ya que se maneja internamente
+    stopSpeaking,
+    setCurrentLanguage,
+
+    // Metodos de configuracion
+    setVADThreshold: setThreshold,
+
+    // Acceso a datos del agente
+    getLeadData: () => agentStateRef.current?.getLeadData() || {},
+    getConversationPhase: () => agentStateRef.current?.getPhase() || ConversationPhase.GREETING
   };
-}; 
+};
