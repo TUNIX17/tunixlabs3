@@ -1,0 +1,254 @@
+{
+  "Metadata": {
+    "title": "TunixLabs - Soluciones Avanzadas de IA",
+    "description": "TunixLabs es una empresa especializada en consultoria y desarrollo de soluciones de Inteligencia Artificial de vanguardia."
+  },
+  "Layout": {
+    "nav": {
+      "home": "Inicio",
+      "services": "Servicios",
+      "contact": "Contacto"
+    }
+  },
+  "HomePage": {
+    "hero": {
+      "title1": "Soluciones de",
+      "title2": "Inteligencia Artificial",
+      "title3": "para tu negocio",
+      "description": "En TunixLabs, transformamos tu empresa con tecnologia de vanguardia. Nuestras soluciones de IA estan disenadas para impulsar tu crecimiento y optimizar tus procesos.",
+      "cta": {
+        "contact": "Contactar",
+        "services": "Ver Servicios"
+      },
+      "loading3D": "Cargando modelo 3D..."
+    },
+    "services": {
+      "badge": "Nuestros Servicios",
+      "title": "Soluciones de IA para cada necesidad",
+      "subtitle": "Impulsando tu negocio con tecnologia de vanguardia",
+      "learnMore": "Saber mas",
+      "items": {
+        "webDev": {
+          "title": "Desarrollos Web",
+          "description": "Creamos experiencias web interactivas y escalables, potenciadas con inteligencia artificial."
+        },
+        "machineLearning": {
+          "title": "Machine Learning",
+          "description": "Implementamos modelos predictivos que aprenden de tus datos para automatizar procesos."
+        },
+        "aiAssistants": {
+          "title": "Asistentes IA",
+          "description": "Creamos asistentes virtuales inteligentes que mejoran la experiencia de tus clientes."
+        },
+        "businessIntelligence": {
+          "title": "Business Intelligence",
+          "description": "Dashboards interactivos y reportes automatizados para monitorear tu negocio."
+        },
+        "computerVision": {
+          "title": "Vision Artificial",
+          "description": "Sistemas de vision por computadora para reconocimiento y analisis de imagenes."
+        },
+        "aiConsulting": {
+          "title": "Consultoria IA",
+          "description": "Te asesoramos en estrategias de IA que maximizan el retorno de inversion."
+        },
+        "rpa": {
+          "title": "RPA con IA",
+          "description": "Automatiza tareas repetitivas con robots de software inteligentes."
+        },
+        "contentGeneration": {
+          "title": "Generacion de Contenido IA",
+          "description": "Crea textos, imagenes y videos personalizados mediante IA."
+        },
+        "marketingAutomation": {
+          "title": "Automatizacion Marketing IA",
+          "description": "Segmenta, personaliza y automatiza campanas de marketing."
+        }
+      }
+    },
+    "contact": {
+      "badge": "Contacto",
+      "title": "Transforma tu negocio con IA",
+      "subtitle": "Contactanos hoy para una consulta gratuita",
+      "form": {
+        "title": "Envianos un mensaje",
+        "description": "Completa el formulario y nos pondremos en contacto contigo.",
+        "name": "Nombre",
+        "namePlaceholder": "Tu nombre",
+        "email": "Email",
+        "emailPlaceholder": "tu@email.com",
+        "subject": "Asunto",
+        "subjectPlaceholder": "Como podemos ayudarte?",
+        "message": "Mensaje",
+        "messagePlaceholder": "Cuentanos sobre tu proyecto",
+        "submit": "Enviar mensaje"
+      },
+      "info": {
+        "title": "Informacion de contacto",
+        "email": "Email",
+        "phone": "Telefono",
+        "location": "Ubicacion",
+        "locationValue": "Madrid, Espana",
+        "followUs": "Siguenos"
+      }
+    },
+    "footer": {
+      "copyright": "TunixLabs. Todos los derechos reservados."
+    }
+  },
+  "ContactPage": {
+    "hero": {
+      "title": "Hablemos de tu proyecto",
+      "description": "Completa el formulario o escribenos directamente. Nuestro equipo te respondera en menos de 24h."
+    },
+    "form": {
+      "title": "Envianos un mensaje",
+      "name": "Nombre",
+      "namePlaceholder": "Tu nombre",
+      "email": "Email",
+      "emailPlaceholder": "tu@email.com",
+      "subject": "Asunto",
+      "subjectPlaceholder": "Sobre que quieres hablar?",
+      "message": "Mensaje",
+      "messagePlaceholder": "Cuentanos tu idea o consulta...",
+      "submit": "Enviar mensaje"
+    },
+    "directContact": {
+      "title": "Contacto directo",
+      "socialMedia": "Redes sociales",
+      "meetingQuestion": "Prefieres una reunion?",
+      "scheduleCall": "Agenda una videollamada"
+    }
+  },
+  "Footer": {
+    "companyName": "TunixLabs",
+    "companyDescription": "Consultoria especializada en soluciones de Inteligencia Artificial para empresas.",
+    "contactTitle": "Contacto",
+    "linksTitle": "Enlaces",
+    "home": "Inicio",
+    "services": "Servicios",
+    "contact": "Contacto",
+    "copyright": "TunixLabs. Todos los derechos reservados."
+  },
+  "Services": {
+    "backToServices": "Volver",
+    "ourServicesBadge": "Nuestros Servicios",
+    "webDev": {
+      "meta": {
+        "title": "Desarrollos Web | TunixLabs",
+        "description": "Creamos experiencias web interactivas y escalables potenciadas con inteligencia artificial."
+      },
+      "hero": {
+        "title": "Desarrollos Web",
+        "description": "Creamos experiencias web interactivas y escalables, potenciadas con inteligencia artificial para llevar tu negocio al siguiente nivel."
+      }
+    },
+    "machineLearning": {
+      "meta": {
+        "title": "Machine Learning | TunixLabs",
+        "description": "Implementamos modelos predictivos que aprenden de tus datos para automatizar procesos."
+      },
+      "hero": {
+        "title": "Machine Learning",
+        "description": "Implementamos modelos predictivos que aprenden de tus datos para automatizar procesos y tomar mejores decisiones."
+      }
+    },
+    "aiAssistants": {
+      "meta": {
+        "title": "Asistentes IA | TunixLabs",
+        "description": "Creamos asistentes virtuales inteligentes que mejoran la experiencia de tus clientes."
+      },
+      "hero": {
+        "title": "Asistentes IA",
+        "description": "Creamos asistentes virtuales inteligentes que mejoran la experiencia de tus clientes y automatizan la atencion."
+      }
+    },
+    "businessIntelligence": {
+      "meta": {
+        "title": "Business Intelligence | TunixLabs",
+        "description": "Dashboards interactivos y reportes automatizados para monitorear tu negocio."
+      },
+      "hero": {
+        "title": "Business Intelligence",
+        "description": "Dashboards interactivos y reportes automatizados para monitorear tu negocio en tiempo real."
+      }
+    },
+    "computerVision": {
+      "meta": {
+        "title": "Vision Artificial | TunixLabs",
+        "description": "Sistemas de vision por computadora para reconocimiento y analisis de imagenes."
+      },
+      "hero": {
+        "title": "Vision Artificial",
+        "description": "Sistemas de vision por computadora para reconocimiento y analisis de imagenes en tu industria."
+      }
+    },
+    "aiConsulting": {
+      "meta": {
+        "title": "Consultoria IA | TunixLabs",
+        "description": "Te asesoramos en estrategias de IA que maximizan el retorno de inversion."
+      },
+      "hero": {
+        "title": "Consultoria IA",
+        "description": "Te asesoramos en estrategias de IA que maximizan el retorno de inversion y transforman tu negocio."
+      }
+    },
+    "rpa": {
+      "meta": {
+        "title": "RPA con IA | TunixLabs",
+        "description": "Automatiza tareas repetitivas con robots de software inteligentes."
+      },
+      "hero": {
+        "title": "RPA con IA",
+        "description": "Automatiza tareas repetitivas con robots de software inteligentes que ahorran tiempo y reducen errores."
+      }
+    },
+    "contentGeneration": {
+      "meta": {
+        "title": "Generacion de Contenido IA | TunixLabs",
+        "description": "Crea textos, imagenes y videos personalizados mediante inteligencia artificial."
+      },
+      "hero": {
+        "title": "Generacion de Contenido IA",
+        "description": "Crea textos, imagenes y videos personalizados mediante inteligencia artificial de ultima generacion."
+      }
+    },
+    "marketingAutomation": {
+      "meta": {
+        "title": "Automatizacion Marketing IA | TunixLabs",
+        "description": "Segmenta, personaliza y automatiza campanas de marketing con IA."
+      },
+      "hero": {
+        "title": "Automatizacion Marketing IA",
+        "description": "Segmenta, personaliza y automatiza campanas de marketing para maximizar conversiones."
+      }
+    }
+  },
+  "VoiceInterface": {
+    "startRecording": "Haz clic para comenzar a grabar",
+    "stopRecording": "Haz clic para detener la grabacion",
+    "processing": "Procesando...",
+    "talkToTunix": "Hablar con Tunix",
+    "errors": {
+      "microphoneAccess": "No se puede acceder al microfono",
+      "speechRecognition": "Error en el reconocimiento de voz",
+      "network": "Error de red. Intenta nuevamente"
+    },
+    "inputPlaceholder": "Escribe tu mensaje aqui...",
+    "send": "Enviar"
+  },
+  "Robot": {
+    "greeting": "Hola, soy Tunix. En que puedo ayudarte?",
+    "thinking": "Estoy pensando...",
+    "error": "Lo siento, ha ocurrido un error. Por favor, intentalo de nuevo.",
+    "loading": "Cargando modelo 3D..."
+  },
+  "Common": {
+    "loading": "Cargando...",
+    "error": "Error",
+    "success": "Exito",
+    "cancel": "Cancelar",
+    "confirm": "Confirmar",
+    "back": "Volver"
+  }
+}
