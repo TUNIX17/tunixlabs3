@@ -1,0 +1,94 @@
+// Prisma Schema for TunixLabs CRM
+// Learn more: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Lead capturado por el voice agent o formulario de contacto
+model Lead {
+  id              String    @id @default(cuid())
+
+  // Datos de contacto
+  name            String?
+  company         String?
+  email           String?
+  phone           String?
+  role            String?
+
+  // Calificacion
+  interests       String[]  @default([])
+  painPoints      String[]  @default([])
+  budget          String?
+  timeline        String?
+  companySize     String?
+  location        String?
+
+  // Estado del lead en el pipeline
+  status          LeadStatus @default(NEW)
+  score           Int        @default(0)
+  source          String     @default("voice-agent")
+
+  // Reunion agendada
+  meetingScheduled Boolean   @default(false)
+  meetingDate     DateTime?
+  calendlyEventId String?
+
+  // Sesion de voz (tracking)
+  sessionId       String?
+  conversationPhase String?
+  turnCount       Int        @default(0)
+
+  // Metadata
+  notes           String?
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
+
+  // Relaciones
+  messages        Message[]
+  activities      Activity[]
+
+  @@index([email])
+  @@index([status])
+  @@index([createdAt])
+}
+
+// Mensajes de la conversacion con el lead
+model Message {
+  id        String   @id @default(cuid())
+  leadId    String
+  lead      Lead     @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  role      String   // 'user' | 'assistant'
+  content   String
+  createdAt DateTime @default(now())
+
+  @@index([leadId])
+}
+
+// Actividades del lead (timeline)
+model Activity {
+  id        String   @id @default(cuid())
+  leadId    String
+  lead      Lead     @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  type      String   // 'email_sent' | 'meeting_scheduled' | 'status_changed' | 'note_added'
+  details   String?
+  createdAt DateTime @default(now())
+
+  @@index([leadId])
+}
+
+// Estados del pipeline de ventas
+enum LeadStatus {
+  NEW
+  CONTACTED
+  QUALIFIED
+  PROPOSAL
+  NEGOTIATION
+  WON
+  LOST
+}

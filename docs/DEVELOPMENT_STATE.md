@@ -1,8 +1,8 @@
 # TunixLabs - Development State
 
 **Last Updated:** 2026-01-08
-**Current Phase:** Real-Time Voice Agent System Complete
-**Sprint:** 1 - Voice Conversation System
+**Current Phase:** CRM & Lead Management System Complete
+**Sprint:** 2 - Lead Persistence & CRM
 
 ---
 
@@ -35,17 +35,28 @@ TunixLabs es una plataforma web de consultoria en IA con:
   - [x] Sistema de agente comercial con prompts
   - [x] Manejo de sesión con timeouts
   - [x] Tracking de fase de conversación
+- [x] **CRM & Lead Management System** (2026-01-08)
+  - [x] PostgreSQL database (Railway) with Prisma ORM
+  - [x] Lead, Message, Activity models
+  - [x] API endpoints: CRUD, capture, export CSV
+  - [x] Email notifications with Resend
+  - [x] Calendly webhook integration
+  - [x] Admin dashboard with authentication
+  - [x] Voice agent lead persistence
 
 ### In Progress
-- [ ] Configurar CEREBRAS_API_KEY en Railway
-- [ ] Testing del sistema de voz en producción
+- [ ] Configurar variables de entorno en Railway:
+  - [ ] RESEND_API_KEY
+  - [ ] CALENDLY_LINK
+  - [ ] CALENDLY_WEBHOOK_SECRET
+  - [ ] ADMIN_PASSWORD
+  - [ ] NEXT_PUBLIC_ADMIN_PASSWORD
 
 ### Pending
-- [ ] PRD document creation
-- [ ] Sprint 1 planning
+- [ ] Testing del sistema completo en producción
+- [ ] Conectar dominio tunixlabs.com
 - [ ] Testing setup (Jest + Playwright)
 - [ ] CI/CD pipeline
-- [ ] Conectar dominio tunixlabs.com
 
 ---
 
@@ -148,6 +159,35 @@ TOTAL:                        →  ~$0.002/cliente
 - `src/components/VoiceInterface/VoiceController.tsx` - Phase indicators
 - `src/components/VoiceInterface/ControlButtons.tsx` - New states
 
+### 7. CRM & Lead Management System (2026-01-08)
+**Decision:** Sistema CRM propio con persistencia PostgreSQL
+**Rationale:**
+- Capturar y gestionar leads del voice agent
+- Notificaciones en tiempo real por email
+- Integración con Calendly para agendar reuniones
+- Dashboard simple para gestión interna
+**Stack:**
+```
+Database:    PostgreSQL (Railway) + Prisma ORM
+Email:       Resend (transaccional)
+Calendar:    Calendly webhooks
+Auth:        Password simple (sessionStorage)
+```
+**Data Flow:**
+```
+Voice Agent → /api/leads/capture → PostgreSQL → Email Notification
+                                            ↓
+                          Admin Dashboard (/admin/leads)
+                                            ↓
+              Calendly Webhook → Update Lead → Email Notification
+```
+**Lead Scoring Algorithm:**
+- name: +15 pts, company: +15 pts, email: +20 pts
+- phone: +10 pts, role: +5 pts
+- Each interest: +10 pts (max 3)
+- Each painPoint: +10 pts (max 3)
+- budget/timeline/companySize: +5 pts each
+
 ---
 
 ## TECH STACK
@@ -161,20 +201,29 @@ Frontend:
 
 Backend:
   API: Next.js API Routes
-  Database: PostgreSQL (Railway) - pendiente
+  Database: PostgreSQL (Railway) + Prisma 5.22.0
+  ORM: Prisma
   Proxies:
-    - /api/cerebras-proxy  # LLM (Cerebras)
-    - /api/groq-proxy      # Legacy/fallback
+    - /api/cerebras-proxy   # LLM (Cerebras)
+    - /api/groq-proxy       # Legacy/fallback
     - /api/transcribe-audio # STT (Groq Whisper)
+    - /api/leads/*          # CRM CRUD
+    - /api/webhooks/*       # External webhooks
 
 AI Services:
   LLM: Cerebras Llama 3.3 70B (FREE - 1M tokens/día)
   STT: Groq Whisper Large V3 ($0.04/hora)
   TTS: Web Speech API (FREE - navegador)
 
+CRM Services:
+  Email: Resend (transaccional)
+  Calendar: Calendly (webhooks)
+  Auth: Password simple (sessionStorage)
+
 Infrastructure:
   Avatar: Ready Player Me
   Hosting: Railway
+  Database: Railway PostgreSQL
   Domain: tunixlabs.com (pendiente DNS)
 ```
 
@@ -187,6 +236,12 @@ Infrastructure:
 - RAILWAY_PUBLIC_DOMAIN
 - PORT (auto)
 
+### Configuradas (PostgreSQL Railway)
+```bash
+# Database - PostgreSQL (Railway)
+DATABASE_URL=postgresql://postgres:***@shortline.proxy.rlwy.net:44455/railway
+```
+
 ### Pendientes de configurar en Railway
 ```bash
 # LLM - Cerebras (REQUERIDO para conversación)
@@ -197,44 +252,133 @@ CEREBRAS_API_KEY=
 # Get key at: https://console.groq.com/
 GROQ_API_KEY=
 
-# Future: Database
-DATABASE_URL=
+# Email Notifications - Resend (para notificar nuevos leads)
+# Get key at: https://resend.com/
+RESEND_API_KEY=
+NOTIFICATION_EMAIL=contacto@tunixlabs.com
 
-# Future: Auth
-AUTH_SECRET=
+# Calendly Integration (para agendar reuniones)
+CALENDLY_LINK=https://calendly.com/tunixlabs/discovery
+CALENDLY_WEBHOOK_SECRET=
+
+# Admin Dashboard Auth
+ADMIN_PASSWORD=tu_password_seguro
+NEXT_PUBLIC_ADMIN_PASSWORD=tu_password_seguro  # Para client-side
 ```
 
-Para configurar: `railway variables --set CEREBRAS_API_KEY=your_key`
+Para configurar: `railway variables --set VARIABLE_NAME=value`
 
 ---
 
 ## NEXT STEPS
 
 1. **Immediate:**
-   - Configurar GROQ_API_KEY en Railway para sistema de voz
-   - Probar interacción con robot 3D en producción
+   - Configurar RESEND_API_KEY en Railway (crear cuenta en resend.com)
+   - Configurar ADMIN_PASSWORD para acceder al CRM
+   - Configurar CALENDLY_LINK con tu link de Calendly
+   - Deploy a Railway con `railway up`
 
 2. **Short-term:**
    - Conectar dominio tunixlabs.com
-   - Agregar PostgreSQL en Railway
-   - Implementar sistema de autenticación
+   - Testing E2E: voz → captura → email → calendario
+   - Probar CRM en /admin
 
 3. **Medium-term:**
-   - Enhance 3D avatar interactions
    - Treasury system for Curso 7i
-   - Testing setup
+   - Testing setup (Jest + Playwright)
+   - CI/CD pipeline
 
 ---
 
 ## BLOCKERS
 
 - [x] ~~Railway project needs to be created~~ ✅ Completado
-- [ ] Need GROQ_API_KEY for voice testing in production
+- [x] ~~Need PostgreSQL database~~ ✅ Railway PostgreSQL conectado
+- [ ] Need RESEND_API_KEY for email notifications
+- [ ] Need CALENDLY_LINK for meeting scheduling
 - [ ] Domain DNS configuration pending
 
 ---
 
-## RECENT CHANGES (2026-01-08)
+## RECENT CHANGES (2026-01-08) - CRM & Lead Management
+
+### Sistema CRM Completo Implementado
+
+1. **Base de Datos PostgreSQL + Prisma**
+   - Prisma 5.22.0 (downgraded de 7.x por incompatibilidades)
+   - Modelos: Lead, Message, Activity
+   - LeadStatus enum: NEW, CONTACTED, QUALIFIED, PROPOSAL, NEGOTIATION, WON, LOST
+   - Lead scoring algorithm integrado
+
+2. **API Endpoints**
+   ```
+   /api/leads           GET  - Lista con filtros y paginación
+   /api/leads           POST - Crear lead manual
+   /api/leads/[id]      GET  - Obtener lead por ID
+   /api/leads/[id]      PUT  - Actualizar lead
+   /api/leads/[id]      DELETE - Eliminar lead
+   /api/leads/capture   POST - Captura desde voice agent
+   /api/leads/export    GET  - Exportar CSV
+   /api/webhooks/calendly POST - Webhook Calendly
+   ```
+
+3. **Notificaciones Email (Resend)**
+   - `sendLeadNotification()` - Notifica nuevos leads
+   - `sendMeetingNotification()` - Notifica reuniones agendadas
+   - Templates HTML estilizados
+
+4. **Integración Calendly**
+   - Webhook handler para eventos
+   - Actualiza lead cuando se agenda reunión
+   - Crea lead nuevo si email no existe
+
+5. **Admin Dashboard**
+   - `/admin` - Dashboard con stats y leads recientes
+   - `/admin/leads` - Lista con filtros y paginación
+   - `/admin/leads/[id]` - Detalle completo con edición
+   - Autenticación por password (sessionStorage)
+   - Sidebar con navegación
+
+6. **Voice Agent → Lead Persistence**
+   - `RobotModel.tsx` modificado con onLeadCaptured callback
+   - Guarda leads automáticamente durante conversación
+   - Lead scoring basado en datos capturados
+
+### Files Created
+```
+prisma/schema.prisma                      - Database schema
+src/lib/prisma.ts                         - Prisma client singleton
+src/lib/email/resend.ts                   - Email service
+src/app/api/leads/route.ts                - CRUD endpoints
+src/app/api/leads/[id]/route.ts           - Individual lead endpoints
+src/app/api/leads/capture/route.ts        - Voice capture endpoint
+src/app/api/leads/export/route.ts         - CSV export
+src/app/api/webhooks/calendly/route.ts    - Calendly webhook
+src/app/admin/layout.tsx                  - Admin layout + auth
+src/app/admin/page.tsx                    - Dashboard
+src/app/admin/leads/page.tsx              - Leads list
+src/app/admin/leads/[id]/page.tsx         - Lead detail
+```
+
+### Files Modified
+```
+package.json                              - +prisma, +resend, +@react-email/render
+.env.example                              - +CRM variables
+src/app/inicio/components/RobotModel.tsx  - +onLeadCaptured callback
+```
+
+### Dependencies Added
+```json
+{
+  "@prisma/client": "5.22.0",
+  "resend": "^4.x",
+  "@react-email/render": "^1.x"
+}
+```
+
+---
+
+## PREVIOUS CHANGES (2026-01-08) - Voice Agent
 
 ### Real-Time Voice Agent System - Complete Implementation
 

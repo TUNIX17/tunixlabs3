@@ -1513,6 +1513,35 @@ function RobotInteractionManager() {
     },
     onError: (error) => {
       console.error('Error en useRobotInteraction desde el contenedor:', error);
+    },
+    onLeadCaptured: async (leadData) => {
+      // Solo guardar si hay datos significativos
+      if (!leadData.name && !leadData.email && (!leadData.interests || leadData.interests.length === 0)) {
+        return;
+      }
+
+      try {
+        const response = await fetch('/api/leads/capture', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            ...leadData,
+            source: 'voice-agent'
+          })
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          console.log('[Lead] Guardado exitosamente:', data.leadId, data.isNew ? '(nuevo)' : '(actualizado)');
+        } else {
+          console.error('[Lead] Error al guardar:', await response.text());
+        }
+      } catch (error) {
+        console.error('[Lead] Error de red:', error);
+      }
+    },
+    onSessionEnd: () => {
+      console.log('[Session] Sesion de voz finalizada');
     }
   });
 

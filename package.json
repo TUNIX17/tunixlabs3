@@ -27,6 +27,7 @@
   "homepage": "https://github.com/TUNIX17/tunixlabs#readme",
   "dependencies": {
     "@prisma/client": "^5.22.0",
+    "@react-email/render": "^2.0.2",
     "@react-spring/three": "^9.7.5",
     "@react-three/drei": "^9.80.3",
     "@react-three/fiber": "^8.13.6",

@@ -229,6 +229,11 @@
     "stopRecording": "Click to stop recording",
     "processing": "Processing...",
     "talkToTunix": "Talk to Tunix",
+    "talkToMe": "Talk to me",
+    "listening": "I'm listening...",
+    "thinking": "Thinking...",
+    "responding": "Responding...",
+    "tryAgain": "Try again",
     "errors": {
       "microphoneAccess": "Cannot access microphone",
       "speechRecognition": "Speech recognition error",

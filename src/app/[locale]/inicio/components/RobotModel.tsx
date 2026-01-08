@@ -11,6 +11,7 @@ import {
   Sparkles
 } from '@react-three/drei';
 import * as THREE from 'three';
+import { useTranslations } from 'next-intl';
 import { useRobotInteraction, RobotInteractionState } from '@/hooks/useRobotInteraction';
 import FloatingMicButton from '@/components/VoiceInterface/FloatingMicButton';
 import AudioVisualizer from '@/components/VoiceInterface/AudioVisualizer';
@@ -1488,6 +1489,8 @@ function RobotInteractionManager() {
   const [isLoading, setIsLoading] = useState(true);
   const robotAnimatedRef = useRef<RobotMethods>(null);
   const [isMounted, setIsMounted] = useState(false);
+  const t = useTranslations('VoiceInterface');
+  const tRobot = useTranslations('Robot');
 
   useEffect(() => {
     setIsMounted(true);
@@ -1627,11 +1630,11 @@ function RobotInteractionManager() {
               style={{ pointerEvents: 'none' }}
             >
               <p className="text-sm font-medium" style={{ color: '#4a5568' }}>
-                {interactionState === RobotInteractionState.IDLE && "Habla conmigo"}
-                {interactionState === RobotInteractionState.LISTENING && "Te escucho..."}
-                {interactionState === RobotInteractionState.PROCESSING && "Pensando..."}
-                {interactionState === RobotInteractionState.SPEAKING && "Respondiendo..."}
-                {interactionState === RobotInteractionState.ERROR && "Intenta de nuevo"}
+                {interactionState === RobotInteractionState.IDLE && t('talkToMe')}
+                {interactionState === RobotInteractionState.LISTENING && t('listening')}
+                {interactionState === RobotInteractionState.PROCESSING && t('thinking')}
+                {interactionState === RobotInteractionState.SPEAKING && t('responding')}
+                {interactionState === RobotInteractionState.ERROR && t('tryAgain')}
               </p>
             </div>
 
