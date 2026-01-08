@@ -30,6 +30,7 @@
     "@react-spring/three": "^9.7.5",
     "@react-three/drei": "^9.80.3",
     "@react-three/fiber": "^8.13.6",
+    "@swc/helpers": "0.5.18",
     "@types/uuid": "^10.0.0",
     "axios": "^1.9.0",
     "form-data": "^4.0.2",
