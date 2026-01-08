@@ -57,3 +57,4 @@ next-env.d.ts
 
 # Python Virtual Environment (symlink)
 .venv
+/src/generated/prisma
