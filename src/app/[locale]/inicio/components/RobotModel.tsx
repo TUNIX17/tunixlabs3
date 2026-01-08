@@ -1644,6 +1644,15 @@ function RobotInteractionManager() {
               interactionState={interactionState}
               isRecording={isRecording}
               disabled={isLoading || interactionState === RobotInteractionState.PROCESSING}
+              translations={{
+                talkToTunix: t('talkToTunix'),
+                processing: t('processing'),
+                stopRecording: t('stopRecording'),
+                listening: t('listening'),
+                talkToMe: t('talkToMe'),
+                interrupt: t('interrupt'),
+                responding: t('responding'),
+              }}
             />
           </div>
         </div>

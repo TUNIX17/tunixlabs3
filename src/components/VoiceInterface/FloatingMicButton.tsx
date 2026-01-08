@@ -1,6 +1,16 @@
 import React from 'react';
 import { RobotInteractionState } from '../../hooks/useRobotInteraction';
 
+interface FloatingMicButtonTranslations {
+  talkToTunix: string;
+  processing: string;
+  stopRecording: string;
+  listening: string;
+  talkToMe: string;
+  interrupt: string;
+  responding: string;
+}
+
 interface FloatingMicButtonProps {
   onClick: () => void;
   interactionState: RobotInteractionState;
@@ -8,6 +18,7 @@ interface FloatingMicButtonProps {
   disabled?: boolean;
   currentVolume?: number; // Nivel de volumen actual (0-1) para feedback visual
   isSessionActive?: boolean; // Si hay una sesion continua activa
+  translations?: FloatingMicButtonTranslations; // Traducciones opcionales
 }
 
 const FloatingMicButton: React.FC<FloatingMicButtonProps> = ({
@@ -17,6 +28,7 @@ const FloatingMicButton: React.FC<FloatingMicButtonProps> = ({
   disabled = false,
   currentVolume = 0,
   isSessionActive = false,
+  translations,
 }) => {
   const isProcessing = interactionState === RobotInteractionState.PROCESSING;
   const isListening = interactionState === RobotInteractionState.LISTENING;
@@ -24,9 +36,20 @@ const FloatingMicButton: React.FC<FloatingMicButtonProps> = ({
   const isSpeaking = interactionState === RobotInteractionState.SPEAKING;
   const isDisabled = disabled || isProcessing;
 
+  // Default translations (Spanish fallback)
+  const t = translations || {
+    talkToTunix: 'Hablar con Tunix',
+    processing: 'Procesando...',
+    stopRecording: 'Detener grabación',
+    listening: 'Te escucho...',
+    talkToMe: 'Habla conmigo',
+    interrupt: 'Interrumpir (habla para detener)',
+    responding: 'Respondiendo...',
+  };
+
   // Determinar el icono y estado visual
   let icon;
-  let title = 'Hablar con Tunix';
+  let title = t.talkToTunix;
   let statusText = '';
 
   if (isProcessing) {
@@ -36,8 +59,8 @@ const FloatingMicButton: React.FC<FloatingMicButtonProps> = ({
         <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
       </svg>
     );
-    title = 'Procesando...';
-    statusText = 'Pensando...';
+    title = t.processing;
+    statusText = t.processing;
   } else if (isListeningActive || isRecording) {
     // Usuario hablando activamente
     icon = (
@@ -45,8 +68,8 @@ const FloatingMicButton: React.FC<FloatingMicButtonProps> = ({
         <path fillRule="evenodd" d="M5 5h10v10H5V5z" clipRule="evenodd" />
       </svg>
     );
-    title = 'Detener grabacion';
-    statusText = 'Te escucho...';
+    title = t.stopRecording;
+    statusText = t.listening;
   } else if (isListening) {
     // VAD activo, esperando voz
     icon = (
@@ -54,8 +77,8 @@ const FloatingMicButton: React.FC<FloatingMicButtonProps> = ({
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
       </svg>
     );
-    title = 'Escuchando... habla cuando quieras';
-    statusText = 'Habla conmigo';
+    title = t.listening;
+    statusText = t.talkToMe;
   } else if (isSpeaking) {
     // Robot hablando
     icon = (
@@ -63,8 +86,8 @@ const FloatingMicButton: React.FC<FloatingMicButtonProps> = ({
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15.536a5 5 0 001.414 1.414m2.828-9.9a9 9 0 0112.728 0" />
       </svg>
     );
-    title = 'Interrumpir (habla para detener)';
-    statusText = 'Respondiendo...';
+    title = t.interrupt;
+    statusText = t.responding;
   } else {
     // Idle
     icon = (
@@ -72,7 +95,7 @@ const FloatingMicButton: React.FC<FloatingMicButtonProps> = ({
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
       </svg>
     );
-    title = 'Hablar con Tunix';
+    title = t.talkToTunix;
     statusText = '';
   }
 

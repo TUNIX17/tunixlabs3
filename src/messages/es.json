@@ -234,6 +234,7 @@
     "thinking": "Pensando...",
     "responding": "Respondiendo...",
     "tryAgain": "Intenta de nuevo",
+    "interrupt": "Interrumpir (habla para detener)",
     "errors": {
       "microphoneAccess": "No se puede acceder al microfono",
       "speechRecognition": "Error en el reconocimiento de voz",
