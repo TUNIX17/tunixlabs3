@@ -121,6 +121,9 @@ export const useRobotInteraction = ({
   // Flag para trackear si la grabación se inició exitosamente
   const recordingStartedRef = useRef<boolean>(false);
 
+  // Ref para trackear el último estado notificado (evita notificaciones duplicadas)
+  const lastNotifiedStateRef = useRef<RobotInteractionState>(RobotInteractionState.IDLE);
+
   // Obtener prompt cache
   const promptCache = getAgentPromptCache();
 
@@ -302,9 +305,10 @@ export const useRobotInteraction = ({
     };
   }, [config.enabled]);
 
-  // Notificar cambios de estado
+  // Notificar cambios de estado (solo si realmente cambió)
   useEffect(() => {
-    if (onStateChange) {
+    if (onStateChange && interactionState !== lastNotifiedStateRef.current) {
+      lastNotifiedStateRef.current = interactionState;
       onStateChange(interactionState);
     }
   }, [interactionState, onStateChange]);

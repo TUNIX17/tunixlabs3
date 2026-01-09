@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useRef, useState, Suspense, forwardRef, useImperativeHandle, useEffect } from 'react';
+import React, { useRef, useState, Suspense, forwardRef, useImperativeHandle, useEffect, useCallback } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import {
   Environment,
@@ -1574,6 +1574,46 @@ function RobotInteractionManager() {
     setIsMounted(true);
   }, []);
 
+  // Memoizar callbacks para evitar re-renders constantes
+  const handleStateChange = useCallback((newState: RobotInteractionState) => {
+    console.log('RobotInteractionState changed:', newState);
+  }, []);
+
+  const handleError = useCallback((error: Error) => {
+    console.error('Error en useRobotInteraction desde el contenedor:', error);
+  }, []);
+
+  const handleLeadCaptured = useCallback(async (leadData: any) => {
+    // Solo guardar si hay datos significativos
+    if (!leadData.name && !leadData.email && (!leadData.interests || leadData.interests.length === 0)) {
+      return;
+    }
+
+    try {
+      const response = await fetch('/api/leads/capture', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...leadData,
+          source: 'voice-agent'
+        })
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log('[Lead] Guardado exitosamente:', data.leadId, data.isNew ? '(nuevo)' : '(actualizado)');
+      } else {
+        console.error('[Lead] Error al guardar:', await response.text());
+      }
+    } catch (error) {
+      console.error('[Lead] Error de red:', error);
+    }
+  }, []);
+
+  const handleSessionEnd = useCallback(() => {
+    console.log('[Session] Sesion de voz finalizada');
+  }, []);
+
   const {
     interactionState,
     userMessage,
@@ -1589,41 +1629,10 @@ function RobotInteractionManager() {
   } = useRobotInteraction({
     initialLanguage: 'es',
     robotSystemPrompt: undefined,
-    onStateChange: (newState) => {
-      console.log('RobotInteractionState changed:', newState);
-    },
-    onError: (error) => {
-      console.error('Error en useRobotInteraction desde el contenedor:', error);
-    },
-    onLeadCaptured: async (leadData) => {
-      // Solo guardar si hay datos significativos
-      if (!leadData.name && !leadData.email && (!leadData.interests || leadData.interests.length === 0)) {
-        return;
-      }
-
-      try {
-        const response = await fetch('/api/leads/capture', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            ...leadData,
-            source: 'voice-agent'
-          })
-        });
-
-        if (response.ok) {
-          const data = await response.json();
-          console.log('[Lead] Guardado exitosamente:', data.leadId, data.isNew ? '(nuevo)' : '(actualizado)');
-        } else {
-          console.error('[Lead] Error al guardar:', await response.text());
-        }
-      } catch (error) {
-        console.error('[Lead] Error de red:', error);
-      }
-    },
-    onSessionEnd: () => {
-      console.log('[Session] Sesion de voz finalizada');
-    }
+    onStateChange: handleStateChange,
+    onError: handleError,
+    onLeadCaptured: handleLeadCaptured,
+    onSessionEnd: handleSessionEnd
   });
 
   useEffect(() => {
