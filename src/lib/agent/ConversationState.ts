@@ -208,62 +208,111 @@ export class AgentStateTracker {
 
   /**
    * Extraer informacion del lead de un mensaje
-   * Usa patrones simples para detectar nombre, empresa, etc.
+   * Usa patrones para detectar nombre, empresa, telefono, email, etc.
    */
   extractLeadInfo(message: string): Partial<LeadData> {
     const extracted: Partial<LeadData> = {};
     const msgLower = message.toLowerCase();
 
-    // Detectar nombre (patrones comunes)
+    console.log('[AgentState] Extrayendo info de:', message.substring(0, 100));
+
+    // Detectar nombre (patrones más flexibles)
     const namePatterns = [
-      /(?:me llamo|soy|mi nombre es)\s+([A-Z][a-zñáéíóú]+(?:\s+[A-Z][a-zñáéíóú]+)?)/i,
-      /(?:my name is|i am|i'm)\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)?)/i
+      /(?:me llamo|soy|mi nombre es|habla)\s+([A-ZÁÉÍÓÚÑa-záéíóúñ]+(?:\s+[A-ZÁÉÍÓÚÑa-záéíóúñ]+)?)/i,
+      /(?:my name is|i am|i'm|this is)\s+([A-Za-z]+(?:\s+[A-Za-z]+)?)/i,
+      // Nombres que empiezan la oración
+      /^([A-ZÁÉÍÓÚÑ][a-záéíóúñ]+(?:\s+[A-ZÁÉÍÓÚÑ][a-záéíóúñ]+)?)\s+(?:aqui|aquí|hablando|speaking)/i
     ];
     for (const pattern of namePatterns) {
       const match = message.match(pattern);
-      if (match && match[1]) {
+      if (match && match[1] && match[1].length > 2) {
         extracted.name = match[1].trim();
+        console.log('[AgentState] Nombre detectado:', extracted.name);
         break;
       }
     }
 
     // Detectar empresa
     const companyPatterns = [
-      /(?:trabajo en|soy de|empresa|company|work at|from)\s+([A-Z][A-Za-zñáéíóú0-9\s]+)/i
+      /(?:trabajo en|soy de|empresa|company|work at|work for|from)\s+([A-ZÁÉÍÓÚÑa-záéíóúñ0-9\s]+)/i,
+      /(?:de la empresa|de|del)\s+([A-Z][A-Za-zñáéíóú0-9\s]+)/i
     ];
     for (const pattern of companyPatterns) {
       const match = message.match(pattern);
-      if (match && match[1]) {
+      if (match && match[1] && match[1].length > 2) {
         extracted.company = match[1].trim();
+        console.log('[AgentState] Empresa detectada:', extracted.company);
         break;
       }
     }
 
     // Detectar email
-    const emailPattern = /[\w.-]+@[\w.-]+\.\w+/;
+    const emailPattern = /[\w.-]+@[\w.-]+\.\w{2,}/;
     const emailMatch = message.match(emailPattern);
     if (emailMatch) {
-      extracted.email = emailMatch[0];
+      extracted.email = emailMatch[0].toLowerCase();
+      console.log('[AgentState] Email detectado:', extracted.email);
+    }
+
+    // Detectar teléfono (varios formatos)
+    const phonePatterns = [
+      // Chile: +56 9 1234 5678 o 9 1234 5678
+      /(?:\+?56\s?)?9\s?\d{4}\s?\d{4}/,
+      // Formato internacional genérico
+      /\+\d{1,3}\s?\d{6,12}/,
+      // Formato con separadores
+      /\d{2,4}[-.\s]?\d{3,4}[-.\s]?\d{3,4}/,
+      // Solo números (8-12 dígitos)
+      /(?<!\d)\d{8,12}(?!\d)/
+    ];
+    for (const pattern of phonePatterns) {
+      const phoneMatch = message.match(pattern);
+      if (phoneMatch) {
+        // Limpiar el teléfono (solo números y +)
+        const cleanPhone = phoneMatch[0].replace(/[^\d+]/g, '');
+        if (cleanPhone.length >= 8) {
+          extracted.phone = cleanPhone;
+          console.log('[AgentState] Teléfono detectado:', extracted.phone);
+          break;
+        }
+      }
     }
 
     // Detectar intereses por keywords
-    const interestKeywords = {
+    const interestKeywords: Record<string, string> = {
       'chatbot': 'development',
+      'bot': 'development',
       'automatizar': 'automation',
+      'automatización': 'automation',
       'automate': 'automation',
+      'automation': 'automation',
       'dashboard': 'development',
       'predecir': 'development',
+      'predicción': 'development',
       'predict': 'development',
       'estrategia': 'consulting',
       'strategy': 'consulting',
       'evaluar': 'consulting',
       'assess': 'consulting',
+      'consultoría': 'consulting',
+      'consultoria': 'consulting',
+      'consulting': 'consulting',
       'rpa': 'automation',
       'proceso': 'automation',
+      'procesos': 'automation',
       'process': 'automation',
       'machine learning': 'development',
+      'ml': 'development',
       'inteligencia artificial': 'consulting',
-      'ai': 'consulting'
+      'ia': 'consulting',
+      'ai': 'consulting',
+      'reunión': 'meeting',
+      'reunion': 'meeting',
+      'cita': 'meeting',
+      'agendar': 'meeting',
+      'llamada': 'meeting',
+      'meeting': 'meeting',
+      'call': 'meeting'
     };
 
     const interests: string[] = [];
@@ -274,13 +323,15 @@ export class AgentStateTracker {
     }
     if (interests.length > 0) {
       extracted.interest = interests;
+      console.log('[AgentState] Intereses detectados:', interests);
     }
 
     // Detectar pain points
     const painKeywords = [
       'problema', 'problem', 'issue', 'challenge', 'dificultad', 'difficulty',
       'lento', 'slow', 'costoso', 'expensive', 'manual', 'repetitivo', 'repetitive',
-      'error', 'errors', 'tiempo', 'time', 'ineficiente', 'inefficient'
+      'error', 'errors', 'tiempo', 'time', 'ineficiente', 'inefficient',
+      'necesito', 'need', 'quiero', 'want', 'busco', 'looking for'
     ];
     const painPoints: string[] = [];
     for (const keyword of painKeywords) {
@@ -290,13 +341,22 @@ export class AgentStateTracker {
         const start = Math.max(0, idx - 20);
         const end = Math.min(message.length, idx + 30);
         const context = message.substring(start, end).trim();
-        if (context && !painPoints.includes(context)) {
+        if (context && context.length > 5 && !painPoints.includes(context)) {
           painPoints.push(context);
         }
       }
     }
     if (painPoints.length > 0) {
-      extracted.painPoints = painPoints.slice(0, 3); // Max 3
+      extracted.painPoints = painPoints.slice(0, 3);
+      console.log('[AgentState] Pain points detectados:', painPoints.slice(0, 3));
+    }
+
+    // Log resumen de lo extraido
+    const extractedKeys = Object.keys(extracted);
+    if (extractedKeys.length > 0) {
+      console.log('[AgentState] Datos extraídos:', extractedKeys.join(', '));
+    } else {
+      console.log('[AgentState] No se extrajo ningún dato del mensaje');
     }
 
     return extracted;

@@ -1516,26 +1516,41 @@ function RobotInteractionManager() {
   }, []);
 
   const handleLeadCaptured = useCallback(async (leadData: any) => {
-    // Solo guardar si hay datos significativos
-    if (!leadData.name && !leadData.email && (!leadData.interests || leadData.interests.length === 0)) {
+    console.log('[Lead] Datos recibidos para guardar:', leadData);
+
+    // Verificar si hay datos significativos (nombre, email, teléfono o intereses)
+    const hasInterests = leadData.interests?.length > 0 || leadData.interest?.length > 0;
+    const hasSignificantData = leadData.name || leadData.email || leadData.phone || hasInterests;
+
+    if (!hasSignificantData) {
+      console.log('[Lead] Sin datos significativos, no se guarda');
       return;
     }
 
     try {
+      // Normalizar el campo interest -> interests para la API
+      const normalizedData = {
+        ...leadData,
+        interests: leadData.interests || leadData.interest || [],
+        source: 'voice-agent'
+      };
+      // Eliminar el campo interest si existe (la API usa interests)
+      delete normalizedData.interest;
+
+      console.log('[Lead] Enviando a API:', normalizedData);
+
       const response = await fetch('/api/leads/capture', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          ...leadData,
-          source: 'voice-agent'
-        })
+        body: JSON.stringify(normalizedData)
       });
 
       if (response.ok) {
         const data = await response.json();
         console.log('[Lead] Guardado exitosamente:', data.leadId, data.isNew ? '(nuevo)' : '(actualizado)');
       } else {
-        console.error('[Lead] Error al guardar:', await response.text());
+        const errorText = await response.text();
+        console.error('[Lead] Error al guardar:', response.status, errorText);
       }
     } catch (error) {
       console.error('[Lead] Error de red:', error);
