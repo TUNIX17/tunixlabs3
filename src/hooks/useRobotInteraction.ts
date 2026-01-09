@@ -467,7 +467,7 @@ export const useRobotInteraction = ({
                 setInteractionState(RobotInteractionState.LISTENING);
                 sessionRef.current?.startListening();
                 // Restaurar VAD config normal
-                updateVADConfig({ volumeThreshold: 0.015 });
+                updateVADConfig({ volumeThreshold: 0.08 }); // Restaurar al threshold por defecto
               } else {
                 setInteractionState(RobotInteractionState.IDLE);
               }

@@ -48,6 +48,9 @@ export class VoiceActivityDetector {
   // Flag para tracking de estado de speech
   private pendingSpeechStart: boolean = false;
 
+  // Debug: contador para logging periódico
+  private analysisCount: number = 0;
+
   constructor(config: Partial<VADConfig> = {}) {
     this.config = { ...DEFAULT_VAD_CONFIG, ...config };
     this.state = {
@@ -101,6 +104,7 @@ export class VoiceActivityDetector {
       );
 
       this.state.isListening = true;
+      this.analysisCount = 0; // Reset contador de debug
       this.emit('listening_start');
 
       console.log('[VAD] Iniciado con config:', this.config);
@@ -192,6 +196,13 @@ export class VoiceActivityDetector {
     // Actualizar estado
     const previousVolume = this.state.currentVolume;
     this.state.currentVolume = volume;
+
+    // Debug: Log periódico de volumen (cada 1 segundo = 20 análisis a 50ms)
+    this.analysisCount++;
+    if (this.analysisCount % 20 === 0) {
+      const status = this.state.isSpeaking ? 'SPEAKING' : 'SILENT';
+      console.log(`[VAD] Volume: ${(volume * 100).toFixed(2)}% | Threshold: ${(this.config.volumeThreshold * 100).toFixed(2)}% | Status: ${status}`);
+    }
 
     // Emitir cambio de volumen si es significativo
     if (Math.abs(volume - previousVolume) > 0.005) {
