@@ -22,10 +22,10 @@ export interface VADConfig {
 
 /** Configuracion por defecto - ambiente normal */
 export const DEFAULT_VAD_CONFIG: VADConfig = {
-  volumeThreshold: 0.015,      // 1.5% - sensible pero no demasiado
-  speechStartDelay: 200,       // 200ms - respuesta rapida
+  volumeThreshold: 0.04,       // 4% - menos sensible al ruido ambiental
+  speechStartDelay: 300,       // 300ms - más debounce para evitar falsos positivos
   silenceTimeout: 1500,        // 1.5s - pausa natural
-  minSpeechDuration: 500,      // 500ms - filtra ruidos cortos
+  minSpeechDuration: 600,      // 600ms - filtra ruidos cortos y clics
   analysisIntervalMs: 50       // 50ms - analisis suave
 };
 

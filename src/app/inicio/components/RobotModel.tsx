@@ -364,9 +364,14 @@ const AnimatedRobotModel = forwardRef<RobotMethods, { onLoad?: () => void; isLis
         }
         
         // Hacemos que el torso se mueva ligeramente con el saludo
-        if (bodyTop2Ref.current) {
+        if (bodyTop2Ref.current && initialRotations.current.body_top2) {
           const waveBodyRotation = Math.sin(waveElapsedTime * 5) * 0.01;
-          bodyTop2Ref.current.rotation.y += waveBodyRotation;
+          // Usar valor base + oscilación (NO acumulativo)
+          bodyTop2Ref.current.rotation.y = THREE.MathUtils.lerp(
+            bodyTop2Ref.current.rotation.y,
+            initialRotations.current.body_top2.y + waveBodyRotation,
+            0.1
+          );
         }
       } else {
         // Si no está saludando, aplicar las rotaciones de reposo normales para el brazo derecho
@@ -536,26 +541,52 @@ const AnimatedRobotModel = forwardRef<RobotMethods, { onLoad?: () => void; isLis
       }
 
       // Añadir animación idle más visible en los hombros
-      if (!isWaving && shoulderLeftRef.current && targetArmRestingRotations.shoulder_left) {
-        // Aumentamos la amplitud del movimiento para hacerlo más visible
-        const shoulderIdleX = Math.sin(time * 0.6) * 0.025;  // Triplicado
-        const shoulderIdleY = Math.sin(time * 0.4) * 0.015;  // Triplicado
-        
-        // Aplicar movimiento sutil adicional a los hombros
-        shoulderLeftRef.current.rotation.x += shoulderIdleX;
-        shoulderLeftRef.current.rotation.y += shoulderIdleY;
-        
-        if (shoulderRightRef.current) {
-          shoulderRightRef.current.rotation.x += shoulderIdleX;
-          shoulderRightRef.current.rotation.y -= shoulderIdleY; // Invertido para simetría
+      // SOLO aplicar si no hay animaciones activas que usen los hombros
+      const hasActiveShoulderAnimation = isWaving || isApproaching || isSteppingBack || isDancing;
+      if (!hasActiveShoulderAnimation && shoulderLeftRef.current && targetArmRestingRotations.shoulder_left) {
+        // Movimiento sutil basado en posición de reposo (NO acumulativo)
+        const shoulderIdleX = Math.sin(time * 0.6) * 0.025;
+        const shoulderIdleY = Math.sin(time * 0.4) * 0.015;
+
+        // Usar lerp hacia la posición de reposo + offset (NO +=)
+        shoulderLeftRef.current.rotation.x = THREE.MathUtils.lerp(
+          shoulderLeftRef.current.rotation.x,
+          targetArmRestingRotations.shoulder_left.x + shoulderIdleX,
+          lerpFactor
+        );
+        shoulderLeftRef.current.rotation.y = THREE.MathUtils.lerp(
+          shoulderLeftRef.current.rotation.y,
+          targetArmRestingRotations.shoulder_left.y + shoulderIdleY,
+          lerpFactor
+        );
+
+        if (shoulderRightRef.current && targetArmRestingRotations.shoulder_right) {
+          shoulderRightRef.current.rotation.x = THREE.MathUtils.lerp(
+            shoulderRightRef.current.rotation.x,
+            targetArmRestingRotations.shoulder_right.x + shoulderIdleX,
+            lerpFactor
+          );
+          shoulderRightRef.current.rotation.y = THREE.MathUtils.lerp(
+            shoulderRightRef.current.rotation.y,
+            targetArmRestingRotations.shoulder_right.y - shoulderIdleY,
+            lerpFactor
+          );
         }
-        
-        // Añadir movimiento sutil a los codos para complementar el movimiento del hombro
-        if (armLeftBotRef.current && armRightBotRef.current) {
+
+        // Movimiento sutil de codos (NO acumulativo)
+        if (armLeftBotRef.current && armRightBotRef.current && targetArmRestingRotations.arm_left_bot && targetArmRestingRotations.arm_right_bot) {
           const elbowIdleX = Math.sin(time * 0.7) * 0.02;
-          
-          armLeftBotRef.current.rotation.x += elbowIdleX;
-          armRightBotRef.current.rotation.x += elbowIdleX;
+
+          armLeftBotRef.current.rotation.x = THREE.MathUtils.lerp(
+            armLeftBotRef.current.rotation.x,
+            targetArmRestingRotations.arm_left_bot.x + elbowIdleX,
+            lerpFactor
+          );
+          armRightBotRef.current.rotation.x = THREE.MathUtils.lerp(
+            armRightBotRef.current.rotation.x,
+            targetArmRestingRotations.arm_right_bot.x + elbowIdleX,
+            lerpFactor
+          );
         }
       }
 

@@ -555,6 +555,13 @@ export const useRobotInteraction = ({
 
   // Metodo para iniciar interaccion por voz (modo continuo)
   const startListening = useCallback(async () => {
+    // Evitar inicio duplicado si ya estamos escuchando
+    if (interactionState === RobotInteractionState.LISTENING ||
+        interactionState === RobotInteractionState.LISTENING_ACTIVE) {
+      console.log('[RobotInteraction] Ya estamos escuchando, ignorando');
+      return;
+    }
+
     try {
       // Limpiar estado anterior
       setUserMessage('');
@@ -574,10 +581,17 @@ export const useRobotInteraction = ({
       // Actualizar estado a escuchando
       setInteractionState(RobotInteractionState.LISTENING);
 
-      // Animar al robot
+      // Animar al robot (después de un pequeño delay para evitar conflictos)
       if (robotRef.current) {
-        robotRef.current.approachCamera();
+        setTimeout(() => {
+          if (robotRef.current) {
+            robotRef.current.approachCamera();
+          }
+        }, 100);
       }
+
+      // Pequeño delay antes de iniciar VAD para evitar capturar ruido del clic
+      await new Promise(resolve => setTimeout(resolve, 300));
 
       // Iniciar VAD
       await startVAD();
@@ -592,7 +606,7 @@ export const useRobotInteraction = ({
         onError(error);
       }
     }
-  }, [startVAD, resetRecording, currentLanguage, onError]);
+  }, [startVAD, resetRecording, currentLanguage, onError, interactionState]);
 
   // Metodo para detener escucha manualmente
   const stopListening = useCallback(async () => {
