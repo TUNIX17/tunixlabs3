@@ -1244,35 +1244,20 @@ const AnimatedRobotModel = forwardRef<RobotMethods, { onLoad?: () => void; isLis
       // Cancelar animaciones conflictivas (excepto approach)
       if (waveTimerRef.current) {
         clearTimeout(waveTimerRef.current);
+        waveTimerRef.current = null;
       }
       if (isThinking) setIsThinking(false);
       if (isDancing) setIsDancing(false);
+      if (isNoddingYes) setIsNoddingYes(false);
 
       setIsWaving(true);
-      waveStartTimeRef.current = performance.now() / 1000; // Convertir a segundos para consistencia
-      
-      // Añadir inclinación sutil de la cabeza durante el saludo
-      if (headRef.current && neckRef.current) {
-        headRef.current.rotation.z = THREE.MathUtils.degToRad(5); // Ligera inclinación lateral
-        neckRef.current.rotation.z = THREE.MathUtils.degToRad(3); // Inclinación complementaria
-      }
-      
-      // Añadir movimiento sutil del torso
-      if (bodyTop1Ref.current) {
-        bodyTop1Ref.current.rotation.z = THREE.MathUtils.degToRad(2); // Ligero giro
-      }
-      
+      waveStartTimeRef.current = performance.now() / 1000;
+
+      // NO manipular huesos directamente - useFrame lo maneja con lerp
+
       // Detener el saludo después de 2.5 segundos
       waveTimerRef.current = setTimeout(() => {
         setIsWaving(false);
-        
-        // Restaurar posiciones originales
-        if (headRef.current && neckRef.current && bodyTop1Ref.current) {
-          headRef.current.rotation.z = initialRotations.current.head?.z || 0;
-          neckRef.current.rotation.z = initialRotations.current.neck?.z || 0;
-          bodyTop1Ref.current.rotation.z = initialRotations.current.body_top1?.z || 0;
-        }
-        
         waveTimerRef.current = null;
       }, 2500);
     };
@@ -1282,62 +1267,32 @@ const AnimatedRobotModel = forwardRef<RobotMethods, { onLoad?: () => void; isLis
       // Cancelar animaciones conflictivas
       if (approachTimerRef.current) {
         clearTimeout(approachTimerRef.current);
+        approachTimerRef.current = null;
       }
-      if (isWaving) setIsWaving(false);
-      if (isDancing) setIsDancing(false);
-      if (isShakingLegs) setIsShakingLegs(false);
-      if (isExcited) setIsExcited(false);
-      if (isConfused) setIsConfused(false);
-      if (isGoodbye) setIsGoodbye(false);
+
+      // Cancelar otras animaciones que podrían interferir
+      cancelAllAnimations();
 
       // Guardar tiempo de inicio y activar animación de acercamiento
+      // El useFrame manejará la animación suave con lerp
       setIsApproaching(true);
-      setIsSteppingBack(false); // Asegurar que no estemos retrocediendo
+      setIsSteppingBack(false);
       approachStartTimeRef.current = performance.now() / 1000;
-      
-      // Añadir inclinación del cuerpo para un acercamiento más natural
-      if (bodyTop1Ref.current && bodyTop2Ref.current) {
-        // Basado en rig.txt - usar los ejes según la documentación
-        bodyTop1Ref.current.rotation.x = THREE.MathUtils.degToRad(15); // Inclinación hacia adelante
-        bodyTop2Ref.current.rotation.x = THREE.MathUtils.degToRad(5); // Ligera inclinación complementaria
-      }
 
-      if (headRef.current && neckRef.current) {
-        // Inclinación ligeramente hacia el usuario
-        headRef.current.rotation.x = THREE.MathUtils.degToRad(-15);
-        neckRef.current.rotation.x = THREE.MathUtils.degToRad(-10);
-      }
-      
-      // Animar brazos según rig.txt - abrir ligeramente en posición de bienvenida
-      if (shoulderLeftRef.current && shoulderRightRef.current) {
-        // Brazos ligeramente adelante y abiertos
-        shoulderLeftRef.current.rotation.x = THREE.MathUtils.degToRad(20); // Hacia adelante
-        shoulderLeftRef.current.rotation.y = THREE.MathUtils.degToRad(15); // Ligeramente separado
-        shoulderLeftRef.current.rotation.z = THREE.MathUtils.degToRad(-130); // Posición óptima según rig.txt
-        
-        shoulderRightRef.current.rotation.x = THREE.MathUtils.degToRad(20); // Hacia adelante
-        shoulderRightRef.current.rotation.y = THREE.MathUtils.degToRad(-15); // Ligeramente separado (simétrico)
-        shoulderRightRef.current.rotation.z = THREE.MathUtils.degToRad(130); // Posición óptima según rig.txt
-      }
-      
-      // Flexión de codos según rig.txt
-      if (armLeftBotRef.current && armRightBotRef.current) {
-        armLeftBotRef.current.rotation.x = THREE.MathUtils.degToRad(30); // Flexión de codo
-        armRightBotRef.current.rotation.x = THREE.MathUtils.degToRad(30); // Flexión de codo
-      }
-      
-      // Después de un tiempo, iniciar el retroceso
+      // NO manipular huesos directamente - dejar que useFrame lo haga con lerp
+
+      // Después de un tiempo, iniciar el retroceso automático
       approachTimerRef.current = setTimeout(() => {
         setIsApproaching(false);
         setIsSteppingBack(true);
         approachStartTimeRef.current = performance.now() / 1000;
-        
+
         // Después de completar el retroceso, detener la animación
         setTimeout(() => {
           setIsSteppingBack(false);
           approachTimerRef.current = null;
         }, 2000);
-      }, 3000); // Quedarse adelante por 3 segundos
+      }, 3000);
     };
 
     // Método para regresar a la posición original
@@ -1345,47 +1300,24 @@ const AnimatedRobotModel = forwardRef<RobotMethods, { onLoad?: () => void; isLis
       // Cancelar animaciones conflictivas
       if (approachTimerRef.current) {
         clearTimeout(approachTimerRef.current);
+        approachTimerRef.current = null;
       }
+
+      // Cancelar otras animaciones
       if (isWaving) setIsWaving(false);
       if (isThinking) setIsThinking(false);
       if (isDancing) setIsDancing(false);
       if (isNoddingYes) setIsNoddingYes(false);
+      if (isExcited) setIsExcited(false);
+      if (isConfused) setIsConfused(false);
+      if (isGoodbye) setIsGoodbye(false);
 
       setIsApproaching(false);
       setIsSteppingBack(true);
       approachStartTimeRef.current = performance.now() / 1000;
-      
-      // Restaurar todas las rotaciones modificadas a sus valores originales
-      if (headRef.current && neckRef.current && initialRotations.current.head && initialRotations.current.neck) {
-        headRef.current.rotation.x = initialRotations.current.head.x;
-        neckRef.current.rotation.x = initialRotations.current.neck.x;
-      }
-      
-      if (bodyTop1Ref.current && bodyTop2Ref.current && initialRotations.current.body_top1 && initialRotations.current.body_top2) {
-        bodyTop1Ref.current.rotation.x = initialRotations.current.body_top1.x;
-        bodyTop2Ref.current.rotation.x = initialRotations.current.body_top2.x;
-      }
-      
-      // Restaurar brazos y codos
-      if (shoulderLeftRef.current && shoulderRightRef.current && 
-          initialRotations.current.shoulder_left && initialRotations.current.shoulder_right) {
-        
-        shoulderLeftRef.current.rotation.x = initialRotations.current.shoulder_left.x;
-        shoulderLeftRef.current.rotation.y = initialRotations.current.shoulder_left.y;
-        shoulderLeftRef.current.rotation.z = initialRotations.current.shoulder_left.z;
-        
-        shoulderRightRef.current.rotation.x = initialRotations.current.shoulder_right.x;
-        shoulderRightRef.current.rotation.y = initialRotations.current.shoulder_right.y;
-        shoulderRightRef.current.rotation.z = initialRotations.current.shoulder_right.z;
-      }
-      
-      if (armLeftBotRef.current && armRightBotRef.current && 
-          initialRotations.current.arm_left_bot && initialRotations.current.arm_right_bot) {
-        
-        armLeftBotRef.current.rotation.x = initialRotations.current.arm_left_bot.x;
-        armRightBotRef.current.rotation.x = initialRotations.current.arm_right_bot.x;
-      }
-      
+
+      // NO manipular huesos directamente - dejar que useFrame los regrese suavemente
+
       approachTimerRef.current = setTimeout(() => {
         setIsSteppingBack(false);
         approachTimerRef.current = null;

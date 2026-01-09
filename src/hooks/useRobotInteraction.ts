@@ -425,7 +425,23 @@ export const useRobotInteraction = ({
           const extractedInfo = agentStateRef.current.extractLeadInfo(recognitionResult.text);
           if (Object.keys(extractedInfo).length > 0) {
             agentStateRef.current.updateLeadData(extractedInfo);
-            onLeadCaptured?.(agentStateRef.current.getLeadData());
+            const leadData = agentStateRef.current.getLeadData();
+            const context = agentStateRef.current.getContext();
+
+            // Calcular duracion de sesion en segundos
+            const sessionDurationSeconds = sessionRef.current
+              ? Math.floor(sessionRef.current.getSessionDuration() / 1000)
+              : Math.floor((Date.now() - context.sessionStartTime) / 1000);
+
+            // Incluir metricas de sesion en los datos del lead
+            onLeadCaptured?.({
+              ...leadData,
+              interests: leadData.interest || [],
+              turnCount: context.turnCount,
+              conversationPhase: context.phase,
+              sessionDurationSeconds,
+              sessionId: `session-${context.sessionStartTime}`
+            });
           }
         }
 
@@ -546,11 +562,27 @@ export const useRobotInteraction = ({
 
     if (robotRef.current) robotRef.current.stepBackward();
 
-    // Notificar lead capturado al final de sesion
+    // Notificar lead capturado al final de sesion con metricas de sesion
     if (agentStateRef.current) {
       const leadData = agentStateRef.current.getLeadData();
-      if (Object.keys(leadData).length > 0) {
-        onLeadCaptured?.(leadData);
+      const context = agentStateRef.current.getContext();
+
+      // Calcular duracion de sesion en segundos
+      const sessionDurationSeconds = sessionRef.current
+        ? Math.floor(sessionRef.current.getSessionDuration() / 1000)
+        : Math.floor((Date.now() - context.sessionStartTime) / 1000);
+
+      if (Object.keys(leadData).length > 0 || context.turnCount > 0) {
+        // Incluir metricas de sesion en los datos del lead
+        onLeadCaptured?.({
+          ...leadData,
+          // Convertir interest a interests para coincidir con el schema
+          interests: leadData.interest || [],
+          turnCount: context.turnCount,
+          conversationPhase: context.phase,
+          sessionDurationSeconds,
+          sessionId: `session-${context.sessionStartTime}`
+        });
       }
     }
 

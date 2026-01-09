@@ -2,6 +2,21 @@
 
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
+import dynamic from 'next/dynamic';
+
+// Cargar charts dinamicamente para evitar problemas de SSR
+const StatusPieChart = dynamic(
+  () => import('@/components/admin/charts/StatusPieChart'),
+  { ssr: false, loading: () => <ChartSkeleton /> }
+);
+const LeadsLineChart = dynamic(
+  () => import('@/components/admin/charts/LeadsLineChart'),
+  { ssr: false, loading: () => <ChartSkeleton /> }
+);
+const ScoreBarChart = dynamic(
+  () => import('@/components/admin/charts/ScoreBarChart'),
+  { ssr: false, loading: () => <ChartSkeleton /> }
+);
 
 interface Stats {
   total: number;
@@ -21,9 +36,29 @@ interface RecentLead {
   createdAt: string;
 }
 
+interface AnalyticsData {
+  totalLeads: number;
+  byStatus: { name: string; value: number; status: string }[];
+  byDay: { date: string; count: number }[];
+  byScore: { range: string; count: number }[];
+  engagementMetrics: {
+    avgSessionDuration: number;
+    avgTurnCount: number;
+  };
+}
+
+function ChartSkeleton() {
+  return (
+    <div className="h-64 flex items-center justify-center">
+      <div className="animate-pulse bg-gray-200 rounded w-full h-full"></div>
+    </div>
+  );
+}
+
 export default function AdminDashboard() {
   const [stats, setStats] = useState<Stats>({ total: 0, new: 0, qualified: 0, meetings: 0, won: 0 });
   const [recentLeads, setRecentLeads] = useState<RecentLead[]>([]);
+  const [analytics, setAnalytics] = useState<AnalyticsData | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -32,16 +67,21 @@ export default function AdminDashboard() {
 
   const fetchData = async () => {
     try {
-      // Fetch leads to calculate stats
-      const res = await fetch('/api/leads?limit=100');
-      const data = await res.json();
+      // Fetch leads and analytics in parallel
+      const [leadsRes, analyticsRes] = await Promise.all([
+        fetch('/api/leads?limit=100'),
+        fetch('/api/leads/analytics')
+      ]);
 
-      if (data.leads) {
-        const leads = data.leads;
+      const leadsData = await leadsRes.json();
+      const analyticsData = await analyticsRes.json();
+
+      if (leadsData.leads) {
+        const leads = leadsData.leads;
 
         // Calculate stats
         const newStats: Stats = {
-          total: data.pagination.total,
+          total: leadsData.pagination.total,
           new: leads.filter((l: RecentLead) => l.status === 'NEW').length,
           qualified: leads.filter((l: RecentLead) => l.status === 'QUALIFIED').length,
           meetings: leads.filter((l: RecentLead & { meetingScheduled?: boolean }) => l.meetingScheduled).length,
@@ -50,6 +90,10 @@ export default function AdminDashboard() {
 
         setStats(newStats);
         setRecentLeads(leads.slice(0, 5));
+      }
+
+      if (analyticsData.success) {
+        setAnalytics(analyticsData.data);
       }
     } catch (error) {
       console.error('Error fetching data:', error);
@@ -76,6 +120,13 @@ export default function AdminDashboard() {
       LOST: 'bg-red-100 text-red-800',
     };
     return colors[status] || 'bg-gray-100 text-gray-800';
+  };
+
+  const formatDuration = (seconds: number): string => {
+    if (seconds < 60) return `${seconds}s`;
+    const minutes = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${minutes}m ${secs}s`;
   };
 
   if (loading) {
@@ -112,6 +163,67 @@ export default function AdminDashboard() {
             </div>
           </div>
         ))}
+      </div>
+
+      {/* Engagement Metrics */}
+      {analytics?.engagementMetrics && (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="bg-gradient-to-r from-indigo-500 to-purple-600 rounded-xl p-6 text-white">
+            <div className="flex items-center gap-4">
+              <div className="bg-white/20 p-3 rounded-lg text-2xl">⏱️</div>
+              <div>
+                <p className="text-3xl font-bold">
+                  {formatDuration(analytics.engagementMetrics.avgSessionDuration)}
+                </p>
+                <p className="text-white/80 text-sm">Duracion Promedio de Sesion</p>
+              </div>
+            </div>
+          </div>
+          <div className="bg-gradient-to-r from-teal-500 to-emerald-600 rounded-xl p-6 text-white">
+            <div className="flex items-center gap-4">
+              <div className="bg-white/20 p-3 rounded-lg text-2xl">💬</div>
+              <div>
+                <p className="text-3xl font-bold">
+                  {analytics.engagementMetrics.avgTurnCount}
+                </p>
+                <p className="text-white/80 text-sm">Turnos Promedio por Conversacion</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Charts Section */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Status Pie Chart */}
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">Leads por Estado</h3>
+          {analytics?.byStatus ? (
+            <StatusPieChart data={analytics.byStatus} />
+          ) : (
+            <ChartSkeleton />
+          )}
+        </div>
+
+        {/* Leads Line Chart */}
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">Leads Ultimos 30 Dias</h3>
+          {analytics?.byDay ? (
+            <LeadsLineChart data={analytics.byDay} />
+          ) : (
+            <ChartSkeleton />
+          )}
+        </div>
+
+        {/* Score Bar Chart */}
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">Distribucion de Score</h3>
+          {analytics?.byScore ? (
+            <ScoreBarChart data={analytics.byScore} />
+          ) : (
+            <ChartSkeleton />
+          )}
+        </div>
       </div>
 
       {/* Recent Leads & Actions */}

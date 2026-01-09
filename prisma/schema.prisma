@@ -43,6 +43,12 @@ model Lead {
   sessionId       String?
   conversationPhase String?
   turnCount       Int        @default(0)
+  sessionDurationSeconds Int?  // Duracion de la sesion en segundos
+
+  // Email sequences (nurturing)
+  lastEmailSent     Int       @default(0)  // 0=ninguno, 1=welcome, 2=case-study, 3=offer
+  lastEmailSentAt   DateTime?
+  emailSequenceActive Boolean  @default(true)
 
   // Metadata
   notes           String?

@@ -86,41 +86,46 @@ export const useGroqConversation = ({
     if (!message.trim()) {
       return '';
     }
-    
+
     // Verificar si podemos hacer la petición
     if (!canMakeRequest) {
       const errorMsg = `Límite de API alcanzado. Por favor, espera ${Math.ceil(waitTime / 1000)} segundos.`;
       setError(errorMsg);
-      
+
       if (onError) {
         onError(new Error(errorMsg));
       }
-      
+
       return '';
     }
-    
+
     // Marcar inicio de procesamiento
     setIsProcessing(true);
     setError(null);
     setCurrentResponse('');
-    
+
     if (onStart) {
       onStart();
     }
-    
+
     try {
       // Registrar la petición para límites
       trackRequest();
-      
+
       // Actualizar configuración del modelo en caso de alto tráfico
       configRef.current = selectModelConfig(0, false);
-      
+
+      // Usar idioma detectado o el del defaultPrompt
+      const effectiveLanguage = language || 'auto';
+      console.log('[GroqConversation] Idioma detectado/usado:', effectiveLanguage);
+
       // Actualizar system prompt basado en el idioma detectado
-      // Usar el sistema de prompts comerciales
       if (language) {
         systemPromptRef.current = getCommercialPrompt(language);
+        console.log('[GroqConversation] Prompt actualizado para idioma:', language);
       } else {
-        systemPromptRef.current = defaultPrompt;
+        // Si no hay idioma detectado, mantener el defaultPrompt
+        console.log('[GroqConversation] Sin idioma detectado, usando prompt por defecto');
       }
       
       // Crear mensajes para la conversación
@@ -240,104 +245,144 @@ export const useGroqConversation = ({
 
       if (!text.trim()) {
         console.warn('[TTS-WebSpeech] Texto vacío, no se reproducirá.');
-        resolve(); // Resuelve inmediatamente si no hay texto
+        resolve();
         return;
       }
 
       const utterance = new SpeechSynthesisUtterance(text);
-      utterance.lang = language;
 
-      // Lógica de selección de voz refinada:
-      const voices = window.speechSynthesis.getVoices();
+      // Función para seleccionar la mejor voz disponible
+      const selectBestVoice = (voices: SpeechSynthesisVoice[], targetLang: string): SpeechSynthesisVoice | undefined => {
+        const langBase = targetLang.split('-')[0].toLowerCase();
+
+        // Log todas las voces disponibles para debug
+        console.log(`[TTS-WebSpeech] Buscando voz para: ${langBase}, voces disponibles:`,
+          voices.map(v => `${v.name}(${v.lang})`).join(', '));
+
+        // Prioridad 1: Voz exacta del idioma (ej: es-ES, es-MX)
+        let voice = voices.find(v => v.lang.toLowerCase().startsWith(langBase));
+        if (voice) {
+          console.log(`[TTS-WebSpeech] Voz encontrada para ${langBase}: ${voice.name} (${voice.lang})`);
+          return voice;
+        }
+
+        // Prioridad 2: Si buscábamos español y no hay, buscar voces con "Spanish" en el nombre
+        if (langBase === 'es') {
+          voice = voices.find(v => v.name.toLowerCase().includes('spanish'));
+          if (voice) {
+            console.log(`[TTS-WebSpeech] Voz Spanish encontrada: ${voice.name}`);
+            return voice;
+          }
+        }
+
+        // Prioridad 3: Fallback a inglés
+        voice = voices.find(v => v.lang.toLowerCase().startsWith('en'));
+        if (voice) {
+          console.log(`[TTS-WebSpeech] Fallback a inglés: ${voice.name}`);
+          return voice;
+        }
+
+        // Prioridad 4: Cualquier voz disponible
+        if (voices.length > 0) {
+          console.log(`[TTS-WebSpeech] Usando primera voz disponible: ${voices[0].name}`);
+          return voices[0];
+        }
+
+        return undefined;
+      };
+
+      // Obtener voces disponibles
+      let voices = window.speechSynthesis.getVoices();
       let selectedVoice: SpeechSynthesisVoice | undefined = undefined;
 
       if (voices.length > 0) {
-        // 1. Filtrar voces por el idioma base (ej. 'en' para 'en-US', 'en-GB')
-        const languageBase = language.split('-')[0];
-        const voicesForLanguage = voices.filter(voice => voice.lang.startsWith(languageBase));
-
-        if (voicesForLanguage.length > 0) {
-          // 2. De las voces del idioma, intentar encontrar una masculina
-          selectedVoice = voicesForLanguage.find(voice => voice.name.toLowerCase().includes('male'));
-          
-          // 3. Si no hay masculina para ese idioma, usar la primera voz disponible para ese idioma
-          if (!selectedVoice) {
-            selectedVoice = voicesForLanguage[0];
-            console.log(`[TTS-WebSpeech] No se encontró voz masculina para ${languageBase}, usando la primera disponible: ${selectedVoice.name}`);
-          }
-        } else {
-          console.warn(`[TTS-WebSpeech] No se encontraron voces para el idioma base ${languageBase}.`);
-          // 4. Fallback MUY genérico: intentar encontrar una voz que contenga el código de idioma (menos preciso)
-          // O simplemente confiar en que utterance.lang hará lo mejor posible.
-          // selectedVoice = voices.find(voice => voice.lang === language);
-          // if (!selectedVoice) {
-          //   selectedVoice = voices[0]; // Fallback a la primera voz del sistema si todo lo demás falla
-          //   if(selectedVoice) console.warn(`[TTS-WebSpeech] Usando voz por defecto del sistema: ${selectedVoice.name}`);
-          // }
-        }
+        selectedVoice = selectBestVoice(voices, language);
       }
 
       if (selectedVoice) {
         utterance.voice = selectedVoice;
+        utterance.lang = selectedVoice.lang; // Usar el lang de la voz seleccionada
         console.log(`[TTS-WebSpeech] Usando voz: ${selectedVoice.name} (${selectedVoice.lang})`);
       } else {
-        console.warn(`[TTS-WebSpeech] No se encontró voz específica para ${language}. Se usará la voz por defecto del navegador para el lang: ${utterance.lang}.`);
+        utterance.lang = language;
+        console.warn(`[TTS-WebSpeech] No se encontró voz, usando lang: ${language}`);
       }
-      
-      // Ajustes para efecto robótico (Feedback: más rápida y aguda)
-      // Valores anteriores: pitch = 1.1, rate = 0.6
-      utterance.pitch = 1.3; // Más agudo.
-      utterance.rate = 0.8;  // Más rápido que 0.6, pero aún por debajo de lo normal.
-      utterance.volume = 1;  // Volumen máximo
+
+      // Ajustes para efecto ROBÓTICO - voz más rápida y procesada
+      utterance.pitch = 1.4;  // Más agudo para sonar robótico
+      utterance.rate = 1.15;  // Más rápido que normal (1.0)
+      utterance.volume = 1;   // Volumen máximo
+
+      let hasStarted = false;
+      let hasEnded = false;
 
       utterance.onstart = () => {
+        hasStarted = true;
         console.log('[TTS-WebSpeech] Reproducción iniciada.');
         if (callbacks.onStart) callbacks.onStart();
       };
 
       utterance.onerror = (event) => {
-        console.error('[TTS-WebSpeech] Error en la reproducción:', event);
+        // Ignorar errores de interrupción si ya terminó
+        if (hasEnded) return;
+
+        // 'interrupted' y 'canceled' son errores esperados cuando cancelamos TTS
+        if (event.error === 'interrupted' || event.error === 'canceled') {
+          console.log('[TTS-WebSpeech] TTS interrumpido/cancelado (esperado)');
+          hasEnded = true;
+          if (callbacks.onEnd) callbacks.onEnd();
+          resolve();
+          return;
+        }
+
+        console.error('[TTS-WebSpeech] Error en la reproducción:', event.error);
         if (callbacks.onError) callbacks.onError(event);
-        reject(event.error || new Error(`Error en SpeechSynthesis: ${event.error}`));
+        reject(new Error(`Error en SpeechSynthesis: ${event.error}`));
       };
 
       // Timeout de seguridad - máximo 30 segundos para TTS
       const ttsTimeout = setTimeout(() => {
+        if (hasEnded) return;
         console.warn('[TTS-WebSpeech] Timeout - TTS no terminó en 30 segundos');
         window.speechSynthesis.cancel();
+        hasEnded = true;
         if (callbacks.onEnd) callbacks.onEnd();
         resolve();
       }, 30000);
 
-      // Modificar onend para limpiar el timeout
       utterance.onend = () => {
+        if (hasEnded) return;
+        hasEnded = true;
         clearTimeout(ttsTimeout);
         console.log('[TTS-WebSpeech] Reproducción finalizada.');
         if (callbacks.onEnd) callbacks.onEnd();
         resolve();
       };
 
-      // Asegurarse de que las voces estén cargadas (especialmente en algunos navegadores)
+      // Manejar carga de voces
       if (voices.length === 0) {
         console.log('[TTS-WebSpeech] Esperando carga de voces...');
-        window.speechSynthesis.onvoiceschanged = () => {
-          // Reintentar la selección de voz una vez que se carguen
+
+        const handleVoicesChanged = () => {
           const updatedVoices = window.speechSynthesis.getVoices();
           console.log('[TTS-WebSpeech] Voces cargadas:', updatedVoices.length);
-          selectedVoice = updatedVoices.find(voice => voice.lang.startsWith(language) && voice.name.toLowerCase().includes('male')) ||
-                          updatedVoices.find(voice => voice.lang.startsWith(language)) ||
-                          updatedVoices[0];
+
+          selectedVoice = selectBestVoice(updatedVoices, language);
           if (selectedVoice) {
             utterance.voice = selectedVoice;
+            utterance.lang = selectedVoice.lang;
             console.log(`[TTS-WebSpeech] (Voces cargadas) Usando voz: ${selectedVoice.name} (${selectedVoice.lang})`);
           }
+
           window.speechSynthesis.speak(utterance);
         };
 
-        // Fallback si onvoiceschanged nunca se dispara (algunos navegadores)
+        window.speechSynthesis.onvoiceschanged = handleVoicesChanged;
+
+        // Fallback si onvoiceschanged nunca se dispara
         setTimeout(() => {
-          if (!window.speechSynthesis.speaking) {
-            console.warn('[TTS-WebSpeech] onvoiceschanged no se disparó, intentando reproducir de todos modos');
+          if (!window.speechSynthesis.speaking && !hasStarted) {
+            console.warn('[TTS-WebSpeech] onvoiceschanged no se disparó, intentando reproducir');
             window.speechSynthesis.speak(utterance);
           }
         }, 500);

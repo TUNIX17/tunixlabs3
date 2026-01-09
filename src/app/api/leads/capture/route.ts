@@ -26,6 +26,7 @@ interface CaptureLeadRequest {
   sessionId?: string;
   conversationPhase?: string;
   turnCount?: number;
+  sessionDurationSeconds?: number;  // Duracion de la sesion en segundos
   source?: string;
 
   // Mensajes de la conversacion
@@ -116,6 +117,7 @@ export async function POST(request: NextRequest) {
           sessionId: body.sessionId,
           conversationPhase: body.conversationPhase,
           turnCount: body.turnCount || 0,
+          sessionDurationSeconds: body.sessionDurationSeconds,
           source: body.source || 'voice-agent',
           score: calculateLeadScore(body)
         }
@@ -178,24 +180,54 @@ export async function POST(request: NextRequest) {
 
 /**
  * Calcular score del lead basado en datos disponibles
+ * Score mejorado con factores de engagement
  */
 function calculateLeadScore(data: CaptureLeadRequest): number {
   let score = 0;
 
-  // Datos de contacto (+10 cada uno)
+  // ===== DATOS DE CONTACTO (max 45) =====
   if (data.name) score += 10;
   if (data.email) score += 15;
   if (data.phone) score += 10;
   if (data.company) score += 10;
 
-  // Calificacion (+10 cada uno)
-  if (data.interests && data.interests.length > 0) score += 10;
-  if (data.painPoints && data.painPoints.length > 0) score += 10;
+  // ===== CALIFICACION (max 35) =====
+  // Intereses con bonus por multiples
+  if (data.interests && data.interests.length > 0) {
+    score += 10;
+    if (data.interests.length >= 2) score += 5;  // Multiples intereses
+  }
+
+  // Pain points con bonus por multiples
+  if (data.painPoints && data.painPoints.length > 0) {
+    score += 10;
+    if (data.painPoints.length >= 2) score += 5;  // Multiples problemas
+  }
+
   if (data.budget) score += 15;
   if (data.timeline) score += 10;
   if (data.companySize) score += 5;
 
-  // Reunion agendada (+20)
+  // ===== ENGAGEMENT (max 30) =====
+  // Turnos de conversacion
+  if (data.turnCount) {
+    if (data.turnCount >= 5) score += 5;   // Conversacion moderada
+    if (data.turnCount >= 10) score += 5;  // Conversacion larga
+  }
+
+  // Duracion de sesion
+  if (data.sessionDurationSeconds) {
+    const minutes = data.sessionDurationSeconds / 60;
+    if (minutes >= 2) score += 5;   // Sesion > 2 min
+    if (minutes >= 5) score += 5;   // Sesion > 5 min
+  }
+
+  // Hora del dia (horario laboral Chile: 9-18)
+  const hour = new Date().getHours();
+  if (hour >= 9 && hour <= 18) score += 3;
+
+  // ===== INTENT SIGNALS (max 25) =====
+  // Reunion agendada es la senal mas fuerte
   if (data.meetingScheduled) score += 20;
 
   // Fase de conversacion
