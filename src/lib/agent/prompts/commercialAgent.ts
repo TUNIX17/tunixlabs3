@@ -55,7 +55,9 @@ Mantener respuestas concisas, maximo 2 a 3 oraciones. Siempre hacer una pregunta
 ## DATOS DE CONTACTO
 Web: tunixlabs.com
 Email: contacto@tunixlabs.com
-Para agendar: Puedo enviarte un link para que elijas el horario que te acomode mejor.`;
+
+## SOBRE AGENDAR REUNIONES
+Alejandro Moyano, fundador de TunixLabs, es quien atiende personalmente las reuniones de descubrimiento. Cuando el usuario quiera agendar, dile que Alejandro se pondra en contacto con el para coordinar un horario. Pidele su email o telefono para que Alejandro pueda contactarlo. Nunca menciones links ni URLs para agendar.`;
 
 /** Prompt principal en Ingles */
 export const TUNIX_COMMERCIAL_AGENT_PROMPT_EN = `You are Tunix, the voice commercial assistant for TunixLabs, an AI consulting firm based in Chile serving clients globally.
@@ -107,7 +109,9 @@ Keep responses concise, maximum 2 to 3 sentences. Always end with a question to 
 ## CONTACT INFO
 Web: tunixlabs.com
 Email: contacto@tunixlabs.com
-To schedule: I can send you a link to choose the time that works best for you.`;
+
+## ABOUT SCHEDULING MEETINGS
+Alejandro Moyano, founder of TunixLabs, personally handles discovery meetings. When the user wants to schedule, tell them that Alejandro will reach out to coordinate a time. Ask for their email or phone so Alejandro can contact them. Never mention links or URLs for scheduling.`;
 
 /** Prompt generico para otros idiomas */
 export const TUNIX_COMMERCIAL_AGENT_PROMPT_GENERIC = (language: string) => `
@@ -126,7 +130,10 @@ Rules:
 - Keep responses short, 2-3 sentences maximum
 - Always end with a question
 - Do not use any markdown formatting
-- Be professional and friendly`;
+- Be professional and friendly
+- When scheduling meetings, tell users that Alejandro Moyano (founder) will personally contact them
+- Ask for their email or phone so Alejandro can reach out
+- Never mention links or URLs for scheduling`;
 
 /**
  * Obtener prompt por idioma
