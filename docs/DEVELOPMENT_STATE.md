@@ -1,8 +1,8 @@
 # TunixLabs - Development State
 
-**Last Updated:** 2026-01-08
-**Current Phase:** CRM & Lead Management System Complete
-**Sprint:** 2 - Lead Persistence & CRM
+**Last Updated:** 2026-01-09
+**Current Phase:** CRM Enhanced with Email Sequences & Analytics
+**Sprint:** 3 - Lead Nurturing & Dashboard Analytics
 
 ---
 
@@ -43,10 +43,28 @@ TunixLabs es una plataforma web de consultoria en IA con:
   - [x] Calendly webhook integration
   - [x] Admin dashboard with authentication
   - [x] Voice agent lead persistence
+- [x] **Email Sequences & Lead Nurturing** (2026-01-09)
+  - [x] 3-email nurturing sequence (welcome, case-study, offer)
+  - [x] Railway Cron endpoint (/api/cron/email-sequences)
+  - [x] Email templates with professional HTML design
+  - [x] Case study selection based on lead interests
+  - [x] Unsubscribe functionality
+- [x] **Enhanced Lead Scoring** (2026-01-09)
+  - [x] Engagement factors: turn count, session duration
+  - [x] Multiple interests/painPoints bonus
+  - [x] Business hours bonus
+  - [x] Session duration tracking in voice agent
+- [x] **Dashboard Analytics** (2026-01-09)
+  - [x] Recharts integration (open source)
+  - [x] Status pie chart (leads by status)
+  - [x] Leads line chart (daily trends)
+  - [x] Score bar chart (score distribution)
+  - [x] Analytics API (/api/leads/analytics)
 
 ### In Progress
 - [ ] Configurar variables de entorno en Railway:
   - [ ] RESEND_API_KEY
+  - [ ] CRON_SECRET (para secuencias de email)
   - [ ] CALENDLY_LINK
   - [ ] CALENDLY_WEBHOOK_SECRET
   - [ ] ADMIN_PASSWORD
@@ -297,6 +315,72 @@ Para configurar: `railway variables --set VARIABLE_NAME=value`
 - [ ] Need RESEND_API_KEY for email notifications
 - [ ] Need CALENDLY_LINK for meeting scheduling
 - [ ] Domain DNS configuration pending
+
+---
+
+## RECENT CHANGES (2026-01-09) - Email Sequences & Analytics
+
+### Mejoras Implementadas (Costo $0)
+
+1. **Email Sequences - Lead Nurturing Automatico**
+   - Secuencia de 3 emails: Bienvenida → Caso de Exito → Oferta Llamada
+   - Tiempos: Inmediato → 24h → 48h
+   - Templates HTML profesionales con branding TunixLabs
+   - Seleccion inteligente de caso de exito segun intereses del lead
+   - Funcion de unsubscribe
+
+2. **Railway Cron Job**
+   - Endpoint: `/api/cron/email-sequences`
+   - Configurar en Railway: `0 * * * * curl -H "Authorization: Bearer $CRON_SECRET" https://tunixlabs.com/api/cron/email-sequences`
+   - Autorizacion con CRON_SECRET
+   - Procesa leads pendientes cada hora
+
+3. **Lead Scoring Mejorado**
+   - Engagement: turnCount >=5 (+5), >=10 (+5)
+   - Duracion sesion: >=2min (+5), >=5min (+5)
+   - Multiples intereses: +5 bonus
+   - Multiples painPoints: +5 bonus
+   - Horario laboral (9-18h Chile): +3
+
+4. **Dashboard con Graficos (Recharts)**
+   - StatusPieChart: Distribucion de leads por estado
+   - LeadsLineChart: Tendencia de leads ultimos 30 dias
+   - ScoreBarChart: Distribucion de scores (0-25, 26-50, 51-75, 76-100)
+   - API Analytics: `/api/leads/analytics`
+
+### Files Created
+```
+src/lib/email/templates/welcome.tsx      - Template email bienvenida
+src/lib/email/templates/case-study.tsx   - Template caso de exito
+src/lib/email/templates/offer-call.tsx   - Template oferta llamada
+src/lib/email/sequences.ts               - Servicio de secuencias
+src/app/api/cron/email-sequences/route.ts - Endpoint cron
+src/app/api/leads/analytics/route.ts     - API analytics
+src/components/admin/charts/StatusPieChart.tsx
+src/components/admin/charts/LeadsLineChart.tsx
+src/components/admin/charts/ScoreBarChart.tsx
+src/components/admin/charts/index.ts
+```
+
+### Files Modified
+```
+prisma/schema.prisma                     - +lastEmailSent, +lastEmailSentAt, +emailSequenceActive, +sessionDurationSeconds
+src/app/api/leads/capture/route.ts       - Lead scoring mejorado
+src/app/admin/page.tsx                   - Integracion graficos
+src/hooks/useRobotInteraction.ts         - Captura sessionDurationSeconds
+package.json                             - +recharts
+```
+
+### Environment Variables Nuevas
+```bash
+CRON_SECRET=<generar con: openssl rand -base64 32>
+```
+
+### Configurar Railway Cron
+En Railway → Settings → Cron Jobs:
+```
+0 * * * *  curl -H "Authorization: Bearer $CRON_SECRET" https://tunixlabs.com/api/cron/email-sequences
+```
 
 ---
 
