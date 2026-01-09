@@ -144,6 +144,7 @@ export const useGroqConversation = ({
       
       // Realizar petición a Cerebras para LLM (gratis, 6x más rápido que Groq)
       // La API de Cerebras es compatible con OpenAI
+      console.log('[GroqConversation] Enviando mensaje a Cerebras LLM, modelo:', configRef.current.conversation);
       const response = await cerebrasClient.post<GroqChatCompletionResponse>('', {
         endpoint: '/chat/completions',
         payload: {
@@ -154,9 +155,10 @@ export const useGroqConversation = ({
           stream: false
         }
       });
-      
+
       // Extraer respuesta
       const assistantResponse = response.data.choices[0]?.message.content || '';
+      console.log('[GroqConversation] Respuesta LLM recibida, longitud:', assistantResponse.length);
       
       // Añadir respuesta al historial
       const newAssistantMessage: ConversationMessage = {
@@ -178,10 +180,19 @@ export const useGroqConversation = ({
       return assistantResponse;
     } catch (error: any) {
       let errorMessage = 'Error desconocido al procesar mensaje';
+      console.error('[GroqConversation] Error en sendMessage:', error);
+
       if (error && error.response) {
         const errorData = error.response.data;
         const status = error.response.status;
         errorMessage = errorData?.error?.message || errorData?.error || errorData?.message || error.message || 'Error al enviar mensaje';
+
+        console.error('[GroqConversation] Error de API - Status:', status, ', Data:', errorData);
+
+        // Verificar si es error de API key no configurada
+        if (status === 500 && errorMessage.includes('clave API')) {
+          errorMessage = 'Error de configuracion: CEREBRAS_API_KEY no esta configurada en el servidor. Contacta al administrador.';
+        }
 
         const retryAfterHeader = error.response.headers?.['retry-after'];
         if (status === 429 && retryAfterHeader) {
@@ -214,11 +225,13 @@ export const useGroqConversation = ({
   ]);
 
   const speakWithWebSpeech = useCallback(async (
-    text: string, 
+    text: string,
     language: string,
     callbacks: { onStart?: () => void; onEnd?: () => void; onError?: (e: SpeechSynthesisErrorEvent) => void }
   ): Promise<void> => {
     return new Promise((resolve, reject) => {
+      console.log('[TTS-WebSpeech] Iniciando con texto de longitud:', text.length, ', idioma:', language);
+
       if (typeof window === 'undefined' || !window.speechSynthesis) {
         console.warn('[TTS-WebSpeech] Web Speech API no está disponible.');
         reject(new Error('Web Speech API no disponible'));
@@ -282,25 +295,37 @@ export const useGroqConversation = ({
         if (callbacks.onStart) callbacks.onStart();
       };
 
-      utterance.onend = () => {
-        console.log('[TTS-WebSpeech] Reproducción finalizada.');
-        if (callbacks.onEnd) callbacks.onEnd();
-        resolve();
-      };
-
       utterance.onerror = (event) => {
         console.error('[TTS-WebSpeech] Error en la reproducción:', event);
         if (callbacks.onError) callbacks.onError(event);
         reject(event.error || new Error(`Error en SpeechSynthesis: ${event.error}`));
       };
-      
+
+      // Timeout de seguridad - máximo 30 segundos para TTS
+      const ttsTimeout = setTimeout(() => {
+        console.warn('[TTS-WebSpeech] Timeout - TTS no terminó en 30 segundos');
+        window.speechSynthesis.cancel();
+        if (callbacks.onEnd) callbacks.onEnd();
+        resolve();
+      }, 30000);
+
+      // Modificar onend para limpiar el timeout
+      utterance.onend = () => {
+        clearTimeout(ttsTimeout);
+        console.log('[TTS-WebSpeech] Reproducción finalizada.');
+        if (callbacks.onEnd) callbacks.onEnd();
+        resolve();
+      };
+
       // Asegurarse de que las voces estén cargadas (especialmente en algunos navegadores)
       if (voices.length === 0) {
+        console.log('[TTS-WebSpeech] Esperando carga de voces...');
         window.speechSynthesis.onvoiceschanged = () => {
           // Reintentar la selección de voz una vez que se carguen
           const updatedVoices = window.speechSynthesis.getVoices();
+          console.log('[TTS-WebSpeech] Voces cargadas:', updatedVoices.length);
           selectedVoice = updatedVoices.find(voice => voice.lang.startsWith(language) && voice.name.toLowerCase().includes('male')) ||
-                          updatedVoices.find(voice => voice.lang.startsWith(language)) || 
+                          updatedVoices.find(voice => voice.lang.startsWith(language)) ||
                           updatedVoices[0];
           if (selectedVoice) {
             utterance.voice = selectedVoice;
@@ -308,6 +333,14 @@ export const useGroqConversation = ({
           }
           window.speechSynthesis.speak(utterance);
         };
+
+        // Fallback si onvoiceschanged nunca se dispara (algunos navegadores)
+        setTimeout(() => {
+          if (!window.speechSynthesis.speaking) {
+            console.warn('[TTS-WebSpeech] onvoiceschanged no se disparó, intentando reproducir de todos modos');
+            window.speechSynthesis.speak(utterance);
+          }
+        }, 500);
       } else {
         window.speechSynthesis.speak(utterance);
       }

@@ -11,10 +11,12 @@ interface ProxyRequestBody {
 }
 
 export async function POST(request: NextRequest) {
+  console.log('[API Cerebras] Recibida solicitud');
+
   if (!CEREBRAS_API_KEY) {
-    console.error("FATAL ERROR: La variable de entorno CEREBRAS_API_KEY no está configurada en el servidor.");
+    console.error("[API Cerebras] FATAL ERROR: La variable de entorno CEREBRAS_API_KEY no está configurada en el servidor.");
     return NextResponse.json(
-      { error: 'Error de configuración del servidor: clave API de Cerebras no encontrada.' },
+      { error: 'Error de configuración del servidor: CEREBRAS_API_KEY no encontrada. Configura esta variable de entorno.' },
       { status: 500 }
     );
   }
@@ -23,9 +25,12 @@ export async function POST(request: NextRequest) {
     const body = await request.json() as ProxyRequestBody;
     const { endpoint, payload, method = 'POST' } = body;
 
+    console.log('[API Cerebras] Endpoint:', endpoint, ', Method:', method);
+
     // Lista blanca de endpoints permitidos
     const allowedEndpoints = ['/chat/completions', '/models'];
     if (!allowedEndpoints.includes(endpoint)) {
+      console.warn('[API Cerebras] Endpoint no permitido:', endpoint);
       return NextResponse.json(
         { error: 'Endpoint no permitido a través del proxy de Cerebras.' },
         { status: 403 }
@@ -49,6 +54,7 @@ export async function POST(request: NextRequest) {
     }
 
     const cerebrasResponse = await axios(axiosConfig);
+    console.log('[API Cerebras] Respuesta recibida, status:', cerebrasResponse.status);
 
     // Crear headers de respuesta incluyendo rate limit info si está disponible
     const responseHeaders = new Headers();

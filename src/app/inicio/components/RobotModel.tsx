@@ -1183,12 +1183,40 @@ const AnimatedRobotModel = forwardRef<RobotMethods, { onLoad?: () => void; isLis
       return t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
     };
 
+    // Función para cancelar todas las animaciones activas
+    const cancelAllAnimations = () => {
+      // Cancelar timers
+      if (waveTimerRef.current) { clearTimeout(waveTimerRef.current); waveTimerRef.current = null; }
+      if (approachTimerRef.current) { clearTimeout(approachTimerRef.current); approachTimerRef.current = null; }
+      if (danceTimerRef.current) { clearTimeout(danceTimerRef.current); danceTimerRef.current = null; }
+      if (nodTimerRef.current) { clearTimeout(nodTimerRef.current); nodTimerRef.current = null; }
+      if (shakeLegsTimerRef.current) { clearTimeout(shakeLegsTimerRef.current); shakeLegsTimerRef.current = null; }
+      if (excitedTimerRef.current) { clearTimeout(excitedTimerRef.current); excitedTimerRef.current = null; }
+      if (confusedTimerRef.current) { clearTimeout(confusedTimerRef.current); confusedTimerRef.current = null; }
+      if (goodbyeTimerRef.current) { clearTimeout(goodbyeTimerRef.current); goodbyeTimerRef.current = null; }
+
+      // Reset estados
+      setIsWaving(false);
+      setIsApproaching(false);
+      setIsSteppingBack(false);
+      setIsDancing(false);
+      setIsNoddingYes(false);
+      setIsShakingLegs(false);
+      setIsThinking(false);
+      setIsExcited(false);
+      setIsConfused(false);
+      setIsGoodbye(false);
+    };
+
     // Método para iniciar el saludo
     const startWaving = () => {
+      // Cancelar animaciones conflictivas (excepto approach)
       if (waveTimerRef.current) {
         clearTimeout(waveTimerRef.current);
       }
-      
+      if (isThinking) setIsThinking(false);
+      if (isDancing) setIsDancing(false);
+
       setIsWaving(true);
       waveStartTimeRef.current = performance.now() / 1000; // Convertir a segundos para consistencia
       
@@ -1220,10 +1248,17 @@ const AnimatedRobotModel = forwardRef<RobotMethods, { onLoad?: () => void; isLis
 
     // Método para acercarse a la cámara
     const approachCamera = () => {
+      // Cancelar animaciones conflictivas
       if (approachTimerRef.current) {
         clearTimeout(approachTimerRef.current);
       }
-      
+      if (isWaving) setIsWaving(false);
+      if (isDancing) setIsDancing(false);
+      if (isShakingLegs) setIsShakingLegs(false);
+      if (isExcited) setIsExcited(false);
+      if (isConfused) setIsConfused(false);
+      if (isGoodbye) setIsGoodbye(false);
+
       // Guardar tiempo de inicio y activar animación de acercamiento
       setIsApproaching(true);
       setIsSteppingBack(false); // Asegurar que no estemos retrocediendo
@@ -1276,10 +1311,15 @@ const AnimatedRobotModel = forwardRef<RobotMethods, { onLoad?: () => void; isLis
 
     // Método para regresar a la posición original
     const stepBackward = () => {
+      // Cancelar animaciones conflictivas
       if (approachTimerRef.current) {
         clearTimeout(approachTimerRef.current);
       }
-      
+      if (isWaving) setIsWaving(false);
+      if (isThinking) setIsThinking(false);
+      if (isDancing) setIsDancing(false);
+      if (isNoddingYes) setIsNoddingYes(false);
+
       setIsApproaching(false);
       setIsSteppingBack(true);
       approachStartTimeRef.current = performance.now() / 1000;
@@ -1368,10 +1408,20 @@ const AnimatedRobotModel = forwardRef<RobotMethods, { onLoad?: () => void; isLis
 
     // Método para iniciar animación de "pensando"
     const startThinking = () => {
+      // Cancelar timers conflictivos
+      if (waveTimerRef.current) { clearTimeout(waveTimerRef.current); waveTimerRef.current = null; }
+      if (danceTimerRef.current) { clearTimeout(danceTimerRef.current); danceTimerRef.current = null; }
+      if (nodTimerRef.current) { clearTimeout(nodTimerRef.current); nodTimerRef.current = null; }
+      if (shakeLegsTimerRef.current) { clearTimeout(shakeLegsTimerRef.current); shakeLegsTimerRef.current = null; }
+
       // Cancelar otras animaciones que podrían interferir
       if (isWaving) setIsWaving(false);
       if (isDancing) setIsDancing(false);
       if (isNoddingYes) setIsNoddingYes(false);
+      if (isShakingLegs) setIsShakingLegs(false);
+      if (isExcited) setIsExcited(false);
+      if (isConfused) setIsConfused(false);
+      // Mantener approach/stepBack si están activos (son compatibles con thinking)
 
       setIsThinking(true);
       thinkingStartTimeRef.current = performance.now() / 1000;
@@ -1567,12 +1617,16 @@ function RobotInteractionManager() {
     if (isLoading) return;
     if (interactionState === RobotInteractionState.PROCESSING) return;
 
-    if (interactionState === RobotInteractionState.LISTENING) {
+    // Manejar LISTENING y LISTENING_ACTIVE - ambos deben detener la escucha
+    if (interactionState === RobotInteractionState.LISTENING ||
+        interactionState === RobotInteractionState.LISTENING_ACTIVE) {
       stopListening();
+    } else if (interactionState === RobotInteractionState.SPEAKING) {
+      // Si está hablando, interrumpir y empezar a escuchar
+      stopSpeaking();
+      startListening();
     } else {
-      if (interactionState === RobotInteractionState.SPEAKING) {
-        stopSpeaking();
-      }
+      // IDLE o ERROR - iniciar escucha
       startListening();
     }
   };
@@ -1642,7 +1696,9 @@ function RobotInteractionManager() {
           style={{ pointerEvents: 'auto' }}
         >
           {/* Audio Visualizer - Above the row when listening */}
-          {(interactionState === RobotInteractionState.LISTENING || isRecording) && (
+          {(interactionState === RobotInteractionState.LISTENING ||
+            interactionState === RobotInteractionState.LISTENING_ACTIVE ||
+            isRecording) && (
             <div className="mb-1">
               <AudioVisualizer width={140} height={25} barColor="var(--neu-primary)" />
             </div>
@@ -1658,6 +1714,7 @@ function RobotInteractionManager() {
               <p className="text-sm font-medium" style={{ color: '#4a5568' }}>
                 {interactionState === RobotInteractionState.IDLE && "Habla conmigo"}
                 {interactionState === RobotInteractionState.LISTENING && "Te escucho..."}
+                {interactionState === RobotInteractionState.LISTENING_ACTIVE && "Grabando..."}
                 {interactionState === RobotInteractionState.PROCESSING && "Pensando..."}
                 {interactionState === RobotInteractionState.SPEAKING && "Respondiendo..."}
                 {interactionState === RobotInteractionState.ERROR && "Intenta de nuevo"}

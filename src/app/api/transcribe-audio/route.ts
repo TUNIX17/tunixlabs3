@@ -6,9 +6,11 @@ const GROQ_API_KEY = process.env.GROQ_API_KEY;
 const GROQ_API_URL = 'https://api.groq.com/openai/v1';
 
 export async function POST(request: NextRequest) {
+  console.log('[API Transcribe] Recibida solicitud de transcripcion');
+
   if (!GROQ_API_KEY) {
-    console.error("FATAL ERROR: La variable de entorno GROQ_API_KEY no está configurada en el servidor.");
-    return NextResponse.json({ error: 'Error de configuración del servidor: clave API no encontrada.' }, { status: 500 });
+    console.error("[API Transcribe] FATAL ERROR: La variable de entorno GROQ_API_KEY no está configurada en el servidor.");
+    return NextResponse.json({ error: 'Error de configuración del servidor: GROQ_API_KEY no encontrada. Configura esta variable de entorno.' }, { status: 500 });
   }
 
   try {

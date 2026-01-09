@@ -118,6 +118,9 @@ export const useRobotInteraction = ({
   // Flag para controlar auto-restart
   const shouldAutoRestartRef = useRef<boolean>(true);
 
+  // Flag para trackear si la grabación se inició exitosamente
+  const recordingStartedRef = useRef<boolean>(false);
+
   // Obtener prompt cache
   const promptCache = getAgentPromptCache();
 
@@ -181,7 +184,7 @@ export const useRobotInteraction = ({
   } = useVAD({
     preset: 'default',
     onSpeechStart: () => {
-      console.log('[RobotInteraction] VAD: Speech detectado');
+      console.log('[RobotInteraction] VAD: Speech detectado, estado actual:', interactionState);
 
       // Si estamos en SPEAKING y barge-in esta habilitado
       if (interactionState === RobotInteractionState.SPEAKING && config.bargeInEnabled) {
@@ -193,20 +196,29 @@ export const useRobotInteraction = ({
 
       // Si estamos en LISTENING, transicionar a LISTENING_ACTIVE
       if (interactionState === RobotInteractionState.LISTENING) {
+        console.log('[RobotInteraction] Transicionando a LISTENING_ACTIVE e iniciando grabacion');
         setInteractionState(RobotInteractionState.LISTENING_ACTIVE);
+        recordingStartedRef.current = false; // Reset flag
         startRecordingForVAD();
       }
     },
     onSpeechEnd: (duration) => {
-      console.log('[RobotInteraction] VAD: Speech terminado, duracion:', duration, 'ms');
+      console.log('[RobotInteraction] VAD: Speech terminado, duracion:', duration, 'ms, estado:', interactionState, ', recordingStarted:', recordingStartedRef.current, ', isRecording:', isRecording);
 
-      // Si estamos grabando, procesar el audio
-      if (interactionState === RobotInteractionState.LISTENING_ACTIVE && isRecording) {
+      // Si estamos en LISTENING_ACTIVE y la grabacion se inicio, procesar el audio
+      // Usamos recordingStartedRef porque isRecording puede no estar actualizado aun
+      if (interactionState === RobotInteractionState.LISTENING_ACTIVE && (isRecording || recordingStartedRef.current)) {
+        console.log('[RobotInteraction] Procesando audio grabado...');
         processRecordedAudio();
+      } else if (interactionState === RobotInteractionState.LISTENING_ACTIVE) {
+        // Si estamos en LISTENING_ACTIVE pero no hay grabacion, volver a escuchar
+        console.warn('[RobotInteraction] LISTENING_ACTIVE pero grabacion no iniciada, volviendo a LISTENING');
+        setInteractionState(RobotInteractionState.LISTENING);
       }
     },
     onError: (error) => {
       console.error('[RobotInteraction] VAD error:', error);
+      if (onError) onError(error);
     }
   });
 
@@ -343,21 +355,34 @@ export const useRobotInteraction = ({
   // Iniciar grabacion cuando VAD detecta voz
   const startRecordingForVAD = useCallback(async () => {
     try {
+      console.log('[RobotInteraction] Iniciando grabacion para VAD...');
       resetRecording();
       await startRecording();
+      recordingStartedRef.current = true; // Marcar que la grabacion se inicio
       sessionRef.current?.stopListening(); // Detener listen timer
+      console.log('[RobotInteraction] Grabacion iniciada exitosamente');
     } catch (error) {
       console.error('[RobotInteraction] Error iniciando grabacion:', error);
+      recordingStartedRef.current = false;
+      // Volver a LISTENING si falla la grabacion
+      setInteractionState(RobotInteractionState.LISTENING);
+      if (onError && error instanceof Error) {
+        onError(error);
+      }
     }
-  }, [startRecording, resetRecording]);
+  }, [startRecording, resetRecording, onError]);
 
   // Procesar audio grabado cuando VAD detecta silencio
   const processRecordedAudio = useCallback(async () => {
+    // Reset flag de grabacion
+    recordingStartedRef.current = false;
+
     try {
+      console.log('[RobotInteraction] Deteniendo grabacion...');
       const currentAudioBlob = await stopRecording();
 
       if (!currentAudioBlob || currentAudioBlob.size === 0) {
-        console.warn('[RobotInteraction] Audio blob vacio');
+        console.warn('[RobotInteraction] Audio blob vacio, tamaño:', currentAudioBlob?.size);
         // Volver a listening si auto-restart
         if (shouldAutoRestartRef.current && sessionRef.current?.shouldAutoRestart()) {
           setInteractionState(RobotInteractionState.LISTENING);
@@ -368,17 +393,21 @@ export const useRobotInteraction = ({
         return;
       }
 
+      console.log('[RobotInteraction] Audio grabado, tamaño:', currentAudioBlob.size, 'bytes. Procesando...');
       setInteractionState(RobotInteractionState.PROCESSING);
       if (robotRef.current) robotRef.current.nodYes();
 
       // Reconocer speech
+      console.log('[RobotInteraction] Enviando audio a STT...');
       const recognitionResult = await recognizeSpeech(currentAudioBlob);
+      console.log('[RobotInteraction] STT resultado:', recognitionResult);
       setUserMessage(recognitionResult.text);
 
       // Actualizar idioma
       let langForThisInteraction = currentLanguage;
       if (recognitionResult.language) {
         if (recognitionResult.language !== currentLanguage) {
+          console.log('[RobotInteraction] Idioma detectado:', recognitionResult.language);
           setCurrentLanguage(recognitionResult.language);
           agentStateRef.current?.setLanguage(recognitionResult.language);
         }
@@ -386,6 +415,7 @@ export const useRobotInteraction = ({
       }
 
       if (recognitionResult.text) {
+        console.log('[RobotInteraction] Texto reconocido:', recognitionResult.text);
         // Extraer info del lead
         if (agentStateRef.current) {
           const extractedInfo = agentStateRef.current.extractLeadInfo(recognitionResult.text);
@@ -399,11 +429,13 @@ export const useRobotInteraction = ({
         updateSystemPrompt(getSystemPrompt());
 
         // Generar respuesta y hablar
+        console.log('[RobotInteraction] Generando respuesta LLM y TTS...');
         await generateResponseAndSpeech(
           recognitionResult.text,
           langForThisInteraction,
           {
             onStart: () => {
+              console.log('[RobotInteraction] TTS iniciado');
               setInteractionState(RobotInteractionState.SPEAKING);
               speakingStartTimeRef.current = Date.now();
               sessionRef.current?.startSpeaking();
@@ -419,6 +451,7 @@ export const useRobotInteraction = ({
               }
             },
             onEnd: () => {
+              console.log('[RobotInteraction] TTS terminado');
               speakingStartTimeRef.current = null;
               sessionRef.current?.stopSpeaking();
 
