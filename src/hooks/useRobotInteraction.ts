@@ -19,7 +19,22 @@ interface RobotAnimations {
   shakeLegsTwist: () => void;
   startThinking: () => void;
   stopThinking: () => void;
+  // Animaciones adicionales para más expresividad
+  startExcited: () => void;
+  startConfused: () => void;
+  startGoodbye: () => void;
 }
+
+// Utilidad para seleccionar animación aleatoria con pesos
+const weightedRandomChoice = <T>(choices: { item: T; weight: number }[]): T => {
+  const totalWeight = choices.reduce((sum, c) => sum + c.weight, 0);
+  let random = Math.random() * totalWeight;
+  for (const choice of choices) {
+    random -= choice.weight;
+    if (random <= 0) return choice.item;
+  }
+  return choices[0].item;
+};
 
 // Estados de interaccion con el robot - ACTUALIZADO
 export enum RobotInteractionState {
@@ -203,6 +218,12 @@ export const useRobotInteraction = ({
         console.log('[RobotInteraction] Transicionando a LISTENING_ACTIVE e iniciando grabacion');
         setInteractionState(RobotInteractionState.LISTENING_ACTIVE);
         recordingStartedRef.current = false; // Reset flag
+
+        // Pequeña reacción visual cuando detecta que el usuario habla
+        if (robotRef.current) {
+          robotRef.current.nodYes(); // Sutil asentimiento de "te escucho"
+        }
+
         startRecordingForVAD();
       }
     },
@@ -456,9 +477,33 @@ export const useRobotInteraction = ({
 
               if (robotRef.current) {
                 robotRef.current.stopThinking();
-                // Usar nodYes() en vez de startWaving() para una animación más sutil
-                // startWaving() ya se llama al inicio de la sesión
-                robotRef.current.nodYes();
+
+                // Variedad de animaciones al responder para más naturalidad
+                const turnCount = sessionRef.current?.getTurnCount() || 0;
+                const animation = weightedRandomChoice([
+                  { item: 'nod', weight: 50 },      // Más común: asentir
+                  { item: 'wave', weight: 20 },    // Ocasional: gesticular
+                  { item: 'excited', weight: 15 }, // Raro: emocionado
+                  { item: 'none', weight: 15 },    // A veces: solo hablar
+                ]);
+
+                switch (animation) {
+                  case 'nod':
+                    robotRef.current.nodYes();
+                    break;
+                  case 'wave':
+                    // Solo saludar si es un turno temprano
+                    if (turnCount < 3) robotRef.current.startWaving();
+                    else robotRef.current.nodYes();
+                    break;
+                  case 'excited':
+                    robotRef.current.startExcited?.();
+                    break;
+                  case 'none':
+                  default:
+                    // Sin animación extra, solo habla
+                    break;
+                }
               }
 
               // En modo barge-in, mantener VAD activo con threshold mas alto
@@ -471,15 +516,26 @@ export const useRobotInteraction = ({
               speakingStartTimeRef.current = null;
               sessionRef.current?.stopSpeaking();
 
-              if (robotRef.current) robotRef.current.stepBackward();
-
               // Auto-restart listening si esta habilitado
-              if (shouldAutoRestartRef.current && config.autoRestartListening && sessionRef.current?.shouldAutoRestart()) {
+              const willContinueListening = shouldAutoRestartRef.current &&
+                config.autoRestartListening &&
+                sessionRef.current?.shouldAutoRestart();
+
+              if (robotRef.current) {
+                // Si va a seguir escuchando, no hacer stepBackward completo
+                // para mantener una postura más "atenta"
+                if (!willContinueListening) {
+                  robotRef.current.stepBackward();
+                }
+                // Si continúa, el robot ya está en posición neutral por stopThinking
+              }
+
+              if (willContinueListening) {
                 console.log('[RobotInteraction] Auto-restart listening');
                 setInteractionState(RobotInteractionState.LISTENING);
                 sessionRef.current?.startListening();
                 // Restaurar VAD config normal
-                updateVADConfig({ volumeThreshold: 0.08 }); // Restaurar al threshold por defecto
+                updateVADConfig({ volumeThreshold: 0.08 });
               } else {
                 setInteractionState(RobotInteractionState.IDLE);
               }
@@ -507,6 +563,12 @@ export const useRobotInteraction = ({
       } else {
         console.log('[RobotInteraction] No se detecto texto');
         setRobotResponse(translatorRef.current.translate('noUserSpeechDetected', currentLanguage));
+
+        // Animación de confusión cuando no entiende
+        if (robotRef.current) {
+          robotRef.current.stopThinking();
+          robotRef.current.startConfused?.();
+        }
 
         // Auto-restart listening
         if (shouldAutoRestartRef.current && config.autoRestartListening) {
@@ -556,7 +618,10 @@ export const useRobotInteraction = ({
     setIsSessionActive(false);
     shouldAutoRestartRef.current = false;
 
-    if (robotRef.current) robotRef.current.stepBackward();
+    // Animación de despedida al terminar la sesión
+    if (robotRef.current) {
+      robotRef.current.startGoodbye?.();
+    }
 
     // Notificar lead capturado al final de sesion con metricas de sesion
     if (agentStateRef.current) {

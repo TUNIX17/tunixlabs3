@@ -245,47 +245,47 @@ export const ANIMATION_CONFIGS: Record<string, AnimationConfig> = {
     lerpFactor: 0.05,
   },
   wave: {
-    duration: 2500,
-    lerpFactor: 0.1,
-    oscillation: { frequency: 5, amplitude: 0.3 },
+    duration: 2000,        // Más corto para no ser intrusivo
+    lerpFactor: 0.08,      // Más suave
+    oscillation: { frequency: 4, amplitude: 0.25 }, // Menos frenético
   },
   approach: {
     duration: 2000,
-    lerpFactor: 0.08,
+    lerpFactor: 0.06,      // Más suave
   },
   stepBack: {
-    duration: 1800,
-    lerpFactor: 0.08,
+    duration: 1500,        // Más rápido para no interrumpir flujo
+    lerpFactor: 0.07,
   },
   dance: {
     duration: 3000,
-    lerpFactor: 0.2,
-    oscillation: { frequency: 5, amplitude: 0.7 },
+    lerpFactor: 0.15,      // Más suave
+    oscillation: { frequency: 4, amplitude: 0.5 }, // Menos intenso
   },
   nodYes: {
-    duration: 1500,
-    lerpFactor: 0.3,
-    oscillation: { frequency: 6, amplitude: 0.5 },
+    duration: 1200,        // Más corto y natural
+    lerpFactor: 0.15,      // Más suave (era 0.3)
+    oscillation: { frequency: 4, amplitude: 0.35 }, // Más natural
   },
   shakeLegs: {
     duration: 2500,
-    lerpFactor: 0.15,
-    oscillation: { frequency: 8, amplitude: 0.6 },
+    lerpFactor: 0.12,
+    oscillation: { frequency: 6, amplitude: 0.4 },
   },
   excited: {
-    duration: 2000,
-    lerpFactor: 0.12,
-    oscillation: { frequency: 8, amplitude: 0.4 },
+    duration: 1800,        // Más corto
+    lerpFactor: 0.1,       // Más suave
+    oscillation: { frequency: 5, amplitude: 0.3 }, // Menos intenso
   },
   confused: {
-    duration: 2000,
-    lerpFactor: 0.08,
-    oscillation: { frequency: 2, amplitude: 0.15 },
+    duration: 1800,
+    lerpFactor: 0.07,      // Más suave para parecer pensativo
+    oscillation: { frequency: 1.5, amplitude: 0.12 },
   },
   goodbye: {
-    duration: 3000,
-    lerpFactor: 0.1,
-    oscillation: { frequency: 4, amplitude: 0.25 },
+    duration: 2500,        // Más corto
+    lerpFactor: 0.08,
+    oscillation: { frequency: 3, amplitude: 0.2 }, // Más suave
   },
   idleLookAround: {
     duration: 3000,
@@ -377,15 +377,15 @@ export const CURSOR_TRACKING = {
 // ============================================
 // PARÁMETROS DE LISTENING
 // ============================================
-// NOTA: Valores muy reducidos para evitar movimientos tipo "exorcista"
-// El seguimiento del cursor ya proporciona suficiente feedback visual
+// Valores balanceados: visibles pero naturales, sin movimientos tipo "exorcista"
+// El seguimiento del cursor complementa estos movimientos sutiles
 export const LISTENING_PARAMS = {
   headTilt: {
-    frequency: 0.3,    // Reducido de 1.5 - movimiento mucho más lento
-    amplitude: 0.015,  // Reducido de 0.05 - movimiento muy sutil
+    frequency: 0.5,    // Lento y natural (original 1.5 era muy rápido)
+    amplitude: 0.025,  // Visible pero sutil (original 0.05 era exagerado)
   },
   neckTilt: {
-    frequency: 0.3,    // Reducido de 1.5
-    amplitude: 0.01,   // Reducido de 0.03
+    frequency: 0.4,    // Ligeramente desfasado del head para más realismo
+    amplitude: 0.015,  // Complementa el movimiento de cabeza
   },
 };
