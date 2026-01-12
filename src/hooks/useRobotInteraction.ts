@@ -157,16 +157,17 @@ export const useRobotInteraction = ({
   });
 
   // Hook para reconocimiento de voz
+  // IMPORTANTE: Usar el idioma configurado del usuario, NO detectar automáticamente
+  // Esto evita que el bot cambie a inglés si el STT detecta erróneamente el idioma
   const {
     recognizeSpeech,
     detectedLanguage
   } = useSpeechRecognition({
-    preferredLanguage: 'auto',
+    preferredLanguage: currentLanguage, // Forzar el idioma configurado del usuario
     onLanguageDetected: (language) => {
-      if (language && language !== currentLanguage) {
-        setCurrentLanguage(language);
-        agentStateRef.current?.setLanguage(language);
-      }
+      // NO cambiar automáticamente el idioma basado en STT
+      // El idioma solo debe cambiarse explícitamente por el usuario
+      console.log('[RobotInteraction] STT detectó idioma:', language, '- Manteniendo idioma configurado:', currentLanguage);
     },
     onError: (error) => {
       console.error('Error en reconocimiento de voz:', error);
@@ -232,12 +233,8 @@ export const useRobotInteraction = ({
     updateSystemPrompt
   } = useGroqConversation({
     initialSystemPrompt: getSystemPrompt(),
-    onStart: () => {
-      setInteractionState(RobotInteractionState.PROCESSING);
-      if (robotRef.current) {
-        robotRef.current.startThinking();
-      }
-    },
+    // Nota: startThinking() se llama explícitamente en processRecordedAudio()
+    // No duplicar aquí para evitar animaciones redundantes
     onComplete: (response) => {
       setRobotResponse(response);
       // Actualizar estado del agente
@@ -399,7 +396,9 @@ export const useRobotInteraction = ({
 
       console.log('[RobotInteraction] Audio grabado, tamaño:', currentAudioBlob.size, 'bytes. Procesando...');
       setInteractionState(RobotInteractionState.PROCESSING);
-      if (robotRef.current) robotRef.current.nodYes();
+      // Iniciar animación de pensando (thinking) mientras se procesa
+      // nodYes() se llamará cuando el TTS inicie
+      if (robotRef.current) robotRef.current.startThinking();
 
       // Reconocer speech
       console.log('[RobotInteraction] Enviando audio a STT...');
@@ -407,16 +406,11 @@ export const useRobotInteraction = ({
       console.log('[RobotInteraction] STT resultado:', recognitionResult);
       setUserMessage(recognitionResult.text);
 
-      // Actualizar idioma
-      let langForThisInteraction = currentLanguage;
-      if (recognitionResult.language) {
-        if (recognitionResult.language !== currentLanguage) {
-          console.log('[RobotInteraction] Idioma detectado:', recognitionResult.language);
-          setCurrentLanguage(recognitionResult.language);
-          agentStateRef.current?.setLanguage(recognitionResult.language);
-        }
-        langForThisInteraction = recognitionResult.language;
-      }
+      // IMPORTANTE: Usar siempre el idioma configurado del usuario, NO el detectado por STT
+      // Esto evita que el bot cambie a inglés cuando Whisper detecta erróneamente el idioma
+      const langForThisInteraction = currentLanguage;
+      console.log('[RobotInteraction] Usando idioma configurado:', langForThisInteraction,
+        '(STT detectó:', recognitionResult.language || 'no detectado', ')');
 
       if (recognitionResult.text) {
         console.log('[RobotInteraction] Texto reconocido:', recognitionResult.text);
@@ -462,7 +456,9 @@ export const useRobotInteraction = ({
 
               if (robotRef.current) {
                 robotRef.current.stopThinking();
-                robotRef.current.startWaving();
+                // Usar nodYes() en vez de startWaving() para una animación más sutil
+                // startWaving() ya se llama al inicio de la sesión
+                robotRef.current.nodYes();
               }
 
               // En modo barge-in, mantener VAD activo con threshold mas alto
@@ -611,19 +607,19 @@ export const useRobotInteraction = ({
         setCurrentPhase(ConversationPhase.GREETING);
       }
 
+      const isNewSession = !sessionRef.current?.isActive();
       setIsSessionActive(true);
       shouldAutoRestartRef.current = true;
 
       // Actualizar estado a escuchando
       setInteractionState(RobotInteractionState.LISTENING);
 
-      // Animar al robot (después de un pequeño delay para evitar conflictos)
-      if (robotRef.current) {
-        setTimeout(() => {
-          if (robotRef.current) {
-            robotRef.current.approachCamera();
-          }
-        }, 100);
+      // Animar al robot SOLO al inicio de una nueva sesión (no en cada auto-restart)
+      // Esto evita movimientos erráticos cuando el robot está en conversación continua
+      if (robotRef.current && isNewSession) {
+        // Saludar al inicio de la sesión en vez de acercarse
+        // approachCamera tiene un timer interno que conflictúa con otras animaciones
+        robotRef.current.startWaving();
       }
 
       // Pequeño delay antes de iniciar VAD para evitar capturar ruido del clic
@@ -675,7 +671,8 @@ export const useRobotInteraction = ({
     const languageToUse = lang || currentLanguage;
     setUserMessage(text);
     setInteractionState(RobotInteractionState.PROCESSING);
-    if (robotRef.current) robotRef.current.approachCamera();
+    // Usar startThinking() en vez de approachCamera() para evitar animaciones erráticas
+    if (robotRef.current) robotRef.current.startThinking();
 
     try {
       // Actualizar system prompt
@@ -694,13 +691,13 @@ export const useRobotInteraction = ({
       }
 
       setInteractionState(RobotInteractionState.IDLE);
-      if (robotRef.current) robotRef.current.stepBackward();
+      if (robotRef.current) robotRef.current.stopThinking();
 
     } catch (error) {
       console.error('Error en sendTextMessage:', error);
       setRobotResponse(translatorRef.current.translate('generalErrorResponse', languageToUse));
       setInteractionState(RobotInteractionState.ERROR);
-      if (robotRef.current) robotRef.current.stepBackward();
+      if (robotRef.current) robotRef.current.stopThinking();
       if (onError) onError(error instanceof Error ? error : new Error(String(error)));
     }
   }, [currentLanguage, sendGroqMessage, updateSystemPrompt, getSystemPrompt, onError]);
