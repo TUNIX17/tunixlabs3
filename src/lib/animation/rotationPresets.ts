@@ -377,13 +377,15 @@ export const CURSOR_TRACKING = {
 // ============================================
 // PARÁMETROS DE LISTENING
 // ============================================
+// NOTA: Valores muy reducidos para evitar movimientos tipo "exorcista"
+// El seguimiento del cursor ya proporciona suficiente feedback visual
 export const LISTENING_PARAMS = {
   headTilt: {
-    frequency: 1.5,
-    amplitude: 0.05,
+    frequency: 0.3,    // Reducido de 1.5 - movimiento mucho más lento
+    amplitude: 0.015,  // Reducido de 0.05 - movimiento muy sutil
   },
   neckTilt: {
-    frequency: 1.5,
-    amplitude: 0.03,
+    frequency: 0.3,    // Reducido de 1.5
+    amplitude: 0.01,   // Reducido de 0.03
   },
 };
