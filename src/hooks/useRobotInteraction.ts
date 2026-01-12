@@ -219,10 +219,9 @@ export const useRobotInteraction = ({
         setInteractionState(RobotInteractionState.LISTENING_ACTIVE);
         recordingStartedRef.current = false; // Reset flag
 
-        // Pequeña reacción visual cuando detecta que el usuario habla
-        if (robotRef.current) {
-          robotRef.current.nodYes(); // Sutil asentimiento de "te escucho"
-        }
+        // NO animar mientras el usuario habla - evita movimientos erráticos
+        // El seguimiento del cursor es suficiente para mostrar atención
+        // Las animaciones se reservan para cuando el robot responde
 
         startRecordingForVAD();
       }
@@ -679,13 +678,10 @@ export const useRobotInteraction = ({
       // Actualizar estado a escuchando
       setInteractionState(RobotInteractionState.LISTENING);
 
-      // Animar al robot SOLO al inicio de una nueva sesión (no en cada auto-restart)
-      // Esto evita movimientos erráticos cuando el robot está en conversación continua
-      if (robotRef.current && isNewSession) {
-        // Saludar al inicio de la sesión en vez de acercarse
-        // approachCamera tiene un timer interno que conflictúa con otras animaciones
-        robotRef.current.startWaving();
-      }
+      // NO animar al robot al iniciar la escucha
+      // Las animaciones durante la escucha causaban movimientos erráticos de la cabeza
+      // El robot ya tiene seguimiento del cursor que es suficiente para mostrar atención
+      // La animación de respuesta se hará cuando el robot hable
 
       // Pequeño delay antes de iniciar VAD para evitar capturar ruido del clic
       await new Promise(resolve => setTimeout(resolve, 300));

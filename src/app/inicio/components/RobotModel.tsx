@@ -1659,9 +1659,9 @@ function RobotInteractionManager() {
           <pointLight position={[0, 5, 5]} intensity={0.3} color="#61dbfb" />
           
           <Suspense fallback={null}>
-            <AnimatedRobotModel 
-              onLoad={handleModelLoaded} 
-              isListening={interactionState === RobotInteractionState.LISTENING}
+            <AnimatedRobotModel
+              onLoad={handleModelLoaded}
+              isListening={interactionState === RobotInteractionState.LISTENING || interactionState === RobotInteractionState.LISTENING_ACTIVE}
               ref={robotAnimatedRef}
             />
             <Environment files="/potsdamer_platz_1k.hdr" />

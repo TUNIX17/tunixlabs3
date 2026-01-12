@@ -377,15 +377,15 @@ export const CURSOR_TRACKING = {
 // ============================================
 // PARÁMETROS DE LISTENING
 // ============================================
-// Valores balanceados: visibles pero naturales, sin movimientos tipo "exorcista"
-// El seguimiento del cursor complementa estos movimientos sutiles
+// Valores mínimos: solo el seguimiento del cursor debe mover la cabeza
+// Eliminados movimientos adicionales que causaban conflictos con otras animaciones
 export const LISTENING_PARAMS = {
   headTilt: {
-    frequency: 0.5,    // Lento y natural (original 1.5 era muy rápido)
-    amplitude: 0.025,  // Visible pero sutil (original 0.05 era exagerado)
+    frequency: 0.3,    // Muy lento
+    amplitude: 0.005,  // Prácticamente imperceptible para evitar conflictos
   },
   neckTilt: {
-    frequency: 0.4,    // Ligeramente desfasado del head para más realismo
-    amplitude: 0.015,  // Complementa el movimiento de cabeza
+    frequency: 0.25,
+    amplitude: 0.003,  // Mínimo para complementar sin ser visible
   },
 };
