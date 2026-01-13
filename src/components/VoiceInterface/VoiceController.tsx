@@ -5,6 +5,7 @@ import { RobotMethods } from '../../types/robot';
 import AudioVisualizer from './AudioVisualizer';
 import LanguageIndicator from './LanguageIndicator';
 import ControlButtons from './ControlButtons';
+import ActionButtons from './ActionButtons';
 
 interface VoiceControllerProps {
   robotRef: React.RefObject<RobotMethods>;
@@ -60,7 +61,8 @@ const VoiceController: React.FC<VoiceControllerProps> = ({
     assignRobotRef,
     // Datos del agente
     getLeadData,
-    getConversationPhase
+    getConversationPhase,
+    getConversationSummary
   } = useRobotInteraction({
     initialLanguage,
     onStateChange,
@@ -256,6 +258,12 @@ const VoiceController: React.FC<VoiceControllerProps> = ({
             <div className="robot-message">
               <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Tunix:</p>
               <p className="text-sm bg-gray-100 dark:bg-gray-800 p-2 rounded-lg">{robotResponse}</p>
+              {/* Botones de accion (Calendly, WhatsApp) con resumen de conversacion */}
+              <ActionButtons
+                robotResponse={robotResponse}
+                className="mt-3"
+                conversationSummary={getConversationSummary()}
+              />
             </div>
           )}
         </div>

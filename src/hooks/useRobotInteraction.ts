@@ -818,6 +818,19 @@ export const useRobotInteraction = ({
 
     // Acceso a datos del agente
     getLeadData: () => agentStateRef.current?.getLeadData() || {},
-    getConversationPhase: () => agentStateRef.current?.getPhase() || ConversationPhase.GREETING
+    getConversationPhase: () => agentStateRef.current?.getPhase() || ConversationPhase.GREETING,
+
+    // Resumen de conversacion para botones de accion
+    getConversationSummary: () => {
+      const leadData = agentStateRef.current?.getLeadData() || {};
+      const context = agentStateRef.current?.getContext();
+      return {
+        name: leadData.name,
+        company: leadData.company,
+        interests: leadData.interest || [],
+        painPoints: leadData.painPoints || [],
+        lastTopic: context?.lastTopic || ''
+      };
+    }
   };
 };

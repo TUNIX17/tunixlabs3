@@ -15,6 +15,7 @@ import { useTranslations } from 'next-intl';
 import { useRobotInteraction, RobotInteractionState } from '@/hooks/useRobotInteraction';
 import FloatingMicButton from '@/components/VoiceInterface/FloatingMicButton';
 import AudioVisualizer from '@/components/VoiceInterface/AudioVisualizer';
+import ActionButtons from '@/components/VoiceInterface/ActionButtons';
 
 // Importar sistema de animaciones
 import {
@@ -1508,6 +1509,7 @@ function RobotInteractionManager() {
     sendTextMessage,
     stopSpeaking,
     setCurrentLanguage,
+    getConversationSummary,
   } = useRobotInteraction({
     initialLanguage: 'es',
     robotSystemPrompt: undefined,
@@ -1655,6 +1657,15 @@ function RobotInteractionManager() {
               }}
             />
           </div>
+
+          {/* Botones de accion (Calendly, WhatsApp) - aparecen cuando el robot los menciona */}
+          {robotResponse && (
+            <ActionButtons
+              robotResponse={robotResponse}
+              className="mt-2"
+              conversationSummary={getConversationSummary()}
+            />
+          )}
         </div>
 
       </div>

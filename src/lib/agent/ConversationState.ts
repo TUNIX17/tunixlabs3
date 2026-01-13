@@ -278,18 +278,46 @@ export class AgentStateTracker {
       }
     }
 
-    // Detectar intereses por keywords
+    // Detectar intereses por keywords - Actualizado 2025
     const interestKeywords: Record<string, string> = {
+      // Development
       'chatbot': 'development',
       'bot': 'development',
-      'automatizar': 'automation',
-      'automatización': 'automation',
-      'automate': 'automation',
-      'automation': 'automation',
       'dashboard': 'development',
       'predecir': 'development',
       'predicción': 'development',
       'predict': 'development',
+      'machine learning': 'development',
+      'ml': 'development',
+      'deep learning': 'development',
+      'vision': 'development',
+      'computer vision': 'development',
+      'nlp': 'development',
+      'voice agent': 'development',
+      'agente de voz': 'development',
+      'asistente virtual': 'development',
+      'virtual assistant': 'development',
+      'recomendacion': 'development',
+      'recommendation': 'development',
+      // Automation
+      'automatizar': 'automation',
+      'automatización': 'automation',
+      'automate': 'automation',
+      'automation': 'automation',
+      'rpa': 'automation',
+      'proceso': 'automation',
+      'procesos': 'automation',
+      'process': 'automation',
+      'workflow': 'automation',
+      'documento': 'automation',
+      'documents': 'automation',
+      'extraccion': 'automation',
+      'extraction': 'automation',
+      'ocr': 'automation',
+      'agentes autonomos': 'automation',
+      'autonomous agents': 'automation',
+      'agentic': 'automation',
+      // Consulting
       'estrategia': 'consulting',
       'strategy': 'consulting',
       'evaluar': 'consulting',
@@ -297,22 +325,37 @@ export class AgentStateTracker {
       'consultoría': 'consulting',
       'consultoria': 'consulting',
       'consulting': 'consulting',
-      'rpa': 'automation',
-      'proceso': 'automation',
-      'procesos': 'automation',
-      'process': 'automation',
-      'machine learning': 'development',
-      'ml': 'development',
+      'roadmap': 'consulting',
+      'madurez': 'consulting',
+      'maturity': 'consulting',
+      'transformacion digital': 'consulting',
+      'digital transformation': 'consulting',
       'inteligencia artificial': 'consulting',
       'ia': 'consulting',
       'ai': 'consulting',
+      // Generative AI (nuevo servicio 2025)
+      'ia generativa': 'generative',
+      'generative ai': 'generative',
+      'llm': 'generative',
+      'gpt': 'generative',
+      'chatgpt': 'generative',
+      'claude': 'generative',
+      'contenido': 'generative',
+      'content': 'generative',
+      'generar': 'generative',
+      'generate': 'generative',
+      'rag': 'generative',
+      'modelo de lenguaje': 'generative',
+      'language model': 'generative',
+      // Meeting intent
       'reunión': 'meeting',
       'reunion': 'meeting',
       'cita': 'meeting',
       'agendar': 'meeting',
       'llamada': 'meeting',
       'meeting': 'meeting',
-      'call': 'meeting'
+      'call': 'meeting',
+      'schedule': 'meeting'
     };
 
     const interests: string[] = [];
@@ -488,5 +531,85 @@ export class AgentStateTracker {
       sessionStartTime: now,
       lastActivityTime: now
     };
+  }
+
+  /**
+   * Generar resumen de la conversacion para mensajes de contacto
+   * Usado para WhatsApp y descripcion de citas
+   */
+  generateConversationSummary(): string {
+    const { leadData, lastTopic } = this.context;
+    const parts: string[] = [];
+
+    // Nombre si lo tenemos
+    if (leadData.name) {
+      parts.push(`Soy ${leadData.name}`);
+    }
+
+    // Empresa si la tenemos
+    if (leadData.company) {
+      parts.push(`de ${leadData.company}`);
+    }
+
+    // Intereses detectados
+    if (leadData.interest && leadData.interest.length > 0) {
+      const interestMap: Record<string, string> = {
+        'consulting': 'consultoria en IA',
+        'development': 'desarrollo de software con IA',
+        'automation': 'automatizacion inteligente',
+        'generative': 'IA generativa',
+        'meeting': 'agendar una reunion'
+      };
+      const interestNames = leadData.interest
+        .map(i => interestMap[i] || i)
+        .filter(Boolean);
+      if (interestNames.length > 0) {
+        parts.push(`Me interesa: ${interestNames.join(', ')}`);
+      }
+    }
+
+    // Pain points si los tenemos
+    if (leadData.painPoints && leadData.painPoints.length > 0) {
+      const painSummary = leadData.painPoints.slice(0, 2).join(', ');
+      parts.push(`Necesidad: ${painSummary}`);
+    }
+
+    // Ultimo tema si tenemos
+    if (lastTopic && !parts.some(p => p.includes(lastTopic))) {
+      parts.push(`Tema: ${lastTopic}`);
+    }
+
+    // Si no hay datos, mensaje generico
+    if (parts.length === 0) {
+      return 'Me gustaria conocer mas sobre los servicios de TunixLabs.';
+    }
+
+    return parts.join('. ') + '.';
+  }
+
+  /**
+   * Generar mensaje completo para WhatsApp
+   */
+  generateWhatsAppMessage(): string {
+    const summary = this.generateConversationSummary();
+    return `Hola Alejandro! Acabo de hablar con Tunix en tu web. ${summary}`;
+  }
+
+  /**
+   * Generar descripcion para cita de Calendly
+   */
+  generateMeetingDescription(): string {
+    const { leadData } = this.context;
+    const parts: string[] = [];
+
+    if (leadData.name) parts.push(`Contacto: ${leadData.name}`);
+    if (leadData.company) parts.push(`Empresa: ${leadData.company}`);
+    if (leadData.email) parts.push(`Email: ${leadData.email}`);
+    if (leadData.phone) parts.push(`Telefono: ${leadData.phone}`);
+
+    const summary = this.generateConversationSummary();
+    parts.push(`\nResumen: ${summary}`);
+
+    return parts.join('\n');
   }
 }
