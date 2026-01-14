@@ -159,14 +159,15 @@ export const useGroqConversation = ({
       // Actualizar configuración del modelo en caso de alto tráfico
       configRef.current = selectModelConfig(0, false);
 
-      // Usar idioma detectado o el del defaultPrompt
-      const effectiveLanguage = language || 'auto';
-      console.log('[GroqConversation] Idioma detectado/usado:', effectiveLanguage);
+      // Normalizar idioma a código ISO (ej: "Spanish" -> "es")
+      const normalizedLanguage = language ? normalizeLanguageCode(language) : null;
+      const effectiveLanguage = normalizedLanguage || 'auto';
+      console.log('[GroqConversation] Idioma detectado/usado:', effectiveLanguage, '(original:', language, ')');
 
-      // Actualizar system prompt basado en el idioma detectado
-      if (language) {
-        systemPromptRef.current = getCommercialPrompt(language);
-        console.log('[GroqConversation] Prompt actualizado para idioma:', language);
+      // Actualizar system prompt basado en el idioma detectado (normalizado)
+      if (normalizedLanguage) {
+        systemPromptRef.current = getCommercialPrompt(normalizedLanguage);
+        console.log('[GroqConversation] Prompt actualizado para idioma:', normalizedLanguage);
       } else {
         // Si no hay idioma detectado, mantener el defaultPrompt
         console.log('[GroqConversation] Sin idioma detectado, usando prompt por defecto');
@@ -563,15 +564,17 @@ export const useGroqConversation = ({
 
   // Método combinado para generar respuesta y luego reproducirla
   const generateResponseAndSpeech = useCallback(async (
-    message: string, 
+    message: string,
     language: string,
     ttsCallbacks: { onStart?: () => void; onEnd?: () => void; onError?: (e: any) => void }
   ): Promise<string> => {
-    const responseText = await sendMessage(message, language);
-    
+    // Normalizar idioma a código ISO (ej: "Spanish" -> "es")
+    const normalizedLanguage = normalizeLanguageCode(language);
+    const responseText = await sendMessage(message, normalizedLanguage);
+
     if (responseText) {
       try {
-        await textToSpeech(responseText, language, ttsCallbacks);
+        await textToSpeech(responseText, normalizedLanguage, ttsCallbacks);
       } catch (ttsError) {
         console.error("[RobotInteraction] Error durante TTS en generateResponseAndSpeech:", ttsError);
         // El error ya debería haber sido manejado por textToSpeech o speakWithWebSpeech a través de ttsCallbacks.onError

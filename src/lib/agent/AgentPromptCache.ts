@@ -7,6 +7,26 @@ import { AgentConfig, DEFAULT_AGENT_CONFIG } from './AgentConfig';
 import { ConversationContext } from './ConversationState';
 import { getCommercialPrompt, buildDynamicPrompt } from './prompts/commercialAgent';
 
+// Mapeo de nombres de idioma a códigos ISO
+const LANGUAGE_NAME_TO_CODE: Record<string, string> = {
+  'spanish': 'es',
+  'español': 'es',
+  'english': 'en',
+  'inglés': 'en',
+};
+
+/**
+ * Normaliza el código de idioma a formato ISO (es, en)
+ */
+const normalizeLanguageCode = (lang: string): string => {
+  if (!lang) return 'es';
+  const langLower = lang.toLowerCase().trim();
+  if (LANGUAGE_NAME_TO_CODE[langLower]) return LANGUAGE_NAME_TO_CODE[langLower];
+  if (langLower.includes('-')) return langLower.split('-')[0];
+  if (langLower.length <= 3) return langLower;
+  return langLower.substring(0, 2);
+};
+
 /**
  * Singleton para cachear y gestionar prompts del agente
  */
@@ -48,13 +68,16 @@ export class AgentPromptCache {
 
   /**
    * Obtener prompt base (sin contexto dinamico)
-   * Cacheado por idioma
+   * Cacheado por idioma (normalizado a código ISO)
    */
   getBasePrompt(language: string): string {
+    // Normalizar idioma a código ISO (ej: "Spanish" -> "es")
+    const normalizedLang = normalizeLanguageCode(language);
+
     // Si el idioma cambio, invalidar cache
-    if (this.cachedLanguage !== language) {
+    if (this.cachedLanguage !== normalizedLang) {
       this.cachedBasePrompt = null;
-      this.cachedLanguage = language;
+      this.cachedLanguage = normalizedLang;
     }
 
     // Retornar cache si existe
@@ -63,8 +86,8 @@ export class AgentPromptCache {
     }
 
     // Construir y cachear
-    this.cachedBasePrompt = getCommercialPrompt(language);
-    console.log('[AgentPromptCache] Base prompt cacheado para idioma:', language);
+    this.cachedBasePrompt = getCommercialPrompt(normalizedLang);
+    console.log('[AgentPromptCache] Base prompt cacheado para idioma:', normalizedLang);
 
     return this.cachedBasePrompt;
   }
@@ -127,7 +150,8 @@ export class AgentPromptCache {
    * Verificar si hay cache valido
    */
   hasCachedPrompt(language: string): boolean {
-    return this.cachedLanguage === language && this.cachedBasePrompt !== null;
+    const normalizedLang = normalizeLanguageCode(language);
+    return this.cachedLanguage === normalizedLang && this.cachedBasePrompt !== null;
   }
 
   /**
