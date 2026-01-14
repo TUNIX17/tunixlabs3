@@ -424,27 +424,10 @@ export const useRobotInteraction = ({
     }
   }, [interactionState, onStateChange]);
 
-  // Actualizar idioma cuando se detecta uno nuevo (normalizado a código ISO)
-  // SOLO acepta español e inglés - otros idiomas se ignoran
-  useEffect(() => {
-    if (detectedLanguage) {
-      const normalizedDetected = normalizeLanguageCode(detectedLanguage);
-
-      // Si el idioma detectado no es soportado (es, en), ignorarlo
-      if (!normalizedDetected) {
-        console.log('[RobotInteraction] Idioma detectado no soportado:', detectedLanguage, '- Manteniendo:', currentLanguage);
-        return;
-      }
-
-      const normalizedCurrent = normalizeLanguageCode(currentLanguage) || 'es';
-
-      if (normalizedDetected !== normalizedCurrent) {
-        console.log('[RobotInteraction] Actualizando idioma:', currentLanguage, '->', normalizedDetected);
-        setCurrentLanguage(normalizedDetected);
-        promptCache.invalidate(); // Invalidar cache cuando cambia idioma
-      }
-    }
-  }, [detectedLanguage, currentLanguage, promptCache]);
+  // NOTA: La detección de idioma ahora se maneja directamente en processRecordedAudio()
+  // para aplicar el idioma detectado a la INTERACCIÓN ACTUAL, no solo a la siguiente.
+  // El useEffect anterior que escuchaba detectedLanguage fue eliminado para evitar
+  // actualizaciones tardías que causaban respuestas en el idioma incorrecto.
 
   // Verificar si se puede hacer barge-in
   const canBargeIn = useCallback((): boolean => {
@@ -539,11 +522,29 @@ export const useRobotInteraction = ({
       console.log('[RobotInteraction] STT resultado:', recognitionResult);
       setUserMessage(recognitionResult.text);
 
-      // IMPORTANTE: Usar siempre el idioma configurado del usuario, NO el detectado por STT
-      // Esto evita que el bot cambie a inglés cuando Whisper detecta erróneamente el idioma
-      const langForThisInteraction = currentLanguage;
-      console.log('[RobotInteraction] Usando idioma configurado:', langForThisInteraction,
-        '(STT detectó:', recognitionResult.language || 'no detectado', ')');
+      // Determinar idioma para esta interacción:
+      // 1. Si STT detectó un idioma SOPORTADO (es, en), usarlo inmediatamente
+      // 2. Si STT detectó un idioma NO SOPORTADO (ru, pt, fr, etc.), ignorarlo y usar currentLanguage
+      // Esto permite cambiar entre español e inglés pero ignora misdetecciones como "Russian"
+      const sttDetectedLang = recognitionResult.language;
+      const normalizedSTTLang = sttDetectedLang ? normalizeLanguageCode(sttDetectedLang) : null;
+      const normalizedCurrentLang = normalizeLanguageCode(currentLanguage) || 'es';
+
+      let langForThisInteraction: string;
+      if (normalizedSTTLang) {
+        // STT detectó un idioma soportado - usarlo
+        langForThisInteraction = normalizedSTTLang;
+        if (normalizedSTTLang !== normalizedCurrentLang) {
+          console.log('[RobotInteraction] STT detectó idioma soportado:', sttDetectedLang, '-> Actualizando a:', normalizedSTTLang);
+          setCurrentLanguage(normalizedSTTLang);
+          promptCache.invalidate();
+        }
+      } else {
+        // STT detectó un idioma NO soportado o no detectó nada - mantener el actual
+        langForThisInteraction = normalizedCurrentLang;
+        console.log('[RobotInteraction] STT detectó idioma no soportado:', sttDetectedLang || 'ninguno', '- Manteniendo:', langForThisInteraction);
+      }
+      console.log('[RobotInteraction] Idioma para esta interacción:', langForThisInteraction);
 
       if (recognitionResult.text) {
         console.log('[RobotInteraction] Texto reconocido:', recognitionResult.text);
@@ -713,7 +714,8 @@ export const useRobotInteraction = ({
     updateVADConfig,
     onError,
     onLeadCaptured,
-    executeAnimationWithCooldown
+    executeAnimationWithCooldown,
+    promptCache
   ]);
 
   // Manejar fin de sesion
