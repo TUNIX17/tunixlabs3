@@ -187,6 +187,34 @@ export const useRobotInteraction = ({
   // Ref para trackear el último estado notificado (evita notificaciones duplicadas)
   const lastNotifiedStateRef = useRef<RobotInteractionState>(RobotInteractionState.IDLE);
 
+  // Ref para debounce de animaciones - previene llamadas rápidas consecutivas
+  const lastAnimationTimeRef = useRef<number>(0);
+  const ANIMATION_COOLDOWN_MS = 800; // Cooldown mínimo entre animaciones
+
+  // Ref para debounce de transiciones de estado VAD - previene ciclos rápidos
+  const lastSpeechTransitionRef = useRef<number>(0);
+  const SPEECH_TRANSITION_COOLDOWN_MS = 500; // Cooldown mínimo entre transiciones speech_start/speech_end
+
+  // Función helper para ejecutar animación con cooldown
+  const executeAnimationWithCooldown = useCallback((
+    animationFn: () => void,
+    animationName: string,
+    forceCooldown: boolean = true
+  ) => {
+    const now = Date.now();
+    const timeSinceLastAnimation = now - lastAnimationTimeRef.current;
+
+    if (forceCooldown && timeSinceLastAnimation < ANIMATION_COOLDOWN_MS) {
+      console.log(`[RobotInteraction] Animación ${animationName} bloqueada - cooldown (${timeSinceLastAnimation}ms < ${ANIMATION_COOLDOWN_MS}ms)`);
+      return false;
+    }
+
+    lastAnimationTimeRef.current = now;
+    animationFn();
+    console.log(`[RobotInteraction] Animación ${animationName} ejecutada`);
+    return true;
+  }, []);
+
   // Obtener prompt cache
   const promptCache = getAgentPromptCache();
 
@@ -253,6 +281,15 @@ export const useRobotInteraction = ({
     onSpeechStart: () => {
       console.log('[RobotInteraction] VAD: Speech detectado, estado actual:', interactionState);
 
+      // Protección contra transiciones rápidas - evita ciclos por ruido
+      const now = Date.now();
+      const timeSinceLastTransition = now - lastSpeechTransitionRef.current;
+      if (timeSinceLastTransition < SPEECH_TRANSITION_COOLDOWN_MS) {
+        console.log(`[RobotInteraction] Transición onSpeechStart bloqueada - cooldown (${timeSinceLastTransition}ms < ${SPEECH_TRANSITION_COOLDOWN_MS}ms)`);
+        return;
+      }
+      lastSpeechTransitionRef.current = now;
+
       // Si estamos en SPEAKING y barge-in esta habilitado
       if (interactionState === RobotInteractionState.SPEAKING && config.bargeInEnabled) {
         if (canBargeIn()) {
@@ -276,6 +313,15 @@ export const useRobotInteraction = ({
     },
     onSpeechEnd: (duration) => {
       console.log('[RobotInteraction] VAD: Speech terminado, duracion:', duration, 'ms, estado:', interactionState, ', recordingStarted:', recordingStartedRef.current, ', isRecording:', isRecording);
+
+      // Protección contra transiciones rápidas - evita ciclos por ruido
+      const now = Date.now();
+      const timeSinceLastTransition = now - lastSpeechTransitionRef.current;
+      if (timeSinceLastTransition < SPEECH_TRANSITION_COOLDOWN_MS) {
+        console.log(`[RobotInteraction] Transición onSpeechEnd bloqueada - cooldown (${timeSinceLastTransition}ms < ${SPEECH_TRANSITION_COOLDOWN_MS}ms)`);
+        return;
+      }
+      lastSpeechTransitionRef.current = now;
 
       // Si estamos en LISTENING_ACTIVE y la grabacion se inicio, procesar el audio
       // Usamos recordingStartedRef porque isRecording puede no estar actualizado aun
@@ -479,8 +525,13 @@ export const useRobotInteraction = ({
       console.log('[RobotInteraction] Audio grabado, tamaño:', currentAudioBlob.size, 'bytes. Procesando...');
       setInteractionState(RobotInteractionState.PROCESSING);
       // Iniciar animación de pensando (thinking) mientras se procesa
-      // nodYes() se llamará cuando el TTS inicie
-      if (robotRef.current) robotRef.current.startThinking();
+      // Usar cooldown para evitar animaciones rápidas consecutivas
+      if (robotRef.current) {
+        executeAnimationWithCooldown(
+          () => robotRef.current?.startThinking(),
+          'startThinking'
+        );
+      }
 
       // Reconocer speech
       console.log('[RobotInteraction] Enviando audio a STT...');
@@ -625,10 +676,13 @@ export const useRobotInteraction = ({
         console.log('[RobotInteraction] No se detecto texto');
         setRobotResponse(translatorRef.current.translate('noUserSpeechDetected', currentLanguage));
 
-        // Animación de confusión cuando no entiende
+        // Animación de confusión cuando no entiende - con cooldown
         if (robotRef.current) {
           robotRef.current.stopThinking();
-          robotRef.current.startConfused?.();
+          executeAnimationWithCooldown(
+            () => robotRef.current?.startConfused?.(),
+            'startConfused'
+          );
         }
 
         // Auto-restart listening
@@ -658,7 +712,8 @@ export const useRobotInteraction = ({
     config.bargeInEnabled,
     updateVADConfig,
     onError,
-    onLeadCaptured
+    onLeadCaptured,
+    executeAnimationWithCooldown
   ]);
 
   // Manejar fin de sesion
@@ -794,8 +849,13 @@ export const useRobotInteraction = ({
     const languageToUse = lang || currentLanguage;
     setUserMessage(text);
     setInteractionState(RobotInteractionState.PROCESSING);
-    // Usar startThinking() en vez de approachCamera() para evitar animaciones erráticas
-    if (robotRef.current) robotRef.current.startThinking();
+    // Usar startThinking() con cooldown para evitar animaciones rápidas
+    if (robotRef.current) {
+      executeAnimationWithCooldown(
+        () => robotRef.current?.startThinking(),
+        'startThinking'
+      );
+    }
 
     try {
       // Actualizar system prompt
@@ -823,7 +883,7 @@ export const useRobotInteraction = ({
       if (robotRef.current) robotRef.current.stopThinking();
       if (onError) onError(error instanceof Error ? error : new Error(String(error)));
     }
-  }, [currentLanguage, sendGroqMessage, updateSystemPrompt, getSystemPrompt, onError]);
+  }, [currentLanguage, sendGroqMessage, updateSystemPrompt, getSystemPrompt, onError, executeAnimationWithCooldown]);
 
   // Metodo para detener habla
   const stopSpeaking = useCallback(() => {

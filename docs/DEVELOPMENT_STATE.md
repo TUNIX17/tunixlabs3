@@ -1,8 +1,8 @@
 # TunixLabs - Development State
 
-**Last Updated:** 2026-01-09
-**Current Phase:** CRM Enhanced with Email Sequences & Analytics
-**Sprint:** 3 - Lead Nurturing & Dashboard Analytics
+**Last Updated:** 2026-01-14
+**Current Phase:** VAD Animation Bug Fix
+**Sprint:** 3.1 - Robot Animation Stability
 
 ---
 
@@ -60,6 +60,16 @@ TunixLabs es una plataforma web de consultoria en IA con:
   - [x] Leads line chart (daily trends)
   - [x] Score bar chart (score distribution)
   - [x] Analytics API (/api/leads/analytics)
+- [x] **VAD-Animation Bug Fix** (2026-01-14)
+  - [x] Fixed erratic robot animations when microphone activates
+  - [x] Added animation cooldown mechanism (800ms between animations)
+  - [x] Added VAD speech transition protection (500ms debounce)
+  - [x] Increased VAD volumeThreshold from 0.08 to 0.12 (reduces false positives)
+  - [x] Increased speechStartDelay from 250ms to 350ms
+  - [x] Increased minSpeechDuration from 500ms to 600ms
+  - [x] Files modified:
+    - `src/hooks/useRobotInteraction.ts` - Animation cooldown + transition protection
+    - `src/lib/audio/vadConfig.ts` - More conservative VAD settings
 
 ### In Progress
 - [ ] Configurar variables de entorno en Railway:
