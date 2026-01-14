@@ -11,9 +11,9 @@ import {
   Sparkles
 } from '@react-three/drei';
 import * as THREE from 'three';
-import { useRobotInteraction, RobotInteractionState } from '../../../hooks/useRobotInteraction';
-import FloatingMicButton from '../../../components/VoiceInterface/FloatingMicButton';
-import AudioVisualizer from '../../../components/VoiceInterface/AudioVisualizer';
+import { useRobotInteraction, RobotInteractionState } from '../../../../hooks/useRobotInteraction';
+import FloatingMicButton from '../../../../components/VoiceInterface/FloatingMicButton';
+import AudioVisualizer from '../../../../components/VoiceInterface/AudioVisualizer';
 
 // Importar sistema de animaciones
 import {
@@ -33,8 +33,8 @@ import {
   IDLE_PARAMS,
   CURSOR_TRACKING,
   LISTENING_PARAMS,
-} from '../../../lib/animation';
-import { easeInOutQuad, easeOutBack } from '../../../lib/animation/easingFunctions';
+} from '../../../../lib/animation';
+import { easeInOutQuad, easeOutBack } from '../../../../lib/animation/easingFunctions';
 
 // Definir tipo para arrays de rotación
 type RotationArray = [number, number, number];

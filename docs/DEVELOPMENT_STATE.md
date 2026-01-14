@@ -714,34 +714,31 @@ src/lib/animation/rotationPresets.ts
 - LISTENING_PARAMS minimizados
 ```
 
-### Fase 3: REVERTIDA (useRobotAnimations hook)
+### TODAS LAS FASES REVERTIDAS (2026-01-14)
 
-**Estado: REVERTIDA - El hook causaba problemas con cursor tracking durante LISTENING**
+**Estado: REVERTIDO A VERSIÓN ORIGINAL (commit a678bb3)**
 
-La integración del hook `useRobotAnimations` fue revertida porque:
-1. El BoneController intermediario introducía latencia en las rotaciones
-2. Las rotaciones iniciales no se capturaban correctamente al registrar huesos
-3. El cursor tracking (que funciona perfectamente con acceso directo a refs) dejaba de funcionar al presionar el micrófono
+Todas las modificaciones de animación fueron revertidas porque:
+1. Las "mejoras" introducían comportamientos inesperados al presionar el micrófono
+2. El `idleIntensity` causaba saltos en la animación al cambiar de estado
+3. Los guard conditions expandidos bloqueaban animaciones que deberían seguir corriendo
+4. Los LISTENING_PARAMS modificados (de 0.05 a 0.003) cambiaban el comportamiento esperado
 
 **Decisión de Arquitectura:**
-- Mantener el enfoque de acceso directo a bone refs (más simple y probado)
-- El hook `useRobotAnimations.ts` queda disponible para futuro uso o referencia
-- Las mejoras de Fases 1 y 2 son suficientes para resolver el problema original
+- El código original (a678bb3) es estable y funciona correctamente
+- Los intentos de "mejorar" las animaciones introdujeron regresiones
+- Keep It Simple: el sistema de animación directo con bone refs funciona bien
 
-### Verificación Final
-- ✅ Build exitoso sin errores de TypeScript
-- ✅ Fases 1 y 2 aplicadas correctamente
-- ✅ Código funcional restaurado con mejoras
-- ✅ Listo para testing en desarrollo local
+**Valores restaurados de LISTENING_PARAMS:**
+```typescript
+headTilt: { frequency: 1.5, amplitude: 0.05 }
+neckTilt: { frequency: 1.5, amplitude: 0.03 }
+```
 
-### Próximos Pasos de Testing
-1. Ejecutar `npm run dev`
-2. Navegar a http://localhost:3000/inicio
-3. Verificar:
-   - Idle y Wave funcionan correctamente
-   - Al presionar micrófono, cursor tracking sigue funcionando
-   - Brazos permanecen estables durante LISTENING
-   - Transiciones suaves entre estados
+### Verificación
+- ✅ Build exitoso
+- ✅ Código restaurado a versión funcional
+- ✅ Listo para testing
 
 ---
 
