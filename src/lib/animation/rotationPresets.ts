@@ -242,115 +242,115 @@ export interface AnimationConfig {
 export const ANIMATION_CONFIGS: Record<string, AnimationConfig> = {
   idle: {
     duration: Infinity,
-    lerpFactor: 0.05,
+    lerpFactor: 0.08,      // SUBIDO de 0.05 para transiciones más rápidas
   },
   wave: {
-    duration: 2000,        // Más corto para no ser intrusivo
-    lerpFactor: 0.08,      // Más suave
-    oscillation: { frequency: 4, amplitude: 0.25 }, // Menos frenético
+    duration: 1800,        // REDUCIDO de 2000 para no ser intrusivo
+    lerpFactor: 0.12,      // SUBIDO de 0.08 para entrada más rápida
+    oscillation: { frequency: 3.5, amplitude: 0.2 }, // REDUCIDO para menos intensidad
   },
   approach: {
     duration: 2000,
-    lerpFactor: 0.06,      // Más suave
+    lerpFactor: 0.08,      // SUBIDO de 0.06
   },
   stepBack: {
-    duration: 1500,        // Más rápido para no interrumpir flujo
-    lerpFactor: 0.07,
+    duration: 1500,
+    lerpFactor: 0.09,      // SUBIDO de 0.07
   },
   dance: {
     duration: 3000,
-    lerpFactor: 0.15,      // Más suave
-    oscillation: { frequency: 4, amplitude: 0.5 }, // Menos intenso
+    lerpFactor: 0.12,      // REDUCIDO de 0.15 para menos brusquedad
+    oscillation: { frequency: 3.5, amplitude: 0.4 }, // REDUCIDO
   },
   nodYes: {
-    duration: 1200,        // Más corto y natural
-    lerpFactor: 0.15,      // Más suave (era 0.3)
-    oscillation: { frequency: 4, amplitude: 0.35 }, // Más natural
+    duration: 1000,        // REDUCIDO de 1200 para más naturalidad
+    lerpFactor: 0.12,      // REDUCIDO de 0.15 para menos brusquedad
+    oscillation: { frequency: 3.5, amplitude: 0.25 }, // REDUCIDO de 0.35
   },
   shakeLegs: {
     duration: 2500,
-    lerpFactor: 0.12,
-    oscillation: { frequency: 6, amplitude: 0.4 },
+    lerpFactor: 0.10,      // REDUCIDO de 0.12
+    oscillation: { frequency: 5, amplitude: 0.35 }, // REDUCIDO
   },
   excited: {
-    duration: 1800,        // Más corto
-    lerpFactor: 0.1,       // Más suave
-    oscillation: { frequency: 5, amplitude: 0.3 }, // Menos intenso
+    duration: 1500,        // REDUCIDO de 1800
+    lerpFactor: 0.08,      // REDUCIDO de 0.1 para menos brusquedad
+    oscillation: { frequency: 4, amplitude: 0.2 }, // REDUCIDO de 0.3
   },
   confused: {
-    duration: 1800,
-    lerpFactor: 0.07,      // Más suave para parecer pensativo
-    oscillation: { frequency: 1.5, amplitude: 0.12 },
+    duration: 1500,        // REDUCIDO de 1800
+    lerpFactor: 0.06,
+    oscillation: { frequency: 1.2, amplitude: 0.08 }, // REDUCIDO de 0.12
   },
   goodbye: {
-    duration: 2500,        // Más corto
+    duration: 2200,        // REDUCIDO de 2500
     lerpFactor: 0.08,
-    oscillation: { frequency: 3, amplitude: 0.2 }, // Más suave
+    oscillation: { frequency: 2.5, amplitude: 0.18 }, // REDUCIDO
   },
   idleLookAround: {
     duration: 3000,
-    lerpFactor: 0.04,
-    oscillation: { frequency: 0.5, amplitude: 0.3 },
+    lerpFactor: 0.05,      // SUBIDO de 0.04
+    oscillation: { frequency: 0.4, amplitude: 0.25 }, // REDUCIDO
   },
   idleStretch: {
     duration: 2500,
-    lerpFactor: 0.06,
+    lerpFactor: 0.07,      // SUBIDO de 0.06
   },
   idleWeightShift: {
     duration: 4000,
-    lerpFactor: 0.03,
+    lerpFactor: 0.04,      // SUBIDO de 0.03
   },
   idleHeadTilt: {
     duration: 2000,
     lerpFactor: 0.08,
-    oscillation: { frequency: 1.5, amplitude: 0.2 },
+    oscillation: { frequency: 1.2, amplitude: 0.15 }, // REDUCIDO
   },
   thinking: {
-    duration: 0, // Continua mientras esté en estado PROCESSING
-    lerpFactor: 0.06,
-    oscillation: { frequency: 0.8, amplitude: 0.1 },
+    duration: 0,
+    lerpFactor: 0.10,      // SUBIDO de 0.06 para entrada más rápida
+    oscillation: { frequency: 0.6, amplitude: 0.08 }, // REDUCIDO
   },
 };
 
 // ============================================
-// PARÁMETROS DE IDLE
+// PARÁMETROS DE IDLE (REDUCIDOS para menos conflictos)
 // ============================================
 export const IDLE_PARAMS = {
   breath: {
-    frequency: 0.7,
-    amplitudeX: 0.01,
-    amplitudeY: 0.005,
+    frequency: 0.5,       // REDUCIDO de 0.7 - más lento
+    amplitudeX: 0.008,    // REDUCIDO de 0.01
+    amplitudeY: 0.004,    // REDUCIDO de 0.005
   },
   bodySway: {
-    frequencyX: 0.3,
-    frequencyZ: 0.2,
-    amplitudeX: 0.005,
-    amplitudeZ: 0.003,
+    frequencyX: 0.25,     // REDUCIDO de 0.3
+    frequencyZ: 0.15,     // REDUCIDO de 0.2
+    amplitudeX: 0.003,    // REDUCIDO de 0.005
+    amplitudeZ: 0.002,    // REDUCIDO de 0.003
   },
   shoulderIdle: {
-    frequencyX: 0.6,
-    frequencyY: 0.4,
-    amplitudeX: 0.025,
-    amplitudeY: 0.015,
+    frequencyX: 0.5,      // REDUCIDO de 0.6
+    frequencyY: 0.3,      // REDUCIDO de 0.4
+    amplitudeX: 0.015,    // REDUCIDO de 0.025
+    amplitudeY: 0.01,     // REDUCIDO de 0.015
   },
   elbowIdle: {
-    frequency: 0.7,
-    amplitude: 0.02,
+    frequency: 0.5,       // REDUCIDO de 0.7
+    amplitude: 0.012,     // REDUCIDO de 0.02
   },
   legSway: {
-    frequency: 0.4,
-    amplitudeX: 0.02,
-    amplitudeY: 0.01,
+    frequency: 0.3,       // REDUCIDO de 0.4
+    amplitudeX: 0.012,    // REDUCIDO de 0.02
+    amplitudeY: 0.006,    // REDUCIDO de 0.01
   },
   kneeSway: {
-    frequency: 0.4,
+    frequency: 0.3,       // REDUCIDO de 0.4
     phaseOffset: 0.2,
-    amplitude: 0.015,
+    amplitude: 0.01,      // REDUCIDO de 0.015
   },
   footSway: {
-    frequency: 0.4,
+    frequency: 0.3,       // REDUCIDO de 0.4
     phaseOffset: 0.4,
-    amplitude: 0.01,
+    amplitude: 0.006,     // REDUCIDO de 0.01
   },
 };
 
@@ -375,17 +375,17 @@ export const CURSOR_TRACKING = {
 };
 
 // ============================================
-// PARÁMETROS DE LISTENING
+// PARÁMETROS DE LISTENING (MINIMIZADOS)
 // ============================================
-// Valores mínimos: solo el seguimiento del cursor debe mover la cabeza
-// Eliminados movimientos adicionales que causaban conflictos con otras animaciones
+// Valores prácticamente imperceptibles para evitar conflictos con otras animaciones
+// El seguimiento del cursor es suficiente para mostrar atención
 export const LISTENING_PARAMS = {
   headTilt: {
-    frequency: 0.3,    // Muy lento
-    amplitude: 0.005,  // Prácticamente imperceptible para evitar conflictos
+    frequency: 0.2,    // REDUCIDO de 0.3 - más lento
+    amplitude: 0.003,  // REDUCIDO de 0.005 - casi invisible
   },
   neckTilt: {
-    frequency: 0.25,
-    amplitude: 0.003,  // Mínimo para complementar sin ser visible
+    frequency: 0.15,   // REDUCIDO de 0.25
+    amplitude: 0.002,  // REDUCIDO de 0.003 - mínimo absoluto
   },
 };

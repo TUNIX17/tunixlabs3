@@ -11,7 +11,7 @@ import {
   Sparkles
 } from '@react-three/drei';
 import * as THREE from 'three';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import { useRobotInteraction, RobotInteractionState } from '@/hooks/useRobotInteraction';
 import FloatingMicButton from '@/components/VoiceInterface/FloatingMicButton';
 import AudioVisualizer from '@/components/VoiceInterface/AudioVisualizer';
@@ -1493,9 +1493,13 @@ function RobotInteractionManager() {
   const t = useTranslations('VoiceInterface');
   const tRobot = useTranslations('Robot');
 
+  // Obtener idioma del locale de la URL (next-intl)
+  const locale = useLocale();
+
   useEffect(() => {
     setIsMounted(true);
-  }, []);
+    console.log('[RobotInteraction] Idioma del locale (URL):', locale);
+  }, [locale]);
 
   const {
     interactionState,
@@ -1511,7 +1515,7 @@ function RobotInteractionManager() {
     setCurrentLanguage,
     getConversationSummary,
   } = useRobotInteraction({
-    initialLanguage: 'es',
+    initialLanguage: locale,
     robotSystemPrompt: undefined,
     onStateChange: (newState) => {
       console.log('RobotInteractionState changed:', newState);

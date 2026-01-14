@@ -6,6 +6,50 @@ import { useRateLimiter } from '../lib/groq/rate-limiter';
 import { getCommercialPrompt } from '../lib/agent';
 import axios from 'axios';
 
+// Mapeo de nombres de idioma a códigos ISO para normalizar en TTS
+const LANGUAGE_NAME_TO_CODE: Record<string, string> = {
+  'spanish': 'es',
+  'español': 'es',
+  'english': 'en',
+  'inglés': 'en',
+  'french': 'fr',
+  'français': 'fr',
+  'german': 'de',
+  'deutsch': 'de',
+  'portuguese': 'pt',
+  'português': 'pt',
+  'italian': 'it',
+  'italiano': 'it',
+};
+
+/**
+ * Normaliza el código de idioma a formato ISO (es, en, etc.)
+ * Maneja tanto nombres completos (Spanish) como códigos (es-ES)
+ */
+const normalizeLanguageCode = (lang: string): string => {
+  if (!lang) return 'es'; // Default a español
+
+  const langLower = lang.toLowerCase().trim();
+
+  // Si es un nombre de idioma, convertir a código
+  if (LANGUAGE_NAME_TO_CODE[langLower]) {
+    return LANGUAGE_NAME_TO_CODE[langLower];
+  }
+
+  // Si ya es un código ISO (ej: es-ES, en-US), extraer la base
+  if (langLower.includes('-')) {
+    return langLower.split('-')[0];
+  }
+
+  // Si es un código corto (es, en), devolverlo tal cual
+  if (langLower.length <= 3) {
+    return langLower;
+  }
+
+  // Fallback: intentar extraer las primeras 2 letras como código
+  return langLower.substring(0, 2);
+};
+
 // Definición de tipos para la respuesta de Groq (Chat Completions)
 interface GroqChatCompletionChoice {
   message: {
@@ -253,10 +297,11 @@ export const useGroqConversation = ({
 
       // Función para seleccionar la mejor voz disponible
       const selectBestVoice = (voices: SpeechSynthesisVoice[], targetLang: string): SpeechSynthesisVoice | undefined => {
-        const langBase = targetLang.split('-')[0].toLowerCase();
+        // Normalizar el idioma (maneja "Spanish" -> "es", "es-ES" -> "es", etc.)
+        const langBase = normalizeLanguageCode(targetLang);
 
         // Log todas las voces disponibles para debug
-        console.log(`[TTS-WebSpeech] Buscando voz para: ${langBase}, voces disponibles:`,
+        console.log(`[TTS-WebSpeech] Buscando voz para: ${langBase} (original: ${targetLang}), voces disponibles:`,
           voices.map(v => `${v.name}(${v.lang})`).join(', '));
 
         // Prioridad 1: Voz exacta del idioma (ej: es-ES, es-MX)

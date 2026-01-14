@@ -9,6 +9,50 @@ import { ConversationSession, DEFAULT_SESSION_CONFIG } from '../lib/conversation
 import { AgentStateTracker, ConversationPhase, getAgentPromptCache } from '../lib/agent';
 import { BARGEIN_VAD_CONFIG } from '../lib/audio/vadConfig';
 
+// Mapeo de nombres de idioma a códigos ISO para normalizar detección de STT
+const LANGUAGE_NAME_TO_CODE: Record<string, string> = {
+  'spanish': 'es',
+  'español': 'es',
+  'english': 'en',
+  'inglés': 'en',
+  'french': 'fr',
+  'français': 'fr',
+  'german': 'de',
+  'deutsch': 'de',
+  'portuguese': 'pt',
+  'português': 'pt',
+  'italian': 'it',
+  'italiano': 'it',
+};
+
+/**
+ * Normaliza el código de idioma a formato ISO (es, en, etc.)
+ * Maneja tanto nombres completos (Spanish) como códigos (es-ES)
+ */
+const normalizeLanguageCode = (lang: string): string => {
+  if (!lang) return 'es'; // Default a español
+
+  const langLower = lang.toLowerCase().trim();
+
+  // Si es un nombre de idioma, convertir a código
+  if (LANGUAGE_NAME_TO_CODE[langLower]) {
+    return LANGUAGE_NAME_TO_CODE[langLower];
+  }
+
+  // Si ya es un código ISO (ej: es-ES, en-US), extraer la base
+  if (langLower.includes('-')) {
+    return langLower.split('-')[0];
+  }
+
+  // Si es un código corto (es, en), devolverlo tal cual
+  if (langLower.length <= 3) {
+    return langLower;
+  }
+
+  // Fallback: intentar extraer las primeras 2 letras como código
+  return langLower.substring(0, 2);
+};
+
 // Interfaz para las animaciones del robot
 interface RobotAnimations {
   startWaving: () => void;
@@ -330,11 +374,17 @@ export const useRobotInteraction = ({
     }
   }, [interactionState, onStateChange]);
 
-  // Actualizar idioma cuando se detecta uno nuevo
+  // Actualizar idioma cuando se detecta uno nuevo (normalizado a código ISO)
   useEffect(() => {
-    if (detectedLanguage && detectedLanguage !== currentLanguage) {
-      setCurrentLanguage(detectedLanguage);
-      promptCache.invalidate(); // Invalidar cache cuando cambia idioma
+    if (detectedLanguage) {
+      const normalizedDetected = normalizeLanguageCode(detectedLanguage);
+      const normalizedCurrent = normalizeLanguageCode(currentLanguage);
+
+      if (normalizedDetected !== normalizedCurrent) {
+        console.log('[RobotInteraction] Actualizando idioma:', currentLanguage, '->', normalizedDetected);
+        setCurrentLanguage(normalizedDetected);
+        promptCache.invalidate(); // Invalidar cache cuando cambia idioma
+      }
     }
   }, [detectedLanguage, currentLanguage, promptCache]);
 

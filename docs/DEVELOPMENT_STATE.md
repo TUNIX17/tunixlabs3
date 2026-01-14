@@ -662,6 +662,99 @@ src/app/inicio/components/RobotModel.tsx  - +onLeadCaptured callback
 
 ---
 
+## RECENT CHANGES (2026-01-14) - Animation System Fix
+
+### Problema Resuelto
+Robot presentaba movimientos bruscos e incoherentes al iniciar conversación, especialmente en brazos. Causado por múltiples animaciones que modificaban los mismos huesos simultáneamente sin coordinación.
+
+### Fase 1: Corrección Inmediata (RobotModel.tsx)
+1. **Guard Conditions Expandidas**
+   - `hasActiveShoulderAnimation`: incluye wave, approach, stepBack, dance, thinking, excited, confused, goodbye
+   - `hasActiveHeadAnimation`: incluye thinking, nodding, confused, goodbye, excited
+   - `hasActiveLegAnimation`: incluye dance, shakeLegs, approach, stepBack
+
+2. **Factor idleIntensity**
+   - Reduce animaciones idle al 15% durante LISTENING
+   - Aplicado a: respiración, body sway, shoulder idle, elbow idle, leg sway
+
+3. **Bloqueo de Animaciones Conflictivas**
+   - Arm resting solo se aplica si `!hasActiveShoulderAnimation`
+   - Leg resting solo se aplica si `!hasActiveLegAnimation`
+
+### Fase 2: Estabilización (rotationPresets.ts)
+1. **ANIMATION_CONFIGS Optimizados**
+   - `idle.lerpFactor`: 0.05 → 0.08 (transiciones más rápidas)
+   - `wave`: duración reducida, intensidad reducida
+   - `nodYes`: duración 1200→1000ms, amplitude 0.35→0.25
+   - `thinking.lerpFactor`: 0.06 → 0.10 (entrada más rápida)
+   - Todas las oscilaciones reducidas para menos brusquedad
+
+2. **IDLE_PARAMS Reducidos**
+   - `breath`: frequency 0.7→0.5, amplitudes reducidas ~20%
+   - `bodySway`: frequencies y amplitudes reducidas ~25%
+   - `shoulderIdle`: amplitudes reducidas ~40%
+   - `elbowIdle`: amplitude 0.02→0.012
+   - `legSway`: amplitudes reducidas ~40%
+
+3. **LISTENING_PARAMS Minimizados**
+   - `headTilt`: frequency 0.3→0.2, amplitude 0.005→0.003
+   - `neckTilt`: frequency 0.25→0.15, amplitude 0.003→0.002
+   - Casi imperceptibles para evitar conflictos con cursor tracking
+
+### Files Modified
+```
+src/app/inicio/components/RobotModel.tsx
+- Guard conditions expandidas
+- Factor idleIntensity para listening
+- Bloqueo condicional de arm/leg resting
+
+src/lib/animation/rotationPresets.ts
+- ANIMATION_CONFIGS optimizados
+- IDLE_PARAMS reducidos
+- LISTENING_PARAMS minimizados
+```
+
+### Fase 3: Integración del Hook useRobotAnimations (RobotModel.tsx)
+
+**Refactorización Mayor - Reducción de ~1200 líneas a ~250 líneas**
+
+1. **Integración del Hook Unificado**
+   - Importado `useRobotAnimations` para manejo centralizado de animaciones
+   - Registro automático de huesos via `registerScene(scene)`
+   - Delegación completa de lógica de animación a `updateAnimations()`
+
+2. **Estados Eliminados** (ahora manejados por el hook)
+   - `isWaving`, `isDancing`, `isNoddingYes`, `isShakingLegs`
+   - `isThinking`, `isExcited`, `isConfused`, `isGoodbye`
+   - Solo se mantienen `isApproaching` y `isSteppingBack` para posición de escena
+
+3. **Refs Eliminados** (ahora en BoneController)
+   - Todos los bone refs individuales (headRef, neckRef, shoulderLeftRef, etc.)
+   - Todos los timer refs (waveTimerRef, danceTimerRef, etc.)
+   - Solo se mantiene `approachTimerRef` para animación de posición
+
+4. **useFrame Simplificado**
+   - De ~900 líneas de lógica manual a ~50 líneas
+   - Mouse tracking + llamada a `updateAnimations()`
+   - Solo maneja posición de escena para approach/stepBack
+
+5. **useImperativeHandle Limpio**
+   - Métodos delegados directamente al hook
+   - Solo `approachCamera` y `stepBackward` tienen lógica local (posición)
+
+### Beneficios de la Fase 3
+- **Código más mantenible**: Sistema de animación centralizado
+- **Mejor blending**: AnimationMachine maneja transiciones automáticamente
+- **Menos bugs**: Un solo lugar para la lógica de animación
+- **Extensibilidad**: Fácil agregar nuevas animaciones en rotationPresets.ts
+
+### Verificación
+- Build exitoso sin errores de TypeScript
+- Todas las fases implementadas
+- Listo para testing en desarrollo local
+
+---
+
 ## NOTES
 
 - El .venv compartido ya tiene las dependencias de Raggy instaladas
