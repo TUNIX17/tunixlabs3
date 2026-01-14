@@ -15,16 +15,21 @@ const LANGUAGE_NAME_TO_CODE: Record<string, string> = {
   'inglés': 'en',
 };
 
+// Idiomas soportados por el sistema
+const SUPPORTED_LANGUAGES = ['es', 'en'];
+
 /**
  * Normaliza el código de idioma a formato ISO (es, en)
+ * SOLO acepta español e inglés - otros idiomas retornan 'es' por defecto
  */
 const normalizeLanguageCode = (lang: string): string => {
   if (!lang) return 'es';
   const langLower = lang.toLowerCase().trim();
   if (LANGUAGE_NAME_TO_CODE[langLower]) return LANGUAGE_NAME_TO_CODE[langLower];
-  if (langLower.includes('-')) return langLower.split('-')[0];
-  if (langLower.length <= 3) return langLower;
-  return langLower.substring(0, 2);
+  let langCode = langLower;
+  if (langLower.includes('-')) langCode = langLower.split('-')[0];
+  if (SUPPORTED_LANGUAGES.includes(langCode)) return langCode;
+  return 'es'; // Idioma no soportado - usar español por defecto
 };
 
 /**

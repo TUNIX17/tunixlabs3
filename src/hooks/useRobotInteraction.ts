@@ -25,32 +25,36 @@ const LANGUAGE_NAME_TO_CODE: Record<string, string> = {
   'italiano': 'it',
 };
 
+// Idiomas soportados por el sistema
+const SUPPORTED_LANGUAGES = ['es', 'en'];
+
 /**
- * Normaliza el código de idioma a formato ISO (es, en, etc.)
- * Maneja tanto nombres completos (Spanish) como códigos (es-ES)
+ * Normaliza el código de idioma a formato ISO (es, en)
+ * SOLO acepta español e inglés - otros idiomas retornan null
  */
-const normalizeLanguageCode = (lang: string): string => {
+const normalizeLanguageCode = (lang: string): string | null => {
   if (!lang) return 'es'; // Default a español
 
   const langLower = lang.toLowerCase().trim();
 
-  // Si es un nombre de idioma, convertir a código
+  // Si es un nombre de idioma conocido, convertir a código
   if (LANGUAGE_NAME_TO_CODE[langLower]) {
     return LANGUAGE_NAME_TO_CODE[langLower];
   }
 
   // Si ya es un código ISO (ej: es-ES, en-US), extraer la base
+  let langCode = langLower;
   if (langLower.includes('-')) {
-    return langLower.split('-')[0];
+    langCode = langLower.split('-')[0];
   }
 
-  // Si es un código corto (es, en), devolverlo tal cual
-  if (langLower.length <= 3) {
-    return langLower;
+  // Solo aceptar idiomas soportados (es, en)
+  if (SUPPORTED_LANGUAGES.includes(langCode)) {
+    return langCode;
   }
 
-  // Fallback: intentar extraer las primeras 2 letras como código
-  return langLower.substring(0, 2);
+  // Idioma no soportado - retornar null para ignorarlo
+  return null;
 };
 
 // Interfaz para las animaciones del robot
@@ -375,10 +379,18 @@ export const useRobotInteraction = ({
   }, [interactionState, onStateChange]);
 
   // Actualizar idioma cuando se detecta uno nuevo (normalizado a código ISO)
+  // SOLO acepta español e inglés - otros idiomas se ignoran
   useEffect(() => {
     if (detectedLanguage) {
       const normalizedDetected = normalizeLanguageCode(detectedLanguage);
-      const normalizedCurrent = normalizeLanguageCode(currentLanguage);
+
+      // Si el idioma detectado no es soportado (es, en), ignorarlo
+      if (!normalizedDetected) {
+        console.log('[RobotInteraction] Idioma detectado no soportado:', detectedLanguage, '- Manteniendo:', currentLanguage);
+        return;
+      }
+
+      const normalizedCurrent = normalizeLanguageCode(currentLanguage) || 'es';
 
       if (normalizedDetected !== normalizedCurrent) {
         console.log('[RobotInteraction] Actualizando idioma:', currentLanguage, '->', normalizedDetected);

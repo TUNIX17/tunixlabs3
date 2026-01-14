@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useRef, useState, Suspense, forwardRef, useImperativeHandle, useEffect, useCallback } from 'react';
+import React, { useRef, useState, Suspense, forwardRef, useImperativeHandle, useEffect } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import {
   Environment,
@@ -252,34 +252,19 @@ const AnimatedRobotModel = forwardRef<RobotMethods, { onLoad?: () => void; isLis
       // Skip animaciones específicas si estamos en thinking (tiene prioridad sobre idle)
       const skipIdleAnimations = isThinking;
 
-      // Factor de reducción para animaciones idle cuando está escuchando
-      // Reduce movimientos para que el robot parezca más atento
-      const idleIntensity = isListeningState ? 0.15 : 1.0;
-
-      // Guard conditions expandidas para bloqueo mutuo entre animaciones
-      const hasActiveShoulderAnimation =
-        isWaving || isApproaching || isSteppingBack || isDancing ||
-        isThinking || isExcited || isConfused || isGoodbye;
-
-      const hasActiveHeadAnimation =
-        isThinking || isNoddingYes || isConfused || isGoodbye || isExcited;
-
-      const hasActiveLegAnimation =
-        isDancing || isShakingLegs || isApproaching || isSteppingBack;
-
       // 1. Animación de Respiración Sutil en body_top1 (usando parámetros configurables)
       if (!skipIdleAnimations && bodyTop1Ref.current && initialRotations.current.body_top1) {
         const { frequency, amplitudeX, amplitudeY } = IDLE_PARAMS.breath;
-        const breathCycle = Math.sin(time * frequency) * amplitudeX * idleIntensity;
+        const breathCycle = Math.sin(time * frequency) * amplitudeX;
         bodyTop1Ref.current.rotation.x = initialRotations.current.body_top1.x + breathCycle;
-        bodyTop1Ref.current.rotation.y = initialRotations.current.body_top1.y + Math.cos(time * (frequency * 0.7)) * amplitudeY * idleIntensity;
+        bodyTop1Ref.current.rotation.y = initialRotations.current.body_top1.y + Math.cos(time * (frequency * 0.7)) * amplitudeY;
       }
 
       // 2. Animación Idle Sutil para el Torso Superior (usando parámetros configurables)
       if (!skipIdleAnimations && bodyTop2Ref.current && initialRotations.current.body_top2) {
         const { frequencyX, frequencyZ, amplitudeX, amplitudeZ } = IDLE_PARAMS.bodySway;
-        const idleSway = Math.sin(time * frequencyX) * amplitudeX * idleIntensity;
-        const idleTwist = Math.cos(time * frequencyZ) * amplitudeZ * idleIntensity;
+        const idleSway = Math.sin(time * frequencyX) * amplitudeX;
+        const idleTwist = Math.cos(time * frequencyZ) * amplitudeZ;
 
         // Guardar la rotación Y actual (que incluye el seguimiento del cursor)
         const currentRotationY = bodyTop2Ref.current.rotation.y;
@@ -379,14 +364,9 @@ const AnimatedRobotModel = forwardRef<RobotMethods, { onLoad?: () => void; isLis
         }
         
         // Hacemos que el torso se mueva ligeramente con el saludo
-        if (bodyTop2Ref.current && initialRotations.current.body_top2) {
+        if (bodyTop2Ref.current) {
           const waveBodyRotation = Math.sin(waveElapsedTime * 5) * 0.01;
-          // Usar valor base + oscilación (NO acumulativo)
-          bodyTop2Ref.current.rotation.y = THREE.MathUtils.lerp(
-            bodyTop2Ref.current.rotation.y,
-            initialRotations.current.body_top2.y + waveBodyRotation,
-            0.1
-          );
+          bodyTop2Ref.current.rotation.y += waveBodyRotation;
         }
       } else {
         // Si no está saludando, aplicar las rotaciones de reposo normales para el brazo derecho
@@ -433,13 +413,11 @@ const AnimatedRobotModel = forwardRef<RobotMethods, { onLoad?: () => void; isLis
       }
 
       // 5. Animación de Piernas a Pose de Reposo y movimiento sutil
-      // Solo aplicar si no hay animaciones activas que usen las piernas
       // Pierna Izquierda (Superior)
-      if (!hasActiveLegAnimation && legLeftTopRef.current && targetLegRestingRotations.leg_left_top) {
+      if (legLeftTopRef.current && targetLegRestingRotations.leg_left_top) {
         // Añadir un sutil movimiento de balanceo a las piernas
-        // Aplicar idleIntensity para reducir movimiento durante LISTENING
-        const legSwayX = Math.sin(time * 0.4) * 0.02 * idleIntensity;
-        const legSwayY = Math.cos(time * 0.3) * 0.01 * idleIntensity;
+        const legSwayX = Math.sin(time * 0.4) * 0.02; // Movimiento más pronunciado
+        const legSwayY = Math.cos(time * 0.3) * 0.01;
         
         legLeftTopRef.current.rotation.x = THREE.MathUtils.lerp(
           legLeftTopRef.current.rotation.x, 
@@ -478,10 +456,9 @@ const AnimatedRobotModel = forwardRef<RobotMethods, { onLoad?: () => void; isLis
       }
       
       // Rodillas y pies - aplicar movimiento más sutil
-      // Solo aplicar si no hay animaciones activas que usen las piernas
       // Pierna Izquierda (Inferior/Rodilla)
-      if (!hasActiveLegAnimation && legLeftBotRef.current && targetLegRestingRotations.leg_left_bot) {
-        const kneeSwayX = Math.sin(time * 0.4 + 0.2) * 0.015 * idleIntensity; // Ligero desfase para movimiento natural
+      if (legLeftBotRef.current && targetLegRestingRotations.leg_left_bot) {
+        const kneeSwayX = Math.sin(time * 0.4 + 0.2) * 0.015; // Ligero desfase para movimiento natural
         
         legLeftBotRef.current.rotation.x = THREE.MathUtils.lerp(
           legLeftBotRef.current.rotation.x, 
@@ -520,9 +497,8 @@ const AnimatedRobotModel = forwardRef<RobotMethods, { onLoad?: () => void; isLis
       }
       
       // Pies
-      // Solo aplicar si no hay animaciones activas que usen las piernas
-      if (!hasActiveLegAnimation && legLeftFootRef.current && targetLegRestingRotations.leg_left_foot) {
-        const footSwayX = Math.sin(time * 0.4 + 0.4) * 0.01 * idleIntensity;
+      if (legLeftFootRef.current && targetLegRestingRotations.leg_left_foot) {
+        const footSwayX = Math.sin(time * 0.4 + 0.4) * 0.01;
         
         legLeftFootRef.current.rotation.x = THREE.MathUtils.lerp(
           legLeftFootRef.current.rotation.x, 
@@ -560,52 +536,26 @@ const AnimatedRobotModel = forwardRef<RobotMethods, { onLoad?: () => void; isLis
       }
 
       // Añadir animación idle más visible en los hombros
-      // SOLO aplicar si no hay animaciones activas que usen los hombros
-      if (!hasActiveShoulderAnimation && shoulderLeftRef.current && targetArmRestingRotations.shoulder_left) {
-        // Movimiento sutil basado en posición de reposo (NO acumulativo)
-        // Aplicar idleIntensity para reducir movimiento durante LISTENING
-        const shoulderIdleX = Math.sin(time * 0.6) * 0.025 * idleIntensity;
-        const shoulderIdleY = Math.sin(time * 0.4) * 0.015 * idleIntensity;
-
-        // Usar lerp hacia la posición de reposo + offset (NO +=)
-        shoulderLeftRef.current.rotation.x = THREE.MathUtils.lerp(
-          shoulderLeftRef.current.rotation.x,
-          targetArmRestingRotations.shoulder_left.x + shoulderIdleX,
-          lerpFactor
-        );
-        shoulderLeftRef.current.rotation.y = THREE.MathUtils.lerp(
-          shoulderLeftRef.current.rotation.y,
-          targetArmRestingRotations.shoulder_left.y + shoulderIdleY,
-          lerpFactor
-        );
-
-        if (shoulderRightRef.current && targetArmRestingRotations.shoulder_right) {
-          shoulderRightRef.current.rotation.x = THREE.MathUtils.lerp(
-            shoulderRightRef.current.rotation.x,
-            targetArmRestingRotations.shoulder_right.x + shoulderIdleX,
-            lerpFactor
-          );
-          shoulderRightRef.current.rotation.y = THREE.MathUtils.lerp(
-            shoulderRightRef.current.rotation.y,
-            targetArmRestingRotations.shoulder_right.y - shoulderIdleY,
-            lerpFactor
-          );
+      if (!isWaving && shoulderLeftRef.current && targetArmRestingRotations.shoulder_left) {
+        // Aumentamos la amplitud del movimiento para hacerlo más visible
+        const shoulderIdleX = Math.sin(time * 0.6) * 0.025;  // Triplicado
+        const shoulderIdleY = Math.sin(time * 0.4) * 0.015;  // Triplicado
+        
+        // Aplicar movimiento sutil adicional a los hombros
+        shoulderLeftRef.current.rotation.x += shoulderIdleX;
+        shoulderLeftRef.current.rotation.y += shoulderIdleY;
+        
+        if (shoulderRightRef.current) {
+          shoulderRightRef.current.rotation.x += shoulderIdleX;
+          shoulderRightRef.current.rotation.y -= shoulderIdleY; // Invertido para simetría
         }
-
-        // Movimiento sutil de codos (NO acumulativo)
-        if (armLeftBotRef.current && armRightBotRef.current && targetArmRestingRotations.arm_left_bot && targetArmRestingRotations.arm_right_bot) {
-          const elbowIdleX = Math.sin(time * 0.7) * 0.02 * idleIntensity;
-
-          armLeftBotRef.current.rotation.x = THREE.MathUtils.lerp(
-            armLeftBotRef.current.rotation.x,
-            targetArmRestingRotations.arm_left_bot.x + elbowIdleX,
-            lerpFactor
-          );
-          armRightBotRef.current.rotation.x = THREE.MathUtils.lerp(
-            armRightBotRef.current.rotation.x,
-            targetArmRestingRotations.arm_right_bot.x + elbowIdleX,
-            lerpFactor
-          );
+        
+        // Añadir movimiento sutil a los codos para complementar el movimiento del hombro
+        if (armLeftBotRef.current && armRightBotRef.current) {
+          const elbowIdleX = Math.sin(time * 0.7) * 0.02;
+          
+          armLeftBotRef.current.rotation.x += elbowIdleX;
+          armRightBotRef.current.rotation.x += elbowIdleX;
         }
       }
 
@@ -1233,110 +1183,138 @@ const AnimatedRobotModel = forwardRef<RobotMethods, { onLoad?: () => void; isLis
       return t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
     };
 
-    // Función para cancelar todas las animaciones activas
-    const cancelAllAnimations = () => {
-      // Cancelar timers
-      if (waveTimerRef.current) { clearTimeout(waveTimerRef.current); waveTimerRef.current = null; }
-      if (approachTimerRef.current) { clearTimeout(approachTimerRef.current); approachTimerRef.current = null; }
-      if (danceTimerRef.current) { clearTimeout(danceTimerRef.current); danceTimerRef.current = null; }
-      if (nodTimerRef.current) { clearTimeout(nodTimerRef.current); nodTimerRef.current = null; }
-      if (shakeLegsTimerRef.current) { clearTimeout(shakeLegsTimerRef.current); shakeLegsTimerRef.current = null; }
-      if (excitedTimerRef.current) { clearTimeout(excitedTimerRef.current); excitedTimerRef.current = null; }
-      if (confusedTimerRef.current) { clearTimeout(confusedTimerRef.current); confusedTimerRef.current = null; }
-      if (goodbyeTimerRef.current) { clearTimeout(goodbyeTimerRef.current); goodbyeTimerRef.current = null; }
-
-      // Reset estados
-      setIsWaving(false);
-      setIsApproaching(false);
-      setIsSteppingBack(false);
-      setIsDancing(false);
-      setIsNoddingYes(false);
-      setIsShakingLegs(false);
-      setIsThinking(false);
-      setIsExcited(false);
-      setIsConfused(false);
-      setIsGoodbye(false);
-    };
-
     // Método para iniciar el saludo
     const startWaving = () => {
-      // Cancelar animaciones conflictivas (excepto approach)
       if (waveTimerRef.current) {
         clearTimeout(waveTimerRef.current);
-        waveTimerRef.current = null;
       }
-      if (isThinking) setIsThinking(false);
-      if (isDancing) setIsDancing(false);
-      if (isNoddingYes) setIsNoddingYes(false);
-
+      
       setIsWaving(true);
-      waveStartTimeRef.current = performance.now() / 1000;
-
-      // NO manipular huesos directamente - useFrame lo maneja con lerp
-
+      waveStartTimeRef.current = performance.now() / 1000; // Convertir a segundos para consistencia
+      
+      // Añadir inclinación sutil de la cabeza durante el saludo
+      if (headRef.current && neckRef.current) {
+        headRef.current.rotation.z = THREE.MathUtils.degToRad(5); // Ligera inclinación lateral
+        neckRef.current.rotation.z = THREE.MathUtils.degToRad(3); // Inclinación complementaria
+      }
+      
+      // Añadir movimiento sutil del torso
+      if (bodyTop1Ref.current) {
+        bodyTop1Ref.current.rotation.z = THREE.MathUtils.degToRad(2); // Ligero giro
+      }
+      
       // Detener el saludo después de 2.5 segundos
       waveTimerRef.current = setTimeout(() => {
         setIsWaving(false);
+        
+        // Restaurar posiciones originales
+        if (headRef.current && neckRef.current && bodyTop1Ref.current) {
+          headRef.current.rotation.z = initialRotations.current.head?.z || 0;
+          neckRef.current.rotation.z = initialRotations.current.neck?.z || 0;
+          bodyTop1Ref.current.rotation.z = initialRotations.current.body_top1?.z || 0;
+        }
+        
         waveTimerRef.current = null;
       }, 2500);
     };
 
     // Método para acercarse a la cámara
     const approachCamera = () => {
-      // Cancelar animaciones conflictivas
       if (approachTimerRef.current) {
         clearTimeout(approachTimerRef.current);
-        approachTimerRef.current = null;
+      }
+      
+      // Guardar tiempo de inicio y activar animación de acercamiento
+      setIsApproaching(true);
+      setIsSteppingBack(false); // Asegurar que no estemos retrocediendo
+      approachStartTimeRef.current = performance.now() / 1000;
+      
+      // Añadir inclinación del cuerpo para un acercamiento más natural
+      if (bodyTop1Ref.current && bodyTop2Ref.current) {
+        // Basado en rig.txt - usar los ejes según la documentación
+        bodyTop1Ref.current.rotation.x = THREE.MathUtils.degToRad(15); // Inclinación hacia adelante
+        bodyTop2Ref.current.rotation.x = THREE.MathUtils.degToRad(5); // Ligera inclinación complementaria
       }
 
-      // Cancelar otras animaciones que podrían interferir
-      cancelAllAnimations();
-
-      // Guardar tiempo de inicio y activar animación de acercamiento
-      // El useFrame manejará la animación suave con lerp
-      setIsApproaching(true);
-      setIsSteppingBack(false);
-      approachStartTimeRef.current = performance.now() / 1000;
-
-      // NO manipular huesos directamente - dejar que useFrame lo haga con lerp
-
-      // Después de un tiempo, iniciar el retroceso automático
+      if (headRef.current && neckRef.current) {
+        // Inclinación ligeramente hacia el usuario
+        headRef.current.rotation.x = THREE.MathUtils.degToRad(-15);
+        neckRef.current.rotation.x = THREE.MathUtils.degToRad(-10);
+      }
+      
+      // Animar brazos según rig.txt - abrir ligeramente en posición de bienvenida
+      if (shoulderLeftRef.current && shoulderRightRef.current) {
+        // Brazos ligeramente adelante y abiertos
+        shoulderLeftRef.current.rotation.x = THREE.MathUtils.degToRad(20); // Hacia adelante
+        shoulderLeftRef.current.rotation.y = THREE.MathUtils.degToRad(15); // Ligeramente separado
+        shoulderLeftRef.current.rotation.z = THREE.MathUtils.degToRad(-130); // Posición óptima según rig.txt
+        
+        shoulderRightRef.current.rotation.x = THREE.MathUtils.degToRad(20); // Hacia adelante
+        shoulderRightRef.current.rotation.y = THREE.MathUtils.degToRad(-15); // Ligeramente separado (simétrico)
+        shoulderRightRef.current.rotation.z = THREE.MathUtils.degToRad(130); // Posición óptima según rig.txt
+      }
+      
+      // Flexión de codos según rig.txt
+      if (armLeftBotRef.current && armRightBotRef.current) {
+        armLeftBotRef.current.rotation.x = THREE.MathUtils.degToRad(30); // Flexión de codo
+        armRightBotRef.current.rotation.x = THREE.MathUtils.degToRad(30); // Flexión de codo
+      }
+      
+      // Después de un tiempo, iniciar el retroceso
       approachTimerRef.current = setTimeout(() => {
         setIsApproaching(false);
         setIsSteppingBack(true);
         approachStartTimeRef.current = performance.now() / 1000;
-
+        
         // Después de completar el retroceso, detener la animación
         setTimeout(() => {
           setIsSteppingBack(false);
           approachTimerRef.current = null;
         }, 2000);
-      }, 3000);
+      }, 3000); // Quedarse adelante por 3 segundos
     };
 
     // Método para regresar a la posición original
     const stepBackward = () => {
-      // Cancelar animaciones conflictivas
       if (approachTimerRef.current) {
         clearTimeout(approachTimerRef.current);
-        approachTimerRef.current = null;
       }
-
-      // Cancelar otras animaciones
-      if (isWaving) setIsWaving(false);
-      if (isThinking) setIsThinking(false);
-      if (isDancing) setIsDancing(false);
-      if (isNoddingYes) setIsNoddingYes(false);
-      if (isExcited) setIsExcited(false);
-      if (isConfused) setIsConfused(false);
-      if (isGoodbye) setIsGoodbye(false);
-
+      
       setIsApproaching(false);
       setIsSteppingBack(true);
       approachStartTimeRef.current = performance.now() / 1000;
-
-      // NO manipular huesos directamente - dejar que useFrame los regrese suavemente
-
+      
+      // Restaurar todas las rotaciones modificadas a sus valores originales
+      if (headRef.current && neckRef.current && initialRotations.current.head && initialRotations.current.neck) {
+        headRef.current.rotation.x = initialRotations.current.head.x;
+        neckRef.current.rotation.x = initialRotations.current.neck.x;
+      }
+      
+      if (bodyTop1Ref.current && bodyTop2Ref.current && initialRotations.current.body_top1 && initialRotations.current.body_top2) {
+        bodyTop1Ref.current.rotation.x = initialRotations.current.body_top1.x;
+        bodyTop2Ref.current.rotation.x = initialRotations.current.body_top2.x;
+      }
+      
+      // Restaurar brazos y codos
+      if (shoulderLeftRef.current && shoulderRightRef.current && 
+          initialRotations.current.shoulder_left && initialRotations.current.shoulder_right) {
+        
+        shoulderLeftRef.current.rotation.x = initialRotations.current.shoulder_left.x;
+        shoulderLeftRef.current.rotation.y = initialRotations.current.shoulder_left.y;
+        shoulderLeftRef.current.rotation.z = initialRotations.current.shoulder_left.z;
+        
+        shoulderRightRef.current.rotation.x = initialRotations.current.shoulder_right.x;
+        shoulderRightRef.current.rotation.y = initialRotations.current.shoulder_right.y;
+        shoulderRightRef.current.rotation.z = initialRotations.current.shoulder_right.z;
+      }
+      
+      if (armLeftBotRef.current && armRightBotRef.current && 
+          initialRotations.current.arm_left_bot && initialRotations.current.arm_right_bot) {
+        
+        armLeftBotRef.current.rotation.x = initialRotations.current.arm_left_bot.x;
+        armRightBotRef.current.rotation.x = initialRotations.current.arm_right_bot.x;
+      }
+      
       approachTimerRef.current = setTimeout(() => {
         setIsSteppingBack(false);
         approachTimerRef.current = null;
@@ -1390,20 +1368,10 @@ const AnimatedRobotModel = forwardRef<RobotMethods, { onLoad?: () => void; isLis
 
     // Método para iniciar animación de "pensando"
     const startThinking = () => {
-      // Cancelar timers conflictivos
-      if (waveTimerRef.current) { clearTimeout(waveTimerRef.current); waveTimerRef.current = null; }
-      if (danceTimerRef.current) { clearTimeout(danceTimerRef.current); danceTimerRef.current = null; }
-      if (nodTimerRef.current) { clearTimeout(nodTimerRef.current); nodTimerRef.current = null; }
-      if (shakeLegsTimerRef.current) { clearTimeout(shakeLegsTimerRef.current); shakeLegsTimerRef.current = null; }
-
       // Cancelar otras animaciones que podrían interferir
       if (isWaving) setIsWaving(false);
       if (isDancing) setIsDancing(false);
       if (isNoddingYes) setIsNoddingYes(false);
-      if (isShakingLegs) setIsShakingLegs(false);
-      if (isExcited) setIsExcited(false);
-      if (isConfused) setIsConfused(false);
-      // Mantener approach/stepBack si están activos (son compatibles con thinking)
 
       setIsThinking(true);
       thinkingStartTimeRef.current = performance.now() / 1000;
@@ -1525,61 +1493,6 @@ function RobotInteractionManager() {
     setIsMounted(true);
   }, []);
 
-  // Memoizar callbacks para evitar re-renders constantes
-  const handleStateChange = useCallback((newState: RobotInteractionState) => {
-    console.log('RobotInteractionState changed:', newState);
-  }, []);
-
-  const handleError = useCallback((error: Error) => {
-    console.error('Error en useRobotInteraction desde el contenedor:', error);
-  }, []);
-
-  const handleLeadCaptured = useCallback(async (leadData: any) => {
-    console.log('[Lead] Datos recibidos para guardar:', leadData);
-
-    // Verificar si hay datos significativos (nombre, email, teléfono o intereses)
-    const hasInterests = leadData.interests?.length > 0 || leadData.interest?.length > 0;
-    const hasSignificantData = leadData.name || leadData.email || leadData.phone || hasInterests;
-
-    if (!hasSignificantData) {
-      console.log('[Lead] Sin datos significativos, no se guarda');
-      return;
-    }
-
-    try {
-      // Normalizar el campo interest -> interests para la API
-      const normalizedData = {
-        ...leadData,
-        interests: leadData.interests || leadData.interest || [],
-        source: 'voice-agent'
-      };
-      // Eliminar el campo interest si existe (la API usa interests)
-      delete normalizedData.interest;
-
-      console.log('[Lead] Enviando a API:', normalizedData);
-
-      const response = await fetch('/api/leads/capture', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(normalizedData)
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        console.log('[Lead] Guardado exitosamente:', data.leadId, data.isNew ? '(nuevo)' : '(actualizado)');
-      } else {
-        const errorText = await response.text();
-        console.error('[Lead] Error al guardar:', response.status, errorText);
-      }
-    } catch (error) {
-      console.error('[Lead] Error de red:', error);
-    }
-  }, []);
-
-  const handleSessionEnd = useCallback(() => {
-    console.log('[Session] Sesion de voz finalizada');
-  }, []);
-
   const {
     interactionState,
     userMessage,
@@ -1595,10 +1508,12 @@ function RobotInteractionManager() {
   } = useRobotInteraction({
     initialLanguage: 'es',
     robotSystemPrompt: undefined,
-    onStateChange: handleStateChange,
-    onError: handleError,
-    onLeadCaptured: handleLeadCaptured,
-    onSessionEnd: handleSessionEnd
+    onStateChange: (newState) => {
+      console.log('RobotInteractionState changed:', newState);
+    },
+    onError: (error) => {
+      console.error('Error en useRobotInteraction desde el contenedor:', error);
+    }
   });
 
   useEffect(() => {
@@ -1623,16 +1538,12 @@ function RobotInteractionManager() {
     if (isLoading) return;
     if (interactionState === RobotInteractionState.PROCESSING) return;
 
-    // Manejar LISTENING y LISTENING_ACTIVE - ambos deben detener la escucha
-    if (interactionState === RobotInteractionState.LISTENING ||
-        interactionState === RobotInteractionState.LISTENING_ACTIVE) {
+    if (interactionState === RobotInteractionState.LISTENING) {
       stopListening();
-    } else if (interactionState === RobotInteractionState.SPEAKING) {
-      // Si está hablando, interrumpir y empezar a escuchar
-      stopSpeaking();
-      startListening();
     } else {
-      // IDLE o ERROR - iniciar escucha
+      if (interactionState === RobotInteractionState.SPEAKING) {
+        stopSpeaking();
+      }
       startListening();
     }
   };
@@ -1678,9 +1589,9 @@ function RobotInteractionManager() {
           <pointLight position={[0, 5, 5]} intensity={0.3} color="#61dbfb" />
           
           <Suspense fallback={null}>
-            <AnimatedRobotModel
-              onLoad={handleModelLoaded}
-              isListening={interactionState === RobotInteractionState.LISTENING || interactionState === RobotInteractionState.LISTENING_ACTIVE}
+            <AnimatedRobotModel 
+              onLoad={handleModelLoaded} 
+              isListening={interactionState === RobotInteractionState.LISTENING}
               ref={robotAnimatedRef}
             />
             <Environment files="/potsdamer_platz_1k.hdr" />
@@ -1702,9 +1613,7 @@ function RobotInteractionManager() {
           style={{ pointerEvents: 'auto' }}
         >
           {/* Audio Visualizer - Above the row when listening */}
-          {(interactionState === RobotInteractionState.LISTENING ||
-            interactionState === RobotInteractionState.LISTENING_ACTIVE ||
-            isRecording) && (
+          {(interactionState === RobotInteractionState.LISTENING || isRecording) && (
             <div className="mb-1">
               <AudioVisualizer width={140} height={25} barColor="var(--neu-primary)" />
             </div>
@@ -1720,7 +1629,6 @@ function RobotInteractionManager() {
               <p className="text-sm font-medium" style={{ color: '#4a5568' }}>
                 {interactionState === RobotInteractionState.IDLE && "Habla conmigo"}
                 {interactionState === RobotInteractionState.LISTENING && "Te escucho..."}
-                {interactionState === RobotInteractionState.LISTENING_ACTIVE && "Grabando..."}
                 {interactionState === RobotInteractionState.PROCESSING && "Pensando..."}
                 {interactionState === RobotInteractionState.SPEAKING && "Respondiendo..."}
                 {interactionState === RobotInteractionState.ERROR && "Intenta de nuevo"}

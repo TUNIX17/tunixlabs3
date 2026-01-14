@@ -12,42 +12,38 @@ const LANGUAGE_NAME_TO_CODE: Record<string, string> = {
   'español': 'es',
   'english': 'en',
   'inglés': 'en',
-  'french': 'fr',
-  'français': 'fr',
-  'german': 'de',
-  'deutsch': 'de',
-  'portuguese': 'pt',
-  'português': 'pt',
-  'italian': 'it',
-  'italiano': 'it',
 };
 
+// Idiomas soportados por el sistema
+const SUPPORTED_LANGUAGES = ['es', 'en'];
+
 /**
- * Normaliza el código de idioma a formato ISO (es, en, etc.)
- * Maneja tanto nombres completos (Spanish) como códigos (es-ES)
+ * Normaliza el código de idioma a formato ISO (es, en)
+ * SOLO acepta español e inglés - otros idiomas retornan 'es' por defecto
  */
 const normalizeLanguageCode = (lang: string): string => {
   if (!lang) return 'es'; // Default a español
 
   const langLower = lang.toLowerCase().trim();
 
-  // Si es un nombre de idioma, convertir a código
+  // Si es un nombre de idioma conocido, convertir a código
   if (LANGUAGE_NAME_TO_CODE[langLower]) {
     return LANGUAGE_NAME_TO_CODE[langLower];
   }
 
   // Si ya es un código ISO (ej: es-ES, en-US), extraer la base
+  let langCode = langLower;
   if (langLower.includes('-')) {
-    return langLower.split('-')[0];
+    langCode = langLower.split('-')[0];
   }
 
-  // Si es un código corto (es, en), devolverlo tal cual
-  if (langLower.length <= 3) {
-    return langLower;
+  // Solo aceptar idiomas soportados (es, en)
+  if (SUPPORTED_LANGUAGES.includes(langCode)) {
+    return langCode;
   }
 
-  // Fallback: intentar extraer las primeras 2 letras como código
-  return langLower.substring(0, 2);
+  // Idioma no soportado - usar español por defecto
+  return 'es';
 };
 
 // Definición de tipos para la respuesta de Groq (Chat Completions)
