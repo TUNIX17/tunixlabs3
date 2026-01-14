@@ -32,7 +32,6 @@ import {
   ANIMATION_CONFIGS,
   IDLE_PARAMS,
   CURSOR_TRACKING,
-  LISTENING_PARAMS,
 } from '../../../../lib/animation';
 import { easeInOutQuad, easeOutBack } from '../../../../lib/animation/easingFunctions';
 
@@ -284,19 +283,13 @@ const AnimatedRobotModel = forwardRef<RobotMethods, { onLoad?: () => void; isLis
         const mouseX = THREE.MathUtils.clamp(targetMouse.current.x, -1, 1);
         const mouseY = THREE.MathUtils.clamp(targetMouse.current.y, -1, 1);
 
-        // Factores adicionales para la animación de "escuchar" (usando parámetros configurables)
-        const listeningHeadTilt = isListeningState
-          ? Math.sin(time * LISTENING_PARAMS.headTilt.frequency) * LISTENING_PARAMS.headTilt.amplitude
-          : 0;
-        const listeningNeckTilt = isListeningState
-          ? Math.sin(time * LISTENING_PARAMS.neckTilt.frequency) * LISTENING_PARAMS.neckTilt.amplitude
-          : 0;
-
+        // Cursor tracking para cabeza - SIN efectos especiales de listening
+        // El robot mantiene el mismo comportamiento en idle y listening
         if (headRef.current && initialRotations.current.head) {
           const { sensitivityX, sensitivityY, lerpFactor: headLerp } = CURSOR_TRACKING.head;
           const targetRotationY = initialRotations.current.head.y + mouseX * sensitivityX;
           const targetRotationX = initialRotations.current.head.x - mouseY * sensitivityY;
-          const targetRotationZ = initialRotations.current.head.z + listeningHeadTilt;
+          const targetRotationZ = initialRotations.current.head.z;
           headRef.current.rotation.y = THREE.MathUtils.lerp(headRef.current.rotation.y, targetRotationY, headLerp);
           headRef.current.rotation.x = THREE.MathUtils.lerp(headRef.current.rotation.x, targetRotationX, headLerp);
           headRef.current.rotation.z = THREE.MathUtils.lerp(headRef.current.rotation.z, targetRotationZ, headLerp);
@@ -306,7 +299,7 @@ const AnimatedRobotModel = forwardRef<RobotMethods, { onLoad?: () => void; isLis
           const { sensitivityX, sensitivityY, lerpFactor: neckLerp } = CURSOR_TRACKING.neck;
           const targetRotationY = initialRotations.current.neck.y + mouseX * sensitivityX;
           const targetRotationX = initialRotations.current.neck.x - mouseY * sensitivityY;
-          const targetRotationZ = initialRotations.current.neck.z + listeningNeckTilt;
+          const targetRotationZ = initialRotations.current.neck.z;
           neckRef.current.rotation.y = THREE.MathUtils.lerp(neckRef.current.rotation.y, targetRotationY, neckLerp);
           neckRef.current.rotation.x = THREE.MathUtils.lerp(neckRef.current.rotation.x, targetRotationX, neckLerp);
           neckRef.current.rotation.z = THREE.MathUtils.lerp(neckRef.current.rotation.z, targetRotationZ, neckLerp);
