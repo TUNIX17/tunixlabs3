@@ -714,44 +714,34 @@ src/lib/animation/rotationPresets.ts
 - LISTENING_PARAMS minimizados
 ```
 
-### Fase 3: Integración del Hook useRobotAnimations (RobotModel.tsx)
+### Fase 3: REVERTIDA (useRobotAnimations hook)
 
-**Refactorización Mayor - Reducción de ~1200 líneas a ~250 líneas**
+**Estado: REVERTIDA - El hook causaba problemas con cursor tracking durante LISTENING**
 
-1. **Integración del Hook Unificado**
-   - Importado `useRobotAnimations` para manejo centralizado de animaciones
-   - Registro automático de huesos via `registerScene(scene)`
-   - Delegación completa de lógica de animación a `updateAnimations()`
+La integración del hook `useRobotAnimations` fue revertida porque:
+1. El BoneController intermediario introducía latencia en las rotaciones
+2. Las rotaciones iniciales no se capturaban correctamente al registrar huesos
+3. El cursor tracking (que funciona perfectamente con acceso directo a refs) dejaba de funcionar al presionar el micrófono
 
-2. **Estados Eliminados** (ahora manejados por el hook)
-   - `isWaving`, `isDancing`, `isNoddingYes`, `isShakingLegs`
-   - `isThinking`, `isExcited`, `isConfused`, `isGoodbye`
-   - Solo se mantienen `isApproaching` y `isSteppingBack` para posición de escena
+**Decisión de Arquitectura:**
+- Mantener el enfoque de acceso directo a bone refs (más simple y probado)
+- El hook `useRobotAnimations.ts` queda disponible para futuro uso o referencia
+- Las mejoras de Fases 1 y 2 son suficientes para resolver el problema original
 
-3. **Refs Eliminados** (ahora en BoneController)
-   - Todos los bone refs individuales (headRef, neckRef, shoulderLeftRef, etc.)
-   - Todos los timer refs (waveTimerRef, danceTimerRef, etc.)
-   - Solo se mantiene `approachTimerRef` para animación de posición
+### Verificación Final
+- ✅ Build exitoso sin errores de TypeScript
+- ✅ Fases 1 y 2 aplicadas correctamente
+- ✅ Código funcional restaurado con mejoras
+- ✅ Listo para testing en desarrollo local
 
-4. **useFrame Simplificado**
-   - De ~900 líneas de lógica manual a ~50 líneas
-   - Mouse tracking + llamada a `updateAnimations()`
-   - Solo maneja posición de escena para approach/stepBack
-
-5. **useImperativeHandle Limpio**
-   - Métodos delegados directamente al hook
-   - Solo `approachCamera` y `stepBackward` tienen lógica local (posición)
-
-### Beneficios de la Fase 3
-- **Código más mantenible**: Sistema de animación centralizado
-- **Mejor blending**: AnimationMachine maneja transiciones automáticamente
-- **Menos bugs**: Un solo lugar para la lógica de animación
-- **Extensibilidad**: Fácil agregar nuevas animaciones en rotationPresets.ts
-
-### Verificación
-- Build exitoso sin errores de TypeScript
-- Todas las fases implementadas
-- Listo para testing en desarrollo local
+### Próximos Pasos de Testing
+1. Ejecutar `npm run dev`
+2. Navegar a http://localhost:3000/inicio
+3. Verificar:
+   - Idle y Wave funcionan correctamente
+   - Al presionar micrófono, cursor tracking sigue funcionando
+   - Brazos permanecen estables durante LISTENING
+   - Transiciones suaves entre estados
 
 ---
 
