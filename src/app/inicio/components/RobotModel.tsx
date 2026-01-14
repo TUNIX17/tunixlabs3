@@ -58,8 +58,8 @@ interface RobotMethods {
 }
 
 // Componente que carga el modelo GLB y aplica animaciones
-const AnimatedRobotModel = forwardRef<RobotMethods, { onLoad?: () => void; isListening?: boolean }>(
-  function AnimatedRobotModel({ onLoad, isListening }, ref) {
+const AnimatedRobotModel = forwardRef<RobotMethods, { onLoad?: () => void; isListening?: boolean; interactionActive?: boolean }>(
+  function AnimatedRobotModel({ onLoad, isListening, interactionActive }, ref) {
     const gltf = useGLTF('/ROBOT2.glb');
     const modelRef = useRef<THREE.Group>(null);
     const { scene } = gltf;
@@ -106,6 +106,8 @@ const AnimatedRobotModel = forwardRef<RobotMethods, { onLoad?: () => void; isLis
 
     // Usamos el valor de la prop si está definido, o false por defecto
     const isListeningState = isListening !== undefined ? isListening : false;
+    // Flag para saber si hay una interacción activa (micrófono encendido)
+    const isInteractionActive = interactionActive !== undefined ? interactionActive : false;
 
     // Refs para los huesos que vamos a animar
     const headRef = useRef<BoneRef>(null);
@@ -240,8 +242,9 @@ const AnimatedRobotModel = forwardRef<RobotMethods, { onLoad?: () => void; isLis
     }, [scene, onLoad]);
 
     useFrame((state, delta) => {
-      // DEBUG: Skip TODAS las animaciones cuando está escuchando para diagnosticar
-      if (isListeningState) {
+      // FIX: Skip TODAS las animaciones cuando hay una interacción activa (micrófono encendido)
+      // Esto evita los movimientos erráticos causados por el audio processing
+      if (isInteractionActive) {
         // Solo mantener el cursor tracking básico, sin ninguna animación
         const mouseX = THREE.MathUtils.clamp(mouse.x, -1, 1);
         const mouseY = THREE.MathUtils.clamp(mouse.y, -1, 1);
@@ -1604,9 +1607,10 @@ function RobotInteractionManager() {
           <pointLight position={[0, 5, 5]} intensity={0.3} color="#61dbfb" />
           
           <Suspense fallback={null}>
-            <AnimatedRobotModel 
-              onLoad={handleModelLoaded} 
+            <AnimatedRobotModel
+              onLoad={handleModelLoaded}
               isListening={interactionState === RobotInteractionState.LISTENING}
+              interactionActive={interactionState !== RobotInteractionState.IDLE}
               ref={robotAnimatedRef}
             />
             <Environment files="/potsdamer_platz_1k.hdr" />
