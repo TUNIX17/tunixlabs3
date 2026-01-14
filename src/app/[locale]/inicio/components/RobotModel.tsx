@@ -240,6 +240,28 @@ const AnimatedRobotModel = forwardRef<RobotMethods, { onLoad?: () => void; isLis
     }, [scene, onLoad]);
 
     useFrame((state, delta) => {
+      // DEBUG: Skip TODAS las animaciones cuando está escuchando para diagnosticar
+      if (isListeningState) {
+        // Solo mantener el cursor tracking básico, sin ninguna animación
+        const mouseX = THREE.MathUtils.clamp(mouse.x, -1, 1);
+        const mouseY = THREE.MathUtils.clamp(mouse.y, -1, 1);
+
+        if (headRef.current && initialRotations.current.head) {
+          const { sensitivityX, sensitivityY, lerpFactor: headLerp } = CURSOR_TRACKING.head;
+          headRef.current.rotation.y = THREE.MathUtils.lerp(
+            headRef.current.rotation.y,
+            initialRotations.current.head.y + mouseX * sensitivityX,
+            headLerp
+          );
+          headRef.current.rotation.x = THREE.MathUtils.lerp(
+            headRef.current.rotation.x,
+            initialRotations.current.head.x - mouseY * sensitivityY,
+            headLerp
+          );
+        }
+        return; // Skip ALL other animations
+      }
+
       // Optimización: Actualizar mouse solo si ha cambiado significativamente
       const mouseDelta = Math.abs(mouse.x - targetMouse.current.x) + Math.abs(mouse.y - targetMouse.current.y);
       if (mouseDelta > 0.001) {

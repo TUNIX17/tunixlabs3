@@ -70,6 +70,12 @@ TunixLabs es una plataforma web de consultoria en IA con:
   - [x] Files modified:
     - `src/hooks/useRobotInteraction.ts` - Animation cooldown + transition protection
     - `src/lib/audio/vadConfig.ts` - More conservative VAD settings
+- [x] **Restored Listening Animations** (2026-01-14)
+  - [x] Re-enabled subtle head/neck tilt oscillation when robot is listening
+  - [x] Uses LISTENING_PARAMS from rotationPresets.ts (frequency: 1.5, amplitude: 0.05)
+  - [x] Now safe with VAD debouncing protection in place
+  - [x] Files modified:
+    - `src/app/inicio/components/RobotModel.tsx` - Added isListening animation effects
 
 ### In Progress
 - [ ] Configurar variables de entorno en Railway:
