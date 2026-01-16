@@ -35,6 +35,10 @@ import {
 } from '../../../lib/animation';
 import { easeInOutQuad, easeOutBack } from '../../../lib/animation/easingFunctions';
 
+// Importar nuevos sistemas de animación mejorados
+import { getBoneLerpFactor, getAdaptiveLerpFactor } from '../../../lib/animation/boneLerpConfig';
+import { SmoothRotationManager, SMOOTH_PRESETS } from '../../../lib/animation/SmoothRotation';
+
 // Definir tipo para arrays de rotación
 type RotationArray = [number, number, number];
 
@@ -242,27 +246,80 @@ const AnimatedRobotModel = forwardRef<RobotMethods, { onLoad?: () => void; isLis
     }, [scene, onLoad]);
 
     useFrame((state, delta) => {
-      // FIX: Skip TODAS las animaciones cuando hay una interacción activa (micrófono encendido)
-      // Esto evita los movimientos erráticos causados por el audio processing
+      const time = state.clock.getElapsedTime();
+
+      // Durante interacción activa: animaciones de "escucha atenta" naturales
+      // El robot muestra que está prestando atención con movimientos sutiles y orgánicos
       if (isInteractionActive) {
-        // Solo mantener el cursor tracking básico, sin ninguna animación
         const mouseX = THREE.MathUtils.clamp(mouse.x, -1, 1);
         const mouseY = THREE.MathUtils.clamp(mouse.y, -1, 1);
 
+        // === PARÁMETROS DE ESCUCHA ATENTA ===
+        // Lerp factor muy bajo para movimientos lentos y suaves
+        const attentiveLerp = 0.02; // Muy lento - movimiento fluido
+        const microLerp = 0.015; // Aún más lento para micro-movimientos
+
+        // Micro-movimientos autónomos que simulan atención activa
+        // Frecuencias muy bajas para evitar aspecto mecánico
+        const attentiveNodFreq = 0.3; // Micro-asentimiento muy lento
+        const attentiveTiltFreq = 0.15; // Inclinación aún más lenta
+
+        // Amplitudes muy sutiles - casi imperceptibles pero dan vida
+        const microNodAmplitude = 0.015; // Sutil movimiento vertical
+        const microTiltAmplitude = 0.008; // Leve inclinación lateral
+
+        // === CABEZA - ESCUCHA ATENTA ===
         if (headRef.current && initialRotations.current.head) {
-          const { sensitivityX, sensitivityY, lerpFactor: headLerp } = CURSOR_TRACKING.head;
-          headRef.current.rotation.y = THREE.MathUtils.lerp(
-            headRef.current.rotation.y,
-            initialRotations.current.head.y + mouseX * sensitivityX,
-            headLerp
-          );
-          headRef.current.rotation.x = THREE.MathUtils.lerp(
-            headRef.current.rotation.x,
-            initialRotations.current.head.x - mouseY * sensitivityY,
-            headLerp
+          // Posición base: ligeramente inclinada hacia adelante (atención)
+          const attentiveForwardTilt = 0.05; // Inclinación sutil hacia adelante
+
+          // Micro-asentimiento muy sutil (como cuando escuchas y asientes ligeramente)
+          const microNod = Math.sin(time * attentiveNodFreq) * microNodAmplitude;
+
+          // Micro-inclinación lateral (como cuando lades la cabeza para escuchar mejor)
+          const microTilt = Math.sin(time * attentiveTiltFreq) * microTiltAmplitude;
+
+          // Cursor tracking MUY reducido - solo miradas ocasionales, no seguimiento constante
+          const { sensitivityX, sensitivityY } = CURSOR_TRACKING.head;
+          const reducedSensitivity = 0.3; // Solo 30% de sensibilidad normal
+
+          // Target: posición base atenta + micro-movimientos + leve cursor influence
+          const targetX = initialRotations.current.head.x + attentiveForwardTilt + microNod - (mouseY * sensitivityY * reducedSensitivity);
+          const targetY = initialRotations.current.head.y + (mouseX * sensitivityX * reducedSensitivity);
+          const targetZ = initialRotations.current.head.z + microTilt;
+
+          // Aplicar con lerp muy suave para movimiento fluido
+          headRef.current.rotation.x = THREE.MathUtils.lerp(headRef.current.rotation.x, targetX, attentiveLerp);
+          headRef.current.rotation.y = THREE.MathUtils.lerp(headRef.current.rotation.y, targetY, attentiveLerp);
+          headRef.current.rotation.z = THREE.MathUtils.lerp(headRef.current.rotation.z, targetZ, microLerp);
+        }
+
+        // === CUELLO - COMPLEMENTA EL MOVIMIENTO DE CABEZA ===
+        if (neckRef.current && initialRotations.current.neck) {
+          // El cuello sigue ligeramente el movimiento, con delay natural
+          const neckMicroNod = Math.sin((time - 0.2) * attentiveNodFreq) * (microNodAmplitude * 0.5);
+
+          const targetNeckX = initialRotations.current.neck.x + neckMicroNod;
+          const targetNeckY = initialRotations.current.neck.y + (mouseX * 0.02); // Muy sutil
+
+          neckRef.current.rotation.x = THREE.MathUtils.lerp(neckRef.current.rotation.x, targetNeckX, microLerp);
+          neckRef.current.rotation.y = THREE.MathUtils.lerp(neckRef.current.rotation.y, targetNeckY, microLerp);
+        }
+
+        // === RESPIRACIÓN SUTIL - INDICA QUE ESTÁ VIVO ===
+        if (bodyTop1Ref.current && initialRotations.current.body_top1) {
+          const breathAmplitude = 0.004; // Muy sutil
+          const breathFreq = 0.6; // Respiración calmada
+          const breathCycle = Math.sin(time * breathFreq) * breathAmplitude;
+
+          bodyTop1Ref.current.rotation.x = THREE.MathUtils.lerp(
+            bodyTop1Ref.current.rotation.x,
+            initialRotations.current.body_top1.x + breathCycle,
+            microLerp
           );
         }
-        return; // Skip ALL other animations
+
+        return; // Skip otras animaciones más complejas
       }
 
       // Optimización: Actualizar mouse solo si ha cambiado significativamente
@@ -270,8 +327,6 @@ const AnimatedRobotModel = forwardRef<RobotMethods, { onLoad?: () => void; isLis
       if (mouseDelta > 0.001) {
         targetMouse.current.lerp(mouse, 0.1);
       }
-
-      const time = state.clock.getElapsedTime();
 
       // Skip animaciones específicas si estamos en thinking (tiene prioridad sobre idle)
       const skipIdleAnimations = isThinking;

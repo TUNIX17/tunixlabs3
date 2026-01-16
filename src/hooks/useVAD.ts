@@ -33,6 +33,15 @@ export interface UseVADOptions {
   /** Callback cuando VAD deja de escuchar */
   onListeningStop?: () => void;
 
+  /** Callback cuando inicia calibración de ruido ambiente */
+  onCalibrationStart?: () => void;
+
+  /** Callback cuando termina calibración */
+  onCalibrationEnd?: (data: { threshold: number; noiseFloor: number }) => void;
+
+  /** Callback cuando el umbral adaptativo cambia */
+  onThresholdUpdate?: (data: { threshold: number; noiseFloor: number }) => void;
+
   /** Callback en caso de error */
   onError?: (error: Error) => void;
 }
@@ -54,6 +63,15 @@ export interface UseVADReturn {
   /** Error actual si existe */
   error: Error | null;
 
+  /** Si está en fase de calibración */
+  isCalibrating: boolean;
+
+  /** Umbral de volumen actual (adaptativo o fijo) */
+  currentThreshold: number;
+
+  /** Nivel de ruido de fondo estimado */
+  noiseFloor: number;
+
   /** Iniciar deteccion de voz */
   startVAD: () => Promise<void>;
 
@@ -71,6 +89,9 @@ export interface UseVADReturn {
 
   /** Cambiar preset */
   setPreset: (preset: VADPreset) => void;
+
+  /** Forzar recalibración del VAD */
+  recalibrate: () => void;
 }
 
 /**
@@ -101,6 +122,9 @@ export const useVAD = (options: UseVADOptions = {}): UseVADReturn => {
     onVolumeChange,
     onListeningStart,
     onListeningStop,
+    onCalibrationStart,
+    onCalibrationEnd,
+    onThresholdUpdate,
     onError
   } = options;
 
@@ -109,6 +133,10 @@ export const useVAD = (options: UseVADOptions = {}): UseVADReturn => {
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [currentVolume, setCurrentVolume] = useState(0);
   const [error, setError] = useState<Error | null>(null);
+  // Nuevos estados para modo adaptativo
+  const [isCalibrating, setIsCalibrating] = useState(false);
+  const [currentThreshold, setCurrentThreshold] = useState(0.12);
+  const [noiseFloor, setNoiseFloor] = useState(0.05);
 
   // Referencia al detector VAD
   const vadRef = useRef<VoiceActivityDetector | null>(null);
@@ -120,6 +148,9 @@ export const useVAD = (options: UseVADOptions = {}): UseVADReturn => {
     onVolumeChange,
     onListeningStart,
     onListeningStop,
+    onCalibrationStart,
+    onCalibrationEnd,
+    onThresholdUpdate,
     onError
   });
 
@@ -131,9 +162,12 @@ export const useVAD = (options: UseVADOptions = {}): UseVADReturn => {
       onVolumeChange,
       onListeningStart,
       onListeningStop,
+      onCalibrationStart,
+      onCalibrationEnd,
+      onThresholdUpdate,
       onError
     };
-  }, [onSpeechStart, onSpeechEnd, onVolumeChange, onListeningStart, onListeningStop, onError]);
+  }, [onSpeechStart, onSpeechEnd, onVolumeChange, onListeningStart, onListeningStop, onCalibrationStart, onCalibrationEnd, onThresholdUpdate, onError]);
 
   // Verificar soporte
   const isSupported = VoiceActivityDetector.isSupported();
@@ -179,7 +213,41 @@ export const useVAD = (options: UseVADOptions = {}): UseVADReturn => {
       setIsListening(false);
       setIsSpeaking(false);
       setCurrentVolume(0);
+      setIsCalibrating(false);
       callbacksRef.current.onListeningStop?.();
+    });
+
+    // Eventos de calibración (modo adaptativo)
+    vadRef.current.on('calibration_start', () => {
+      setIsCalibrating(true);
+      callbacksRef.current.onCalibrationStart?.();
+    });
+
+    vadRef.current.on('calibration_end', (data) => {
+      setIsCalibrating(false);
+      if (data?.threshold !== undefined) {
+        setCurrentThreshold(data.threshold);
+      }
+      if (data?.noiseFloor !== undefined) {
+        setNoiseFloor(data.noiseFloor);
+      }
+      callbacksRef.current.onCalibrationEnd?.({
+        threshold: data?.threshold ?? 0.12,
+        noiseFloor: data?.noiseFloor ?? 0.05
+      });
+    });
+
+    vadRef.current.on('threshold_update', (data) => {
+      if (data?.threshold !== undefined) {
+        setCurrentThreshold(data.threshold);
+      }
+      if (data?.noiseFloor !== undefined) {
+        setNoiseFloor(data.noiseFloor);
+      }
+      callbacksRef.current.onThresholdUpdate?.({
+        threshold: data?.threshold ?? 0.12,
+        noiseFloor: data?.noiseFloor ?? 0.05
+      });
     });
 
     // Auto-start si esta configurado
@@ -268,18 +336,29 @@ export const useVAD = (options: UseVADOptions = {}): UseVADReturn => {
     }
   }, []);
 
+  // Forzar recalibración
+  const recalibrate = useCallback((): void => {
+    if (vadRef.current) {
+      vadRef.current.recalibrate();
+    }
+  }, []);
+
   return {
     isListening,
     isSpeaking,
     currentVolume,
     isSupported,
     error,
+    isCalibrating,
+    currentThreshold,
+    noiseFloor,
     startVAD,
     stopVAD,
     setThreshold,
     updateConfig,
     getConfig,
-    setPreset
+    setPreset,
+    recalibrate
   };
 };
 

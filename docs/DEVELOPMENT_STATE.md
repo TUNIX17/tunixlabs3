@@ -1,8 +1,8 @@
 # TunixLabs - Development State
 
-**Last Updated:** 2026-01-14
-**Current Phase:** VAD Animation Bug Fix
-**Sprint:** 3.1 - Robot Animation Stability
+**Last Updated:** 2026-01-16
+**Current Phase:** VAD & Animation System Enhancement
+**Sprint:** 3.2 - Adaptive VAD & Animation Priority System
 
 ---
 
@@ -76,6 +76,66 @@ TunixLabs es una plataforma web de consultoria en IA con:
   - [x] Now safe with VAD debouncing protection in place
   - [x] Files modified:
     - `src/app/inicio/components/RobotModel.tsx` - Added isListening animation effects
+- [x] **Adaptive VAD System** (2026-01-16)
+  - [x] Dynamic threshold based on ambient noise floor estimation
+  - [x] SNR (Signal-to-Noise Ratio) based threshold calculation
+  - [x] Hysteresis for detection stability (prevents rapid on/off)
+  - [x] Automatic calibration phase (2s) at microphone activation
+  - [x] Moving minimum algorithm for noise floor tracking
+  - [x] Files created:
+    - `src/lib/audio/adaptiveVAD.ts` - Core adaptive processor
+  - [x] Files modified:
+    - `src/lib/audio/vad.ts` - Integrated adaptive processor
+    - `src/lib/audio/vadConfig.ts` - Added adaptive config to presets
+    - `src/hooks/useVAD.ts` - Exposed calibration state and events
+    - `src/hooks/useRobotInteraction.ts` - Added calibration callbacks
+- [x] **Animation Priority System** (2026-01-16)
+  - [x] Priority-based animation management (0=IDLE to 10=FORCED)
+  - [x] Prevents animation conflicts by bone ownership
+  - [x] Automatic interruption of lower-priority animations
+  - [x] Callback system for animation completion/interruption
+  - [x] Files created:
+    - `src/lib/animation/AnimationPriority.ts` - Priority manager
+- [x] **Per-Bone Lerp Factors** (2026-01-16)
+  - [x] Different lerp speeds based on bone weight/importance
+  - [x] Heavy bones (body) move slower, light bones (head) respond faster
+  - [x] Separate factors for enter/exit/idle transitions
+  - [x] Files created:
+    - `src/lib/animation/boneLerpConfig.ts` - Lerp configuration
+  - [x] Files modified:
+    - `src/app/inicio/components/RobotModel.tsx` - Integrated per-bone lerp
+- [x] **Spring-Damper Smoothing** (2026-01-16)
+  - [x] SmoothDamp implementation (Unity-style) for natural transitions
+  - [x] Eliminates jitter and provides momentum
+  - [x] Configurable smoothTime, maxSpeed, arrivalThreshold
+  - [x] Multiple presets: verySlow, normal, fast, responsive, cursorTrack
+  - [x] Files created:
+    - `src/lib/animation/SmoothRotation.ts` - Smoothing system
+- [x] **Pause Detection System** (2026-01-16)
+  - [x] Classifies pauses: BREATH (200-600ms), THOUGHT (600-1500ms), SENTENCE_END (>1500ms)
+  - [x] Recommends actions: CONTINUE, WAIT, PROCESS, END_SESSION
+  - [x] Tracks speech/silence patterns for intelligent processing
+  - [x] Files created:
+    - `src/lib/audio/pauseDetection.ts` - Pause classification
+  - [x] Files modified:
+    - `src/hooks/useRobotInteraction.ts` - Integrated PauseTracker
+- [x] **Language Detection from Noise Fix** (2026-01-16)
+  - [x] Fixed language switching from ambient noise detection
+  - [x] Added minimum text length requirement (≥3 chars with actual letters)
+  - [x] Language only changes when STT detects meaningful speech
+  - [x] Files modified:
+    - `src/hooks/useRobotInteraction.ts` - Added `hasSignificantText` check
+- [x] **Natural Listening Head Movement** (2026-01-16)
+  - [x] Replaced basic cursor tracking with "attentive listening" animation
+  - [x] Added subtle micro-nod (0.3Hz, 0.015 rad amplitude) for natural attention
+  - [x] Added gentle lateral tilt (0.15Hz, 0.008 rad) like tilting to listen
+  - [x] Reduced cursor tracking sensitivity to 30% during listening
+  - [x] Added forward tilt (0.05 rad) to show engaged attention
+  - [x] Very smooth lerp factors (0.02) for organic movement
+  - [x] Neck follows head with natural delay for anatomical realism
+  - [x] Files modified:
+    - `src/app/inicio/components/RobotModel.tsx` - New listening animation system
+    - `src/app/[locale]/inicio/components/RobotModel.tsx` - Same changes
 
 ### In Progress
 - [ ] Configurar variables de entorno en Railway:
@@ -193,6 +253,30 @@ TOTAL:                        →  ~$0.002/cliente
 - `src/components/VoiceInterface/VoiceController.tsx` - Phase indicators
 - `src/components/VoiceInterface/ControlButtons.tsx` - New states
 
+### 8. Adaptive VAD & Animation Enhancement (2026-01-16)
+**Decision:** Replace fixed VAD threshold with adaptive noise floor estimation
+**Rationale:**
+- Fixed threshold (0.12) failed in quiet rooms (too sensitive) and noisy environments (missed speech)
+- Adaptive system calibrates to ambient noise level automatically
+- SNR-based threshold adjusts dynamically as conditions change
+- Hysteresis prevents rapid state changes from noise
+**Implementation:**
+- `AdaptiveVADProcessor` class with moving minimum algorithm
+- 2-second calibration phase at microphone activation
+- SNR factor of 2.5 (threshold = noiseFloor × 2.5)
+- Integrated into existing `VoiceActivityDetector` as optional processor
+
+**Decision:** Implement per-bone lerp factors and animation priority system
+**Rationale:**
+- Uniform lerp caused unnatural movement (heavy body parts moved as fast as head)
+- Multiple animations fighting for same bones caused jitter
+- Need conflict resolution for overlapping animations
+**Implementation:**
+- `boneLerpConfig.ts` with physics-based lerp factors per bone
+- `AnimationPriority` enum with levels 0-10
+- `AnimationPriorityManager` for bone ownership and conflict resolution
+- `SmoothRotation` spring-damper system for momentum-based transitions
+
 ### 7. CRM & Lead Management System (2026-01-08)
 **Decision:** Sistema CRM propio con persistencia PostgreSQL
 **Rationale:**
@@ -307,17 +391,21 @@ Para configurar: `railway variables --set VARIABLE_NAME=value`
 ## NEXT STEPS
 
 1. **Immediate:**
-   - Configurar RESEND_API_KEY en Railway (crear cuenta en resend.com)
-   - Configurar ADMIN_PASSWORD para acceder al CRM
-   - Configurar CALENDLY_LINK con tu link de Calendly
-   - Deploy a Railway con `railway up`
+   - Test new adaptive VAD in production environment
+   - Test animation priority system with different states
+   - Deploy to Railway with `railway up`
+   - Configure missing Railway environment variables (RESEND_API_KEY, ADMIN_PASSWORD, CALENDLY_LINK)
 
 2. **Short-term:**
-   - Conectar dominio tunixlabs.com
-   - Testing E2E: voz → captura → email → calendario
-   - Probar CRM en /admin
+   - Fine-tune SNR factor based on production testing (current: 2.5)
+   - Add visual feedback for VAD calibration state in UI
+   - Integrate `SmoothRotation` into more bone animations
+   - Test pause detection system end-to-end
+   - Connect domain tunixlabs.com
 
 3. **Medium-term:**
+   - Full integration of AnimationPriorityManager into RobotModel.tsx
+   - Consider ElevenLabs integration for higher quality TTS
    - Treasury system for Curso 7i
    - Testing setup (Jest + Playwright)
    - CI/CD pipeline
@@ -331,6 +419,190 @@ Para configurar: `railway variables --set VARIABLE_NAME=value`
 - [ ] Need RESEND_API_KEY for email notifications
 - [ ] Need CALENDLY_LINK for meeting scheduling
 - [ ] Domain DNS configuration pending
+
+---
+
+## RECENT CHANGES (2026-01-16) - Adaptive VAD & Animation System
+
+### Technical Audit & Implementation
+
+Based on a comprehensive technical audit of the AI voice agent with 3D avatar, the following systems were implemented to address identified issues:
+
+### 1. Adaptive VAD System
+
+**Problem Solved:** Fixed threshold (0.12) caused issues in varying noise environments.
+
+**Solution:** Dynamic threshold based on ambient noise estimation.
+
+**New File: `src/lib/audio/adaptiveVAD.ts`** (~200 lines)
+```typescript
+export class AdaptiveVADProcessor {
+  // Moving minimum for noise floor estimation
+  // SNR-based threshold calculation
+  // Hysteresis for stable detection
+
+  processVolume(volume: number): {
+    threshold: number;
+    isVoice: boolean;
+    noiseFloor: number;
+    isCalibrating: boolean;
+  };
+
+  startCalibration(): void;
+  recalibrate(): void;
+}
+```
+
+**Configuration Parameters:**
+```typescript
+interface AdaptiveVADConfig {
+  enabled: boolean;           // Default: true
+  snrFactor: number;         // Default: 2.5 (threshold = noiseFloor * snrFactor)
+  historySize: number;       // Default: 100 samples
+  hysteresis: number;        // Default: 0.015 (prevents rapid on/off)
+  minThreshold: number;      // Default: 0.03
+  maxThreshold: number;      // Default: 0.35
+  noiseFloorDecay: number;   // Default: 0.995
+  calibrationDurationMs: number;  // Default: 2000
+}
+```
+
+### 2. Animation Priority System
+
+**Problem Solved:** Multiple animations fighting for the same bones caused erratic movements.
+
+**Solution:** Priority-based bone ownership with automatic conflict resolution.
+
+**New File: `src/lib/animation/AnimationPriority.ts`** (~350 lines)
+```typescript
+export enum AnimationPriority {
+  IDLE = 0,
+  LISTENING = 1,
+  CURSOR_TRACK = 2,
+  EMOTE = 3,
+  SPEAKING = 4,
+  THINKING = 5,
+  GESTURE = 6,
+  INTERRUPT = 7,
+  FORCED = 10
+}
+
+export class AnimationPriorityManager {
+  registerAnimation(animation: ManagedAnimation): boolean;
+  interruptAnimation(animationId: string): void;
+  completeAnimation(animationId: string): void;
+  isBoneAvailable(boneName: string, priority: AnimationPriority): boolean;
+}
+```
+
+### 3. Per-Bone Lerp Configuration
+
+**Problem Solved:** Uniform lerp factor caused unnatural movements (heavy bones moved too fast).
+
+**Solution:** Bone-specific lerp factors based on physical weight/importance.
+
+**New File: `src/lib/animation/boneLerpConfig.ts`** (~180 lines)
+```typescript
+export const BONE_LERP_FACTORS: Record<string, BoneLerpFactors> = {
+  head: { enter: 0.08, exit: 0.12, idle: 0.06, max: 0.20 },
+  neck: { enter: 0.07, exit: 0.10, idle: 0.05, max: 0.18 },
+  body_top1: { enter: 0.03, exit: 0.05, idle: 0.02, max: 0.10 },
+  body_top2: { enter: 0.025, exit: 0.04, idle: 0.015, max: 0.08 },
+  // ... shoulders, arms, legs with appropriate values
+};
+
+export function getBoneLerpFactor(
+  boneName: string,
+  mode: 'enter' | 'exit' | 'idle'
+): number;
+```
+
+### 4. Spring-Damper Smoothing System
+
+**Problem Solved:** Linear lerp caused abrupt starts/stops and no momentum.
+
+**Solution:** SmoothDamp algorithm (Unity-style) for natural spring physics.
+
+**New File: `src/lib/animation/SmoothRotation.ts`** (~360 lines)
+```typescript
+export class SmoothRotation {
+  setTarget(target: THREE.Euler): void;
+  update(deltaTime: number): THREE.Euler;
+  hasArrived(): boolean;
+  snapTo(rotation: THREE.Euler): void;
+}
+
+export class SmoothRotationManager {
+  getOrCreate(boneName: string): SmoothRotation;
+  updateAll(deltaTime: number): void;
+}
+
+export const SMOOTH_PRESETS = {
+  verySlow: { smoothTime: 0.3, maxSpeed: 5.0 },
+  normal: { smoothTime: 0.15, maxSpeed: 10.0 },
+  fast: { smoothTime: 0.08, maxSpeed: 15.0 },
+  responsive: { smoothTime: 0.05, maxSpeed: 20.0 },
+  cursorTrack: { smoothTime: 0.1, maxSpeed: 12.0 }
+};
+```
+
+### 5. Pause Detection System
+
+**Problem Solved:** System couldn't distinguish breathing pauses from end of speech.
+
+**Solution:** Classify pauses by duration and recommend appropriate actions.
+
+**New File: `src/lib/audio/pauseDetection.ts`** (~250 lines)
+```typescript
+export enum PauseType {
+  NONE, BREATH, THOUGHT, SENTENCE_END, LONG_SILENCE
+}
+
+export enum PauseAction {
+  CONTINUE, WAIT, PROCESS, END_SESSION
+}
+
+export class PauseTracker {
+  onSpeechStart(): void;
+  onSpeechEnd(): void;
+  classifyCurrentPause(): PauseClassification;
+  update(): void;
+  reset(): void;
+}
+```
+
+**Pause Classification:**
+| Duration | Type | Action |
+|----------|------|--------|
+| 200-600ms | BREATH | CONTINUE |
+| 600-1500ms | THOUGHT | WAIT |
+| 1500-5000ms | SENTENCE_END | PROCESS |
+| >5000ms | LONG_SILENCE | END_SESSION |
+
+### Files Modified
+
+| File | Changes |
+|------|---------|
+| `src/lib/audio/vad.ts` | Integrated AdaptiveVADProcessor, new events (calibration_start, calibration_end, threshold_update) |
+| `src/lib/audio/vadConfig.ts` | Added adaptive config to all presets, type re-exports |
+| `src/hooks/useVAD.ts` | Exposed isCalibrating, currentThreshold, noiseFloor, recalibrate |
+| `src/hooks/useRobotInteraction.ts` | Added PauseTracker, calibration state/callbacks |
+| `src/app/inicio/components/RobotModel.tsx` | Integrated boneLerpConfig, subtle breathing during listening |
+
+### New Files Created
+
+| File | Purpose | Lines |
+|------|---------|-------|
+| `src/lib/audio/adaptiveVAD.ts` | Adaptive threshold processor | ~200 |
+| `src/lib/audio/pauseDetection.ts` | Pause classification | ~250 |
+| `src/lib/animation/boneLerpConfig.ts` | Per-bone lerp factors | ~180 |
+| `src/lib/animation/AnimationPriority.ts` | Priority-based animation manager | ~350 |
+| `src/lib/animation/SmoothRotation.ts` | Spring-damper smoothing | ~360 |
+
+### Build Verification
+- ✅ `npm run build` - Successful compilation
+- ✅ All TypeScript errors resolved
+- ✅ All 6 pages compiled successfully
 
 ---
 

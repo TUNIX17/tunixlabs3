@@ -8,6 +8,7 @@ import { AudioPlayer } from '../lib/audio/player';
 import { ConversationSession, DEFAULT_SESSION_CONFIG } from '../lib/conversation';
 import { AgentStateTracker, ConversationPhase, getAgentPromptCache } from '../lib/agent';
 import { BARGEIN_VAD_CONFIG } from '../lib/audio/vadConfig';
+import { PauseTracker, PauseAction } from '../lib/audio/pauseDetection';
 
 // Mapeo de nombres de idioma a códigos ISO para normalizar detección de STT
 const LANGUAGE_NAME_TO_CODE: Record<string, string> = {
@@ -267,15 +268,25 @@ export const useRobotInteraction = ({
     }
   });
 
+  // Ref para PauseTracker
+  const pauseTrackerRef = useRef<PauseTracker>(new PauseTracker());
+
+  // Estado de calibración VAD
+  const [isVADCalibrating, setIsVADCalibrating] = useState(false);
+
   // Hook para VAD (Voice Activity Detection)
   const {
     isListening: vadIsListening,
     isSpeaking: vadIsSpeaking,
     currentVolume,
+    isCalibrating: vadIsCalibrating,
+    currentThreshold: vadCurrentThreshold,
+    noiseFloor: vadNoiseFloor,
     startVAD,
     stopVAD,
     setThreshold,
-    updateConfig: updateVADConfig
+    updateConfig: updateVADConfig,
+    recalibrate: recalibrateVAD
   } = useVAD({
     preset: 'default',
     onSpeechStart: () => {
@@ -337,6 +348,24 @@ export const useRobotInteraction = ({
     onError: (error) => {
       console.error('[RobotInteraction] VAD error:', error);
       if (onError) onError(error);
+    },
+    onCalibrationStart: () => {
+      console.log('[RobotInteraction] VAD: Iniciando calibración de ruido ambiente...');
+      setIsVADCalibrating(true);
+    },
+    onCalibrationEnd: (data) => {
+      console.log('[RobotInteraction] VAD: Calibración completada:', {
+        threshold: (data.threshold * 100).toFixed(1) + '%',
+        noiseFloor: (data.noiseFloor * 100).toFixed(1) + '%'
+      });
+      setIsVADCalibrating(false);
+    },
+    onThresholdUpdate: (data) => {
+      // Log solo cambios significativos
+      console.log('[RobotInteraction] VAD: Umbral adaptativo actualizado:', {
+        threshold: (data.threshold * 100).toFixed(1) + '%',
+        noiseFloor: (data.noiseFloor * 100).toFixed(1) + '%'
+      });
     }
   });
 
@@ -523,26 +552,35 @@ export const useRobotInteraction = ({
       setUserMessage(recognitionResult.text);
 
       // Determinar idioma para esta interacción:
-      // 1. Si STT detectó un idioma SOPORTADO (es, en), usarlo inmediatamente
-      // 2. Si STT detectó un idioma NO SOPORTADO (ru, pt, fr, etc.), ignorarlo y usar currentLanguage
-      // Esto permite cambiar entre español e inglés pero ignora misdetecciones como "Russian"
+      // 1. SOLO cambiar idioma si hay texto significativo (mínimo 3 caracteres, palabras reales)
+      // 2. Si STT detectó un idioma SOPORTADO (es, en) Y hay texto significativo, usarlo
+      // 3. Si STT detectó un idioma NO SOPORTADO o no hay texto, mantener currentLanguage
+      // Esto evita que ruido ambiental cambie el idioma erróneamente
       const sttDetectedLang = recognitionResult.language;
       const normalizedSTTLang = sttDetectedLang ? normalizeLanguageCode(sttDetectedLang) : null;
       const normalizedCurrentLang = normalizeLanguageCode(currentLanguage) || 'es';
 
+      // Verificar si el texto es significativo (no solo ruido)
+      const trimmedText = (recognitionResult.text || '').trim();
+      const hasSignificantText = trimmedText.length >= 3 && /[a-zA-ZáéíóúüñÁÉÍÓÚÜÑ]{2,}/.test(trimmedText);
+
       let langForThisInteraction: string;
-      if (normalizedSTTLang) {
-        // STT detectó un idioma soportado - usarlo
+      if (normalizedSTTLang && hasSignificantText) {
+        // STT detectó un idioma soportado Y hay texto significativo - usarlo
         langForThisInteraction = normalizedSTTLang;
         if (normalizedSTTLang !== normalizedCurrentLang) {
-          console.log('[RobotInteraction] STT detectó idioma soportado:', sttDetectedLang, '-> Actualizando a:', normalizedSTTLang);
+          console.log('[RobotInteraction] STT detectó idioma soportado con texto válido:', sttDetectedLang, '-> Actualizando a:', normalizedSTTLang);
           setCurrentLanguage(normalizedSTTLang);
           promptCache.invalidate();
         }
       } else {
-        // STT detectó un idioma NO soportado o no detectó nada - mantener el actual
+        // STT detectó idioma NO soportado, o no hay texto significativo - mantener el actual
         langForThisInteraction = normalizedCurrentLang;
-        console.log('[RobotInteraction] STT detectó idioma no soportado:', sttDetectedLang || 'ninguno', '- Manteniendo:', langForThisInteraction);
+        if (!hasSignificantText) {
+          console.log('[RobotInteraction] Texto no significativo (ruido?):', trimmedText || '<vacío>', '- Ignorando detección de idioma, manteniendo:', langForThisInteraction);
+        } else {
+          console.log('[RobotInteraction] STT detectó idioma no soportado:', sttDetectedLang || 'ninguno', '- Manteniendo:', langForThisInteraction);
+        }
       }
       console.log('[RobotInteraction] Idioma para esta interacción:', langForThisInteraction);
 
@@ -928,6 +966,11 @@ export const useRobotInteraction = ({
     vadIsListening,
     vadIsSpeaking,
 
+    // Estado de VAD adaptativo
+    isVADCalibrating,
+    vadCurrentThreshold,
+    vadNoiseFloor,
+
     // Metodos principales
     assignRobotRef,
     startListening,
@@ -939,6 +982,7 @@ export const useRobotInteraction = ({
 
     // Metodos de configuracion
     setVADThreshold: setThreshold,
+    recalibrateVAD,
 
     // Acceso a datos del agente
     getLeadData: () => agentStateRef.current?.getLeadData() || {},

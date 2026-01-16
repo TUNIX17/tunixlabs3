@@ -1,17 +1,22 @@
 /**
  * Voice Activity Detection (VAD) using Web Audio API
  * Detecta cuando el usuario esta hablando basado en umbral de volumen
+ * Soporta modo adaptativo con calibración automática de ruido ambiente
  */
 
 import { VADConfig, DEFAULT_VAD_CONFIG } from './vadConfig';
+import { AdaptiveVADProcessor } from './adaptiveVAD';
 
 /** Eventos emitidos por VAD */
 export type VADEvent =
-  | 'speech_start'    // Usuario empezo a hablar
-  | 'speech_end'      // Usuario dejo de hablar (silencio detectado)
-  | 'volume_change'   // Cambio en nivel de volumen
-  | 'listening_start' // VAD empezo a escuchar
-  | 'listening_stop'; // VAD dejo de escuchar
+  | 'speech_start'        // Usuario empezo a hablar
+  | 'speech_end'          // Usuario dejo de hablar (silencio detectado)
+  | 'volume_change'       // Cambio en nivel de volumen
+  | 'listening_start'     // VAD empezo a escuchar
+  | 'listening_stop'      // VAD dejo de escuchar
+  | 'calibration_start'   // Iniciando calibración de ruido
+  | 'calibration_end'     // Calibración completada
+  | 'threshold_update';   // Umbral adaptativo actualizado
 
 /** Estado interno del VAD */
 export interface VADState {
@@ -20,14 +25,24 @@ export interface VADState {
   currentVolume: number;       // Nivel de volumen actual (0-1)
   speechStartTime: number | null;   // Timestamp cuando empezo a hablar
   lastSpeechTime: number | null;    // Ultimo timestamp con voz detectada
+  // Estado del modo adaptativo
+  isCalibrating: boolean;      // Si está en fase de calibración
+  adaptiveThreshold: number;   // Umbral actual (adaptativo o fijo)
+  noiseFloor: number;          // Nivel de ruido estimado
 }
 
 /** Callback para eventos VAD */
-export type VADCallback = (data?: { volume?: number; duration?: number }) => void;
+export type VADCallback = (data?: {
+  volume?: number;
+  duration?: number;
+  threshold?: number;
+  noiseFloor?: number;
+}) => void;
 
 /**
  * Clase principal de Voice Activity Detection
  * Usa Web Audio API para analizar volumen en tiempo real
+ * Soporta modo adaptativo con calibración automática
  */
 export class VoiceActivityDetector {
   private audioContext: AudioContext | null = null;
@@ -41,6 +56,9 @@ export class VoiceActivityDetector {
   private state: VADState;
   private callbacks: Map<VADEvent, Set<VADCallback>>;
 
+  // Procesador adaptativo (opcional)
+  private adaptiveProcessor: AdaptiveVADProcessor | null = null;
+
   // Timers para debounce
   private speechStartTimer: ReturnType<typeof setTimeout> | null = null;
   private silenceTimer: ReturnType<typeof setTimeout> | null = null;
@@ -51,6 +69,9 @@ export class VoiceActivityDetector {
   // Debug: contador para logging periódico
   private analysisCount: number = 0;
 
+  // Último umbral reportado (para evitar spam de eventos)
+  private lastReportedThreshold: number = 0;
+
   constructor(config: Partial<VADConfig> = {}) {
     this.config = { ...DEFAULT_VAD_CONFIG, ...config };
     this.state = {
@@ -58,9 +79,18 @@ export class VoiceActivityDetector {
       isSpeaking: false,
       currentVolume: 0,
       speechStartTime: null,
-      lastSpeechTime: null
+      lastSpeechTime: null,
+      isCalibrating: false,
+      adaptiveThreshold: this.config.volumeThreshold,
+      noiseFloor: 0.05
     };
     this.callbacks = new Map();
+
+    // Inicializar procesador adaptativo si está habilitado
+    if (this.config.adaptive?.enabled) {
+      this.adaptiveProcessor = new AdaptiveVADProcessor(this.config.adaptive);
+      console.log('[VAD] Modo adaptativo habilitado');
+    }
   }
 
   /**
@@ -97,6 +127,14 @@ export class VoiceActivityDetector {
       // Buffer para datos de frecuencia
       this.dataArray = new Uint8Array(this.analyser.frequencyBinCount);
 
+      // Iniciar calibración si modo adaptativo está habilitado
+      if (this.adaptiveProcessor) {
+        this.adaptiveProcessor.startCalibration();
+        this.state.isCalibrating = true;
+        this.emit('calibration_start');
+        console.log('[VAD] Iniciando calibración de ruido ambiente...');
+      }
+
       // Iniciar analisis periodico
       this.analysisInterval = setInterval(
         () => this.analyzeVolume(),
@@ -107,7 +145,11 @@ export class VoiceActivityDetector {
       this.analysisCount = 0; // Reset contador de debug
       this.emit('listening_start');
 
-      console.log('[VAD] Iniciado con config:', this.config);
+      const modeStr = this.adaptiveProcessor ? 'ADAPTATIVO' : 'FIJO';
+      console.log(`[VAD] Iniciado en modo ${modeStr} con config:`, {
+        threshold: this.config.volumeThreshold,
+        adaptive: this.config.adaptive?.enabled
+      });
 
     } catch (error) {
       console.error('[VAD] Error al iniciar:', error);
@@ -177,6 +219,12 @@ export class VoiceActivityDetector {
     this.analyser = null;
     this.dataArray = null;
     this.pendingSpeechStart = false;
+
+    // Resetear procesador adaptativo
+    if (this.adaptiveProcessor) {
+      this.adaptiveProcessor.reset();
+    }
+    this.state.isCalibrating = false;
   }
 
   /**
@@ -197,11 +245,56 @@ export class VoiceActivityDetector {
     const previousVolume = this.state.currentVolume;
     this.state.currentVolume = volume;
 
+    // Variables para detección de voz
+    let isVoiceDetected: boolean;
+    let currentThreshold: number;
+
+    // Usar procesador adaptativo si está disponible
+    if (this.adaptiveProcessor) {
+      const result = this.adaptiveProcessor.processVolume(volume);
+
+      // Actualizar estado con valores adaptativos
+      this.state.adaptiveThreshold = result.threshold;
+      this.state.noiseFloor = result.noiseFloor;
+      currentThreshold = result.threshold;
+
+      // Manejar fin de calibración
+      if (this.state.isCalibrating && !result.isCalibrating) {
+        this.state.isCalibrating = false;
+        this.emit('calibration_end', {
+          threshold: result.threshold,
+          noiseFloor: result.noiseFloor
+        });
+        console.log('[VAD] Calibración completada:', {
+          threshold: (result.threshold * 100).toFixed(2) + '%',
+          noiseFloor: (result.noiseFloor * 100).toFixed(2) + '%'
+        });
+      }
+
+      // Emitir actualización de umbral si cambió significativamente
+      if (Math.abs(result.threshold - this.lastReportedThreshold) > 0.005) {
+        this.lastReportedThreshold = result.threshold;
+        this.emit('threshold_update', {
+          threshold: result.threshold,
+          noiseFloor: result.noiseFloor
+        });
+      }
+
+      // No detectar voz durante calibración
+      isVoiceDetected = result.isCalibrating ? false : result.isVoice;
+    } else {
+      // Modo fijo: usar umbral configurado directamente
+      currentThreshold = this.config.volumeThreshold;
+      this.state.adaptiveThreshold = currentThreshold;
+      isVoiceDetected = volume > currentThreshold;
+    }
+
     // Debug: Log periódico de volumen (cada 1 segundo = 20 análisis a 50ms)
     this.analysisCount++;
     if (this.analysisCount % 20 === 0) {
-      const status = this.state.isSpeaking ? 'SPEAKING' : 'SILENT';
-      console.log(`[VAD] Volume: ${(volume * 100).toFixed(2)}% | Threshold: ${(this.config.volumeThreshold * 100).toFixed(2)}% | Status: ${status}`);
+      const status = this.state.isSpeaking ? 'SPEAKING' : (this.state.isCalibrating ? 'CALIBRATING' : 'SILENT');
+      const modeStr = this.adaptiveProcessor ? 'ADAPT' : 'FIXED';
+      console.log(`[VAD:${modeStr}] Vol: ${(volume * 100).toFixed(1)}% | Thr: ${(currentThreshold * 100).toFixed(1)}% | Noise: ${(this.state.noiseFloor * 100).toFixed(1)}% | ${status}`);
     }
 
     // Emitir cambio de volumen si es significativo
@@ -209,8 +302,10 @@ export class VoiceActivityDetector {
       this.emit('volume_change', { volume });
     }
 
-    // Verificar si hay voz
-    const isVoiceDetected = volume > this.config.volumeThreshold;
+    // No procesar voz durante calibración
+    if (this.state.isCalibrating) {
+      return;
+    }
 
     if (isVoiceDetected) {
       this.handleVoiceDetected();
@@ -363,7 +458,58 @@ export class VoiceActivityDetector {
    */
   updateConfig(newConfig: Partial<VADConfig>): void {
     this.config = { ...this.config, ...newConfig };
+
+    // Actualizar procesador adaptativo si la config cambió
+    if (newConfig.adaptive && this.adaptiveProcessor) {
+      this.adaptiveProcessor.updateConfig(newConfig.adaptive);
+    }
+
+    // Habilitar/deshabilitar modo adaptativo dinámicamente
+    if (newConfig.adaptive?.enabled !== undefined) {
+      if (newConfig.adaptive.enabled && !this.adaptiveProcessor) {
+        this.adaptiveProcessor = new AdaptiveVADProcessor(this.config.adaptive);
+        console.log('[VAD] Modo adaptativo habilitado dinámicamente');
+      } else if (!newConfig.adaptive.enabled && this.adaptiveProcessor) {
+        this.adaptiveProcessor = null;
+        this.state.isCalibrating = false;
+        console.log('[VAD] Modo adaptativo deshabilitado');
+      }
+    }
+
     console.log('[VAD] Config actualizada:', this.config);
+  }
+
+  /**
+   * Verificar si está en fase de calibración
+   */
+  isCalibrating(): boolean {
+    return this.state.isCalibrating;
+  }
+
+  /**
+   * Obtener el umbral actual (adaptativo o fijo)
+   */
+  getCurrentThreshold(): number {
+    return this.state.adaptiveThreshold;
+  }
+
+  /**
+   * Obtener el nivel de ruido estimado
+   */
+  getNoiseFloor(): number {
+    return this.state.noiseFloor;
+  }
+
+  /**
+   * Forzar recalibración del VAD adaptativo
+   */
+  recalibrate(): void {
+    if (this.adaptiveProcessor && this.state.isListening) {
+      this.adaptiveProcessor.startCalibration();
+      this.state.isCalibrating = true;
+      this.emit('calibration_start');
+      console.log('[VAD] Recalibración iniciada');
+    }
   }
 
   /**
@@ -402,7 +548,12 @@ export class VoiceActivityDetector {
   /**
    * Emitir evento
    */
-  private emit(event: VADEvent, data?: { volume?: number; duration?: number }): void {
+  private emit(event: VADEvent, data?: {
+    volume?: number;
+    duration?: number;
+    threshold?: number;
+    noiseFloor?: number;
+  }): void {
     const callbacks = this.callbacks.get(event);
     if (callbacks) {
       callbacks.forEach(cb => {

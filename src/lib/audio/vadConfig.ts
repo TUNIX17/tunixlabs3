@@ -3,6 +3,8 @@
  * Configuraciones para deteccion de actividad de voz
  */
 
+import { AdaptiveVADConfig, DEFAULT_ADAPTIVE_CONFIG } from './adaptiveVAD';
+
 export interface VADConfig {
   /** Umbral de volumen (0-1) - audio por encima es considerado voz */
   volumeThreshold: number;
@@ -18,42 +20,70 @@ export interface VADConfig {
 
   /** Intervalo de analisis de volumen (ms) */
   analysisIntervalMs: number;
+
+  /** Configuración para modo adaptativo (umbral dinámico) */
+  adaptive?: AdaptiveVADConfig;
 }
 
-/** Configuracion por defecto - ambiente normal */
+/** Configuracion por defecto - ambiente normal con modo adaptativo habilitado */
 export const DEFAULT_VAD_CONFIG: VADConfig = {
-  volumeThreshold: 0.12,       // 12% - umbral más alto para evitar falsos positivos por ruido de fondo
+  volumeThreshold: 0.12,       // 12% - umbral fallback (se usa si adaptativo está deshabilitado)
   speechStartDelay: 350,       // 350ms - debounce mayor para evitar activaciones por ruido
   silenceTimeout: 1200,        // 1.2s - pausa natural
   minSpeechDuration: 600,      // 600ms - filtra ruidos cortos con más rigor
-  analysisIntervalMs: 50       // 50ms - analisis suave
+  analysisIntervalMs: 50,      // 50ms - analisis suave
+  adaptive: {
+    ...DEFAULT_ADAPTIVE_CONFIG,
+    enabled: true              // Modo adaptativo habilitado por defecto
+  }
 };
 
 /** Configuracion para ambientes ruidosos */
 export const NOISY_VAD_CONFIG: VADConfig = {
-  volumeThreshold: 0.12,       // 12% - umbral mas alto para filtrar ruido
+  volumeThreshold: 0.15,       // 15% - umbral fallback más alto
   speechStartDelay: 350,       // 350ms - mas debounce
   silenceTimeout: 1500,        // 1.5s - mas tolerancia
   minSpeechDuration: 600,      // 600ms - mas estricto
-  analysisIntervalMs: 50
+  analysisIntervalMs: 50,
+  adaptive: {
+    ...DEFAULT_ADAPTIVE_CONFIG,
+    enabled: true,
+    snrFactor: 3.0,            // Requiere más SNR en ambiente ruidoso
+    hysteresis: 0.02,          // Más histéresis para estabilidad
+    minThreshold: 0.08         // Umbral mínimo más alto
+  }
 };
 
 /** Configuracion para ambientes muy silenciosos */
 export const QUIET_VAD_CONFIG: VADConfig = {
-  volumeThreshold: 0.008,      // 0.8% - muy sensible
+  volumeThreshold: 0.05,       // 5% - umbral fallback bajo
   speechStartDelay: 150,       // 150ms - respuesta muy rapida
   silenceTimeout: 1200,        // 1.2s - pausa mas corta
   minSpeechDuration: 400,      // 400ms
-  analysisIntervalMs: 50
+  analysisIntervalMs: 50,
+  adaptive: {
+    ...DEFAULT_ADAPTIVE_CONFIG,
+    enabled: true,
+    snrFactor: 2.0,            // Menos SNR requerido
+    minThreshold: 0.02,        // Umbral mínimo muy bajo
+    calibrationDurationMs: 1500 // Calibración más rápida
+  }
 };
 
 /** Configuracion para barge-in (durante TTS) */
 export const BARGEIN_VAD_CONFIG: VADConfig = {
-  volumeThreshold: 0.10,       // 10% - umbral alto para evitar que TTS se auto-interrumpa
+  volumeThreshold: 0.12,       // 12% - umbral fallback alto para barge-in
   speechStartDelay: 200,       // 200ms - respuesta rapida para interrumpir
   silenceTimeout: 800,         // 0.8s - mas corto para barge-in
   minSpeechDuration: 400,      // 400ms - permitir interrupciones claras
-  analysisIntervalMs: 40       // 40ms - analisis frecuente
+  analysisIntervalMs: 40,      // 40ms - analisis frecuente
+  adaptive: {
+    ...DEFAULT_ADAPTIVE_CONFIG,
+    enabled: true,
+    snrFactor: 3.5,            // Requiere más SNR para evitar auto-interrupción por TTS
+    hysteresis: 0.025,         // Más histéresis durante barge-in
+    minThreshold: 0.08         // No bajar de 8% durante barge-in
+  }
 };
 
 /** Presets disponibles */
@@ -85,3 +115,7 @@ export const createVADConfig = (
     ...overrides
   };
 };
+
+// Re-exportar tipos de adaptiveVAD para conveniencia
+export type { AdaptiveVADConfig } from './adaptiveVAD';
+export { DEFAULT_ADAPTIVE_CONFIG } from './adaptiveVAD';
