@@ -86,9 +86,7 @@
       "info": {
         "title": "Informacion de contacto",
         "email": "Email",
-        "phone": "Telefono",
-        "location": "Ubicacion",
-        "locationValue": "Madrid, Espana",
+        "whatsappCta": "Escribenos por WhatsApp",
         "followUs": "Siguenos"
       }
     },

@@ -2,7 +2,8 @@
 
 import React from 'react';
 import { useTranslations } from 'next-intl';
-import { FiMail, FiPhone, FiMessageCircle, FiSend, FiInstagram, FiLinkedin, FiTwitter } from 'react-icons/fi';
+import { FiMail, FiMessageCircle, FiSend, FiInstagram, FiLinkedin, FiTwitter } from 'react-icons/fi';
+import { BsWhatsapp } from 'react-icons/bs';
 
 export default function ContactoPage() {
   const t = useTranslations('ContactPage');
@@ -78,14 +79,19 @@ export default function ContactoPage() {
                 <div className="neu-service-icon flex-shrink-0" style={{ width: '48px', height: '48px', margin: 0 }}>
                   <FiMail className="h-5 w-5" style={{ color: 'var(--neu-primary)' }} />
                 </div>
-                <span style={{ color: '#718096' }}>contacto@tunixlabs.com</span>
+                <span style={{ color: 'var(--text-muted)' }}>contacto@tunixlabs.com</span>
               </div>
-              <div className="flex items-center gap-3">
-                <div className="neu-service-icon flex-shrink-0" style={{ width: '48px', height: '48px', margin: 0 }}>
-                  <FiPhone className="h-5 w-5" style={{ color: 'var(--neu-primary)' }} />
+              <a
+                href="https://wa.me/56930367979?text=Hola,%20me%20gustaría%20obtener%20más%20información%20sobre%20sus%20servicios%20de%20IA."
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-3 group"
+              >
+                <div className="neu-service-icon flex-shrink-0 transition-all duration-300 group-hover:-translate-y-1" style={{ width: '48px', height: '48px', margin: 0, background: 'linear-gradient(145deg, #25D366, #128C7E)' }}>
+                  <BsWhatsapp className="h-5 w-5 text-white" />
                 </div>
-                <span style={{ color: '#718096' }}>+34 600 123 456</span>
-              </div>
+                <span style={{ color: 'var(--text-muted)' }} className="group-hover:text-green-600 transition-colors">Escríbenos por WhatsApp</span>
+              </a>
             </div>
 
             <div className="mb-8">
@@ -106,7 +112,14 @@ export default function ContactoPage() {
 
           <div className="neu-pressed p-6 rounded-xl text-center">
             <p className="text-lg font-semibold mb-3 neu-gradient-text">{t('directContact.meetingQuestion')}</p>
-            <a href="mailto:contacto@tunixlabs.com" className="neu-btn-primary inline-block">
+            <a
+              href="https://wa.me/56930367979?text=Hola,%20me%20gustaría%20agendar%20una%20reunión%20para%20discutir%20mi%20proyecto."
+              target="_blank"
+              rel="noopener noreferrer"
+              className="neu-btn-primary inline-flex items-center gap-2"
+              style={{ background: 'linear-gradient(145deg, #25D366, #128C7E)' }}
+            >
+              <BsWhatsapp className="h-5 w-5" />
               {t('directContact.scheduleCall')}
             </a>
           </div>

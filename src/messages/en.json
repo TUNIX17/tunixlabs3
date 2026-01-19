@@ -86,9 +86,7 @@
       "info": {
         "title": "Contact information",
         "email": "Email",
-        "phone": "Phone",
-        "location": "Location",
-        "locationValue": "Madrid, Spain",
+        "whatsappCta": "Contact us on WhatsApp",
         "followUs": "Follow us"
       }
     },
