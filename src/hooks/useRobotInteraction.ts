@@ -118,7 +118,7 @@ const DEFAULT_CONTINUOUS_CONFIG: ContinuousConversationConfig = {
   idleTimeoutMs: 60000,
   listenTimeoutMs: 30000,
   bargeInEnabled: true,
-  minSpeakingTimeBeforeBargeIn: 1000
+  minSpeakingTimeBeforeBargeIn: 500 // Reduced from 1000ms for faster barge-in response
 };
 
 // Opciones para el hook
@@ -555,6 +555,7 @@ export const useRobotInteraction = ({
       // 1. SOLO cambiar idioma si hay texto significativo (mínimo 3 caracteres, palabras reales)
       // 2. Si STT detectó un idioma SOPORTADO (es, en) Y hay texto significativo, usarlo
       // 3. Si STT detectó un idioma NO SOPORTADO o no hay texto, mantener currentLanguage
+      // 4. NEW: With language confirmation enabled, require 2-3 consistent turns before switching globally
       // Esto evita que ruido ambiental cambie el idioma erróneamente
       const sttDetectedLang = recognitionResult.language;
       const normalizedSTTLang = sttDetectedLang ? normalizeLanguageCode(sttDetectedLang) : null;
@@ -566,12 +567,36 @@ export const useRobotInteraction = ({
 
       let langForThisInteraction: string;
       if (normalizedSTTLang && hasSignificantText) {
-        // STT detectó un idioma soportado Y hay texto significativo - usarlo
-        langForThisInteraction = normalizedSTTLang;
-        if (normalizedSTTLang !== normalizedCurrentLang) {
-          console.log('[RobotInteraction] STT detectó idioma soportado con texto válido:', sttDetectedLang, '-> Actualizando a:', normalizedSTTLang);
-          setCurrentLanguage(normalizedSTTLang);
-          promptCache.invalidate();
+        // STT detectó un idioma soportado Y hay texto significativo
+
+        // Add to language detection history if agent state tracking is available
+        if (agentStateRef.current) {
+          agentStateRef.current.addLanguageDetection(normalizedSTTLang, 1.0);
+        }
+
+        // Check if language confirmation is enabled (controlled by feature flag through AgentStateTracker)
+        const shouldSwitch = agentStateRef.current?.shouldSwitchLanguage(normalizedSTTLang) ?? true;
+
+        if (shouldSwitch) {
+          // Either confirmation is disabled (immediate switch) or we've confirmed after N turns
+          langForThisInteraction = normalizedSTTLang;
+          if (normalizedSTTLang !== normalizedCurrentLang) {
+            console.log('[RobotInteraction] Language switch CONFIRMED:', sttDetectedLang, '-> Actualizando a:', normalizedSTTLang);
+
+            // Confirm the switch in agent state
+            agentStateRef.current?.confirmLanguageSwitch();
+
+            setCurrentLanguage(normalizedSTTLang);
+            promptCache.invalidate();
+          }
+        } else {
+          // Use detected language for THIS response, but don't switch globally yet
+          // This allows natural response in detected language while waiting for confirmation
+          langForThisInteraction = normalizedSTTLang;
+          const pendingInfo = agentStateRef.current?.getPendingLanguageSwitch();
+          console.log('[RobotInteraction] Language switch PENDING:', normalizedSTTLang,
+            `(${pendingInfo?.turnCount || 1}/${pendingInfo?.required || 2} turns)`,
+            '- Using for this response only, not switching globally');
         }
       } else {
         // STT detectó idioma NO soportado, o no hay texto significativo - mantener el actual

@@ -1,11 +1,15 @@
 /**
  * Hook React para Voice Activity Detection (VAD)
- * Proporciona deteccion de voz en tiempo real usando Web Audio API
+ * Proporciona deteccion de voz en tiempo real usando Web Audio API o Silero VAD
+ * Supports both RMS-based and ML-based (Silero) VAD engines
  */
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { VoiceActivityDetector, VADState, VADEvent } from '../lib/audio/vad';
 import { VADConfig, VADPreset, getVADConfig, createVADConfig } from '../lib/audio/vadConfig';
+import { createVAD, VADEngineType, UnifiedVAD, getAvailableEngines } from '../lib/audio/vadFactory';
+import { SileroVADConfig, DEFAULT_SILERO_CONFIG } from '../lib/audio/sileroVAD';
+import { getVADEngine } from '../lib/config/featureFlags';
 
 /** Opciones para el hook useVAD */
 export interface UseVADOptions {
@@ -14,6 +18,12 @@ export interface UseVADOptions {
 
   /** Configuracion personalizada (override del preset) */
   config?: Partial<VADConfig>;
+
+  /** VAD engine type: 'rms' (default), 'silero' (ML-based), or 'auto' (try silero, fallback to rms) */
+  vadType?: VADEngineType;
+
+  /** Silero-specific configuration (only used when vadType is 'silero' or 'auto') */
+  sileroConfig?: Partial<SileroVADConfig>;
 
   /** Iniciar automaticamente al montar */
   autoStart?: boolean;
@@ -72,6 +82,12 @@ export interface UseVADReturn {
   /** Nivel de ruido de fondo estimado */
   noiseFloor: number;
 
+  /** The actual VAD engine being used */
+  engineType: 'rms' | 'silero' | null;
+
+  /** Whether fallback was used (tried silero but fell back to rms) */
+  usedFallback: boolean;
+
   /** Iniciar deteccion de voz */
   startVAD: () => Promise<void>;
 
@@ -85,7 +101,7 @@ export interface UseVADReturn {
   updateConfig: (config: Partial<VADConfig>) => void;
 
   /** Obtener configuracion actual */
-  getConfig: () => VADConfig | null;
+  getConfig: () => VADConfig | SileroVADConfig | null;
 
   /** Cambiar preset */
   setPreset: (preset: VADPreset) => void;
@@ -116,6 +132,8 @@ export const useVAD = (options: UseVADOptions = {}): UseVADReturn => {
   const {
     preset = 'default',
     config: customConfig,
+    vadType,
+    sileroConfig,
     autoStart = false,
     onSpeechStart,
     onSpeechEnd,
@@ -137,9 +155,14 @@ export const useVAD = (options: UseVADOptions = {}): UseVADReturn => {
   const [isCalibrating, setIsCalibrating] = useState(false);
   const [currentThreshold, setCurrentThreshold] = useState(0.12);
   const [noiseFloor, setNoiseFloor] = useState(0.05);
+  // Engine type tracking
+  const [engineType, setEngineType] = useState<'rms' | 'silero' | null>(null);
+  const [usedFallback, setUsedFallback] = useState(false);
 
-  // Referencia al detector VAD
-  const vadRef = useRef<VoiceActivityDetector | null>(null);
+  // Referencia al detector VAD (unified interface)
+  const vadRef = useRef<UnifiedVAD | null>(null);
+  // Track initialization
+  const isInitializedRef = useRef(false);
 
   // Referencia a callbacks para evitar re-renders
   const callbacksRef = useRef({
@@ -169,104 +192,133 @@ export const useVAD = (options: UseVADOptions = {}): UseVADReturn => {
     };
   }, [onSpeechStart, onSpeechEnd, onVolumeChange, onListeningStart, onListeningStop, onCalibrationStart, onCalibrationEnd, onThresholdUpdate, onError]);
 
-  // Verificar soporte
-  const isSupported = VoiceActivityDetector.isSupported();
+  // Verificar soporte (check both engines)
+  const availableEngines = getAvailableEngines();
+  const isSupported = availableEngines.rms || availableEngines.silero;
 
-  // Inicializar VAD
+  // Get effective engine type from feature flag or option
+  const effectiveVadType = vadType || getVADEngine();
+
+  // Initialize VAD with factory
   useEffect(() => {
     if (!isSupported) {
-      console.warn('[useVAD] Web Audio API no soportada en este navegador');
+      console.warn('[useVAD] No VAD engine supported in this browser');
       return;
     }
 
-    // Crear configuracion
-    const vadConfig = createVADConfig(preset, customConfig);
-
-    // Crear instancia de VAD
-    vadRef.current = new VoiceActivityDetector(vadConfig);
-
-    // Registrar callbacks
-    vadRef.current.on('speech_start', () => {
-      setIsSpeaking(true);
-      callbacksRef.current.onSpeechStart?.();
-    });
-
-    vadRef.current.on('speech_end', (data) => {
-      setIsSpeaking(false);
-      callbacksRef.current.onSpeechEnd?.(data?.duration ?? 0);
-    });
-
-    vadRef.current.on('volume_change', (data) => {
-      if (data?.volume !== undefined) {
-        setCurrentVolume(data.volume);
-        callbacksRef.current.onVolumeChange?.(data.volume);
-      }
-    });
-
-    vadRef.current.on('listening_start', () => {
-      setIsListening(true);
-      setError(null);
-      callbacksRef.current.onListeningStart?.();
-    });
-
-    vadRef.current.on('listening_stop', () => {
-      setIsListening(false);
-      setIsSpeaking(false);
-      setCurrentVolume(0);
-      setIsCalibrating(false);
-      callbacksRef.current.onListeningStop?.();
-    });
-
-    // Eventos de calibración (modo adaptativo)
-    vadRef.current.on('calibration_start', () => {
-      setIsCalibrating(true);
-      callbacksRef.current.onCalibrationStart?.();
-    });
-
-    vadRef.current.on('calibration_end', (data) => {
-      setIsCalibrating(false);
-      if (data?.threshold !== undefined) {
-        setCurrentThreshold(data.threshold);
-      }
-      if (data?.noiseFloor !== undefined) {
-        setNoiseFloor(data.noiseFloor);
-      }
-      callbacksRef.current.onCalibrationEnd?.({
-        threshold: data?.threshold ?? 0.12,
-        noiseFloor: data?.noiseFloor ?? 0.05
-      });
-    });
-
-    vadRef.current.on('threshold_update', (data) => {
-      if (data?.threshold !== undefined) {
-        setCurrentThreshold(data.threshold);
-      }
-      if (data?.noiseFloor !== undefined) {
-        setNoiseFloor(data.noiseFloor);
-      }
-      callbacksRef.current.onThresholdUpdate?.({
-        threshold: data?.threshold ?? 0.12,
-        noiseFloor: data?.noiseFloor ?? 0.05
-      });
-    });
-
-    // Auto-start si esta configurado
-    if (autoStart) {
-      vadRef.current.start().catch((err) => {
-        const error = err instanceof Error ? err : new Error(String(err));
-        setError(error);
-        callbacksRef.current.onError?.(error);
-      });
+    // Prevent double initialization
+    if (isInitializedRef.current) {
+      return;
     }
 
-    // Cleanup al desmontar
+    const initVAD = async () => {
+      try {
+        // Create VAD config
+        const vadConfig = createVADConfig(preset, customConfig);
+
+        // Use factory to create the appropriate VAD
+        const result = await createVAD({
+          engine: effectiveVadType,
+          rmsConfig: vadConfig,
+          sileroConfig: sileroConfig || DEFAULT_SILERO_CONFIG
+        });
+
+        vadRef.current = result.vad;
+        setEngineType(result.engineType);
+        setUsedFallback(result.usedFallback);
+        isInitializedRef.current = true;
+
+        console.log(`[useVAD] Initialized with engine: ${result.engineType}${result.usedFallback ? ' (fallback)' : ''}`);
+
+        // Register callbacks
+        vadRef.current.on('speech_start', () => {
+          setIsSpeaking(true);
+          callbacksRef.current.onSpeechStart?.();
+        });
+
+        vadRef.current.on('speech_end', (data) => {
+          setIsSpeaking(false);
+          callbacksRef.current.onSpeechEnd?.(data?.duration ?? 0);
+        });
+
+        vadRef.current.on('volume_change', (data) => {
+          if (data?.volume !== undefined) {
+            setCurrentVolume(data.volume);
+            callbacksRef.current.onVolumeChange?.(data.volume);
+          }
+        });
+
+        vadRef.current.on('listening_start', () => {
+          setIsListening(true);
+          setError(null);
+          callbacksRef.current.onListeningStart?.();
+        });
+
+        vadRef.current.on('listening_stop', () => {
+          setIsListening(false);
+          setIsSpeaking(false);
+          setCurrentVolume(0);
+          setIsCalibrating(false);
+          callbacksRef.current.onListeningStop?.();
+        });
+
+        // Calibration events (adaptive mode / Silero model loading)
+        vadRef.current.on('calibration_start', () => {
+          setIsCalibrating(true);
+          callbacksRef.current.onCalibrationStart?.();
+        });
+
+        vadRef.current.on('calibration_end', (data) => {
+          setIsCalibrating(false);
+          if (data?.threshold !== undefined) {
+            setCurrentThreshold(data.threshold);
+          }
+          if (data?.noiseFloor !== undefined) {
+            setNoiseFloor(data.noiseFloor);
+          }
+          callbacksRef.current.onCalibrationEnd?.({
+            threshold: data?.threshold ?? 0.12,
+            noiseFloor: data?.noiseFloor ?? 0.05
+          });
+        });
+
+        vadRef.current.on('threshold_update', (data) => {
+          if (data?.threshold !== undefined) {
+            setCurrentThreshold(data.threshold);
+          }
+          if (data?.noiseFloor !== undefined) {
+            setNoiseFloor(data.noiseFloor);
+          }
+          callbacksRef.current.onThresholdUpdate?.({
+            threshold: data?.threshold ?? 0.12,
+            noiseFloor: data?.noiseFloor ?? 0.05
+          });
+        });
+
+        // Auto-start if configured
+        if (autoStart) {
+          await vadRef.current.start();
+        }
+      } catch (err) {
+        const error = err instanceof Error ? err : new Error(String(err));
+        console.error('[useVAD] Initialization error:', error);
+        setError(error);
+        callbacksRef.current.onError?.(error);
+      }
+    };
+
+    initVAD();
+
+    // Cleanup on unmount
     return () => {
       if (vadRef.current) {
         vadRef.current.dispose();
         vadRef.current = null;
       }
+      isInitializedRef.current = false;
+      setEngineType(null);
     };
-  }, [isSupported, preset]); // Solo re-crear cuando cambia el preset
+  }, [isSupported, preset, effectiveVadType]); // Re-create when engine type changes
 
   // Aplicar customConfig cuando cambia
   useEffect(() => {
@@ -324,7 +376,7 @@ export const useVAD = (options: UseVADOptions = {}): UseVADReturn => {
   }, []);
 
   // Obtener configuracion actual
-  const getConfig = useCallback((): VADConfig | null => {
+  const getConfig = useCallback((): VADConfig | SileroVADConfig | null => {
     return vadRef.current?.getConfig() ?? null;
   }, []);
 
@@ -352,6 +404,8 @@ export const useVAD = (options: UseVADOptions = {}): UseVADReturn => {
     isCalibrating,
     currentThreshold,
     noiseFloor,
+    engineType,
+    usedFallback,
     startVAD,
     stopVAD,
     setThreshold,

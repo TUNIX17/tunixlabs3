@@ -31,6 +31,31 @@ export interface LeadData {
   calendarLink?: string;
 }
 
+/** Language detection entry for tracking */
+export interface LanguageDetection {
+  language: string;
+  confidence: number;
+  turnNumber: number;
+  timestamp: number;
+}
+
+/** Configuration for language confirmation */
+export interface LanguageConfirmationConfig {
+  /** Number of consecutive turns required to confirm language switch */
+  requiredConsecutiveTurns: number;
+  /** Minimum confidence threshold to consider a detection */
+  minConfidenceThreshold: number;
+  /** Whether language confirmation is enabled */
+  enabled: boolean;
+}
+
+/** Default language confirmation config */
+export const DEFAULT_LANGUAGE_CONFIRMATION_CONFIG: LanguageConfirmationConfig = {
+  requiredConsecutiveTurns: 2, // 2-3 turns before switching
+  minConfidenceThreshold: 0.7,
+  enabled: false // Controlled by feature flag
+};
+
 /** Contexto de la conversacion */
 export interface ConversationContext {
   phase: ConversationPhase;
@@ -41,6 +66,11 @@ export interface ConversationContext {
   language: string;
   sessionStartTime: number;
   lastActivityTime: number;
+  // Language confirmation tracking
+  languageHistory: LanguageDetection[];
+  confirmedLanguage: string;
+  pendingLanguageSwitch: string | null;
+  languageSwitchTurnCount: number;
 }
 
 /** Transiciones validas entre fases */
@@ -70,9 +100,14 @@ const PHASE_INSTRUCTIONS: Record<ConversationPhase, string> = {
  */
 export class AgentStateTracker {
   private context: ConversationContext;
+  private languageConfig: LanguageConfirmationConfig;
 
-  constructor(language: string = 'es') {
+  constructor(language: string = 'es', languageConfig?: Partial<LanguageConfirmationConfig>) {
     const now = Date.now();
+    this.languageConfig = {
+      ...DEFAULT_LANGUAGE_CONFIRMATION_CONFIG,
+      ...languageConfig
+    };
     this.context = {
       phase: ConversationPhase.GREETING,
       turnCount: 0,
@@ -81,7 +116,12 @@ export class AgentStateTracker {
       lastTopic: '',
       language,
       sessionStartTime: now,
-      lastActivityTime: now
+      lastActivityTime: now,
+      // Language confirmation tracking
+      languageHistory: [],
+      confirmedLanguage: language,
+      pendingLanguageSwitch: null,
+      languageSwitchTurnCount: 0
     };
   }
 
@@ -194,6 +234,113 @@ export class AgentStateTracker {
    */
   setLanguage(language: string): void {
     this.context.language = language;
+  }
+
+  /**
+   * Add a language detection to history
+   * Used for tracking detected languages over multiple turns
+   */
+  addLanguageDetection(language: string, confidence: number = 1.0): void {
+    const detection: LanguageDetection = {
+      language,
+      confidence,
+      turnNumber: this.context.turnCount,
+      timestamp: Date.now()
+    };
+
+    this.context.languageHistory.push(detection);
+
+    // Keep only last 10 detections to prevent memory growth
+    if (this.context.languageHistory.length > 10) {
+      this.context.languageHistory.shift();
+    }
+
+    console.log('[AgentState] Language detection added:', detection);
+  }
+
+  /**
+   * Determine if we should switch to a detected language
+   * Returns true only if the language has been consistently detected for N turns
+   */
+  shouldSwitchLanguage(detectedLanguage: string): boolean {
+    // If language confirmation is disabled, always allow immediate switch
+    if (!this.languageConfig.enabled) {
+      return true;
+    }
+
+    const currentLang = this.context.confirmedLanguage;
+
+    // If detected language matches current confirmed language, no switch needed
+    if (detectedLanguage === currentLang) {
+      this.context.pendingLanguageSwitch = null;
+      this.context.languageSwitchTurnCount = 0;
+      return false;
+    }
+
+    // Check if this is a continuation of a pending switch
+    if (this.context.pendingLanguageSwitch === detectedLanguage) {
+      this.context.languageSwitchTurnCount++;
+      console.log(`[AgentState] Language switch pending: ${detectedLanguage}, turn ${this.context.languageSwitchTurnCount}/${this.languageConfig.requiredConsecutiveTurns}`);
+
+      // Check if we've reached the threshold
+      if (this.context.languageSwitchTurnCount >= this.languageConfig.requiredConsecutiveTurns) {
+        console.log(`[AgentState] Language switch CONFIRMED after ${this.context.languageSwitchTurnCount} turns: ${currentLang} -> ${detectedLanguage}`);
+        return true;
+      }
+    } else {
+      // New language detected, start tracking
+      this.context.pendingLanguageSwitch = detectedLanguage;
+      this.context.languageSwitchTurnCount = 1;
+      console.log(`[AgentState] New language detected: ${detectedLanguage}, starting confirmation countdown`);
+    }
+
+    return false;
+  }
+
+  /**
+   * Confirm the pending language switch
+   * Should be called after shouldSwitchLanguage returns true
+   */
+  confirmLanguageSwitch(): void {
+    if (this.context.pendingLanguageSwitch) {
+      const oldLang = this.context.confirmedLanguage;
+      const newLang = this.context.pendingLanguageSwitch;
+
+      this.context.confirmedLanguage = newLang;
+      this.context.language = newLang;
+      this.context.pendingLanguageSwitch = null;
+      this.context.languageSwitchTurnCount = 0;
+
+      console.log(`[AgentState] Language switch completed: ${oldLang} -> ${newLang}`);
+    }
+  }
+
+  /**
+   * Get the confirmed language (stable language after confirmation)
+   */
+  getConfirmedLanguage(): string {
+    return this.context.confirmedLanguage;
+  }
+
+  /**
+   * Get pending language switch info
+   */
+  getPendingLanguageSwitch(): { language: string | null; turnCount: number; required: number } {
+    return {
+      language: this.context.pendingLanguageSwitch,
+      turnCount: this.context.languageSwitchTurnCount,
+      required: this.languageConfig.requiredConsecutiveTurns
+    };
+  }
+
+  /**
+   * Update language confirmation config
+   */
+  setLanguageConfirmationConfig(config: Partial<LanguageConfirmationConfig>): void {
+    this.languageConfig = {
+      ...this.languageConfig,
+      ...config
+    };
   }
 
   /**
@@ -521,15 +668,21 @@ export class AgentStateTracker {
    */
   reset(language?: string): void {
     const now = Date.now();
+    const newLanguage = language || this.context.language;
     this.context = {
       phase: ConversationPhase.GREETING,
       turnCount: 0,
       leadData: {},
       objections: [],
       lastTopic: '',
-      language: language || this.context.language,
+      language: newLanguage,
       sessionStartTime: now,
-      lastActivityTime: now
+      lastActivityTime: now,
+      // Reset language confirmation tracking
+      languageHistory: [],
+      confirmedLanguage: newLanguage,
+      pendingLanguageSwitch: null,
+      languageSwitchTurnCount: 0
     };
   }
 

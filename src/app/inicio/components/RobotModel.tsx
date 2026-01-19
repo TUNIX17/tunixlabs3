@@ -37,8 +37,10 @@ import {
 import { easeInOutQuad, easeOutBack } from '../../../lib/animation/easingFunctions';
 
 // Importar nuevos sistemas de animación mejorados
-import { getBoneLerpFactor, getAdaptiveLerpFactor } from '../../../lib/animation/boneLerpConfig';
-import { SmoothRotationManager, SMOOTH_PRESETS } from '../../../lib/animation/SmoothRotation';
+import { getBoneLerpFactor, getAdaptiveLerpFactor, BONE_LERP_FACTORS } from '../../../lib/animation/boneLerpConfig';
+import { SmoothRotationManager, SMOOTH_PRESETS, SmoothRotation } from '../../../lib/animation/SmoothRotation';
+import { AnimationPriorityManager, AnimationPriority, createAnimation, ANIMATION_BONE_SETS } from '../../../lib/animation/AnimationPriority';
+import { FEATURE_FLAGS } from '../../../lib/config/featureFlags';
 
 // Definir tipo para arrays de rotación
 type RotationArray = [number, number, number];
@@ -136,6 +138,10 @@ const AnimatedRobotModel = forwardRef<RobotMethods, { onLoad?: () => void; isLis
 
     // Refs para almacenar las rotaciones iniciales
     const initialRotations = useRef<{ [key: string]: THREE.Euler }>({});
+
+    // Animation system managers (for enhanced animation control)
+    const animationManagerRef = useRef<AnimationPriorityManager | null>(null);
+    const smoothRotationManagerRef = useRef<SmoothRotationManager | null>(null);
 
     // Coordenadas del mouse (normalizadas)
     const mouse = useThree((state) => state.mouse);
@@ -246,8 +252,51 @@ const AnimatedRobotModel = forwardRef<RobotMethods, { onLoad?: () => void; isLis
       }
     }, [scene, onLoad]);
 
+    // Initialize animation managers (for enhanced animation control)
+    React.useEffect(() => {
+      // Only initialize if feature flags are enabled
+      if (FEATURE_FLAGS.ENABLE_ANIMATION_PRIORITY) {
+        animationManagerRef.current = new AnimationPriorityManager();
+        console.log('[RobotModel] AnimationPriorityManager initialized');
+      }
+
+      if (FEATURE_FLAGS.ENABLE_SMOOTH_ROTATION) {
+        smoothRotationManagerRef.current = new SmoothRotationManager(SMOOTH_PRESETS.normal);
+        console.log('[RobotModel] SmoothRotationManager initialized');
+      }
+
+      return () => {
+        // Cleanup
+        if (animationManagerRef.current) {
+          animationManagerRef.current.clear();
+          animationManagerRef.current = null;
+        }
+        if (smoothRotationManagerRef.current) {
+          smoothRotationManagerRef.current.clear();
+          smoothRotationManagerRef.current = null;
+        }
+      };
+    }, []);
+
+    // Helper function to get lerp factor with per-bone config
+    const getLerpForBone = React.useCallback((boneName: string, mode: 'enter' | 'exit' | 'idle' = 'idle'): number => {
+      if (FEATURE_FLAGS.ENABLE_BONE_LERP_CONFIG) {
+        return getBoneLerpFactor(boneName, mode);
+      }
+      // Fallback to default lerp factor
+      return ANIMATION_CONFIGS.idle.lerpFactor;
+    }, []);
+
     useFrame((state, delta) => {
       const time = state.clock.getElapsedTime();
+
+      // Update animation managers if enabled
+      if (FEATURE_FLAGS.ENABLE_ANIMATION_PRIORITY && animationManagerRef.current) {
+        animationManagerRef.current.update();
+      }
+      if (FEATURE_FLAGS.ENABLE_SMOOTH_ROTATION && smoothRotationManagerRef.current) {
+        smoothRotationManagerRef.current.updateAll(delta);
+      }
 
       // Durante interacción activa: animaciones de "escucha atenta" naturales
       // El robot muestra que está prestando atención con movimientos sutiles y orgánicos
@@ -394,7 +443,11 @@ const AnimatedRobotModel = forwardRef<RobotMethods, { onLoad?: () => void; isLis
       }
 
       // 4. Animación de Brazos
+      // Use per-bone lerp factors when feature flag is enabled
       const lerpFactor = ANIMATION_CONFIGS.idle.lerpFactor;
+      const shoulderLerp = getLerpForBone('shoulder_left', 'idle');
+      const armTopLerp = getLerpForBone('arm_left_top', 'idle');
+      const armBotLerp = getLerpForBone('arm_left_bot', 'idle');
 
       if (isWaving) {
         // Tiempo transcurrido desde que empezó el saludo
@@ -444,46 +497,46 @@ const AnimatedRobotModel = forwardRef<RobotMethods, { onLoad?: () => void; isLis
         }
       } else {
         // Si no está saludando, aplicar las rotaciones de reposo normales para el brazo derecho
-        // Hombro Derecho
+        // Hombro Derecho - uses per-bone lerp for more natural movement
         if (shoulderRightRef.current && targetArmRestingRotations.shoulder_right) {
-          shoulderRightRef.current.rotation.x = THREE.MathUtils.lerp(shoulderRightRef.current.rotation.x, targetArmRestingRotations.shoulder_right.x, lerpFactor);
-          shoulderRightRef.current.rotation.y = THREE.MathUtils.lerp(shoulderRightRef.current.rotation.y, targetArmRestingRotations.shoulder_right.y, lerpFactor);
-          shoulderRightRef.current.rotation.z = THREE.MathUtils.lerp(shoulderRightRef.current.rotation.z, targetArmRestingRotations.shoulder_right.z, lerpFactor);
+          shoulderRightRef.current.rotation.x = THREE.MathUtils.lerp(shoulderRightRef.current.rotation.x, targetArmRestingRotations.shoulder_right.x, shoulderLerp);
+          shoulderRightRef.current.rotation.y = THREE.MathUtils.lerp(shoulderRightRef.current.rotation.y, targetArmRestingRotations.shoulder_right.y, shoulderLerp);
+          shoulderRightRef.current.rotation.z = THREE.MathUtils.lerp(shoulderRightRef.current.rotation.z, targetArmRestingRotations.shoulder_right.z, shoulderLerp);
         }
-        
+
         // Brazo Superior Derecho
         if (armRightTopRef.current && targetArmRestingRotations.arm_right_top) {
-          armRightTopRef.current.rotation.x = THREE.MathUtils.lerp(armRightTopRef.current.rotation.x, targetArmRestingRotations.arm_right_top.x, lerpFactor);
-          armRightTopRef.current.rotation.y = THREE.MathUtils.lerp(armRightTopRef.current.rotation.y, targetArmRestingRotations.arm_right_top.y, lerpFactor);
-          armRightTopRef.current.rotation.z = THREE.MathUtils.lerp(armRightTopRef.current.rotation.z, targetArmRestingRotations.arm_right_top.z, lerpFactor);
+          armRightTopRef.current.rotation.x = THREE.MathUtils.lerp(armRightTopRef.current.rotation.x, targetArmRestingRotations.arm_right_top.x, armTopLerp);
+          armRightTopRef.current.rotation.y = THREE.MathUtils.lerp(armRightTopRef.current.rotation.y, targetArmRestingRotations.arm_right_top.y, armTopLerp);
+          armRightTopRef.current.rotation.z = THREE.MathUtils.lerp(armRightTopRef.current.rotation.z, targetArmRestingRotations.arm_right_top.z, armTopLerp);
         }
-        
+
         // Antebrazo Derecho
         if (armRightBotRef.current && targetArmRestingRotations.arm_right_bot) {
-          armRightBotRef.current.rotation.x = THREE.MathUtils.lerp(armRightBotRef.current.rotation.x, targetArmRestingRotations.arm_right_bot.x, lerpFactor);
-          armRightBotRef.current.rotation.y = THREE.MathUtils.lerp(armRightBotRef.current.rotation.y, targetArmRestingRotations.arm_right_bot.y, lerpFactor);
-          armRightBotRef.current.rotation.z = THREE.MathUtils.lerp(armRightBotRef.current.rotation.z, targetArmRestingRotations.arm_right_bot.z, lerpFactor);
+          armRightBotRef.current.rotation.x = THREE.MathUtils.lerp(armRightBotRef.current.rotation.x, targetArmRestingRotations.arm_right_bot.x, armBotLerp);
+          armRightBotRef.current.rotation.y = THREE.MathUtils.lerp(armRightBotRef.current.rotation.y, targetArmRestingRotations.arm_right_bot.y, armBotLerp);
+          armRightBotRef.current.rotation.z = THREE.MathUtils.lerp(armRightBotRef.current.rotation.z, targetArmRestingRotations.arm_right_bot.z, armBotLerp);
         }
       }
 
       // Siempre aplicar las rotaciones de reposo para el brazo izquierdo
-      // Hombro Izquierdo
+      // Hombro Izquierdo - uses per-bone lerp for more natural movement
       if (shoulderLeftRef.current && targetArmRestingRotations.shoulder_left) {
-        shoulderLeftRef.current.rotation.x = THREE.MathUtils.lerp(shoulderLeftRef.current.rotation.x, targetArmRestingRotations.shoulder_left.x, lerpFactor);
-        shoulderLeftRef.current.rotation.y = THREE.MathUtils.lerp(shoulderLeftRef.current.rotation.y, targetArmRestingRotations.shoulder_left.y, lerpFactor);
-        shoulderLeftRef.current.rotation.z = THREE.MathUtils.lerp(shoulderLeftRef.current.rotation.z, targetArmRestingRotations.shoulder_left.z, lerpFactor);
+        shoulderLeftRef.current.rotation.x = THREE.MathUtils.lerp(shoulderLeftRef.current.rotation.x, targetArmRestingRotations.shoulder_left.x, shoulderLerp);
+        shoulderLeftRef.current.rotation.y = THREE.MathUtils.lerp(shoulderLeftRef.current.rotation.y, targetArmRestingRotations.shoulder_left.y, shoulderLerp);
+        shoulderLeftRef.current.rotation.z = THREE.MathUtils.lerp(shoulderLeftRef.current.rotation.z, targetArmRestingRotations.shoulder_left.z, shoulderLerp);
       }
       // Brazo Superior Izquierdo
       if (armLeftTopRef.current && targetArmRestingRotations.arm_left_top) {
-        armLeftTopRef.current.rotation.x = THREE.MathUtils.lerp(armLeftTopRef.current.rotation.x, targetArmRestingRotations.arm_left_top.x, lerpFactor);
-        armLeftTopRef.current.rotation.y = THREE.MathUtils.lerp(armLeftTopRef.current.rotation.y, targetArmRestingRotations.arm_left_top.y, lerpFactor);
-        armLeftTopRef.current.rotation.z = THREE.MathUtils.lerp(armLeftTopRef.current.rotation.z, targetArmRestingRotations.arm_left_top.z, lerpFactor);
+        armLeftTopRef.current.rotation.x = THREE.MathUtils.lerp(armLeftTopRef.current.rotation.x, targetArmRestingRotations.arm_left_top.x, armTopLerp);
+        armLeftTopRef.current.rotation.y = THREE.MathUtils.lerp(armLeftTopRef.current.rotation.y, targetArmRestingRotations.arm_left_top.y, armTopLerp);
+        armLeftTopRef.current.rotation.z = THREE.MathUtils.lerp(armLeftTopRef.current.rotation.z, targetArmRestingRotations.arm_left_top.z, armTopLerp);
       }
       // Antebrazo Izquierdo
       if (armLeftBotRef.current && targetArmRestingRotations.arm_left_bot) {
-        armLeftBotRef.current.rotation.x = THREE.MathUtils.lerp(armLeftBotRef.current.rotation.x, targetArmRestingRotations.arm_left_bot.x, lerpFactor);
-        armLeftBotRef.current.rotation.y = THREE.MathUtils.lerp(armLeftBotRef.current.rotation.y, targetArmRestingRotations.arm_left_bot.y, lerpFactor);
-        armLeftBotRef.current.rotation.z = THREE.MathUtils.lerp(armLeftBotRef.current.rotation.z, targetArmRestingRotations.arm_left_bot.z, lerpFactor);
+        armLeftBotRef.current.rotation.x = THREE.MathUtils.lerp(armLeftBotRef.current.rotation.x, targetArmRestingRotations.arm_left_bot.x, armBotLerp);
+        armLeftBotRef.current.rotation.y = THREE.MathUtils.lerp(armLeftBotRef.current.rotation.y, targetArmRestingRotations.arm_left_bot.y, armBotLerp);
+        armLeftBotRef.current.rotation.z = THREE.MathUtils.lerp(armLeftBotRef.current.rotation.z, targetArmRestingRotations.arm_left_bot.z, armBotLerp);
       }
 
       // 5. Animación de Piernas a Pose de Reposo y movimiento sutil
