@@ -109,10 +109,15 @@
       "subjectPlaceholder": "What would you like to discuss?",
       "message": "Message",
       "messagePlaceholder": "Tell us your idea or question...",
-      "submit": "Send message"
+      "submit": "Send message",
+      "sending": "Sending...",
+      "successTitle": "Message sent",
+      "successMessage": "We will reply to your email soon.",
+      "sendAnother": "Send another message"
     },
     "directContact": {
       "title": "Direct contact",
+      "whatsapp": "Contact us on WhatsApp",
       "socialMedia": "Social media",
       "meetingQuestion": "Prefer a meeting?",
       "scheduleCall": "Schedule a video call"

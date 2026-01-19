@@ -109,10 +109,15 @@
       "subjectPlaceholder": "Sobre que quieres hablar?",
       "message": "Mensaje",
       "messagePlaceholder": "Cuentanos tu idea o consulta...",
-      "submit": "Enviar mensaje"
+      "submit": "Enviar mensaje",
+      "sending": "Enviando...",
+      "successTitle": "Mensaje enviado",
+      "successMessage": "Te responderemos pronto a tu correo.",
+      "sendAnother": "Enviar otro mensaje"
     },
     "directContact": {
       "title": "Contacto directo",
+      "whatsapp": "Escribenos por WhatsApp",
       "socialMedia": "Redes sociales",
       "meetingQuestion": "Prefieres una reunion?",
       "scheduleCall": "Agenda una videollamada"
