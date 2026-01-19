@@ -1,8 +1,8 @@
 # TunixLabs - Development State
 
 **Last Updated:** 2026-01-19
-**Current Phase:** Aurora Theme Implementation Complete
-**Sprint:** 3.4 - Aurora Theme Migration
+**Current Phase:** Language Lock Fix
+**Sprint:** 3.5 - Voice Agent Stability
 
 ---
 
@@ -162,6 +162,34 @@ TunixLabs es una plataforma web de consultoria en IA con:
     - `src/lib/animation/index.ts` - Fixed BONE_GROUPS export conflict
   - [x] Build verification: npm run build succeeds
   - [x] VAD engine selection via feature flag: VAD_ENGINE='rms'|'silero'|'auto'
+- [x] **Language Lock Fix** (2026-01-19)
+  - [x] Fixed robot language switching mid-conversation from noise/STT errors
+  - [x] Language now locked to page-detected language at session start
+  - [x] STT language detection is logged but ignored for language switching
+  - [x] Prevents unnatural language changes during conversation
+  - [x] Connected page locale to RobotModel so language switch button works
+  - [x] Files modified:
+    - `src/hooks/useRobotInteraction.ts` - Simplified language handling to use fixed session language
+    - `src/app/[locale]/inicio/page.tsx` - Added useLocale() and passes locale to RobotModel
+    - `src/app/[locale]/inicio/components/RobotModel.tsx` - Added locale prop, uses it as initialLanguage
+    - `src/app/inicio/components/RobotModel.tsx` - Added locale prop with 'es' default
+- [x] **Terminal Loading Animation** (2026-01-19)
+  - [x] Created TerminalLoading component with macOS-style terminal window
+  - [x] Light/white neumorphic theme matching site design
+  - [x] Simulated command sequence: `tunix --init`, `load avatar --model robot`, `start assistant`
+  - [x] Animated command output with realistic delays (0-3200ms sequence)
+  - [x] Blinking cursor during typing animation
+  - [x] Success checkmarks (green) and info messages (purple)
+  - [x] Smooth fade-out transition when model loads and animation completes
+  - [x] Robot appears with automatic wave greeting after terminal
+  - [x] Files created:
+    - `src/components/ui/TerminalLoading.tsx` - Terminal component (~220 lines)
+  - [x] Files modified:
+    - `src/styles/globals.css` - Added terminalFadeIn and terminalBounce keyframes
+    - `src/app/[locale]/inicio/components/RobotModel.tsx` - Integrated TerminalLoading
+    - `src/app/[locale]/inicio/components/RobotInteractionContainer.tsx` - Changed loading to null
+    - `src/app/[locale]/inicio/page.tsx` - Changed loading to null
+    - Same changes in non-locale versions (`src/app/inicio/...`)
 - [x] **Aurora Theme Implementation** (2026-01-19)
   - [x] Updated CSS variables from Teal/Cyan to Aurora Purple/Violet:
     - `--neu-bg`: #e0e5ec → #e8e4f0

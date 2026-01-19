@@ -551,63 +551,22 @@ export const useRobotInteraction = ({
       console.log('[RobotInteraction] STT resultado:', recognitionResult);
       setUserMessage(recognitionResult.text);
 
-      // Determinar idioma para esta interacción:
-      // 1. SOLO cambiar idioma si hay texto significativo (mínimo 3 caracteres, palabras reales)
-      // 2. Si STT detectó un idioma SOPORTADO (es, en) Y hay texto significativo, usarlo
-      // 3. Si STT detectó un idioma NO SOPORTADO o no hay texto, mantener currentLanguage
-      // 4. NEW: With language confirmation enabled, require 2-3 consistent turns before switching globally
-      // Esto evita que ruido ambiental cambie el idioma erróneamente
-      const sttDetectedLang = recognitionResult.language;
-      const normalizedSTTLang = sttDetectedLang ? normalizeLanguageCode(sttDetectedLang) : null;
+      // IDIOMA FIJO: El idioma se establece al inicio de la sesión basándose en la página
+      // y NO cambia durante la conversación, independientemente de lo que detecte el STT.
+      // Esto evita cambios de idioma por ruido ambiental o detecciones erróneas del STT.
       const normalizedCurrentLang = normalizeLanguageCode(currentLanguage) || 'es';
+      const langForThisInteraction = normalizedCurrentLang;
 
-      // Verificar si el texto es significativo (no solo ruido)
-      const trimmedText = (recognitionResult.text || '').trim();
-      const hasSignificantText = trimmedText.length >= 3 && /[a-zA-ZáéíóúüñÁÉÍÓÚÜÑ]{2,}/.test(trimmedText);
-
-      let langForThisInteraction: string;
-      if (normalizedSTTLang && hasSignificantText) {
-        // STT detectó un idioma soportado Y hay texto significativo
-
-        // Add to language detection history if agent state tracking is available
-        if (agentStateRef.current) {
-          agentStateRef.current.addLanguageDetection(normalizedSTTLang, 1.0);
-        }
-
-        // Check if language confirmation is enabled (controlled by feature flag through AgentStateTracker)
-        const shouldSwitch = agentStateRef.current?.shouldSwitchLanguage(normalizedSTTLang) ?? true;
-
-        if (shouldSwitch) {
-          // Either confirmation is disabled (immediate switch) or we've confirmed after N turns
-          langForThisInteraction = normalizedSTTLang;
-          if (normalizedSTTLang !== normalizedCurrentLang) {
-            console.log('[RobotInteraction] Language switch CONFIRMED:', sttDetectedLang, '-> Actualizando a:', normalizedSTTLang);
-
-            // Confirm the switch in agent state
-            agentStateRef.current?.confirmLanguageSwitch();
-
-            setCurrentLanguage(normalizedSTTLang);
-            promptCache.invalidate();
-          }
-        } else {
-          // Use detected language for THIS response, but don't switch globally yet
-          // This allows natural response in detected language while waiting for confirmation
-          langForThisInteraction = normalizedSTTLang;
-          const pendingInfo = agentStateRef.current?.getPendingLanguageSwitch();
-          console.log('[RobotInteraction] Language switch PENDING:', normalizedSTTLang,
-            `(${pendingInfo?.turnCount || 1}/${pendingInfo?.required || 2} turns)`,
-            '- Using for this response only, not switching globally');
-        }
-      } else {
-        // STT detectó idioma NO soportado, o no hay texto significativo - mantener el actual
-        langForThisInteraction = normalizedCurrentLang;
-        if (!hasSignificantText) {
-          console.log('[RobotInteraction] Texto no significativo (ruido?):', trimmedText || '<vacío>', '- Ignorando detección de idioma, manteniendo:', langForThisInteraction);
-        } else {
-          console.log('[RobotInteraction] STT detectó idioma no soportado:', sttDetectedLang || 'ninguno', '- Manteniendo:', langForThisInteraction);
+      // Log para debug - mostrar qué detectó el STT pero ignorarlo
+      const sttDetectedLang = recognitionResult.language;
+      if (sttDetectedLang) {
+        const normalizedSTTLang = normalizeLanguageCode(sttDetectedLang);
+        if (normalizedSTTLang && normalizedSTTLang !== normalizedCurrentLang) {
+          console.log('[RobotInteraction] STT detectó idioma diferente:', sttDetectedLang,
+            '- IGNORADO. Usando idioma fijo de sesión:', normalizedCurrentLang);
         }
       }
-      console.log('[RobotInteraction] Idioma para esta interacción:', langForThisInteraction);
+      console.log('[RobotInteraction] Idioma fijo para esta sesión:', langForThisInteraction);
 
       if (recognitionResult.text) {
         console.log('[RobotInteraction] Texto reconocido:', recognitionResult.text);

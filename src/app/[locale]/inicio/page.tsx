@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import { Link } from '@/i18n/navigation';
 import type { Pathnames } from '@/i18n/routing';
 import { HiOutlineGlobeAlt, HiOutlineChartBar, HiOutlineChatBubbleLeftRight, HiOutlinePresentationChartBar, HiOutlineCamera, HiOutlineLightBulb, HiOutlineCog8Tooth, HiOutlinePencilSquare, HiOutlineMegaphone } from 'react-icons/hi2';
@@ -11,17 +11,12 @@ import dynamic from 'next/dynamic';
 
 const RobotModel = dynamic(() => import('./components/RobotModel'), {
   ssr: false,
-  loading: () => {
-    return (
-      <div className="w-full h-full flex items-center justify-center">
-        <div className="text-blue-600 text-lg">Loading...</div>
-      </div>
-    );
-  }
+  loading: () => null, // RobotModel handles its own loading with TerminalLoading
 });
 
 export default function HomePage() {
   const t = useTranslations('HomePage');
+  const locale = useLocale(); // Obtener el locale actual de la página
   const [scrolled, setScrolled] = useState(false);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isMounted, setIsMounted] = useState(false);
@@ -176,7 +171,7 @@ export default function HomePage() {
                 <div className="neu-robot-container">
                   <div className="neu-robot-avatar">
                     <div className="robot-canvas-wrapper">
-                      <RobotModel />
+                      <RobotModel locale={locale} />
                     </div>
                   </div>
                 </div>

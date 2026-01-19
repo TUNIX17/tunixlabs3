@@ -11,10 +11,12 @@ import {
   Sparkles
 } from '@react-three/drei';
 import * as THREE from 'three';
+import { useTranslations } from 'next-intl';
 import { useRobotInteraction, RobotInteractionState } from '../../../../hooks/useRobotInteraction';
 import FloatingMicButton from '../../../../components/VoiceInterface/FloatingMicButton';
 import AudioVisualizer from '../../../../components/VoiceInterface/AudioVisualizer';
 import ActionButtons from '../../../../components/VoiceInterface/ActionButtons';
+import TerminalLoading from '../../../../components/ui/TerminalLoading';
 
 // Importar sistema de animaciones
 import {
@@ -1544,19 +1546,17 @@ const AnimatedRobotModel = forwardRef<RobotMethods, { onLoad?: () => void; isLis
   }
 );
 
-// Componente de carga para mostrar mientras se carga el modelo
-function LoadingSpinner() {
-  return (
-    <div className="absolute inset-0 flex items-center justify-center bg-white/50 dark:bg-black/50 z-10 pointer-events-none">
-      <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
-      <p className="ml-3 text-blue-600 dark:text-blue-400">Cargando robot...</p>
-    </div>
-  );
+// Props del componente contenedor
+interface RobotInteractionManagerProps {
+  locale?: string;
 }
 
 // Componente contenedor
-function RobotInteractionManager() {
-  const [isLoading, setIsLoading] = useState(true);
+function RobotInteractionManager({ locale = 'es' }: RobotInteractionManagerProps) {
+  const t = useTranslations('VoiceInterface');
+  const [isModelLoaded, setIsModelLoaded] = useState(false);
+  const [showTerminal, setShowTerminal] = useState(true);
+  const [robotReady, setRobotReady] = useState(false);
   const robotAnimatedRef = useRef<RobotMethods>(null);
   const [isMounted, setIsMounted] = useState(false);
 
@@ -1577,7 +1577,7 @@ function RobotInteractionManager() {
     stopSpeaking,
     setCurrentLanguage,
   } = useRobotInteraction({
-    initialLanguage: 'es',
+    initialLanguage: locale, // Usar el locale de la página
     robotSystemPrompt: undefined,
     onStateChange: (newState) => {
       console.log('RobotInteractionState changed:', newState);
@@ -1591,22 +1591,27 @@ function RobotInteractionManager() {
     if (robotAnimatedRef.current) {
       assignRobotRef(robotAnimatedRef.current);
     }
-  }, [robotAnimatedRef, assignRobotRef, isLoading]);
+  }, [robotAnimatedRef, assignRobotRef, isModelLoaded]);
 
   const handleModelLoaded = () => {
-    setIsLoading(false);
+    setIsModelLoaded(true);
+  };
 
-    // Saludo automatico cuando termina de cargar
-    // Usamos un pequeño delay para asegurar que todo esté listo
+  // Called when terminal animation completes and fades out
+  const handleTerminalComplete = () => {
+    setShowTerminal(false);
+    setRobotReady(true);
+
+    // Saludo automatico cuando el robot aparece
     setTimeout(() => {
       if (robotAnimatedRef.current) {
         robotAnimatedRef.current.startWaving();
       }
-    }, 500);
+    }, 300);
   };
 
   const handleMicButtonClick = () => {
-    if (isLoading) return;
+    if (!robotReady) return;
     if (interactionState === RobotInteractionState.PROCESSING) return;
 
     if (interactionState === RobotInteractionState.LISTENING) {
@@ -1620,14 +1625,33 @@ function RobotInteractionManager() {
   };
 
   if (!isMounted) {
-    return <div className="h-full w-full flex items-center justify-center" style={{ minHeight: '420px' }} aria-hidden="true"><LoadingSpinner/></div>;
+    return (
+      <div
+        className="h-full w-full flex items-center justify-center relative"
+        style={{ minHeight: '420px' }}
+        aria-hidden="true"
+      >
+        <TerminalLoading isModelLoaded={false} />
+      </div>
+    );
   }
 
   return (
     <div className="h-full w-full touch-none relative overflow-hidden bg-transparent pointer-events-auto" style={{ minHeight: 'min(420px, 85vw)' }}>
-      {isLoading && <LoadingSpinner />}
+      {/* Terminal Loading - shows while model loads, fades out when ready */}
+      {showTerminal && (
+        <TerminalLoading
+          isModelLoaded={isModelLoaded}
+          onComplete={handleTerminalComplete}
+        />
+      )}
 
-      <div className="absolute inset-0 w-full h-full flex items-center justify-center">
+      {/* Robot Canvas with fade-in transition */}
+      <div
+        className={`absolute inset-0 w-full h-full flex items-center justify-center transition-opacity duration-700 ${
+          robotReady ? 'opacity-100' : 'opacity-0'
+        }`}
+      >
         <Canvas
           shadows
           className="overflow-visible"
@@ -1679,10 +1703,12 @@ function RobotInteractionManager() {
           </Suspense>
         </Canvas>
 
-        {/* Bottom Section - Message + Mic Button in row */}
+        {/* Bottom Section - Message + Mic Button in row (hidden during terminal) */}
         <div
-          className="absolute bottom-4 left-1/2 transform -translate-x-1/2 z-20 flex flex-col items-center gap-2"
-          style={{ pointerEvents: 'auto' }}
+          className={`absolute bottom-4 left-1/2 transform -translate-x-1/2 z-20 flex flex-col items-center gap-2 transition-all duration-500 ${
+            robotReady ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4 pointer-events-none'
+          }`}
+          style={{ pointerEvents: robotReady ? 'auto' : 'none' }}
         >
           {/* Audio Visualizer - Above the row when listening */}
           {(interactionState === RobotInteractionState.LISTENING || isRecording) && (
@@ -1699,11 +1725,11 @@ function RobotInteractionManager() {
               style={{ pointerEvents: 'none' }}
             >
               <p className="text-sm font-medium" style={{ color: '#4a5568' }}>
-                {interactionState === RobotInteractionState.IDLE && "Habla conmigo"}
-                {interactionState === RobotInteractionState.LISTENING && "Te escucho..."}
-                {interactionState === RobotInteractionState.PROCESSING && "Pensando..."}
-                {interactionState === RobotInteractionState.SPEAKING && "Respondiendo..."}
-                {interactionState === RobotInteractionState.ERROR && "Intenta de nuevo"}
+                {interactionState === RobotInteractionState.IDLE && t('talkToMe')}
+                {interactionState === RobotInteractionState.LISTENING && t('listening')}
+                {interactionState === RobotInteractionState.PROCESSING && t('thinking')}
+                {interactionState === RobotInteractionState.SPEAKING && t('responding')}
+                {interactionState === RobotInteractionState.ERROR && t('tryAgain')}
               </p>
             </div>
 
@@ -1712,7 +1738,7 @@ function RobotInteractionManager() {
               onClick={handleMicButtonClick}
               interactionState={interactionState}
               isRecording={isRecording}
-              disabled={isLoading || interactionState === RobotInteractionState.PROCESSING}
+              disabled={!robotReady || interactionState === RobotInteractionState.PROCESSING}
             />
           </div>
 

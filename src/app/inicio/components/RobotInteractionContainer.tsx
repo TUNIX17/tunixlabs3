@@ -3,16 +3,10 @@ import dynamic from 'next/dynamic';
 
 // Importar dinámicamente el modelo de robot para evitar errores de SSR
 // RobotModel ahora incluye toda la lógica de interacción integrada
+// El TerminalLoading se maneja internamente en RobotModel
 const RobotModel = dynamic(() => import('./RobotModel'), {
   ssr: false,
-  loading: () => (
-    <div className="flex items-center justify-center h-[450px] bg-gray-100 dark:bg-gray-800 rounded-lg">
-      <div className="text-center">
-        <div className="animate-spin h-10 w-10 border-4 border-blue-500 rounded-full border-t-transparent mx-auto mb-4"></div>
-        <p className="text-gray-600 dark:text-gray-300">Cargando modelo 3D...</p>
-      </div>
-    </div>
-  ),
+  loading: () => null, // RobotModel handles its own loading state with TerminalLoading
 });
 
 const RobotInteractionContainer: React.FC = () => {
