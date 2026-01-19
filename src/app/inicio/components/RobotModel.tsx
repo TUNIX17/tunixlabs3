@@ -1772,20 +1772,12 @@ function RobotInteractionManager() {
             />
           </div>
 
-          {/* Robot Response with Action Buttons (Calendly/WhatsApp) */}
+          {/* Action Buttons - appear when robot mentions Calendly or WhatsApp */}
           {robotResponse && (
-            <div className="mt-3 max-w-sm">
-              <div className="neu-pressed rounded-xl px-4 py-3 text-center">
-                <p className="text-sm" style={{ color: '#4a5568' }}>
-                  {robotResponse}
-                </p>
-              </div>
-              {/* Action Buttons - appear when robot mentions Calendly or WhatsApp */}
-              <ActionButtons
-                robotResponse={robotResponse}
-                className="mt-3"
-              />
-            </div>
+            <ActionButtons
+              robotResponse={robotResponse}
+              className="mt-3"
+            />
           )}
         </div>
 
