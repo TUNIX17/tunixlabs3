@@ -394,6 +394,66 @@ body {
   animation-delay: 3s;
 }
 
+/* Floating Neumorphic Elements - Aurora Theme */
+.floating-neu-element {
+  position: absolute;
+  border-radius: 50%;
+  background: var(--neu-bg);
+  box-shadow:
+    6px 6px 12px var(--neu-shadow-dark),
+    -6px -6px 12px var(--neu-shadow-light);
+}
+
+.floating-neu-element.e1 {
+  width: 60px;
+  height: 60px;
+  top: 10%;
+  right: 15%;
+  animation: neu-orbit1 15s linear infinite;
+}
+
+.floating-neu-element.e2 {
+  width: 40px;
+  height: 40px;
+  bottom: 25%;
+  left: 5%;
+  animation: neu-orbit2 20s linear infinite;
+}
+
+.floating-neu-element.e3 {
+  width: 30px;
+  height: 30px;
+  top: 35%;
+  left: 8%;
+  animation: neu-orbit3 12s linear infinite;
+}
+
+.floating-neu-element.e4 {
+  width: 25px;
+  height: 25px;
+  bottom: 15%;
+  right: 10%;
+  animation: neu-orbit1 18s linear infinite reverse;
+}
+
+@keyframes neu-orbit1 {
+  0% { transform: translateY(0) translateX(0); }
+  25% { transform: translateY(-20px) translateX(10px); }
+  50% { transform: translateY(0) translateX(20px); }
+  75% { transform: translateY(20px) translateX(10px); }
+  100% { transform: translateY(0) translateX(0); }
+}
+
+@keyframes neu-orbit2 {
+  0% { transform: translateY(0) rotate(0deg); }
+  100% { transform: translateY(-10px) rotate(360deg); }
+}
+
+@keyframes neu-orbit3 {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.2); }
+}
+
 /* Neural Network Effect */
 .neural-network {
   position: relative;

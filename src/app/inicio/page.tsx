@@ -7,49 +7,6 @@ import { HiOutlineGlobeAlt, HiOutlineChartBar, HiOutlineChatBubbleLeftRight, HiO
 import React from 'react';
 import dynamic from 'next/dynamic';
 
-// Definir el componente de partículas flotantes en un archivo separado
-const FloatingParticles = dynamic(() => 
-  Promise.resolve().then(() => {
-    const FloatingParticlesComponent = ({ count = 20 }: { count?: number }) => {
-      const [particles, setParticles] = useState<Array<{
-        top: string;
-        left: string;
-        width: string;
-        height: string;
-        backgroundColor: string;
-        animation: string;
-      }>>([]);
-      
-      useEffect(() => {
-        const newParticles = Array(count).fill(0).map(() => ({
-          top: `${Math.random() * 100}%`,
-          left: `${Math.random() * 100}%`,
-          width: `${Math.random() * 4 + 2}px`,
-          height: `${Math.random() * 4 + 2}px`,
-          backgroundColor: `rgba(${Math.floor(Math.random() * 50 + 100)}, ${Math.floor(Math.random() * 50 + 50)}, ${Math.floor(Math.random() * 50 + 200)}, ${Math.random() * 0.5 + 0.2})`,
-          animation: `float ${Math.random() * 10 + 10}s infinite ease-in-out ${Math.random() * 5}s`
-        }));
-        setParticles(newParticles);
-      }, [count]);
-      
-      return (
-        <div className="absolute inset-0 pointer-events-none">
-          {particles.map((particle, i) => (
-            <div 
-              key={i}
-              className="absolute rounded-full"
-              style={particle}
-            />
-          ))}
-        </div>
-      );
-    };
-    
-    return FloatingParticlesComponent;
-  }),
-  { ssr: false }
-);
-
 // Carga dinámica del componente RobotModel para evitar errores de SSR
 const RobotModel = dynamic(() => import('./components/RobotModel'), {
   ssr: false,
@@ -182,9 +139,11 @@ export default function HomePage() {
       <div className="parallax-wrapper">
       {/* Hero Section - Neumorphic Style */}
         <section className="relative pt-20 pb-32 overflow-hidden">
-          {/* Decorative blurred shapes - Aurora Theme */}
-          <div className="absolute -top-10 right-0 w-96 h-96 bg-violet-400 rounded-full mix-blend-multiply opacity-15 filter blur-3xl animate-pulse-slow"></div>
-          <div className="absolute top-40 -left-10 w-80 h-80 bg-purple-500 rounded-full mix-blend-multiply opacity-15 filter blur-3xl animate-pulse-slow animation-delay-1000"></div>
+          {/* Floating Neumorphic Elements */}
+          <div className="floating-neu-element e1"></div>
+          <div className="floating-neu-element e2"></div>
+          <div className="floating-neu-element e3"></div>
+          <div className="floating-neu-element e4"></div>
 
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             <div className="lg:grid lg:grid-cols-12 lg:gap-8 items-center">
@@ -225,10 +184,6 @@ export default function HomePage() {
                   </div>
                 </div>
 
-                {/* Floating Particles around the circle */}
-                <div className="absolute inset-0 pointer-events-none">
-                  <FloatingParticles count={15} />
-                </div>
               </div>
             </div>
           </div>
