@@ -79,6 +79,11 @@ const pasos = [
 const AutomatizacionMarketingIAPage: React.FC = () => {
   return (
     <div className="min-h-screen neu-bg" style={{ backgroundColor: 'var(--neu-bg)' }}>
+      {/* Aurora Blobs */}
+      <div className="aurora-blob aurora-blob-1"></div>
+      <div className="aurora-blob aurora-blob-2"></div>
+      <div className="aurora-blob aurora-blob-3"></div>
+      <div className="aurora-blob aurora-blob-4"></div>
       <Head>
         <title>Automatización de Marketing y Ventas con IA - TunixLabs</title>
         <meta name="description" content="Automatiza campañas, personaliza experiencias y toma decisiones inteligentes con IA. Soluciones de marketing y ventas para maximizar conversión, eficiencia y ROI." />
@@ -92,8 +97,6 @@ const AutomatizacionMarketingIAPage: React.FC = () => {
 
       {/* HERO - Neumorphic Style */}
       <section className="w-full py-16 sm:py-20 px-4 neu-bg relative overflow-hidden">
-        <div className="absolute -top-20 -right-20 w-80 h-80 rounded-full bg-violet-400 mix-blend-multiply opacity-20 filter blur-3xl"></div>
-        <div className="absolute -bottom-20 -left-20 w-72 h-72 rounded-full bg-purple-500 mix-blend-multiply opacity-20 filter blur-3xl"></div>
 
         <div className="max-w-4xl mx-auto text-center relative z-10">
           <Link href="/inicio" className="neu-pressed inline-flex items-center px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 mb-8" style={{ color: '#718096' }}>

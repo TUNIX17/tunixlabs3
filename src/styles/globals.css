@@ -394,64 +394,79 @@ body {
   animation-delay: 3s;
 }
 
-/* Floating Neumorphic Elements - Aurora Theme */
-.floating-neu-element {
-  position: absolute;
+/* Floating Aurora Blobs - Animated colored shapes with fade */
+.aurora-blob {
+  position: fixed;
   border-radius: 50%;
-  background: var(--neu-bg);
-  box-shadow:
-    6px 6px 12px var(--neu-shadow-dark),
-    -6px -6px 12px var(--neu-shadow-light);
+  filter: blur(80px);
+  mix-blend-mode: multiply;
+  pointer-events: none;
+  z-index: 0;
 }
 
-.floating-neu-element.e1 {
-  width: 60px;
-  height: 60px;
-  top: 10%;
-  right: 15%;
-  animation: neu-orbit1 15s linear infinite;
+.aurora-blob-1 {
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, rgba(124, 58, 237, 0.4) 0%, rgba(124, 58, 237, 0) 70%);
+  animation: aurora-move-1 25s ease-in-out infinite, aurora-fade 8s ease-in-out infinite;
 }
 
-.floating-neu-element.e2 {
-  width: 40px;
-  height: 40px;
-  bottom: 25%;
-  left: 5%;
-  animation: neu-orbit2 20s linear infinite;
+.aurora-blob-2 {
+  width: 350px;
+  height: 350px;
+  background: radial-gradient(circle, rgba(167, 139, 250, 0.35) 0%, rgba(167, 139, 250, 0) 70%);
+  animation: aurora-move-2 30s ease-in-out infinite, aurora-fade 10s ease-in-out infinite 2s;
 }
 
-.floating-neu-element.e3 {
-  width: 30px;
-  height: 30px;
-  top: 35%;
-  left: 8%;
-  animation: neu-orbit3 12s linear infinite;
+.aurora-blob-3 {
+  width: 300px;
+  height: 300px;
+  background: radial-gradient(circle, rgba(196, 181, 253, 0.3) 0%, rgba(196, 181, 253, 0) 70%);
+  animation: aurora-move-3 20s ease-in-out infinite, aurora-fade 6s ease-in-out infinite 4s;
 }
 
-.floating-neu-element.e4 {
-  width: 25px;
-  height: 25px;
-  bottom: 15%;
-  right: 10%;
-  animation: neu-orbit1 18s linear infinite reverse;
+.aurora-blob-4 {
+  width: 250px;
+  height: 250px;
+  background: radial-gradient(circle, rgba(139, 92, 246, 0.35) 0%, rgba(139, 92, 246, 0) 70%);
+  animation: aurora-move-4 35s ease-in-out infinite, aurora-fade 12s ease-in-out infinite 1s;
 }
 
-@keyframes neu-orbit1 {
-  0% { transform: translateY(0) translateX(0); }
-  25% { transform: translateY(-20px) translateX(10px); }
-  50% { transform: translateY(0) translateX(20px); }
-  75% { transform: translateY(20px) translateX(10px); }
-  100% { transform: translateY(0) translateX(0); }
+@keyframes aurora-move-1 {
+  0% { top: -10%; left: -5%; }
+  25% { top: 20%; left: 60%; }
+  50% { top: 60%; left: 80%; }
+  75% { top: 40%; left: 20%; }
+  100% { top: -10%; left: -5%; }
 }
 
-@keyframes neu-orbit2 {
-  0% { transform: translateY(0) rotate(0deg); }
-  100% { transform: translateY(-10px) rotate(360deg); }
+@keyframes aurora-move-2 {
+  0% { top: 70%; right: -10%; }
+  25% { top: 30%; right: 30%; }
+  50% { top: -5%; right: 60%; }
+  75% { top: 50%; right: 10%; }
+  100% { top: 70%; right: -10%; }
 }
 
-@keyframes neu-orbit3 {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.2); }
+@keyframes aurora-move-3 {
+  0% { bottom: -10%; left: 40%; }
+  33% { bottom: 40%; left: 70%; }
+  66% { bottom: 60%; left: 10%; }
+  100% { bottom: -10%; left: 40%; }
+}
+
+@keyframes aurora-move-4 {
+  0% { top: 50%; left: -10%; }
+  20% { top: 10%; left: 30%; }
+  40% { top: 30%; left: 70%; }
+  60% { top: 70%; left: 50%; }
+  80% { top: 80%; left: 20%; }
+  100% { top: 50%; left: -10%; }
+}
+
+@keyframes aurora-fade {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 0.7; }
 }
 
 /* Neural Network Effect */

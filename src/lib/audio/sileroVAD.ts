@@ -116,7 +116,9 @@ export class SileroVADWrapper {
       this.emit('calibration_start');
       console.log('[SileroVAD] Loading Silero model...');
 
-      // Create MicVAD instance
+      // Create MicVAD instance with custom paths for ONNX model
+      // baseAssetPath is used for: worklet file + model file
+      // onnxWASMBasePath is used for: ONNX runtime WASM files
       this.vad = await MicVAD.new({
         positiveSpeechThreshold: this.config.positiveSpeechThreshold,
         negativeSpeechThreshold: this.config.negativeSpeechThreshold,
@@ -124,6 +126,16 @@ export class SileroVADWrapper {
         minSpeechMs: this.config.minSpeechMs,
         preSpeechPadMs: this.config.preSpeechPadMs,
         submitUserSpeechOnPause: this.config.submitUserSpeechOnPause,
+
+        // Use legacy model (smaller, faster)
+        model: 'legacy',
+
+        // Asset paths - all assets served from /onnx/
+        baseAssetPath: '/onnx/',      // For worklet + model files
+        onnxWASMBasePath: '/onnx/',   // For ONNX WASM runtime files
+
+        // Don't auto-start, we'll start manually after setup
+        startOnLoad: false,
 
         onSpeechStart: () => {
           this.handleSpeechStart();
@@ -143,8 +155,8 @@ export class SileroVADWrapper {
         }
       });
 
-      // Start the VAD
-      this.vad.start();
+      // Start the VAD manually
+      await this.vad.start();
 
       // Set up volume monitoring using the same audio stream
       await this.setupVolumeMonitoring();

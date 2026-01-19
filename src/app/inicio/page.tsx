@@ -129,23 +129,24 @@ export default function HomePage() {
   }, []);
 
   return (
-    <div className="min-h-screen relative overflow-hidden neu-bg" style={{backgroundColor: 'var(--neu-bg)'}}>
-      {/* Neural Network Background - Sutil */}
-      <canvas
-        ref={canvasRef}
-        className="absolute inset-0 z-0 opacity-30"
-      />
+    <>
+      {/* Aurora Blobs - Fixed position, visible across all pages */}
+      <div className="aurora-blob aurora-blob-1"></div>
+      <div className="aurora-blob aurora-blob-2"></div>
+      <div className="aurora-blob aurora-blob-3"></div>
+      <div className="aurora-blob aurora-blob-4"></div>
 
-      {/* Parallax Wrapper */}
-      <div className="parallax-wrapper">
-      {/* Hero Section - Neumorphic Style */}
-        <section className="relative pt-20 pb-32 overflow-hidden">
-          {/* Floating Neumorphic Elements */}
-          <div className="floating-neu-element e1"></div>
-          <div className="floating-neu-element e2"></div>
-          <div className="floating-neu-element e3"></div>
-          <div className="floating-neu-element e4"></div>
+      <div className="min-h-screen relative neu-bg" style={{backgroundColor: 'var(--neu-bg)'}}>
+        {/* Neural Network Background - Sutil */}
+        <canvas
+          ref={canvasRef}
+          className="absolute inset-0 z-0 opacity-30"
+        />
 
+        {/* Parallax Wrapper */}
+        <div className="parallax-wrapper">
+        {/* Hero Section - Neumorphic Style */}
+          <section className="relative pt-20 pb-32">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             <div className="lg:grid lg:grid-cols-12 lg:gap-8 items-center">
               {/* Content Column */}
@@ -366,10 +367,6 @@ export default function HomePage() {
 
         {/* Contact Section - Neumorphic Style */}
         <section id="contacto" className="py-16 neu-bg relative overflow-hidden">
-          {/* Decorative blurred shapes - Aurora Theme */}
-          <div className="absolute -right-20 -bottom-20 w-80 h-80 rounded-full bg-violet-400 mix-blend-multiply opacity-20 filter blur-3xl animate-pulse-slow"></div>
-          <div className="absolute -left-20 top-20 w-72 h-72 rounded-full bg-purple-500 mix-blend-multiply opacity-20 filter blur-3xl animate-pulse-slow animation-delay-2000"></div>
-
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             <div className="text-center mb-12">
               <span className="neu-pressed inline-block px-4 py-2 rounded-full text-sm font-semibold tracking-wide uppercase" style={{ color: 'var(--neu-primary)' }}>
@@ -512,6 +509,7 @@ export default function HomePage() {
           <p>&copy; 2026 TunixLabs. Todos los derechos reservados.</p>
         </footer>
         </div>
-    </div>
+      </div>
+    </>
   );
 } 
