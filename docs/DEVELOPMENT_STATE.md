@@ -1,8 +1,8 @@
 # TunixLabs - Development State
 
 **Last Updated:** 2026-01-19
-**Current Phase:** Silero VAD Integration Complete
-**Sprint:** 3.3 - Silero VAD Migration & Integration Plan
+**Current Phase:** Aurora Theme Implementation Complete
+**Sprint:** 3.4 - Aurora Theme Migration
 
 ---
 
@@ -162,6 +162,38 @@ TunixLabs es una plataforma web de consultoria en IA con:
     - `src/lib/animation/index.ts` - Fixed BONE_GROUPS export conflict
   - [x] Build verification: npm run build succeeds
   - [x] VAD engine selection via feature flag: VAD_ENGINE='rms'|'silero'|'auto'
+- [x] **Aurora Theme Implementation** (2026-01-19)
+  - [x] Updated CSS variables from Teal/Cyan to Aurora Purple/Violet:
+    - `--neu-bg`: #e0e5ec → #e8e4f0
+    - `--neu-primary`: #0d9488 → #7c3aed
+    - `--neu-primary-dark`: #0f766e → #6d28d9
+    - `--neu-accent`: #14b8a6 → #a78bfa
+    - Added `--neu-accent-light`: #c4b5fd
+    - Added `--text-dark`: #2d2640
+    - Added `--text-muted`: #6b6280
+  - [x] Updated all decorative shapes from bg-indigo-300/bg-purple-300 to bg-violet-400/bg-purple-500
+  - [x] Updated neural network and particle colors to Aurora violet (rgba(124, 58, 237, x))
+  - [x] Updated neon effects and input focus rings to Aurora theme
+  - [x] Updated service icons to more representative HeroIcons v2:
+    - Desarrollos Web: HiOutlineGlobeAlt
+    - Machine Learning: HiOutlineChartBar
+    - Asistentes IA: HiOutlineChatBubbleLeftRight
+    - Business Intelligence: HiOutlinePresentationChartBar
+    - Vision Artificial: HiOutlineCamera
+    - Consultoria IA: HiOutlineLightBulb
+    - RPA: HiOutlineCog8Tooth
+    - Generacion Contenido: HiOutlinePencilSquare
+    - Automatizacion Marketing: HiOutlineMegaphone
+  - [x] Updated contact email to contacto@tunixlabs.com
+  - [x] Updated "Enviar mensaje" buttons to mailto links
+  - [x] Files modified:
+    - `src/styles/globals.css` - Aurora theme CSS variables
+    - `src/app/[locale]/inicio/page.tsx` - Landing page with Aurora
+    - `src/app/inicio/page.tsx` - Non-i18n landing page with Aurora
+    - `src/app/[locale]/contacto/page.tsx` - Contact page with mailto
+    - `src/app/contacto/page.tsx` - Non-i18n contact page with mailto
+    - All 18 service pages (locale and non-locale) - Aurora decorative shapes
+  - [x] Build verification: npm run build succeeds (48 pages generated)
 
 ### In Progress
 - [ ] Configurar variables de entorno en Railway:

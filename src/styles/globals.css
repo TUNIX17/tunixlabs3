@@ -20,14 +20,17 @@
   --background-start-rgb: 249, 250, 251;
   --background-end-rgb: 249, 250, 251;
 
-  /* Neumorphism Variables - Teal/Cyan Modern Theme */
-  --neu-bg: #e0e5ec;
+  /* Neumorphism Variables - Aurora Purple/Violet Theme */
+  --neu-bg: #e8e4f0;
   --neu-shadow-light: #ffffff;
-  --neu-shadow-dark: #a3b1c6;
-  --neu-primary: #0d9488;
-  --neu-primary-dark: #0f766e;
-  --neu-accent: #14b8a6;
-  --neu-glow: rgba(13, 148, 136, 0.15);
+  --neu-shadow-dark: #c5bdd4;
+  --neu-primary: #7c3aed;
+  --neu-primary-dark: #6d28d9;
+  --neu-accent: #a78bfa;
+  --neu-accent-light: #c4b5fd;
+  --neu-glow: rgba(124, 58, 237, 0.15);
+  --text-dark: #2d2640;
+  --text-muted: #6b6280;
 }
 
 /* Estilos generales para todos los navegadores */
@@ -51,18 +54,14 @@ body {
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: #f9fafb !important;
-  color: #111827 !important;
-  background-image: linear-gradient(
-    to bottom,
-    rgba(var(--background-start-rgb), 1),
-    rgba(var(--background-end-rgb), 1)
-  );
+  background-color: var(--neu-bg) !important;
+  color: var(--text-dark) !important;
 }
 
 @layer base {
   body {
-    @apply bg-gray-50 text-gray-900;
+    background-color: var(--neu-bg);
+    color: var(--text-dark);
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   }
   
@@ -405,27 +404,27 @@ body {
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background-color: rgba(59, 130, 246, 0.6);
+  background-color: rgba(124, 58, 237, 0.6);
   animation: neural-pulse 3s infinite ease-in-out;
 }
 
 .neural-line {
   position: absolute;
   height: 1px;
-  background: linear-gradient(90deg, 
-    rgba(59, 130, 246, 0) 0%, 
-    rgba(59, 130, 246, 0.5) 50%, 
-    rgba(59, 130, 246, 0) 100%);
+  background: linear-gradient(90deg,
+    rgba(124, 58, 237, 0) 0%,
+    rgba(124, 58, 237, 0.5) 50%,
+    rgba(124, 58, 237, 0) 100%);
   transform-origin: left center;
 }
 
-/* Partículas y elementos visuales */
+/* Partículas y elementos visuales - Aurora Theme */
 .particle-1, .particle-2, .particle-3 {
   position: absolute;
   width: 5px;
   height: 5px;
   border-radius: 50%;
-  background-color: rgba(59, 130, 246, 0.6);
+  background-color: rgba(124, 58, 237, 0.6);
   filter: blur(1px);
   opacity: 0.3;
   animation: particle-move 20s ease-in-out infinite;
@@ -441,7 +440,7 @@ body {
   left: 70%;
   width: 8px;
   height: 8px;
-  background-color: rgba(139, 92, 246, 0.6);
+  background-color: rgba(167, 139, 250, 0.6);
   animation-delay: 2s;
   animation-duration: 25s;
 }
@@ -451,7 +450,7 @@ body {
   left: 20%;
   width: 6px;
   height: 6px;
-  background-color: rgba(79, 70, 229, 0.6);
+  background-color: rgba(196, 181, 253, 0.6);
   animation-delay: 1s;
   animation-duration: 15s;
 }
@@ -461,18 +460,18 @@ body {
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background-color: rgba(59, 130, 246, 0.8);
+  background-color: rgba(124, 58, 237, 0.8);
   animation: orbit 8s linear infinite;
 }
 
 .particle-orbit-1 {
-  background-color: rgba(59, 130, 246, 0.8);
+  background-color: rgba(124, 58, 237, 0.8);
 }
 
 .particle-orbit-2 {
   width: 8px;
   height: 8px;
-  background-color: rgba(139, 92, 246, 0.8);
+  background-color: rgba(167, 139, 250, 0.8);
   animation-delay: 1s;
   animation-duration: 12s;
 }
@@ -480,7 +479,7 @@ body {
 .particle-orbit-3 {
   width: 10px;
   height: 10px;
-  background-color: rgba(16, 185, 129, 0.8);
+  background-color: rgba(196, 181, 253, 0.8);
   animation-delay: 2s;
   animation-duration: 15s;
 }
@@ -514,17 +513,17 @@ body {
   transform: translateZ(0);
 }
 
-/* Efectos de texto y sombras universales */
+/* Efectos de texto y sombras universales - Aurora Theme */
 .neon-text {
-  text-shadow: 0 0 5px rgba(59, 130, 246, 0.7), 
-              0 0 10px rgba(59, 130, 246, 0.5),
-              0 0 15px rgba(59, 130, 246, 0.3);
+  text-shadow: 0 0 5px rgba(124, 58, 237, 0.7),
+              0 0 10px rgba(124, 58, 237, 0.5),
+              0 0 15px rgba(124, 58, 237, 0.3);
 }
 
 .neon-border {
-  box-shadow: 0 0 5px rgba(59, 130, 246, 0.7),
-              0 0 10px rgba(59, 130, 246, 0.5),
-              0 0 15px rgba(59, 130, 246, 0.3);
+  box-shadow: 0 0 5px rgba(124, 58, 237, 0.7),
+              0 0 10px rgba(124, 58, 237, 0.5),
+              0 0 15px rgba(124, 58, 237, 0.3);
 }
 
 /* ===========================================
@@ -755,7 +754,7 @@ body {
   box-shadow:
     inset 6px 6px 12px var(--neu-shadow-dark),
     inset -6px -6px 12px var(--neu-shadow-light),
-    0 0 0 3px rgba(13, 148, 136, 0.25);
+    0 0 0 3px rgba(124, 58, 237, 0.25);
 }
 
 /* Neumorphic Logo Text */

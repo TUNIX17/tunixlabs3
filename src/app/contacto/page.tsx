@@ -12,8 +12,8 @@ export default function ContactoPage() {
 
       {/* HERO - Neumorphic */}
       <section className="w-full py-16 sm:py-20 px-4 neu-bg relative overflow-hidden">
-        <div className="absolute -top-20 -right-20 w-80 h-80 rounded-full bg-indigo-300 mix-blend-multiply opacity-20 filter blur-3xl"></div>
-        <div className="absolute -bottom-20 -left-20 w-72 h-72 rounded-full bg-purple-300 mix-blend-multiply opacity-20 filter blur-3xl"></div>
+        <div className="absolute -top-20 -right-20 w-80 h-80 rounded-full bg-violet-400 mix-blend-multiply opacity-20 filter blur-3xl"></div>
+        <div className="absolute -bottom-20 -left-20 w-72 h-72 rounded-full bg-purple-500 mix-blend-multiply opacity-20 filter blur-3xl"></div>
 
         <div className="max-w-4xl mx-auto text-center relative z-10">
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold neu-gradient-text mb-6">
@@ -56,9 +56,12 @@ export default function ContactoPage() {
               <textarea id="mensaje" name="mensaje" required rows={5} placeholder="Cuentanos tu idea o consulta..." className="neu-input resize-none" />
             </div>
 
-            <button type="submit" className="neu-btn-primary w-full flex items-center justify-center gap-2 mt-2">
+            <a
+              href="mailto:contacto@tunixlabs.com?subject=Contacto desde TunixLabs&body=Hola, me gustaría obtener más información sobre sus servicios de IA."
+              className="neu-btn-primary w-full flex items-center justify-center gap-2 mt-2"
+            >
               <FiSend className="h-5 w-5" /> Enviar mensaje
-            </button>
+            </a>
           </form>
         </div>
 

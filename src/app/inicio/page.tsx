@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { FiDatabase, FiActivity, FiUsers, FiBarChart2, FiCode, FiMessageCircle, FiEye, FiSettings } from 'react-icons/fi';
+import { HiOutlineGlobeAlt, HiOutlineChartBar, HiOutlineChatBubbleLeftRight, HiOutlinePresentationChartBar, HiOutlineCamera, HiOutlineLightBulb, HiOutlineCog8Tooth, HiOutlinePencilSquare, HiOutlineMegaphone } from 'react-icons/hi2';
 import React from 'react';
 import dynamic from 'next/dynamic';
 
@@ -26,7 +26,7 @@ const FloatingParticles = dynamic(() =>
           left: `${Math.random() * 100}%`,
           width: `${Math.random() * 4 + 2}px`,
           height: `${Math.random() * 4 + 2}px`,
-          backgroundColor: `rgba(${Math.floor(Math.random() * 100 + 100)}, ${Math.floor(Math.random() * 100 + 100)}, 246, ${Math.random() * 0.5 + 0.2})`,
+          backgroundColor: `rgba(${Math.floor(Math.random() * 50 + 100)}, ${Math.floor(Math.random() * 50 + 50)}, ${Math.floor(Math.random() * 50 + 200)}, ${Math.random() * 0.5 + 0.2})`,
           animation: `float ${Math.random() * 10 + 10}s infinite ease-in-out ${Math.random() * 5}s`
         }));
         setParticles(newParticles);
@@ -124,9 +124,9 @@ export default function HomePage() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       
       // Dibujar conexiones
-      ctx.strokeStyle = 'rgba(59, 130, 246, 0.1)';
+      ctx.strokeStyle = 'rgba(124, 58, 237, 0.1)';
       ctx.lineWidth = 0.5;
-      
+
       for (let i = 0; i < nodes.length; i++) {
         const nodeA = nodes[i];
         for (let j = i + 1; j < nodes.length; j++) {
@@ -134,7 +134,7 @@ export default function HomePage() {
           const distance = Math.sqrt(
             Math.pow(nodeA.x - nodeB.x, 2) + Math.pow(nodeA.y - nodeB.y, 2)
           );
-          
+
           if (distance < 200) {
             ctx.beginPath();
             ctx.moveTo(nodeA.x, nodeA.y);
@@ -143,12 +143,12 @@ export default function HomePage() {
           }
         }
       }
-      
+
       // Dibujar nodos
       for (const node of nodes) {
         ctx.beginPath();
         ctx.arc(node.x, node.y, node.radius, 0, Math.PI * 2);
-        ctx.fillStyle = 'rgba(59, 130, 246, 0.4)';
+        ctx.fillStyle = 'rgba(124, 58, 237, 0.4)';
         ctx.fill();
         
         // Actualizar posición
@@ -182,9 +182,9 @@ export default function HomePage() {
       <div className="parallax-wrapper">
       {/* Hero Section - Neumorphic Style */}
         <section className="relative pt-20 pb-32 overflow-hidden">
-          {/* Decorative blurred shapes */}
-          <div className="absolute -top-10 right-0 w-96 h-96 bg-indigo-400 rounded-full mix-blend-multiply opacity-10 filter blur-3xl animate-pulse-slow"></div>
-          <div className="absolute top-40 -left-10 w-80 h-80 bg-purple-400 rounded-full mix-blend-multiply opacity-10 filter blur-3xl animate-pulse-slow animation-delay-1000"></div>
+          {/* Decorative blurred shapes - Aurora Theme */}
+          <div className="absolute -top-10 right-0 w-96 h-96 bg-violet-400 rounded-full mix-blend-multiply opacity-15 filter blur-3xl animate-pulse-slow"></div>
+          <div className="absolute top-40 -left-10 w-80 h-80 bg-purple-500 rounded-full mix-blend-multiply opacity-15 filter blur-3xl animate-pulse-slow animation-delay-1000"></div>
 
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             <div className="lg:grid lg:grid-cols-12 lg:gap-8 items-center">
@@ -255,10 +255,10 @@ export default function HomePage() {
                 <Link href="/servicios/desarrollos-web" passHref>
                   <div className="neu-raised p-6 rounded-2xl group cursor-pointer transition-all duration-300 hover:-translate-y-1">
                     <div className="neu-service-icon">
-                      <FiCode className="h-8 w-8" style={{ color: 'var(--neu-primary)' }} />
+                      <HiOutlineGlobeAlt className="h-8 w-8" style={{ color: 'var(--neu-primary)' }} />
                     </div>
-                    <h3 className="text-xl font-bold mt-4" style={{ color: '#2d3748' }}>Desarrollos Web</h3>
-                    <p className="mt-2 text-sm" style={{ color: '#718096' }}>Creamos experiencias web interactivas y escalables, potenciadas con inteligencia artificial.</p>
+                    <h3 className="text-xl font-bold mt-4" style={{ color: 'var(--text-dark)' }}>Desarrollos Web</h3>
+                    <p className="mt-2 text-sm" style={{ color: 'var(--text-muted)' }}>Creamos experiencias web interactivas y escalables, potenciadas con inteligencia artificial.</p>
                     <span className="inline-flex items-center mt-4 text-sm font-medium neu-gradient-text group-hover:underline">
                       Saber mas
                       <svg className="ml-2 h-4 w-4 transform group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -272,10 +272,10 @@ export default function HomePage() {
                 <Link href="/servicios/machine-learning" passHref>
                   <div className="neu-raised p-6 rounded-2xl group cursor-pointer transition-all duration-300 hover:-translate-y-1">
                     <div className="neu-service-icon">
-                      <FiActivity className="h-8 w-8" style={{ color: 'var(--neu-primary)' }} />
+                      <HiOutlineChartBar className="h-8 w-8" style={{ color: 'var(--neu-primary)' }} />
                     </div>
-                    <h3 className="text-xl font-bold mt-4" style={{ color: '#2d3748' }}>Machine Learning</h3>
-                    <p className="mt-2 text-sm" style={{ color: '#718096' }}>Implementamos modelos predictivos que aprenden de tus datos para automatizar procesos.</p>
+                    <h3 className="text-xl font-bold mt-4" style={{ color: 'var(--text-dark)' }}>Machine Learning</h3>
+                    <p className="mt-2 text-sm" style={{ color: 'var(--text-muted)' }}>Implementamos modelos predictivos que aprenden de tus datos para automatizar procesos.</p>
                     <span className="inline-flex items-center mt-4 text-sm font-medium neu-gradient-text group-hover:underline">
                       Saber mas
                       <svg className="ml-2 h-4 w-4 transform group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -289,10 +289,10 @@ export default function HomePage() {
                 <Link href="/servicios/asistentes-ia" passHref>
                   <div className="neu-raised p-6 rounded-2xl group cursor-pointer transition-all duration-300 hover:-translate-y-1">
                     <div className="neu-service-icon">
-                      <FiUsers className="h-8 w-8" style={{ color: 'var(--neu-primary)' }} />
+                      <HiOutlineChatBubbleLeftRight className="h-8 w-8" style={{ color: 'var(--neu-primary)' }} />
                     </div>
-                    <h3 className="text-xl font-bold mt-4" style={{ color: '#2d3748' }}>Asistentes IA</h3>
-                    <p className="mt-2 text-sm" style={{ color: '#718096' }}>Creamos asistentes virtuales inteligentes que mejoran la experiencia de tus clientes.</p>
+                    <h3 className="text-xl font-bold mt-4" style={{ color: 'var(--text-dark)' }}>Asistentes IA</h3>
+                    <p className="mt-2 text-sm" style={{ color: 'var(--text-muted)' }}>Creamos asistentes virtuales inteligentes que mejoran la experiencia de tus clientes.</p>
                     <span className="inline-flex items-center mt-4 text-sm font-medium neu-gradient-text group-hover:underline">
                       Saber mas
                       <svg className="ml-2 h-4 w-4 transform group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -306,10 +306,10 @@ export default function HomePage() {
                 <Link href="/servicios/business-intelligence" passHref>
                   <div className="neu-raised p-6 rounded-2xl group cursor-pointer transition-all duration-300 hover:-translate-y-1">
                     <div className="neu-service-icon">
-                      <FiBarChart2 className="h-8 w-8" style={{ color: 'var(--neu-primary)' }} />
+                      <HiOutlinePresentationChartBar className="h-8 w-8" style={{ color: 'var(--neu-primary)' }} />
                     </div>
-                    <h3 className="text-xl font-bold mt-4" style={{ color: '#2d3748' }}>Business Intelligence</h3>
-                    <p className="mt-2 text-sm" style={{ color: '#718096' }}>Dashboards interactivos y reportes automatizados para monitorear tu negocio.</p>
+                    <h3 className="text-xl font-bold mt-4" style={{ color: 'var(--text-dark)' }}>Business Intelligence</h3>
+                    <p className="mt-2 text-sm" style={{ color: 'var(--text-muted)' }}>Dashboards interactivos y reportes automatizados para monitorear tu negocio.</p>
                     <span className="inline-flex items-center mt-4 text-sm font-medium neu-gradient-text group-hover:underline">
                       Saber mas
                       <svg className="ml-2 h-4 w-4 transform group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -323,10 +323,10 @@ export default function HomePage() {
                 <Link href="/servicios/vision-artificial" passHref>
                   <div className="neu-raised p-6 rounded-2xl group cursor-pointer transition-all duration-300 hover:-translate-y-1">
                     <div className="neu-service-icon">
-                      <FiEye className="h-8 w-8" style={{ color: 'var(--neu-primary)' }} />
+                      <HiOutlineCamera className="h-8 w-8" style={{ color: 'var(--neu-primary)' }} />
                     </div>
-                    <h3 className="text-xl font-bold mt-4" style={{ color: '#2d3748' }}>Vision Artificial</h3>
-                    <p className="mt-2 text-sm" style={{ color: '#718096' }}>Sistemas de vision por computadora para reconocimiento y analisis de imagenes.</p>
+                    <h3 className="text-xl font-bold mt-4" style={{ color: 'var(--text-dark)' }}>Vision Artificial</h3>
+                    <p className="mt-2 text-sm" style={{ color: 'var(--text-muted)' }}>Sistemas de vision por computadora para reconocimiento y analisis de imagenes.</p>
                     <span className="inline-flex items-center mt-4 text-sm font-medium neu-gradient-text group-hover:underline">
                       Saber mas
                       <svg className="ml-2 h-4 w-4 transform group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -340,10 +340,10 @@ export default function HomePage() {
                 <Link href="/servicios/consultoria-ia" passHref>
                   <div className="neu-raised p-6 rounded-2xl group cursor-pointer transition-all duration-300 hover:-translate-y-1">
                     <div className="neu-service-icon">
-                      <FiMessageCircle className="h-8 w-8" style={{ color: 'var(--neu-primary)' }} />
+                      <HiOutlineLightBulb className="h-8 w-8" style={{ color: 'var(--neu-primary)' }} />
                     </div>
-                    <h3 className="text-xl font-bold mt-4" style={{ color: '#2d3748' }}>Consultoria IA</h3>
-                    <p className="mt-2 text-sm" style={{ color: '#718096' }}>Te asesoramos en estrategias de IA que maximizan el retorno de inversion.</p>
+                    <h3 className="text-xl font-bold mt-4" style={{ color: 'var(--text-dark)' }}>Consultoria IA</h3>
+                    <p className="mt-2 text-sm" style={{ color: 'var(--text-muted)' }}>Te asesoramos en estrategias de IA que maximizan el retorno de inversion.</p>
                     <span className="inline-flex items-center mt-4 text-sm font-medium neu-gradient-text group-hover:underline">
                       Saber mas
                       <svg className="ml-2 h-4 w-4 transform group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -357,10 +357,10 @@ export default function HomePage() {
                 <Link href="/servicios/rpa" passHref>
                   <div className="neu-raised p-6 rounded-2xl group cursor-pointer transition-all duration-300 hover:-translate-y-1">
                     <div className="neu-service-icon">
-                      <FiSettings className="h-8 w-8" style={{ color: 'var(--neu-primary)' }} />
+                      <HiOutlineCog8Tooth className="h-8 w-8" style={{ color: 'var(--neu-primary)' }} />
                     </div>
-                    <h3 className="text-xl font-bold mt-4" style={{ color: '#2d3748' }}>RPA con IA</h3>
-                    <p className="mt-2 text-sm" style={{ color: '#718096' }}>Automatiza tareas repetitivas con robots de software inteligentes.</p>
+                    <h3 className="text-xl font-bold mt-4" style={{ color: 'var(--text-dark)' }}>RPA con IA</h3>
+                    <p className="mt-2 text-sm" style={{ color: 'var(--text-muted)' }}>Automatiza tareas repetitivas con robots de software inteligentes.</p>
                     <span className="inline-flex items-center mt-4 text-sm font-medium neu-gradient-text group-hover:underline">
                       Saber mas
                       <svg className="ml-2 h-4 w-4 transform group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -374,10 +374,10 @@ export default function HomePage() {
                 <Link href="/servicios/generacion-contenido-ia" passHref>
                   <div className="neu-raised p-6 rounded-2xl group cursor-pointer transition-all duration-300 hover:-translate-y-1">
                     <div className="neu-service-icon">
-                      <FiMessageCircle className="h-8 w-8" style={{ color: 'var(--neu-primary)' }} />
+                      <HiOutlinePencilSquare className="h-8 w-8" style={{ color: 'var(--neu-primary)' }} />
                     </div>
-                    <h3 className="text-xl font-bold mt-4" style={{ color: '#2d3748' }}>Generacion de Contenido IA</h3>
-                    <p className="mt-2 text-sm" style={{ color: '#718096' }}>Crea textos, imagenes y videos personalizados mediante IA.</p>
+                    <h3 className="text-xl font-bold mt-4" style={{ color: 'var(--text-dark)' }}>Generacion de Contenido IA</h3>
+                    <p className="mt-2 text-sm" style={{ color: 'var(--text-muted)' }}>Crea textos, imagenes y videos personalizados mediante IA.</p>
                     <span className="inline-flex items-center mt-4 text-sm font-medium neu-gradient-text group-hover:underline">
                       Saber mas
                       <svg className="ml-2 h-4 w-4 transform group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -391,10 +391,10 @@ export default function HomePage() {
                 <Link href="/servicios/automatizacion-marketing-ia" passHref>
                   <div className="neu-raised p-6 rounded-2xl group cursor-pointer transition-all duration-300 hover:-translate-y-1">
                     <div className="neu-service-icon">
-                      <FiBarChart2 className="h-8 w-8" style={{ color: 'var(--neu-primary)' }} />
+                      <HiOutlineMegaphone className="h-8 w-8" style={{ color: 'var(--neu-primary)' }} />
                     </div>
-                    <h3 className="text-xl font-bold mt-4" style={{ color: '#2d3748' }}>Automatizacion Marketing IA</h3>
-                    <p className="mt-2 text-sm" style={{ color: '#718096' }}>Segmenta, personaliza y automatiza campanas de marketing.</p>
+                    <h3 className="text-xl font-bold mt-4" style={{ color: 'var(--text-dark)' }}>Automatizacion Marketing IA</h3>
+                    <p className="mt-2 text-sm" style={{ color: 'var(--text-muted)' }}>Segmenta, personaliza y automatiza campanas de marketing.</p>
                     <span className="inline-flex items-center mt-4 text-sm font-medium neu-gradient-text group-hover:underline">
                       Saber mas
                       <svg className="ml-2 h-4 w-4 transform group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -410,9 +410,9 @@ export default function HomePage() {
 
         {/* Contact Section - Neumorphic Style */}
         <section id="contacto" className="py-16 neu-bg relative overflow-hidden">
-          {/* Decorative blurred shapes */}
-          <div className="absolute -right-20 -bottom-20 w-80 h-80 rounded-full bg-indigo-300 mix-blend-multiply opacity-20 filter blur-3xl animate-pulse-slow"></div>
-          <div className="absolute -left-20 top-20 w-72 h-72 rounded-full bg-purple-300 mix-blend-multiply opacity-20 filter blur-3xl animate-pulse-slow animation-delay-2000"></div>
+          {/* Decorative blurred shapes - Aurora Theme */}
+          <div className="absolute -right-20 -bottom-20 w-80 h-80 rounded-full bg-violet-400 mix-blend-multiply opacity-20 filter blur-3xl animate-pulse-slow"></div>
+          <div className="absolute -left-20 top-20 w-72 h-72 rounded-full bg-purple-500 mix-blend-multiply opacity-20 filter blur-3xl animate-pulse-slow animation-delay-2000"></div>
 
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             <div className="text-center mb-12">
@@ -481,16 +481,19 @@ export default function HomePage() {
                 </div>
 
                 <div className="mt-6">
-                  <button type="button" className="neu-btn-primary w-full">
+                  <a
+                    href="mailto:contacto@tunixlabs.com?subject=Contacto desde TunixLabs&body=Hola, me gustaría obtener más información sobre sus servicios de IA."
+                    className="neu-btn-primary w-full inline-block text-center"
+                  >
                     Enviar mensaje
-                  </button>
+                  </a>
                 </div>
               </div>
 
               {/* Información de contacto */}
               <div className="text-center lg:text-left">
                 <div className="max-w-md mx-auto lg:mr-0 lg:ml-auto">
-                  <h3 className="text-xl font-semibold mb-6" style={{ color: '#2d3748' }}>Informacion de contacto</h3>
+                  <h3 className="text-xl font-semibold mb-6" style={{ color: 'var(--text-dark)' }}>Informacion de contacto</h3>
 
                   <div className="space-y-6">
                     <div className="flex items-start">
@@ -500,8 +503,8 @@ export default function HomePage() {
                         </svg>
                       </div>
                       <div className="ml-4">
-                        <p className="text-lg font-medium" style={{ color: '#2d3748' }}>Email</p>
-                        <p className="mt-1" style={{ color: '#718096' }}>info@tunixlabs.com</p>
+                        <p className="text-lg font-medium" style={{ color: 'var(--text-dark)' }}>Email</p>
+                        <p className="mt-1" style={{ color: 'var(--text-muted)' }}>contacto@tunixlabs.com</p>
                       </div>
                     </div>
 

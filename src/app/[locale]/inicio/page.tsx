@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/navigation';
 import type { Pathnames } from '@/i18n/routing';
-import { FiDatabase, FiActivity, FiUsers, FiBarChart2, FiCode, FiMessageCircle, FiEye, FiSettings } from 'react-icons/fi';
+import { HiOutlineGlobeAlt, HiOutlineChartBar, HiOutlineChatBubbleLeftRight, HiOutlinePresentationChartBar, HiOutlineCamera, HiOutlineLightBulb, HiOutlineCog8Tooth, HiOutlinePencilSquare, HiOutlineMegaphone } from 'react-icons/hi2';
 import React from 'react';
 import dynamic from 'next/dynamic';
 
@@ -26,7 +26,7 @@ const FloatingParticles = dynamic(() =>
           left: `${Math.random() * 100}%`,
           width: `${Math.random() * 4 + 2}px`,
           height: `${Math.random() * 4 + 2}px`,
-          backgroundColor: `rgba(${Math.floor(Math.random() * 100 + 100)}, ${Math.floor(Math.random() * 100 + 100)}, 246, ${Math.random() * 0.5 + 0.2})`,
+          backgroundColor: `rgba(${Math.floor(Math.random() * 50 + 100)}, ${Math.floor(Math.random() * 50 + 50)}, ${Math.floor(Math.random() * 50 + 200)}, ${Math.random() * 0.5 + 0.2})`,
           animation: `float ${Math.random() * 10 + 10}s infinite ease-in-out ${Math.random() * 5}s`
         }));
         setParticles(newParticles);
@@ -117,7 +117,7 @@ export default function HomePage() {
 
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      ctx.strokeStyle = 'rgba(59, 130, 246, 0.1)';
+      ctx.strokeStyle = 'rgba(124, 58, 237, 0.1)';
       ctx.lineWidth = 0.5;
 
       for (let i = 0; i < nodes.length; i++) {
@@ -140,7 +140,7 @@ export default function HomePage() {
       for (const node of nodes) {
         ctx.beginPath();
         ctx.arc(node.x, node.y, node.radius, 0, Math.PI * 2);
-        ctx.fillStyle = 'rgba(59, 130, 246, 0.4)';
+        ctx.fillStyle = 'rgba(124, 58, 237, 0.4)';
         ctx.fill();
 
         node.x += node.vx;
@@ -160,16 +160,16 @@ export default function HomePage() {
     };
   }, []);
 
-  const services: Array<{ key: string; icon: typeof FiCode; href: Pathnames }> = [
-    { key: 'webDev', icon: FiCode, href: '/servicios/desarrollos-web' },
-    { key: 'machineLearning', icon: FiActivity, href: '/servicios/machine-learning' },
-    { key: 'aiAssistants', icon: FiUsers, href: '/servicios/asistentes-ia' },
-    { key: 'businessIntelligence', icon: FiBarChart2, href: '/servicios/business-intelligence' },
-    { key: 'computerVision', icon: FiEye, href: '/servicios/vision-artificial' },
-    { key: 'aiConsulting', icon: FiMessageCircle, href: '/servicios/consultoria-ia' },
-    { key: 'rpa', icon: FiSettings, href: '/servicios/rpa' },
-    { key: 'contentGeneration', icon: FiMessageCircle, href: '/servicios/generacion-contenido-ia' },
-    { key: 'marketingAutomation', icon: FiBarChart2, href: '/servicios/automatizacion-marketing-ia' },
+  const services: Array<{ key: string; icon: typeof HiOutlineGlobeAlt; href: Pathnames }> = [
+    { key: 'webDev', icon: HiOutlineGlobeAlt, href: '/servicios/desarrollos-web' },
+    { key: 'machineLearning', icon: HiOutlineChartBar, href: '/servicios/machine-learning' },
+    { key: 'aiAssistants', icon: HiOutlineChatBubbleLeftRight, href: '/servicios/asistentes-ia' },
+    { key: 'businessIntelligence', icon: HiOutlinePresentationChartBar, href: '/servicios/business-intelligence' },
+    { key: 'computerVision', icon: HiOutlineCamera, href: '/servicios/vision-artificial' },
+    { key: 'aiConsulting', icon: HiOutlineLightBulb, href: '/servicios/consultoria-ia' },
+    { key: 'rpa', icon: HiOutlineCog8Tooth, href: '/servicios/rpa' },
+    { key: 'contentGeneration', icon: HiOutlinePencilSquare, href: '/servicios/generacion-contenido-ia' },
+    { key: 'marketingAutomation', icon: HiOutlineMegaphone, href: '/servicios/automatizacion-marketing-ia' },
   ];
 
   return (
@@ -181,8 +181,8 @@ export default function HomePage() {
 
       <div className="parallax-wrapper">
         <section className="relative pt-20 pb-32 overflow-hidden">
-          <div className="absolute -top-10 right-0 w-96 h-96 bg-indigo-400 rounded-full mix-blend-multiply opacity-10 filter blur-3xl animate-pulse-slow"></div>
-          <div className="absolute top-40 -left-10 w-80 h-80 bg-purple-400 rounded-full mix-blend-multiply opacity-10 filter blur-3xl animate-pulse-slow animation-delay-1000"></div>
+          <div className="absolute -top-10 right-0 w-96 h-96 bg-violet-400 rounded-full mix-blend-multiply opacity-15 filter blur-3xl animate-pulse-slow"></div>
+          <div className="absolute top-40 -left-10 w-80 h-80 bg-purple-500 rounded-full mix-blend-multiply opacity-15 filter blur-3xl animate-pulse-slow animation-delay-1000"></div>
 
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             <div className="lg:grid lg:grid-cols-12 lg:gap-8 items-center">
@@ -274,8 +274,8 @@ export default function HomePage() {
         </section>
 
         <section id="contacto" className="py-16 neu-bg relative overflow-hidden">
-          <div className="absolute -right-20 -bottom-20 w-80 h-80 rounded-full bg-indigo-300 mix-blend-multiply opacity-20 filter blur-3xl animate-pulse-slow"></div>
-          <div className="absolute -left-20 top-20 w-72 h-72 rounded-full bg-purple-300 mix-blend-multiply opacity-20 filter blur-3xl animate-pulse-slow animation-delay-2000"></div>
+          <div className="absolute -right-20 -bottom-20 w-80 h-80 rounded-full bg-violet-400 mix-blend-multiply opacity-20 filter blur-3xl animate-pulse-slow"></div>
+          <div className="absolute -left-20 top-20 w-72 h-72 rounded-full bg-purple-500 mix-blend-multiply opacity-20 filter blur-3xl animate-pulse-slow animation-delay-2000"></div>
 
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             <div className="text-center mb-12">
@@ -343,9 +343,12 @@ export default function HomePage() {
                 </div>
 
                 <div className="mt-6">
-                  <button type="button" className="neu-btn-primary w-full">
+                  <a
+                    href="mailto:contacto@tunixlabs.com?subject=Contacto desde TunixLabs&body=Hola, me gustaría obtener más información sobre sus servicios de IA."
+                    className="neu-btn-primary w-full inline-block text-center"
+                  >
                     {t('contact.form.submit')}
-                  </button>
+                  </a>
                 </div>
               </div>
 
@@ -361,8 +364,8 @@ export default function HomePage() {
                         </svg>
                       </div>
                       <div className="ml-4">
-                        <p className="text-lg font-medium" style={{ color: '#2d3748' }}>{t('contact.info.email')}</p>
-                        <p className="mt-1" style={{ color: '#718096' }}>info@tunixlabs.com</p>
+                        <p className="text-lg font-medium" style={{ color: 'var(--text-dark)' }}>{t('contact.info.email')}</p>
+                        <p className="mt-1" style={{ color: 'var(--text-muted)' }}>contacto@tunixlabs.com</p>
                       </div>
                     </div>
 
