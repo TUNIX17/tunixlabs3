@@ -1,6 +1,6 @@
 # TunixLabs - Development State
 
-**Last Updated:** 2026-01-16
+**Last Updated:** 2026-01-19
 **Current Phase:** VAD & Animation System Enhancement
 **Sprint:** 3.2 - Adaptive VAD & Animation Priority System
 
@@ -135,6 +135,14 @@ TunixLabs es una plataforma web de consultoria en IA con:
   - [x] Neck follows head with natural delay for anatomical realism
   - [x] Files modified:
     - `src/app/inicio/components/RobotModel.tsx` - New listening animation system
+    - `src/app/[locale]/inicio/components/RobotModel.tsx` - Same changes
+- [x] **Restored ActionButtons (Calendly/WhatsApp)** (2026-01-19)
+  - [x] Fixed missing ActionButtons component that was removed in commit 9b46775
+  - [x] ActionButtons now appear when robot mentions Calendly, WhatsApp, or meeting-related keywords
+  - [x] Shows robot response in a styled card below the mic button
+  - [x] Automatically displays Calendly and WhatsApp buttons based on keyword detection
+  - [x] Files modified:
+    - `src/app/inicio/components/RobotModel.tsx` - Added ActionButtons import and UI integration
     - `src/app/[locale]/inicio/components/RobotModel.tsx` - Same changes
 
 ### In Progress

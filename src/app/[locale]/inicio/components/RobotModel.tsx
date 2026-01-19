@@ -14,6 +14,7 @@ import * as THREE from 'three';
 import { useRobotInteraction, RobotInteractionState } from '../../../../hooks/useRobotInteraction';
 import FloatingMicButton from '../../../../components/VoiceInterface/FloatingMicButton';
 import AudioVisualizer from '../../../../components/VoiceInterface/AudioVisualizer';
+import ActionButtons from '../../../../components/VoiceInterface/ActionButtons';
 
 // Importar sistema de animaciones
 import {
@@ -1714,6 +1715,22 @@ function RobotInteractionManager() {
               disabled={isLoading || interactionState === RobotInteractionState.PROCESSING}
             />
           </div>
+
+          {/* Robot Response with Action Buttons (Calendly/WhatsApp) */}
+          {robotResponse && (
+            <div className="mt-3 max-w-sm">
+              <div className="neu-pressed rounded-xl px-4 py-3 text-center">
+                <p className="text-sm" style={{ color: '#4a5568' }}>
+                  {robotResponse}
+                </p>
+              </div>
+              {/* Action Buttons - appear when robot mentions Calendly or WhatsApp */}
+              <ActionButtons
+                robotResponse={robotResponse}
+                className="mt-3"
+              />
+            </div>
+          )}
         </div>
 
       </div>
