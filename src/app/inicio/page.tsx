@@ -129,14 +129,12 @@ export default function HomePage() {
   }, []);
 
   return (
-    <>
-      {/* Aurora Blobs - Fixed position, visible across all pages */}
-      <div className="aurora-blob aurora-blob-1"></div>
-      <div className="aurora-blob aurora-blob-2"></div>
-      <div className="aurora-blob aurora-blob-3"></div>
-      <div className="aurora-blob aurora-blob-4"></div>
-
       <div className="min-h-screen relative neu-bg" style={{backgroundColor: 'var(--neu-bg)'}}>
+        {/* Aurora Blobs - Floating animated shapes */}
+        <div className="aurora-blob aurora-blob-1"></div>
+        <div className="aurora-blob aurora-blob-2"></div>
+        <div className="aurora-blob aurora-blob-3"></div>
+        <div className="aurora-blob aurora-blob-4"></div>
         {/* Neural Network Background - Sutil */}
         <canvas
           ref={canvasRef}
@@ -510,6 +508,5 @@ export default function HomePage() {
         </footer>
         </div>
       </div>
-    </>
   );
 } 

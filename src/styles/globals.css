@@ -394,78 +394,78 @@ body {
   animation-delay: 3s;
 }
 
-/* Floating Aurora Blobs - Animated colored shapes with fade */
+/* Floating Aurora Blobs - Subtle animated colored shapes */
 .aurora-blob {
-  position: fixed;
+  position: absolute;
   border-radius: 50%;
-  filter: blur(100px);
+  filter: blur(80px);
   pointer-events: none;
   z-index: 1;
 }
 
 .aurora-blob-1 {
-  width: 500px;
-  height: 500px;
-  background: rgba(124, 58, 237, 0.25);
-  animation: aurora-move-1 25s ease-in-out infinite, aurora-fade 8s ease-in-out infinite;
+  width: 250px;
+  height: 250px;
+  background: rgba(124, 58, 237, 0.15);
+  animation: aurora-move-1 30s ease-in-out infinite, aurora-fade 10s ease-in-out infinite;
 }
 
 .aurora-blob-2 {
-  width: 450px;
-  height: 450px;
-  background: rgba(167, 139, 250, 0.22);
-  animation: aurora-move-2 30s ease-in-out infinite, aurora-fade 10s ease-in-out infinite 2s;
+  width: 200px;
+  height: 200px;
+  background: rgba(167, 139, 250, 0.12);
+  animation: aurora-move-2 35s ease-in-out infinite, aurora-fade 12s ease-in-out infinite 3s;
 }
 
 .aurora-blob-3 {
-  width: 400px;
-  height: 400px;
-  background: rgba(196, 181, 253, 0.2);
-  animation: aurora-move-3 20s ease-in-out infinite, aurora-fade 6s ease-in-out infinite 4s;
+  width: 180px;
+  height: 180px;
+  background: rgba(196, 181, 253, 0.1);
+  animation: aurora-move-3 25s ease-in-out infinite, aurora-fade 8s ease-in-out infinite 5s;
 }
 
 .aurora-blob-4 {
-  width: 350px;
-  height: 350px;
-  background: rgba(139, 92, 246, 0.22);
-  animation: aurora-move-4 35s ease-in-out infinite, aurora-fade 12s ease-in-out infinite 1s;
+  width: 220px;
+  height: 220px;
+  background: rgba(139, 92, 246, 0.12);
+  animation: aurora-move-4 40s ease-in-out infinite, aurora-fade 14s ease-in-out infinite 2s;
 }
 
 @keyframes aurora-move-1 {
-  0% { top: -15%; left: -10%; }
-  25% { top: 25%; left: 55%; }
-  50% { top: 55%; left: 75%; }
-  75% { top: 35%; left: 15%; }
-  100% { top: -15%; left: -10%; }
+  0% { top: -10%; left: -5%; }
+  25% { top: 20%; left: 50%; }
+  50% { top: 50%; left: 70%; }
+  75% { top: 30%; left: 10%; }
+  100% { top: -10%; left: -5%; }
 }
 
 @keyframes aurora-move-2 {
-  0% { top: 65%; right: -15%; }
-  25% { top: 25%; right: 25%; }
-  50% { top: -10%; right: 55%; }
-  75% { top: 45%; right: 5%; }
-  100% { top: 65%; right: -15%; }
+  0% { top: 60%; right: -10%; }
+  25% { top: 20%; right: 20%; }
+  50% { top: -5%; right: 50%; }
+  75% { top: 40%; right: 5%; }
+  100% { top: 60%; right: -10%; }
 }
 
 @keyframes aurora-move-3 {
-  0% { bottom: -15%; left: 35%; }
-  33% { bottom: 35%; left: 65%; }
-  66% { bottom: 55%; left: 5%; }
-  100% { bottom: -15%; left: 35%; }
+  0% { bottom: -10%; left: 30%; }
+  33% { bottom: 30%; left: 60%; }
+  66% { bottom: 50%; left: 5%; }
+  100% { bottom: -10%; left: 30%; }
 }
 
 @keyframes aurora-move-4 {
-  0% { top: 45%; left: -15%; }
-  20% { top: 5%; left: 25%; }
-  40% { top: 25%; left: 65%; }
-  60% { top: 65%; left: 45%; }
-  80% { top: 75%; left: 15%; }
-  100% { top: 45%; left: -15%; }
+  0% { top: 40%; left: -10%; }
+  20% { top: 5%; left: 20%; }
+  40% { top: 20%; left: 60%; }
+  60% { top: 60%; left: 40%; }
+  80% { top: 70%; left: 10%; }
+  100% { top: 40%; left: -10%; }
 }
 
 @keyframes aurora-fade {
-  0%, 100% { opacity: 0.4; }
-  50% { opacity: 0.8; }
+  0%, 100% { opacity: 0.15; }
+  50% { opacity: 0.35; }
 }
 
 /* Neural Network Effect */
