@@ -301,41 +301,41 @@ const AnimatedRobotModel = forwardRef<RobotMethods, { onLoad?: () => void; isLis
       }
 
       // Durante interacción activa: animaciones de "escucha atenta" visibles
-      // El robot NO sigue el cursor, hace movimientos autónomos naturales
+      // El robot mantiene comportamiento similar a idle pero con movimientos sutiles autónomos
       if (isInteractionActive) {
         // === PARÁMETROS DE ANIMACIÓN CONVERSACIONAL ===
-        const conversationLerp = 0.04; // Suave pero visible
-        const smoothLerp = 0.03;
+        // Lerp más suave para transiciones naturales
+        const conversationLerp = 0.05;
+        const smoothLerp = 0.04;
 
         // Frecuencias variadas para movimientos orgánicos
-        const nodFreq = 0.8;      // Cabeceo arriba/abajo
-        const tiltFreq = 0.5;     // Inclinación lateral
-        const lookAroundFreq = 0.3; // Mirar alrededor
-        const breathFreq = 0.6;   // Respiración
+        const nodFreq = 0.6;        // Cabeceo arriba/abajo (más lento, más natural)
+        const tiltFreq = 0.4;       // Inclinación lateral
+        const lookAroundFreq = 0.25; // Mirar alrededor (sutil)
+        const breathFreq = 0.7;     // Respiración
 
-        // Amplitudes visibles pero naturales (en radianes)
-        const nodAmplitude = 0.12;      // ~7 grados - cabeceo notable
-        const tiltAmplitude = 0.08;     // ~4.5 grados - inclinación lateral
-        const lookAroundAmplitude = 0.15; // ~8.5 grados - mirar lados
-        const armSwayAmplitude = 0.05;  // Movimiento sutil de brazos
+        // Amplitudes sutiles pero visibles (en radianes)
+        // Movimientos similares a idle para mantener coherencia visual
+        const nodAmplitude = 0.06;        // ~3.5 grados - cabeceo sutil
+        const tiltAmplitude = 0.04;       // ~2.3 grados - inclinación lateral sutil
+        const lookAroundAmplitude = 0.08; // ~4.5 grados - mirar lados sutil
+        const armSwayAmplitude = 0.08;    // Movimiento visible de brazos
 
         // === CABEZA - MOVIMIENTOS CONVERSACIONALES ===
+        // Mira al frente con movimientos sutiles (similar a idle)
         if (headRef.current && initialRotations.current.head) {
-          // Cabeceo arriba/abajo (como asintiendo mientras escucha)
+          // Cabeceo arriba/abajo centrado en posición neutral
           const nod = Math.sin(time * nodFreq) * nodAmplitude;
 
           // Inclinación lateral (como ladeando la cabeza pensativo)
           const tilt = Math.sin(time * tiltFreq + 1.5) * tiltAmplitude;
 
-          // Mirar lentamente a los lados (como pensando)
+          // Mirar lentamente a los lados
           const lookAround = Math.sin(time * lookAroundFreq) * lookAroundAmplitude;
 
-          // Posición base inclinada hacia adelante (atención)
-          const forwardTilt = 0.1; // ~5.7 grados hacia adelante
-
-          // Usar 0 como base para Y para evitar giro 360°
-          const targetX = initialRotations.current.head.x + forwardTilt + nod;
-          const targetY = lookAround; // Sin seguimiento de cursor
+          // Sin inclinación hacia adelante - mira al frente
+          const targetX = initialRotations.current.head.x + nod;
+          const targetY = lookAround;
           const targetZ = initialRotations.current.head.z + tilt;
 
           // Limitar rotaciones a rangos seguros
@@ -351,8 +351,8 @@ const AnimatedRobotModel = forwardRef<RobotMethods, { onLoad?: () => void; isLis
         // === CUELLO - COMPLEMENTA CABEZA CON DELAY ===
         if (neckRef.current && initialRotations.current.neck) {
           // El cuello sigue la cabeza con un pequeño delay (más natural)
-          const neckNod = Math.sin((time - 0.3) * nodFreq) * (nodAmplitude * 0.4);
-          const neckLook = Math.sin((time - 0.2) * lookAroundFreq) * (lookAroundAmplitude * 0.3);
+          const neckNod = Math.sin((time - 0.3) * nodFreq) * (nodAmplitude * 0.5);
+          const neckLook = Math.sin((time - 0.2) * lookAroundFreq) * (lookAroundAmplitude * 0.4);
 
           const targetNeckX = initialRotations.current.neck.x + neckNod;
           const targetNeckY = neckLook;
@@ -364,28 +364,68 @@ const AnimatedRobotModel = forwardRef<RobotMethods, { onLoad?: () => void; isLis
           neckRef.current.rotation.y = THREE.MathUtils.lerp(neckRef.current.rotation.y, clampedNeckY, smoothLerp);
         }
 
-        // === BRAZOS - MOVIMIENTO SUTIL MIENTRAS CONVERSA ===
+        // === BRAZOS - MOVIMIENTO VISIBLE MIENTRAS CONVERSA ===
+        // Aplicar posiciones base de reposo + oscilaciones sutiles
         if (shoulderLeftRef.current && shoulderRightRef.current && targetArmRestingRotations.shoulder_left) {
-          // Balanceo sutil de hombros (como gestos al hablar)
-          const armSway = Math.sin(time * 0.7) * armSwayAmplitude;
-          const armSwayOffset = Math.sin(time * 0.7 + Math.PI) * armSwayAmplitude; // Opuesto para el otro brazo
+          // Balanceo de hombros (como gestos al conversar)
+          const armSwayX = Math.sin(time * 0.5) * armSwayAmplitude;
+          const armSwayZ = Math.sin(time * 0.4 + 0.5) * (armSwayAmplitude * 0.3);
 
+          // Hombro izquierdo
           shoulderLeftRef.current.rotation.x = THREE.MathUtils.lerp(
             shoulderLeftRef.current.rotation.x,
-            targetArmRestingRotations.shoulder_left.x + armSway,
+            targetArmRestingRotations.shoulder_left.x + armSwayX,
             smoothLerp
           );
+          shoulderLeftRef.current.rotation.y = THREE.MathUtils.lerp(
+            shoulderLeftRef.current.rotation.y,
+            targetArmRestingRotations.shoulder_left.y,
+            smoothLerp
+          );
+          shoulderLeftRef.current.rotation.z = THREE.MathUtils.lerp(
+            shoulderLeftRef.current.rotation.z,
+            targetArmRestingRotations.shoulder_left.z + armSwayZ,
+            smoothLerp
+          );
+
+          // Hombro derecho (movimiento opuesto)
           shoulderRightRef.current.rotation.x = THREE.MathUtils.lerp(
             shoulderRightRef.current.rotation.x,
-            targetArmRestingRotations.shoulder_right.x + armSwayOffset,
+            targetArmRestingRotations.shoulder_right.x - armSwayX,
+            smoothLerp
+          );
+          shoulderRightRef.current.rotation.y = THREE.MathUtils.lerp(
+            shoulderRightRef.current.rotation.y,
+            targetArmRestingRotations.shoulder_right.y,
+            smoothLerp
+          );
+          shoulderRightRef.current.rotation.z = THREE.MathUtils.lerp(
+            shoulderRightRef.current.rotation.z,
+            targetArmRestingRotations.shoulder_right.z - armSwayZ,
+            smoothLerp
+          );
+        }
+
+        // Antebrazos con movimiento sutil
+        if (armLeftBotRef.current && armRightBotRef.current && targetArmRestingRotations.arm_left_bot) {
+          const elbowSway = Math.sin(time * 0.6 + 1) * 0.04;
+
+          armLeftBotRef.current.rotation.x = THREE.MathUtils.lerp(
+            armLeftBotRef.current.rotation.x,
+            targetArmRestingRotations.arm_left_bot.x + elbowSway,
+            smoothLerp
+          );
+          armRightBotRef.current.rotation.x = THREE.MathUtils.lerp(
+            armRightBotRef.current.rotation.x,
+            targetArmRestingRotations.arm_right_bot.x - elbowSway,
             smoothLerp
           );
         }
 
         // === CUERPO - RESPIRACIÓN Y BALANCEO ===
         if (bodyTop1Ref.current && initialRotations.current.body_top1) {
-          const breathCycle = Math.sin(time * breathFreq) * 0.02; // Respiración visible
-          const bodySway = Math.sin(time * 0.4) * 0.01; // Leve balanceo
+          const breathCycle = Math.sin(time * breathFreq) * 0.015;
+          const bodySway = Math.sin(time * 0.35) * 0.012;
 
           bodyTop1Ref.current.rotation.x = THREE.MathUtils.lerp(
             bodyTop1Ref.current.rotation.x,
@@ -401,12 +441,17 @@ const AnimatedRobotModel = forwardRef<RobotMethods, { onLoad?: () => void; isLis
 
         // === TORSO SUPERIOR - LEVE GIRO ===
         if (bodyTop2Ref.current && initialRotations.current.body_top2) {
-          // El torso gira ligeramente siguiendo la mirada
-          const torsoTurn = Math.sin(time * lookAroundFreq) * 0.03;
+          const torsoTurn = Math.sin(time * lookAroundFreq) * 0.04;
+          const torsoSway = Math.sin(time * 0.3 + 0.8) * 0.008;
 
           bodyTop2Ref.current.rotation.y = THREE.MathUtils.lerp(
             bodyTop2Ref.current.rotation.y,
             initialRotations.current.body_top2.y + torsoTurn,
+            smoothLerp
+          );
+          bodyTop2Ref.current.rotation.z = THREE.MathUtils.lerp(
+            bodyTop2Ref.current.rotation.z,
+            initialRotations.current.body_top2.z + torsoSway,
             smoothLerp
           );
         }
