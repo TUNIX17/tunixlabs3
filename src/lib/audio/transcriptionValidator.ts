@@ -63,18 +63,62 @@ const COMMON_SPANISH_WORDS = new Set([
  * Palabras comunes en inglés que el STT debería reconocer
  */
 const COMMON_ENGLISH_WORDS = new Set([
-  'hello', 'hi', 'hey', 'what', 'how', 'good', 'yes', 'no', 'thanks',
-  'please', 'okay', 'ok', 'sure', 'understand', 'want', 'need', 'can',
-  'have', 'there', 'is', 'am', 'are', 'me', 'you', 'he', 'she', 'we',
-  'they', 'my', 'your', 'his', 'her', 'our', 'their', 'but', 'because',
-  'when', 'where', 'how', 'which', 'who', 'very', 'more', 'less', 'much',
-  'little', 'all', 'nothing', 'something', 'now', 'later', 'after', 'before',
-  'always', 'never', 'here', 'there', 'near', 'far', 'up', 'down',
-  'company', 'business', 'work', 'project', 'system', 'data', 'help',
-  'information', 'service', 'consulting', 'automate', 'intelligence',
-  'artificial', 'chatbot', 'robot', 'meeting', 'call', 'schedule',
-  'contact', 'price', 'cost', 'budget', 'time', 'week', 'month',
-  'name', 'email', 'phone', 'number'
+  // Greetings and basic expressions
+  'hello', 'hi', 'hey', 'good', 'yes', 'no', 'thanks', 'thank', 'please',
+  'okay', 'ok', 'sure', 'understand', 'perfect', 'great', 'excellent',
+  'bye', 'goodbye', 'welcome', 'morning', 'afternoon', 'evening', 'night',
+  // Common verbs
+  'want', 'need', 'can', 'have', 'has', 'had', 'do', 'does', 'did', 'done',
+  'get', 'got', 'give', 'gave', 'make', 'made', 'take', 'took', 'go', 'went',
+  'come', 'came', 'see', 'saw', 'know', 'knew', 'think', 'thought', 'say', 'said',
+  'tell', 'told', 'ask', 'asked', 'use', 'used', 'find', 'found', 'try', 'tried',
+  'leave', 'left', 'call', 'called', 'keep', 'kept', 'let', 'put', 'seem',
+  'help', 'helped', 'show', 'showed', 'hear', 'heard', 'play', 'run', 'move',
+  'live', 'believe', 'bring', 'happen', 'write', 'provide', 'offer', 'offers',
+  'sit', 'stand', 'lose', 'pay', 'meet', 'include', 'continue', 'learn',
+  'change', 'lead', 'understand', 'watch', 'follow', 'stop', 'create', 'speak',
+  'read', 'spend', 'grow', 'open', 'walk', 'win', 'teach', 'buy', 'looking',
+  // Pronouns and articles
+  'i', 'me', 'you', 'he', 'him', 'she', 'her', 'it', 'we', 'us', 'they', 'them',
+  'my', 'your', 'his', 'her', 'its', 'our', 'their', 'mine', 'yours', 'ours', 'theirs',
+  'this', 'that', 'these', 'those', 'who', 'whom', 'whose', 'which', 'what',
+  'a', 'an', 'the', 'some', 'any', 'each', 'every', 'both', 'few', 'many',
+  // Conjunctions and prepositions
+  'and', 'or', 'but', 'so', 'if', 'then', 'because', 'although', 'though',
+  'while', 'when', 'where', 'how', 'why', 'whether', 'unless', 'until',
+  'in', 'on', 'at', 'to', 'for', 'with', 'by', 'from', 'about', 'into',
+  'through', 'during', 'before', 'after', 'above', 'below', 'between', 'under',
+  'of', 'as', 'than', 'like', 'over', 'such', 'only', 'also', 'just',
+  // Adverbs
+  'very', 'more', 'less', 'much', 'most', 'little', 'well', 'better', 'best',
+  'all', 'nothing', 'something', 'anything', 'everything', 'someone', 'anyone',
+  'now', 'then', 'today', 'tomorrow', 'yesterday', 'later', 'soon', 'already',
+  'always', 'never', 'often', 'sometimes', 'usually', 'still', 'yet', 'ever',
+  'here', 'there', 'near', 'far', 'up', 'down', 'away', 'back', 'out',
+  'really', 'actually', 'currently', 'recently', 'quickly', 'slowly',
+  // Business/technology nouns
+  'company', 'business', 'work', 'project', 'system', 'data', 'web', 'website',
+  'help', 'information', 'service', 'services', 'consulting', 'consultation',
+  'automate', 'automation', 'intelligence', 'artificial', 'chatbot', 'robot', 'ai',
+  'meeting', 'schedule', 'appointment', 'demo', 'demonstration',
+  'contact', 'price', 'cost', 'budget', 'time', 'week', 'month', 'year', 'day',
+  'name', 'email', 'phone', 'number', 'address', 'site', 'page', 'application',
+  'app', 'software', 'platform', 'solution', 'solutions', 'client', 'clients',
+  'customer', 'customers', 'user', 'users', 'team', 'product', 'products',
+  // Question words
+  'what', 'which', 'who', 'whom', 'whose', 'where', 'when', 'why', 'how',
+  // Basic numbers
+  'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten',
+  'first', 'second', 'third', 'several', 'many', 'few',
+  // Common adjectives
+  'good', 'bad', 'big', 'small', 'new', 'old', 'long', 'short', 'high', 'low',
+  'better', 'best', 'worse', 'worst', 'same', 'different', 'other', 'another',
+  'fast', 'slow', 'easy', 'hard', 'difficult', 'possible', 'impossible', 'available',
+  'interested', 'interesting', 'important', 'necessary', 'free', 'full', 'ready',
+  // Auxiliary and modal verbs
+  'is', 'am', 'are', 'was', 'were', 'be', 'been', 'being',
+  'will', 'would', 'could', 'should', 'may', 'might', 'must', 'shall',
+  'has', 'have', 'had', 'do', 'does', 'did'
 ]);
 
 /**
