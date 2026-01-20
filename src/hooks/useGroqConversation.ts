@@ -4,6 +4,7 @@ import { cerebrasClient } from '../lib/cerebras/client';
 import { selectModelConfig } from '../lib/groq/models';
 import { useRateLimiter } from '../lib/groq/rate-limiter';
 import { getCommercialPrompt } from '../lib/agent';
+import { sanitizeForSpeech } from '../lib/text/sanitizeForSpeech';
 import axios from 'axios';
 
 // Mapeo de nombres de idioma a códigos ISO para normalizar en TTS
@@ -290,7 +291,12 @@ export const useGroqConversation = ({
         return;
       }
 
-      const utterance = new SpeechSynthesisUtterance(text);
+      // Sanitize text to remove markdown formatting (asterisks, dashes, etc.)
+      // This prevents the TTS from reading "asterisk" or "dash" literally
+      const sanitizedText = sanitizeForSpeech(text);
+      console.log('[TTS-WebSpeech] Texto sanitizado para TTS, longitud:', sanitizedText.length);
+
+      const utterance = new SpeechSynthesisUtterance(sanitizedText);
 
       // Función para seleccionar la mejor voz disponible
       const selectBestVoice = (voices: SpeechSynthesisVoice[], targetLang: string): SpeechSynthesisVoice | undefined => {

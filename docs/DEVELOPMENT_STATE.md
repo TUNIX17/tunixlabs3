@@ -2,7 +2,7 @@
 
 **Last Updated:** 2026-01-20
 **Current Phase:** Voice Architecture Simplification
-**Sprint:** 3.7 - Voice System Refactor
+**Sprint:** 3.8 - TTS Text Sanitization
 
 ---
 
@@ -243,6 +243,20 @@ TunixLabs es una plataforma web de consultoria en IA con:
     - `src/app/contacto/page.tsx` - Non-i18n contact page with mailto
     - All 18 service pages (locale and non-locale) - Aurora decorative shapes
   - [x] Build verification: npm run build succeeds (48 pages generated)
+- [x] **TTS Text Sanitizer** (2026-01-20)
+  - [x] Created `sanitizeForSpeech()` function to clean markdown before TTS
+  - [x] Removes asterisks (*) from list items that were read as "asterisco"
+  - [x] Removes dashes (-) from list items that were read as "guion"
+  - [x] Removes markdown formatting: bold (**), italic (*), code blocks, headers
+  - [x] Removes links, images, blockquotes, horizontal rules
+  - [x] Converts newlines to periods for natural speech pauses
+  - [x] Works for both Spanish and English text
+  - [x] Integrated into `speakWithWebSpeech()` before utterance creation
+  - [x] Files created:
+    - `src/lib/text/sanitizeForSpeech.ts` - Text sanitization utilities (~110 lines)
+  - [x] Files modified:
+    - `src/hooks/useGroqConversation.ts` - Integrated sanitizer before TTS
+  - [x] Build verification: npm run build succeeds
 
 ### In Progress
 - [ ] Configurar variables de entorno en Railway:
