@@ -21,30 +21,36 @@ interface ActionButtonsProps {
   conversationSummary?: ConversationSummary;
 }
 
-// Keywords que activan los botones
+// Keywords que activan los botones - MÁS ESPECÍFICOS para evitar falsos positivos
+// Solo se activan cuando el robot ofrece explícitamente estas opciones de contacto
 const CALENDLY_KEYWORDS = [
   'calendly',
-  'agendar',
-  'agenda',
-  'schedule',
-  'booking',
-  'reunión',
-  'reunion',
-  'meeting',
-  'cita',
+  'agendar una llamada',
+  'agendar una reunion',
+  'agendar una cita',
+  'schedule a call',
+  'schedule a meeting',
+  'book a call',
+  'booking a meeting',
   'horarios disponibles',
-  'available times'
+  'available times',
+  '15 minutos con alejandro',
+  '15 minutes with alejandro',
+  'agendar directamente',
+  'schedule directly'
 ];
 
 const WHATSAPP_KEYWORDS = [
   'whatsapp',
   'whats app',
-  'escribir',
-  'mensaje',
-  'chatear',
-  'chat',
-  'contactar directamente',
-  'contact directly'
+  'escribirle por whatsapp',
+  'escribir por whatsapp',
+  'mensaje por whatsapp',
+  'contactar por whatsapp',
+  'contact on whatsapp',
+  'message on whatsapp',
+  '+56 9 3036 7979',
+  '+56930367979'
 ];
 
 /**

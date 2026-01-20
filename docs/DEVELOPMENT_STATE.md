@@ -253,9 +253,27 @@ TunixLabs es una plataforma web de consultoria en IA con:
   - [x] Works for both Spanish and English text
   - [x] Integrated into `speakWithWebSpeech()` before utterance creation
   - [x] Files created:
-    - `src/lib/text/sanitizeForSpeech.ts` - Text sanitization utilities (~110 lines)
+    - `src/lib/text/sanitizeForSpeech.ts` - Text sanitization utilities (~90 lines)
   - [x] Files modified:
     - `src/hooks/useGroqConversation.ts` - Integrated sanitizer before TTS
+  - [x] Build verification: npm run build succeeds
+- [x] **Voice Agent Fine-Tuning** (2026-01-20)
+  - [x] Fixed TTS timeout issue - split long text into sentences
+    - Chrome Web Speech API has bug where long utterances never fire `onend`
+    - Now splits text by sentences and speaks each sequentially
+    - 10s timeout per sentence instead of 30s for entire text
+  - [x] Made ActionButtons keywords more specific
+    - Previous keywords like "mensaje", "chatear" triggered false positives
+    - Now requires explicit phrases like "agendar una llamada", "whatsapp"
+    - Prevents buttons appearing randomly during conversation
+  - [x] Reinforced contact info in agent prompts
+    - Added CRITICAL RULE: never invent phone numbers/emails/URLs
+    - Emphasized to ONLY use the exact contact data provided
+    - Prevents LLM from generating fake numbers like +1555...
+  - [x] Files modified:
+    - `src/hooks/useGroqConversation.ts` - TTS sentence splitting
+    - `src/components/VoiceInterface/ActionButtons.tsx` - Specific keywords
+    - `src/lib/agent/prompts/commercialAgent.ts` - Contact info reinforcement
   - [x] Build verification: npm run build succeeds
 
 ### In Progress

@@ -276,168 +276,144 @@ export const useGroqConversation = ({
     language: string,
     callbacks: { onStart?: () => void; onEnd?: () => void; onError?: (e: SpeechSynthesisErrorEvent) => void }
   ): Promise<void> => {
-    return new Promise((resolve, reject) => {
-      console.log('[TTS-WebSpeech] Iniciando con texto de longitud:', text.length, ', idioma:', language);
+    console.log('[TTS-WebSpeech] Iniciando con texto de longitud:', text.length, ', idioma:', language);
 
-      if (typeof window === 'undefined' || !window.speechSynthesis) {
-        console.warn('[TTS-WebSpeech] Web Speech API no está disponible.');
-        reject(new Error('Web Speech API no disponible'));
-        return;
+    if (typeof window === 'undefined' || !window.speechSynthesis) {
+      console.warn('[TTS-WebSpeech] Web Speech API no está disponible.');
+      throw new Error('Web Speech API no disponible');
+    }
+
+    if (!text.trim()) {
+      console.warn('[TTS-WebSpeech] Texto vacío, no se reproducirá.');
+      return;
+    }
+
+    // Sanitize text to remove markdown formatting
+    const sanitizedText = sanitizeForSpeech(text);
+    console.log('[TTS-WebSpeech] Texto sanitizado para TTS, longitud:', sanitizedText.length);
+
+    // Split text into sentences to avoid Chrome TTS bug where long text never fires onend
+    // Chrome has a known bug where utterances > ~200-300 chars can hang
+    const splitIntoSentences = (text: string): string[] => {
+      // Split by sentence-ending punctuation, keeping the punctuation
+      const sentences = text.match(/[^.!?]+[.!?]+|[^.!?]+$/g) || [text];
+      return sentences.map(s => s.trim()).filter(s => s.length > 0);
+    };
+
+    const sentences = splitIntoSentences(sanitizedText);
+    console.log('[TTS-WebSpeech] Dividido en', sentences.length, 'oraciones');
+
+    // Function to select the best available voice
+    const selectBestVoice = (voices: SpeechSynthesisVoice[], targetLang: string): SpeechSynthesisVoice | undefined => {
+      const langBase = normalizeLanguageCode(targetLang);
+
+      // Priority 1: Exact language match
+      let voice = voices.find(v => v.lang.toLowerCase().startsWith(langBase));
+      if (voice) return voice;
+
+      // Priority 2: Spanish fallback
+      if (langBase === 'es') {
+        voice = voices.find(v => v.name.toLowerCase().includes('spanish'));
+        if (voice) return voice;
       }
 
-      if (!text.trim()) {
-        console.warn('[TTS-WebSpeech] Texto vacío, no se reproducirá.');
-        resolve();
-        return;
-      }
+      // Priority 3: English fallback
+      voice = voices.find(v => v.lang.toLowerCase().startsWith('en'));
+      if (voice) return voice;
 
-      // Sanitize text to remove markdown formatting (asterisks, dashes, etc.)
-      // This prevents the TTS from reading "asterisk" or "dash" literally
-      const sanitizedText = sanitizeForSpeech(text);
-      console.log('[TTS-WebSpeech] Texto sanitizado para TTS, longitud:', sanitizedText.length);
+      // Priority 4: Any voice
+      return voices.length > 0 ? voices[0] : undefined;
+    };
 
-      const utterance = new SpeechSynthesisUtterance(sanitizedText);
-
-      // Función para seleccionar la mejor voz disponible
-      const selectBestVoice = (voices: SpeechSynthesisVoice[], targetLang: string): SpeechSynthesisVoice | undefined => {
-        // Normalizar el idioma (maneja "Spanish" -> "es", "es-ES" -> "es", etc.)
-        const langBase = normalizeLanguageCode(targetLang);
-
-        // Log todas las voces disponibles para debug
-        console.log(`[TTS-WebSpeech] Buscando voz para: ${langBase} (original: ${targetLang}), voces disponibles:`,
-          voices.map(v => `${v.name}(${v.lang})`).join(', '));
-
-        // Prioridad 1: Voz exacta del idioma (ej: es-ES, es-MX)
-        let voice = voices.find(v => v.lang.toLowerCase().startsWith(langBase));
-        if (voice) {
-          console.log(`[TTS-WebSpeech] Voz encontrada para ${langBase}: ${voice.name} (${voice.lang})`);
-          return voice;
-        }
-
-        // Prioridad 2: Si buscábamos español y no hay, buscar voces con "Spanish" en el nombre
-        if (langBase === 'es') {
-          voice = voices.find(v => v.name.toLowerCase().includes('spanish'));
-          if (voice) {
-            console.log(`[TTS-WebSpeech] Voz Spanish encontrada: ${voice.name}`);
-            return voice;
-          }
-        }
-
-        // Prioridad 3: Fallback a inglés
-        voice = voices.find(v => v.lang.toLowerCase().startsWith('en'));
-        if (voice) {
-          console.log(`[TTS-WebSpeech] Fallback a inglés: ${voice.name}`);
-          return voice;
-        }
-
-        // Prioridad 4: Cualquier voz disponible
-        if (voices.length > 0) {
-          console.log(`[TTS-WebSpeech] Usando primera voz disponible: ${voices[0].name}`);
-          return voices[0];
-        }
-
-        return undefined;
-      };
-
-      // Obtener voces disponibles
-      let voices = window.speechSynthesis.getVoices();
-      let selectedVoice: SpeechSynthesisVoice | undefined = undefined;
-
-      if (voices.length > 0) {
-        selectedVoice = selectBestVoice(voices, language);
-      }
-
-      if (selectedVoice) {
-        utterance.voice = selectedVoice;
-        utterance.lang = selectedVoice.lang; // Usar el lang de la voz seleccionada
-        console.log(`[TTS-WebSpeech] Usando voz: ${selectedVoice.name} (${selectedVoice.lang})`);
-      } else {
-        utterance.lang = language;
-        console.warn(`[TTS-WebSpeech] No se encontró voz, usando lang: ${language}`);
-      }
-
-      // Ajustes para efecto ROBÓTICO - voz más rápida y procesada
-      utterance.pitch = 1.4;  // Más agudo para sonar robótico
-      utterance.rate = 1.15;  // Más rápido que normal (1.0)
-      utterance.volume = 1;   // Volumen máximo
-
-      let hasStarted = false;
-      let hasEnded = false;
-
-      utterance.onstart = () => {
-        hasStarted = true;
-        console.log('[TTS-WebSpeech] Reproducción iniciada.');
-        if (callbacks.onStart) callbacks.onStart();
-      };
-
-      utterance.onerror = (event) => {
-        // Ignorar errores de interrupción si ya terminó
-        if (hasEnded) return;
-
-        // 'interrupted' y 'canceled' son errores esperados cuando cancelamos TTS
-        if (event.error === 'interrupted' || event.error === 'canceled') {
-          console.log('[TTS-WebSpeech] TTS interrumpido/cancelado (esperado)');
-          hasEnded = true;
-          if (callbacks.onEnd) callbacks.onEnd();
-          resolve();
-          return;
-        }
-
-        console.error('[TTS-WebSpeech] Error en la reproducción:', event.error);
-        if (callbacks.onError) callbacks.onError(event);
-        reject(new Error(`Error en SpeechSynthesis: ${event.error}`));
-      };
-
-      // Timeout de seguridad - máximo 30 segundos para TTS
-      const ttsTimeout = setTimeout(() => {
-        if (hasEnded) return;
-        console.warn('[TTS-WebSpeech] Timeout - TTS no terminó en 30 segundos');
-        window.speechSynthesis.cancel();
-        hasEnded = true;
-        if (callbacks.onEnd) callbacks.onEnd();
-        resolve();
-      }, 30000);
-
-      utterance.onend = () => {
-        if (hasEnded) return;
-        hasEnded = true;
-        clearTimeout(ttsTimeout);
-        console.log('[TTS-WebSpeech] Reproducción finalizada.');
-        if (callbacks.onEnd) callbacks.onEnd();
-        resolve();
-      };
-
-      // Manejar carga de voces
-      if (voices.length === 0) {
-        console.log('[TTS-WebSpeech] Esperando carga de voces...');
-
+    // Get voices (may need to wait for them to load)
+    let voices = window.speechSynthesis.getVoices();
+    if (voices.length === 0) {
+      // Wait for voices to load
+      await new Promise<void>((resolve) => {
         const handleVoicesChanged = () => {
-          const updatedVoices = window.speechSynthesis.getVoices();
-          console.log('[TTS-WebSpeech] Voces cargadas:', updatedVoices.length);
+          voices = window.speechSynthesis.getVoices();
+          resolve();
+        };
+        window.speechSynthesis.onvoiceschanged = handleVoicesChanged;
+        // Timeout fallback
+        setTimeout(resolve, 500);
+      });
+      voices = window.speechSynthesis.getVoices();
+    }
 
-          selectedVoice = selectBestVoice(updatedVoices, language);
-          if (selectedVoice) {
-            utterance.voice = selectedVoice;
-            utterance.lang = selectedVoice.lang;
-            console.log(`[TTS-WebSpeech] (Voces cargadas) Usando voz: ${selectedVoice.name} (${selectedVoice.lang})`);
+    const selectedVoice = selectBestVoice(voices, language);
+    if (selectedVoice) {
+      console.log(`[TTS-WebSpeech] Usando voz: ${selectedVoice.name} (${selectedVoice.lang})`);
+    }
+
+    // Speak each sentence sequentially
+    let hasCalledOnStart = false;
+
+    for (let i = 0; i < sentences.length; i++) {
+      const sentence = sentences[i];
+
+      await new Promise<void>((resolve, reject) => {
+        const utterance = new SpeechSynthesisUtterance(sentence);
+
+        if (selectedVoice) {
+          utterance.voice = selectedVoice;
+          utterance.lang = selectedVoice.lang;
+        } else {
+          utterance.lang = language;
+        }
+
+        // Robot voice settings
+        utterance.pitch = 1.4;
+        utterance.rate = 1.15;
+        utterance.volume = 1;
+
+        let hasEnded = false;
+
+        utterance.onstart = () => {
+          if (!hasCalledOnStart) {
+            hasCalledOnStart = true;
+            console.log('[TTS-WebSpeech] Reproducción iniciada.');
+            if (callbacks.onStart) callbacks.onStart();
           }
-
-          window.speechSynthesis.speak(utterance);
         };
 
-        window.speechSynthesis.onvoiceschanged = handleVoicesChanged;
+        utterance.onerror = (event) => {
+          if (hasEnded) return;
 
-        // Fallback si onvoiceschanged nunca se dispara
-        setTimeout(() => {
-          if (!window.speechSynthesis.speaking && !hasStarted) {
-            console.warn('[TTS-WebSpeech] onvoiceschanged no se disparó, intentando reproducir');
-            window.speechSynthesis.speak(utterance);
+          if (event.error === 'interrupted' || event.error === 'canceled') {
+            console.log('[TTS-WebSpeech] TTS interrumpido/cancelado');
+            hasEnded = true;
+            resolve();
+            return;
           }
-        }, 500);
-      } else {
+
+          console.error('[TTS-WebSpeech] Error:', event.error);
+          if (callbacks.onError) callbacks.onError(event);
+          reject(new Error(`TTS Error: ${event.error}`));
+        };
+
+        // Shorter timeout per sentence (10s should be plenty for one sentence)
+        const timeout = setTimeout(() => {
+          if (hasEnded) return;
+          console.warn('[TTS-WebSpeech] Timeout en oración', i + 1);
+          window.speechSynthesis.cancel();
+          hasEnded = true;
+          resolve(); // Continue to next sentence
+        }, 10000);
+
+        utterance.onend = () => {
+          if (hasEnded) return;
+          hasEnded = true;
+          clearTimeout(timeout);
+          resolve();
+        };
+
         window.speechSynthesis.speak(utterance);
-      }
-    });
+      });
+    }
+
+    console.log('[TTS-WebSpeech] Reproducción finalizada.');
+    if (callbacks.onEnd) callbacks.onEnd();
   }, []);
 
   // Método para convertir texto a voz
