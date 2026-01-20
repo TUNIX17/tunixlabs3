@@ -1,8 +1,8 @@
 # TunixLabs - Development State
 
-**Last Updated:** 2026-01-19
-**Current Phase:** Language Lock Fix
-**Sprint:** 3.5 - Voice Agent Stability
+**Last Updated:** 2026-01-20
+**Current Phase:** Transcription Validation
+**Sprint:** 3.6 - Voice Agent Quality
 
 ---
 
@@ -162,6 +162,19 @@ TunixLabs es una plataforma web de consultoria en IA con:
     - `src/lib/animation/index.ts` - Fixed BONE_GROUPS export conflict
   - [x] Build verification: npm run build succeeds
   - [x] VAD engine selection via feature flag: VAD_ENGINE='rms'|'silero'|'auto'
+- [x] **Transcription Validation System** (2026-01-20)
+  - [x] Created transcription validator to detect STT misinterpretations
+  - [x] Detects language mixing (French/German/Italian + English patterns)
+  - [x] Detects suspicious patterns like "O'Hala?", "pour fin", "What's up"
+  - [x] Robot asks to repeat instead of sending incoherent text to LLM
+  - [x] Uses Web Speech TTS directly for "didn't understand" message (no LLM call)
+  - [x] Auto-restarts listening after asking to repeat
+  - [x] Added translations for "robot.did_not_understand" message
+  - [x] Files created:
+    - `src/lib/audio/transcriptionValidator.ts` - Validation logic (~200 lines)
+  - [x] Files modified:
+    - `src/hooks/useRobotInteraction.ts` - Integrated validation before LLM call
+    - `src/lib/language/translator.ts` - Added new translation keys
 - [x] **Language Lock Fix** (2026-01-19)
   - [x] Fixed robot language switching mid-conversation from noise/STT errors
   - [x] Language now locked to page-detected language at session start

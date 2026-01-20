@@ -178,6 +178,41 @@ export const SYSTEM_MESSAGES: Record<string, Record<string, string>> = {
     nl: 'Te veel verzoeken. Even geduld.',
     pl: 'Zbyt wiele żądań. Proszę chwilę poczekać.',
     tr: 'Çok fazla istek. Lütfen bir an bekleyin.'
+  },
+  // Mensaje cuando el STT no entiende bien (transcripción incoherente)
+  'robot.did_not_understand': {
+    es: 'Disculpa, no te entendí bien. ¿Podrías repetirlo por favor?',
+    en: 'Sorry, I didn\'t quite catch that. Could you please repeat?',
+    fr: 'Désolé, je n\'ai pas bien compris. Pourriez-vous répéter ?',
+    de: 'Entschuldigung, ich habe das nicht verstanden. Könnten Sie das bitte wiederholen?',
+    it: 'Scusa, non ho capito bene. Potresti ripetere per favore?',
+    pt: 'Desculpe, não entendi bem. Poderia repetir, por favor?',
+    ar: 'عذرًا، لم أفهم جيدًا. هل يمكنك التكرار من فضلك؟',
+    zh: '抱歉，我没听清楚。您能再说一遍吗？',
+    ja: 'すみません、よく聞き取れませんでした。もう一度お願いできますか？',
+    ko: '죄송합니다, 잘 못 알아들었습니다. 다시 한번 말씀해 주시겠어요?',
+    ru: 'Извините, я не совсем понял. Не могли бы вы повторить?',
+    nl: 'Sorry, ik heb dat niet goed begrepen. Kunt u het herhalen?',
+    pl: 'Przepraszam, nie zrozumiałem. Czy mógłbyś powtórzyć?',
+    tr: 'Özür dilerim, tam anlayamadım. Tekrar edebilir misiniz?'
+  },
+  // Mensaje cuando no se detectó voz del usuario
+  'noUserSpeechDetected': {
+    es: 'No escuché nada. ¿Puedes repetir?',
+    en: 'I didn\'t hear anything. Can you repeat?',
+    fr: 'Je n\'ai rien entendu. Pouvez-vous répéter ?',
+    de: 'Ich habe nichts gehört. Können Sie das wiederholen?',
+    it: 'Non ho sentito niente. Puoi ripetere?',
+    pt: 'Não ouvi nada. Pode repetir?'
+  },
+  // Mensaje de error general
+  'generalErrorResponse': {
+    es: 'Lo siento, ocurrió un problema. ¿Podemos intentarlo de nuevo?',
+    en: 'I\'m sorry, there was a problem. Can we try again?',
+    fr: 'Désolé, il y a eu un problème. Pouvons-nous réessayer ?',
+    de: 'Es tut mir leid, es gab ein Problem. Können wir es noch einmal versuchen?',
+    it: 'Mi dispiace, c\'è stato un problema. Possiamo riprovare?',
+    pt: 'Desculpe, houve um problema. Podemos tentar de novo?'
   }
 };
 

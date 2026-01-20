@@ -9,6 +9,7 @@ import { ConversationSession, DEFAULT_SESSION_CONFIG } from '../lib/conversation
 import { AgentStateTracker, ConversationPhase, getAgentPromptCache } from '../lib/agent';
 import { BARGEIN_VAD_CONFIG } from '../lib/audio/vadConfig';
 import { PauseTracker, PauseAction } from '../lib/audio/pauseDetection';
+import { validateTranscription } from '../lib/audio/transcriptionValidator';
 
 // Mapeo de nombres de idioma a códigos ISO para normalizar detección de STT
 const LANGUAGE_NAME_TO_CODE: Record<string, string> = {
@@ -570,6 +571,76 @@ export const useRobotInteraction = ({
 
       if (recognitionResult.text) {
         console.log('[RobotInteraction] Texto reconocido:', recognitionResult.text);
+
+        // VALIDAR TRANSCRIPCIÓN - Detectar si el STT malinterpretó el audio
+        const validationResult = validateTranscription(recognitionResult.text, langForThisInteraction);
+        console.log('[RobotInteraction] Validación de transcripción:', {
+          isValid: validationResult.isValid,
+          confidence: validationResult.confidence.toFixed(2),
+          suggestedAction: validationResult.suggestedAction,
+          issues: validationResult.detectedIssues
+        });
+
+        // Si la transcripción es incoherente, pedir que repita SIN llamar al LLM
+        if (validationResult.suggestedAction === 'ask_repeat') {
+          console.log('[RobotInteraction] Transcripción incoherente detectada, pidiendo repetir');
+
+          // Detener animación de pensando
+          if (robotRef.current) {
+            robotRef.current.stopThinking();
+            executeAnimationWithCooldown(
+              () => robotRef.current?.startConfused?.(),
+              'startConfused'
+            );
+          }
+
+          // Mensaje de "no entendí"
+          const repeatMessage = translatorRef.current.translate('robot.did_not_understand', langForThisInteraction);
+          setRobotResponse(repeatMessage);
+
+          // Hablar el mensaje directamente con TTS (sin pasar por LLM)
+          if (typeof window !== 'undefined' && window.speechSynthesis) {
+            const utterance = new SpeechSynthesisUtterance(repeatMessage);
+            utterance.lang = langForThisInteraction === 'en' ? 'en-US' : 'es-ES';
+            utterance.rate = 1.15;
+            utterance.pitch = 1.4;
+
+            utterance.onstart = () => {
+              setInteractionState(RobotInteractionState.SPEAKING);
+              speakingStartTimeRef.current = Date.now();
+            };
+
+            utterance.onend = () => {
+              speakingStartTimeRef.current = null;
+              // Auto-restart listening para que el usuario pueda repetir
+              if (shouldAutoRestartRef.current && config.autoRestartListening) {
+                console.log('[RobotInteraction] Volviendo a escuchar después de pedir repetir');
+                setInteractionState(RobotInteractionState.LISTENING);
+                sessionRef.current?.startListening();
+              } else {
+                setInteractionState(RobotInteractionState.IDLE);
+              }
+            };
+
+            utterance.onerror = () => {
+              setInteractionState(RobotInteractionState.IDLE);
+            };
+
+            window.speechSynthesis.speak(utterance);
+          } else {
+            // Si no hay TTS disponible, volver a escuchar
+            if (shouldAutoRestartRef.current && config.autoRestartListening) {
+              setInteractionState(RobotInteractionState.LISTENING);
+              sessionRef.current?.startListening();
+            } else {
+              setInteractionState(RobotInteractionState.IDLE);
+            }
+          }
+
+          return; // NO continuar con el flujo normal (no llamar al LLM)
+        }
+
+        // Transcripción válida - continuar con el flujo normal
         // Extraer info del lead
         if (agentStateRef.current) {
           const extractedInfo = agentStateRef.current.extractLeadInfo(recognitionResult.text);
