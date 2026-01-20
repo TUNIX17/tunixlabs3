@@ -869,4 +869,101 @@ body {
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-} 
+}
+
+/* ===========================================
+   ORBE RESPIRANTE - Voice Button Animations
+   =========================================== */
+
+/* Animación de respiración suave para el botón */
+@keyframes orbe-breathe {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+.animate-orbe-breathe {
+  animation: orbe-breathe 2s ease-in-out infinite;
+}
+
+/* Ondas concéntricas que se expanden */
+@keyframes orbe-wave {
+  0% {
+    transform: scale(0.8);
+    opacity: 0.6;
+  }
+  100% {
+    transform: scale(1.4);
+    opacity: 0;
+  }
+}
+
+.animate-orbe-wave {
+  animation: orbe-wave 2s ease-out infinite;
+}
+
+/* Ondas más rápidas cuando está escuchando activamente */
+@keyframes orbe-wave-fast {
+  0% {
+    transform: scale(0.8);
+    opacity: 0.7;
+  }
+  100% {
+    transform: scale(1.5);
+    opacity: 0;
+  }
+}
+
+.animate-orbe-wave-fast {
+  animation: orbe-wave-fast 1s ease-out infinite;
+}
+
+/* Glow pulsante de fondo */
+@keyframes orbe-glow {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.6;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 1;
+  }
+}
+
+.animate-orbe-glow {
+  animation: orbe-glow 2s ease-in-out infinite;
+}
+
+/* Fade in para texto de estado */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.3s ease-out forwards;
+}
+
+/* Animación de barras de audio ondulantes */
+@keyframes audio-bar-wave {
+  0%, 100% {
+    transform: scaleY(0.3);
+  }
+  50% {
+    transform: scaleY(1);
+  }
+}
+
+.animate-audio-bar {
+  animation: audio-bar-wave 0.5s ease-in-out infinite;
+  transform-origin: bottom;
+}

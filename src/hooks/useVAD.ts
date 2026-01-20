@@ -88,6 +88,9 @@ export interface UseVADReturn {
   /** Whether fallback was used (tried silero but fell back to rms) */
   usedFallback: boolean;
 
+  /** Whether the VAD model is pre-loaded and ready for instant start */
+  isPreloaded: boolean;
+
   /** Iniciar deteccion de voz */
   startVAD: () => Promise<void>;
 
@@ -236,9 +239,17 @@ export const useVAD = (options: UseVADOptions = {}): UseVADReturn => {
         // This ensures the model is ready when user clicks the mic button
         if (result.vad.preload && result.engineType === 'silero') {
           console.log('[useVAD] Starting background pre-load of Silero model...');
-          result.vad.preload().catch((err) => {
-            console.warn('[useVAD] Background pre-load failed (will load on first use):', err);
-          });
+          result.vad.preload()
+            .then(() => {
+              console.log('[useVAD] Silero model pre-loaded successfully - instant start ready');
+              setIsPreloaded(true);
+            })
+            .catch((err) => {
+              console.warn('[useVAD] Background pre-load failed (will load on first use):', err);
+            });
+        } else if (result.engineType === 'rms') {
+          // RMS VAD doesn't need pre-loading, it's always ready
+          setIsPreloaded(true);
         }
 
         // Register callbacks
@@ -417,6 +428,7 @@ export const useVAD = (options: UseVADOptions = {}): UseVADReturn => {
     noiseFloor,
     engineType,
     usedFallback,
+    isPreloaded,
     startVAD,
     stopVAD,
     setThreshold,
