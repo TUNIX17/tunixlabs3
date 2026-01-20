@@ -387,3 +387,19 @@ export const LISTENING_PARAMS = {
     amplitude: 0.03,
   },
 };
+
+// ============================================
+// LÍMITES DE ROTACIÓN SEGUROS
+// Evitan giros de 360° cuando el modelo tiene rotaciones iniciales cercanas a ±π
+// ============================================
+export const ROTATION_LIMITS = {
+  head: {
+    maxY: Math.PI * 0.4,  // ±72 grados - rango horizontal
+    maxX: Math.PI * 0.3,  // ±54 grados - rango vertical (asentir)
+    maxZ: Math.PI * 0.15, // ±27 grados - rango de inclinación lateral
+  },
+  neck: {
+    maxY: Math.PI * 0.25, // ±45 grados
+    maxX: Math.PI * 0.2,  // ±36 grados
+  },
+};

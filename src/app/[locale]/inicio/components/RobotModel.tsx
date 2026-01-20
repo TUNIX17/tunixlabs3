@@ -35,6 +35,7 @@ import {
   ANIMATION_CONFIGS,
   IDLE_PARAMS,
   CURSOR_TRACKING,
+  ROTATION_LIMITS,
 } from '../../../../lib/animation';
 import { easeInOutQuad, easeOutBack } from '../../../../lib/animation/easingFunctions';
 
@@ -282,14 +283,25 @@ const AnimatedRobotModel = forwardRef<RobotMethods, { onLoad?: () => void; isLis
           const reducedSensitivity = 0.3; // Solo 30% de sensibilidad normal
 
           // Target: posición base atenta + micro-movimientos + leve cursor influence
-          const targetX = initialRotations.current.head.x + attentiveForwardTilt + microNod - (mouseY * sensitivityY * reducedSensitivity);
-          const targetY = initialRotations.current.head.y + (mouseX * sensitivityX * reducedSensitivity);
-          const targetZ = initialRotations.current.head.z + microTilt;
+          // NOTA: Usar 0 como base para Y en lugar de initialRotations para evitar giros 360°
+          // El modelo puede tener rotaciones iniciales cercanas a ±π que causan problemas de interpolación
+          const baseX = initialRotations.current.head.x;
+          const baseY = 0; // Forzar Y a 0 como base para evitar giro 360°
+          const baseZ = initialRotations.current.head.z;
+
+          const targetX = baseX + attentiveForwardTilt + microNod - (mouseY * sensitivityY * reducedSensitivity);
+          const targetY = baseY + (mouseX * sensitivityX * reducedSensitivity);
+          const targetZ = baseZ + microTilt;
+
+          // Limitar rotaciones a rangos seguros (evitar valores cercanos a ±π)
+          const clampedTargetX = THREE.MathUtils.clamp(targetX, -ROTATION_LIMITS.head.maxX, ROTATION_LIMITS.head.maxX);
+          const clampedTargetY = THREE.MathUtils.clamp(targetY, -ROTATION_LIMITS.head.maxY, ROTATION_LIMITS.head.maxY);
+          const clampedTargetZ = THREE.MathUtils.clamp(targetZ, -ROTATION_LIMITS.head.maxZ, ROTATION_LIMITS.head.maxZ);
 
           // Aplicar con lerp muy suave para movimiento fluido
-          headRef.current.rotation.x = THREE.MathUtils.lerp(headRef.current.rotation.x, targetX, attentiveLerp);
-          headRef.current.rotation.y = THREE.MathUtils.lerp(headRef.current.rotation.y, targetY, attentiveLerp);
-          headRef.current.rotation.z = THREE.MathUtils.lerp(headRef.current.rotation.z, targetZ, microLerp);
+          headRef.current.rotation.x = THREE.MathUtils.lerp(headRef.current.rotation.x, clampedTargetX, attentiveLerp);
+          headRef.current.rotation.y = THREE.MathUtils.lerp(headRef.current.rotation.y, clampedTargetY, attentiveLerp);
+          headRef.current.rotation.z = THREE.MathUtils.lerp(headRef.current.rotation.z, clampedTargetZ, microLerp);
         }
 
         // === CUELLO - COMPLEMENTA EL MOVIMIENTO DE CABEZA ===
@@ -297,11 +309,19 @@ const AnimatedRobotModel = forwardRef<RobotMethods, { onLoad?: () => void; isLis
           // El cuello sigue ligeramente el movimiento, con delay natural
           const neckMicroNod = Math.sin((time - 0.2) * attentiveNodFreq) * (microNodAmplitude * 0.5);
 
-          const targetNeckX = initialRotations.current.neck.x + neckMicroNod;
-          const targetNeckY = initialRotations.current.neck.y + (mouseX * 0.02); // Muy sutil
+          // Usar 0 como base para Y para evitar giros 360°
+          const neckBaseX = initialRotations.current.neck.x;
+          const neckBaseY = 0;
 
-          neckRef.current.rotation.x = THREE.MathUtils.lerp(neckRef.current.rotation.x, targetNeckX, microLerp);
-          neckRef.current.rotation.y = THREE.MathUtils.lerp(neckRef.current.rotation.y, targetNeckY, microLerp);
+          const targetNeckX = neckBaseX + neckMicroNod;
+          const targetNeckY = neckBaseY + (mouseX * 0.02); // Muy sutil
+
+          // Limitar rotaciones del cuello
+          const clampedNeckX = THREE.MathUtils.clamp(targetNeckX, -ROTATION_LIMITS.neck.maxX, ROTATION_LIMITS.neck.maxX);
+          const clampedNeckY = THREE.MathUtils.clamp(targetNeckY, -ROTATION_LIMITS.neck.maxY, ROTATION_LIMITS.neck.maxY);
+
+          neckRef.current.rotation.x = THREE.MathUtils.lerp(neckRef.current.rotation.x, clampedNeckX, microLerp);
+          neckRef.current.rotation.y = THREE.MathUtils.lerp(neckRef.current.rotation.y, clampedNeckY, microLerp);
         }
 
         // === RESPIRACIÓN SUTIL - INDICA QUE ESTÁ VIVO ===
@@ -365,23 +385,38 @@ const AnimatedRobotModel = forwardRef<RobotMethods, { onLoad?: () => void; isLis
 
         // Cursor tracking para cabeza - SIN efectos especiales de listening
         // El robot mantiene el mismo comportamiento en idle y listening
+        // NOTA: Usar 0 como base para Y para evitar giros 360° cuando el modelo tiene rotaciones iniciales extremas
         if (headRef.current && initialRotations.current.head) {
           const { sensitivityX, sensitivityY, lerpFactor: headLerp } = CURSOR_TRACKING.head;
-          const targetRotationY = initialRotations.current.head.y + mouseX * sensitivityX;
+          // Usar 0 como base para Y en lugar de initialRotations.current.head.y
+          const baseY = 0;
+          const targetRotationY = baseY + mouseX * sensitivityX;
           const targetRotationX = initialRotations.current.head.x - mouseY * sensitivityY;
           const targetRotationZ = initialRotations.current.head.z;
-          headRef.current.rotation.y = THREE.MathUtils.lerp(headRef.current.rotation.y, targetRotationY, headLerp);
-          headRef.current.rotation.x = THREE.MathUtils.lerp(headRef.current.rotation.x, targetRotationX, headLerp);
+
+          // Limitar rotaciones a rangos seguros
+          const clampedY = THREE.MathUtils.clamp(targetRotationY, -ROTATION_LIMITS.head.maxY, ROTATION_LIMITS.head.maxY);
+          const clampedX = THREE.MathUtils.clamp(targetRotationX, -ROTATION_LIMITS.head.maxX, ROTATION_LIMITS.head.maxX);
+
+          headRef.current.rotation.y = THREE.MathUtils.lerp(headRef.current.rotation.y, clampedY, headLerp);
+          headRef.current.rotation.x = THREE.MathUtils.lerp(headRef.current.rotation.x, clampedX, headLerp);
           headRef.current.rotation.z = THREE.MathUtils.lerp(headRef.current.rotation.z, targetRotationZ, headLerp);
         }
 
         if (neckRef.current && initialRotations.current.neck) {
           const { sensitivityX, sensitivityY, lerpFactor: neckLerp } = CURSOR_TRACKING.neck;
-          const targetRotationY = initialRotations.current.neck.y + mouseX * sensitivityX;
+          // Usar 0 como base para Y
+          const baseY = 0;
+          const targetRotationY = baseY + mouseX * sensitivityX;
           const targetRotationX = initialRotations.current.neck.x - mouseY * sensitivityY;
           const targetRotationZ = initialRotations.current.neck.z;
-          neckRef.current.rotation.y = THREE.MathUtils.lerp(neckRef.current.rotation.y, targetRotationY, neckLerp);
-          neckRef.current.rotation.x = THREE.MathUtils.lerp(neckRef.current.rotation.x, targetRotationX, neckLerp);
+
+          // Limitar rotaciones del cuello
+          const clampedNeckY = THREE.MathUtils.clamp(targetRotationY, -ROTATION_LIMITS.neck.maxY, ROTATION_LIMITS.neck.maxY);
+          const clampedNeckX = THREE.MathUtils.clamp(targetRotationX, -ROTATION_LIMITS.neck.maxX, ROTATION_LIMITS.neck.maxX);
+
+          neckRef.current.rotation.y = THREE.MathUtils.lerp(neckRef.current.rotation.y, clampedNeckY, neckLerp);
+          neckRef.current.rotation.x = THREE.MathUtils.lerp(neckRef.current.rotation.x, clampedNeckX, neckLerp);
           neckRef.current.rotation.z = THREE.MathUtils.lerp(neckRef.current.rotation.z, targetRotationZ, neckLerp);
         }
 
