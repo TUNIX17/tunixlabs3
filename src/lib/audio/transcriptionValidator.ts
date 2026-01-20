@@ -7,21 +7,56 @@
  * Palabras comunes en español que el STT debería reconocer correctamente
  */
 const COMMON_SPANISH_WORDS = new Set([
+  // Saludos y expresiones básicas
   'hola', 'que', 'como', 'bien', 'si', 'no', 'gracias', 'por', 'favor',
-  'bueno', 'claro', 'ojalá', 'ojala', 'vale', 'ok', 'okay', 'entiendo',
+  'bueno', 'claro', 'ojala', 'vale', 'ok', 'okay', 'entiendo', 'perfecto',
+  'genial', 'excelente', 'adios', 'hasta', 'luego', 'buenos', 'dias',
+  'tardes', 'noches', 'bienvenido', 'bienvenidos',
+  // Verbos comunes
   'quiero', 'necesito', 'puedo', 'tengo', 'hay', 'es', 'soy', 'estoy',
-  'me', 'te', 'se', 'le', 'lo', 'la', 'los', 'las', 'un', 'una',
-  'el', 'ella', 'nosotros', 'ustedes', 'ellos', 'mi', 'tu', 'su',
-  'pero', 'porque', 'cuando', 'donde', 'como', 'cual', 'quien',
-  'muy', 'mas', 'menos', 'mucho', 'poco', 'todo', 'nada', 'algo',
-  'ahora', 'luego', 'despues', 'antes', 'siempre', 'nunca',
-  'aqui', 'ahi', 'alli', 'cerca', 'lejos', 'arriba', 'abajo',
-  'empresa', 'negocio', 'trabajo', 'proyecto', 'sistema', 'datos',
-  'ayuda', 'información', 'informacion', 'servicio', 'consulta',
-  'automatizar', 'inteligencia', 'artificial', 'chatbot', 'robot',
-  'reunión', 'reunion', 'llamada', 'cita', 'agendar', 'contacto',
-  'precio', 'costo', 'presupuesto', 'tiempo', 'semana', 'mes',
-  'nombre', 'email', 'correo', 'teléfono', 'telefono', 'número', 'numero'
+  'tienen', 'tenemos', 'hacen', 'hacemos', 'hace', 'hago', 'dan', 'damos',
+  'ofrecen', 'ofrece', 'ofrecemos', 'trabajan', 'trabajamos', 'trabaja',
+  'pueden', 'podemos', 'puede', 'saben', 'sabemos', 'sabe', 'estan',
+  'son', 'somos', 'ser', 'estar', 'tener', 'hacer', 'poder', 'saber',
+  'ver', 'veo', 'ves', 'vemos', 'ven', 'decir', 'digo', 'dice', 'dicen',
+  'ir', 'voy', 'vas', 'va', 'vamos', 'van', 'querer', 'buscar', 'busco',
+  'buscas', 'busca', 'buscamos', 'buscan', 'usar', 'uso', 'usas', 'usa',
+  'usamos', 'usan', 'ayudar', 'ayudo', 'ayuda', 'ayudamos', 'ayudan',
+  'conocer', 'conozco', 'conoce', 'conocemos', 'conocen',
+  // Pronombres y artículos
+  'me', 'te', 'se', 'le', 'lo', 'la', 'los', 'las', 'un', 'una', 'unos', 'unas',
+  'el', 'ella', 'nosotros', 'ustedes', 'ellos', 'mi', 'tu', 'su', 'mis', 'tus', 'sus',
+  'este', 'esta', 'estos', 'estas', 'ese', 'esa', 'esos', 'esas',
+  'yo', 'vos', 'usted', 'les', 'nos',
+  // Conjunciones y preposiciones
+  'pero', 'porque', 'cuando', 'donde', 'cual', 'quien', 'cuales', 'quienes',
+  'con', 'sin', 'para', 'hacia', 'desde', 'hasta', 'entre', 'sobre', 'bajo',
+  'de', 'del', 'al', 'en', 'a', 'y', 'o', 'u', 'ni', 'que', 'si', 'aunque',
+  // Adverbios
+  'muy', 'mas', 'menos', 'mucho', 'poco', 'todo', 'nada', 'algo', 'alguien',
+  'ahora', 'despues', 'antes', 'siempre', 'nunca', 'ya', 'todavia', 'aun',
+  'aqui', 'ahi', 'alli', 'cerca', 'lejos', 'arriba', 'abajo', 'dentro', 'fuera',
+  'tambien', 'solo', 'solamente', 'realmente', 'actualmente', 'normalmente',
+  // Sustantivos de negocio/tecnología
+  'empresa', 'negocio', 'trabajo', 'proyecto', 'sistema', 'datos', 'web',
+  'ayuda', 'informacion', 'servicio', 'servicios', 'consulta', 'consultoria',
+  'automatizar', 'automatizacion', 'inteligencia', 'artificial', 'chatbot', 'robot',
+  'reunion', 'llamada', 'cita', 'agendar', 'contacto', 'demo', 'demostracion',
+  'precio', 'costo', 'presupuesto', 'tiempo', 'semana', 'mes', 'ano', 'dia',
+  'nombre', 'email', 'correo', 'telefono', 'numero', 'direccion', 'sitio',
+  'pagina', 'aplicacion', 'app', 'software', 'plataforma', 'solucion', 'soluciones',
+  'cliente', 'clientes', 'usuario', 'usuarios', 'equipo', 'producto', 'productos',
+  // Preguntas comunes
+  'cuanto', 'cuantos', 'cuanta', 'cuantas', 'cual', 'cuales', 'como', 'que',
+  'donde', 'cuando', 'porque', 'quien', 'quienes',
+  // Números básicos
+  'uno', 'dos', 'tres', 'cuatro', 'cinco', 'seis', 'siete', 'ocho', 'nueve', 'diez',
+  'primero', 'segundo', 'tercero', 'varios', 'algunos', 'muchos', 'pocos',
+  // Adjetivos comunes
+  'buena', 'buenas', 'malo', 'mala', 'grande', 'pequeno', 'nuevo', 'nueva',
+  'mejor', 'peor', 'mayor', 'menor', 'mismo', 'misma', 'otro', 'otra', 'otros', 'otras',
+  'rapido', 'lento', 'facil', 'dificil', 'posible', 'imposible', 'disponible',
+  'interesado', 'interesada', 'interesante', 'importante', 'necesario', 'necesaria'
 ]);
 
 /**
@@ -161,16 +196,20 @@ export function validateTranscription(
   }
 
   // Detectar caracteres extraños o no-alfanuméricos excesivos
-  const alphanumericRatio = (text.replace(/[^a-záéíóúüñ\s]/gi, '').length) / text.length;
-  if (alphanumericRatio < 0.7) {
+  // Incluir puntuación española normal: ¿¡ y puntuación común
+  const alphanumericRatio = (text.replace(/[^a-záéíóúüñ\s.,!?¿¡;:'"()-]/gi, '').length) / text.length;
+  if (alphanumericRatio < 0.6) {
     confidence -= 0.2;
     issues.push('excessive_special_characters');
   }
 
   // Detectar preguntas con estructura extraña
-  if (text.includes('?') && /[A-Z][a-z]+\s*\?/.test(text)) {
-    // Nombres propios seguidos de signos de interrogación (como "O'Hala?")
-    if (!/^(qué|que|cómo|como|cuándo|cuando|dónde|donde|quién|quien|what|how|when|where|who)/i.test(text)) {
+  // NOTA: En español las preguntas usan ¿? y pueden empezar con afirmaciones
+  // Ej: "Sí, ¿qué servicios tienen?" es perfectamente válido
+  if (text.includes('?') && !text.includes('¿')) {
+    // Solo preguntas en formato inglés (sin ¿) con estructura rara
+    // Patrón: nombre propio solo seguido de "?" (como "O'Hala?")
+    if (/^[A-Z][a-z']+\s*\?$/.test(text.trim())) {
       confidence -= 0.2;
       issues.push('unusual_question_structure');
     }
@@ -206,6 +245,15 @@ export function validateTranscription(
 }
 
 /**
+ * Normaliza texto removiendo tildes para comparación
+ */
+function normalizeAccents(text: string): string {
+  return text
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '');
+}
+
+/**
  * Cuenta palabras válidas en el idioma esperado
  */
 function countValidWords(words: string[], language: string): number {
@@ -214,7 +262,8 @@ function countValidWords(words: string[], language: string): number {
   const otherSet = language === 'en' ? COMMON_SPANISH_WORDS : COMMON_ENGLISH_WORDS;
 
   return words.filter(word => {
-    const cleanWord = word.replace(/[.,!?;:'"]/g, '').toLowerCase();
+    // Limpiar puntuación y normalizar tildes
+    const cleanWord = normalizeAccents(word.replace(/[.,!?;:'"¿¡]/g, '')).toLowerCase();
     return wordSet.has(cleanWord) || otherSet.has(cleanWord) || cleanWord.length <= 2;
   }).length;
 }
