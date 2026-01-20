@@ -27,6 +27,10 @@ export interface UnifiedVAD {
   off(event: VADEvent, callback?: VADCallback): void;
   updateConfig(config: Partial<VADConfig | SileroVADConfig>): void;
   getConfig(): VADConfig | SileroVADConfig;
+  /** Pre-load resources (e.g., ML models) without starting microphone */
+  preload?(): Promise<void>;
+  /** Check if resources are pre-loaded */
+  isModelPreloaded?(): boolean;
 }
 
 /** Factory configuration */

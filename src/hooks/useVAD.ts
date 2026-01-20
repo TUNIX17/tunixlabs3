@@ -158,6 +158,8 @@ export const useVAD = (options: UseVADOptions = {}): UseVADReturn => {
   // Engine type tracking
   const [engineType, setEngineType] = useState<'rms' | 'silero' | null>(null);
   const [usedFallback, setUsedFallback] = useState(false);
+  // Pre-load state - true when model is loaded and ready for instant start
+  const [isPreloaded, setIsPreloaded] = useState(false);
 
   // Referencia al detector VAD (unified interface)
   const vadRef = useRef<UnifiedVAD | null>(null);
@@ -229,6 +231,15 @@ export const useVAD = (options: UseVADOptions = {}): UseVADReturn => {
         isInitializedRef.current = true;
 
         console.log(`[useVAD] Initialized with engine: ${result.engineType}${result.usedFallback ? ' (fallback)' : ''}`);
+
+        // PRE-LOAD: Start loading the model in background immediately
+        // This ensures the model is ready when user clicks the mic button
+        if (result.vad.preload && result.engineType === 'silero') {
+          console.log('[useVAD] Starting background pre-load of Silero model...');
+          result.vad.preload().catch((err) => {
+            console.warn('[useVAD] Background pre-load failed (will load on first use):', err);
+          });
+        }
 
         // Register callbacks
         vadRef.current.on('speech_start', () => {

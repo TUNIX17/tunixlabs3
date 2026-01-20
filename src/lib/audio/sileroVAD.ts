@@ -82,6 +82,11 @@ export class SileroVADWrapper {
   private volumeInterval: ReturnType<typeof setInterval> | null = null;
   private dataArray: Uint8Array | null = null;
 
+  // Pre-loading state - modelo cargado antes de start()
+  private isPreloaded: boolean = false;
+  private preloadPromise: Promise<void> | null = null;
+  private vadModule: typeof import('@ricky0123/vad-web') | null = null;
+
   constructor(config: Partial<SileroVADConfig> = {}) {
     this.config = { ...DEFAULT_SILERO_CONFIG, ...config };
     this.state = {
@@ -98,6 +103,70 @@ export class SileroVADWrapper {
   }
 
   /**
+   * Pre-load the Silero model without starting the microphone
+   * Call this early (e.g., on page load) to avoid delay when user clicks the mic button
+   */
+  async preload(): Promise<void> {
+    // If already preloaded or preloading, return existing promise
+    if (this.isPreloaded) {
+      console.log('[SileroVAD] Already preloaded');
+      return;
+    }
+
+    if (this.preloadPromise) {
+      console.log('[SileroVAD] Preload already in progress, waiting...');
+      return this.preloadPromise;
+    }
+
+    this.preloadPromise = this._doPreload();
+    return this.preloadPromise;
+  }
+
+  private async _doPreload(): Promise<void> {
+    try {
+      console.log('[SileroVAD] Pre-loading Silero model...');
+      const startTime = performance.now();
+
+      // Dynamic import the module
+      this.vadModule = await import('@ricky0123/vad-web');
+
+      // Pre-load the ONNX model by creating a temporary MicVAD
+      // We'll use startOnLoad: false and not actually start it
+      // This downloads and initializes the ONNX model
+      const tempVad = await this.vadModule.MicVAD.new({
+        positiveSpeechThreshold: this.config.positiveSpeechThreshold,
+        negativeSpeechThreshold: this.config.negativeSpeechThreshold,
+        model: 'legacy',
+        baseAssetPath: '/onnx/',
+        onnxWASMBasePath: '/onnx/',
+        startOnLoad: false,
+        // Dummy callbacks - these won't be called since we're not starting
+        onSpeechStart: () => {},
+        onSpeechEnd: () => {},
+        onVADMisfire: () => {}
+      });
+
+      // Immediately pause/cleanup the temp instance
+      tempVad.pause();
+
+      this.isPreloaded = true;
+      const elapsed = Math.round(performance.now() - startTime);
+      console.log(`[SileroVAD] Model pre-loaded successfully in ${elapsed}ms`);
+    } catch (error) {
+      console.error('[SileroVAD] Pre-load failed:', error);
+      this.preloadPromise = null;
+      throw error;
+    }
+  }
+
+  /**
+   * Check if the model is pre-loaded
+   */
+  isModelPreloaded(): boolean {
+    return this.isPreloaded;
+  }
+
+  /**
    * Start Silero VAD - requests microphone and begins listening
    */
   async start(): Promise<void> {
@@ -107,14 +176,20 @@ export class SileroVADWrapper {
     }
 
     try {
-      // Dynamic import to avoid SSR issues
-      const vadModule = await import('@ricky0123/vad-web');
-      const { MicVAD } = vadModule;
-
-      // Emit calibration start (Silero loads model)
+      // Emit calibration start
       this.state.isCalibrating = true;
       this.emit('calibration_start');
-      console.log('[SileroVAD] Loading Silero model...');
+
+      // Use pre-loaded module if available, otherwise load now
+      let vadModule: typeof import('@ricky0123/vad-web');
+      if (this.vadModule && this.isPreloaded) {
+        console.log('[SileroVAD] Using pre-loaded module (fast start)');
+        vadModule = this.vadModule;
+      } else {
+        console.log('[SileroVAD] Loading Silero model (not pre-loaded)...');
+        vadModule = await import('@ricky0123/vad-web');
+      }
+      const { MicVAD } = vadModule;
 
       // Create MicVAD instance with custom paths for ONNX model
       // baseAssetPath is used for: worklet file + model file
