@@ -4,7 +4,7 @@ import dynamic from 'next/dynamic';
 // Importar dinámicamente el modelo de robot para evitar errores de SSR
 // RobotModel ahora incluye toda la lógica de interacción integrada
 // El TerminalLoading se maneja internamente en RobotModel
-const RobotModel = dynamic(() => import('./RobotModel'), {
+const RobotModel = dynamic(() => import('@/components/RobotModel'), {
   ssr: false,
   loading: () => null, // RobotModel handles its own loading state with TerminalLoading
 });

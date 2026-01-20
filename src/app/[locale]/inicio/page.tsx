@@ -9,7 +9,7 @@ import { BsWhatsapp } from 'react-icons/bs';
 import React from 'react';
 import dynamic from 'next/dynamic';
 
-const RobotModel = dynamic(() => import('./components/RobotModel'), {
+const RobotModel = dynamic(() => import('@/components/RobotModel'), {
   ssr: false,
   loading: () => null, // RobotModel handles its own loading with TerminalLoading
 });

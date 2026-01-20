@@ -9,13 +9,9 @@ import React from 'react';
 import dynamic from 'next/dynamic';
 
 // Carga dinámica del componente RobotModel para evitar errores de SSR
-const RobotModel = dynamic(() => import('./components/RobotModel'), {
+const RobotModel = dynamic(() => import('@/components/RobotModel'), {
   ssr: false,
-  loading: () => (
-    <div className="w-full h-full flex items-center justify-center">
-      <div className="text-blue-600 text-lg">Cargando modelo 3D...</div>
-    </div>
-  )
+  loading: () => null, // RobotModel handles its own loading with TerminalLoading
 });
 
 export default function HomePage() {
