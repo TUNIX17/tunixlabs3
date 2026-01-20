@@ -300,97 +300,118 @@ const AnimatedRobotModel = forwardRef<RobotMethods, { onLoad?: () => void; isLis
         smoothRotationManagerRef.current.updateAll(delta);
       }
 
-      // Durante interacción activa: animaciones de "escucha atenta" naturales
-      // El robot muestra que está prestando atención con movimientos sutiles y orgánicos
+      // Durante interacción activa: animaciones de "escucha atenta" visibles
+      // El robot NO sigue el cursor, hace movimientos autónomos naturales
       if (isInteractionActive) {
-        const mouseX = THREE.MathUtils.clamp(mouse.x, -1, 1);
-        const mouseY = THREE.MathUtils.clamp(mouse.y, -1, 1);
+        // === PARÁMETROS DE ANIMACIÓN CONVERSACIONAL ===
+        const conversationLerp = 0.04; // Suave pero visible
+        const smoothLerp = 0.03;
 
-        // === PARÁMETROS DE ESCUCHA ATENTA ===
-        // Lerp factor muy bajo para movimientos lentos y suaves
-        const attentiveLerp = 0.02; // Muy lento - movimiento fluido
-        const microLerp = 0.015; // Aún más lento para micro-movimientos
+        // Frecuencias variadas para movimientos orgánicos
+        const nodFreq = 0.8;      // Cabeceo arriba/abajo
+        const tiltFreq = 0.5;     // Inclinación lateral
+        const lookAroundFreq = 0.3; // Mirar alrededor
+        const breathFreq = 0.6;   // Respiración
 
-        // Micro-movimientos autónomos que simulan atención activa
-        // Frecuencias muy bajas para evitar aspecto mecánico
-        const attentiveNodFreq = 0.3; // Micro-asentimiento muy lento
-        const attentiveTiltFreq = 0.15; // Inclinación aún más lenta
+        // Amplitudes visibles pero naturales (en radianes)
+        const nodAmplitude = 0.12;      // ~7 grados - cabeceo notable
+        const tiltAmplitude = 0.08;     // ~4.5 grados - inclinación lateral
+        const lookAroundAmplitude = 0.15; // ~8.5 grados - mirar lados
+        const armSwayAmplitude = 0.05;  // Movimiento sutil de brazos
 
-        // Amplitudes muy sutiles - casi imperceptibles pero dan vida
-        const microNodAmplitude = 0.015; // Sutil movimiento vertical
-        const microTiltAmplitude = 0.008; // Leve inclinación lateral
-
-        // === CABEZA - ESCUCHA ATENTA ===
+        // === CABEZA - MOVIMIENTOS CONVERSACIONALES ===
         if (headRef.current && initialRotations.current.head) {
-          // Posición base: ligeramente inclinada hacia adelante (atención)
-          const attentiveForwardTilt = 0.05; // Inclinación sutil hacia adelante
+          // Cabeceo arriba/abajo (como asintiendo mientras escucha)
+          const nod = Math.sin(time * nodFreq) * nodAmplitude;
 
-          // Micro-asentimiento muy sutil (como cuando escuchas y asientes ligeramente)
-          const microNod = Math.sin(time * attentiveNodFreq) * microNodAmplitude;
+          // Inclinación lateral (como ladeando la cabeza pensativo)
+          const tilt = Math.sin(time * tiltFreq + 1.5) * tiltAmplitude;
 
-          // Micro-inclinación lateral (como cuando lades la cabeza para escuchar mejor)
-          const microTilt = Math.sin(time * attentiveTiltFreq) * microTiltAmplitude;
+          // Mirar lentamente a los lados (como pensando)
+          const lookAround = Math.sin(time * lookAroundFreq) * lookAroundAmplitude;
 
-          // Cursor tracking MUY reducido - solo miradas ocasionales, no seguimiento constante
-          const { sensitivityX, sensitivityY } = CURSOR_TRACKING.head;
-          const reducedSensitivity = 0.3; // Solo 30% de sensibilidad normal
+          // Posición base inclinada hacia adelante (atención)
+          const forwardTilt = 0.1; // ~5.7 grados hacia adelante
 
-          // Target: posición base atenta + micro-movimientos + leve cursor influence
-          // NOTA: Usar 0 como base para Y en lugar de initialRotations para evitar giros 360°
-          // El modelo puede tener rotaciones iniciales cercanas a ±π que causan problemas de interpolación
-          const baseX = initialRotations.current.head.x;
-          const baseY = 0; // Forzar Y a 0 como base para evitar giro 360°
-          const baseZ = initialRotations.current.head.z;
+          // Usar 0 como base para Y para evitar giro 360°
+          const targetX = initialRotations.current.head.x + forwardTilt + nod;
+          const targetY = lookAround; // Sin seguimiento de cursor
+          const targetZ = initialRotations.current.head.z + tilt;
 
-          const targetX = baseX + attentiveForwardTilt + microNod - (mouseY * sensitivityY * reducedSensitivity);
-          const targetY = baseY + (mouseX * sensitivityX * reducedSensitivity);
-          const targetZ = baseZ + microTilt;
+          // Limitar rotaciones a rangos seguros
+          const clampedX = THREE.MathUtils.clamp(targetX, -ROTATION_LIMITS.head.maxX, ROTATION_LIMITS.head.maxX);
+          const clampedY = THREE.MathUtils.clamp(targetY, -ROTATION_LIMITS.head.maxY, ROTATION_LIMITS.head.maxY);
+          const clampedZ = THREE.MathUtils.clamp(targetZ, -ROTATION_LIMITS.head.maxZ, ROTATION_LIMITS.head.maxZ);
 
-          // Limitar rotaciones a rangos seguros (evitar valores cercanos a ±π)
-          const clampedTargetX = THREE.MathUtils.clamp(targetX, -ROTATION_LIMITS.head.maxX, ROTATION_LIMITS.head.maxX);
-          const clampedTargetY = THREE.MathUtils.clamp(targetY, -ROTATION_LIMITS.head.maxY, ROTATION_LIMITS.head.maxY);
-          const clampedTargetZ = THREE.MathUtils.clamp(targetZ, -ROTATION_LIMITS.head.maxZ, ROTATION_LIMITS.head.maxZ);
-
-          // Aplicar con lerp muy suave para movimiento fluido
-          headRef.current.rotation.x = THREE.MathUtils.lerp(headRef.current.rotation.x, clampedTargetX, attentiveLerp);
-          headRef.current.rotation.y = THREE.MathUtils.lerp(headRef.current.rotation.y, clampedTargetY, attentiveLerp);
-          headRef.current.rotation.z = THREE.MathUtils.lerp(headRef.current.rotation.z, clampedTargetZ, microLerp);
+          headRef.current.rotation.x = THREE.MathUtils.lerp(headRef.current.rotation.x, clampedX, conversationLerp);
+          headRef.current.rotation.y = THREE.MathUtils.lerp(headRef.current.rotation.y, clampedY, conversationLerp);
+          headRef.current.rotation.z = THREE.MathUtils.lerp(headRef.current.rotation.z, clampedZ, smoothLerp);
         }
 
-        // === CUELLO - COMPLEMENTA EL MOVIMIENTO DE CABEZA ===
+        // === CUELLO - COMPLEMENTA CABEZA CON DELAY ===
         if (neckRef.current && initialRotations.current.neck) {
-          // El cuello sigue ligeramente el movimiento, con delay natural
-          const neckMicroNod = Math.sin((time - 0.2) * attentiveNodFreq) * (microNodAmplitude * 0.5);
+          // El cuello sigue la cabeza con un pequeño delay (más natural)
+          const neckNod = Math.sin((time - 0.3) * nodFreq) * (nodAmplitude * 0.4);
+          const neckLook = Math.sin((time - 0.2) * lookAroundFreq) * (lookAroundAmplitude * 0.3);
 
-          // Usar 0 como base para Y para evitar giros 360°
-          const neckBaseX = initialRotations.current.neck.x;
-          const neckBaseY = 0;
+          const targetNeckX = initialRotations.current.neck.x + neckNod;
+          const targetNeckY = neckLook;
 
-          const targetNeckX = neckBaseX + neckMicroNod;
-          const targetNeckY = neckBaseY + (mouseX * 0.02); // Muy sutil
-
-          // Limitar rotaciones del cuello
           const clampedNeckX = THREE.MathUtils.clamp(targetNeckX, -ROTATION_LIMITS.neck.maxX, ROTATION_LIMITS.neck.maxX);
           const clampedNeckY = THREE.MathUtils.clamp(targetNeckY, -ROTATION_LIMITS.neck.maxY, ROTATION_LIMITS.neck.maxY);
 
-          neckRef.current.rotation.x = THREE.MathUtils.lerp(neckRef.current.rotation.x, clampedNeckX, microLerp);
-          neckRef.current.rotation.y = THREE.MathUtils.lerp(neckRef.current.rotation.y, clampedNeckY, microLerp);
+          neckRef.current.rotation.x = THREE.MathUtils.lerp(neckRef.current.rotation.x, clampedNeckX, smoothLerp);
+          neckRef.current.rotation.y = THREE.MathUtils.lerp(neckRef.current.rotation.y, clampedNeckY, smoothLerp);
         }
 
-        // === RESPIRACIÓN SUTIL - INDICA QUE ESTÁ VIVO ===
+        // === BRAZOS - MOVIMIENTO SUTIL MIENTRAS CONVERSA ===
+        if (shoulderLeftRef.current && shoulderRightRef.current && targetArmRestingRotations.shoulder_left) {
+          // Balanceo sutil de hombros (como gestos al hablar)
+          const armSway = Math.sin(time * 0.7) * armSwayAmplitude;
+          const armSwayOffset = Math.sin(time * 0.7 + Math.PI) * armSwayAmplitude; // Opuesto para el otro brazo
+
+          shoulderLeftRef.current.rotation.x = THREE.MathUtils.lerp(
+            shoulderLeftRef.current.rotation.x,
+            targetArmRestingRotations.shoulder_left.x + armSway,
+            smoothLerp
+          );
+          shoulderRightRef.current.rotation.x = THREE.MathUtils.lerp(
+            shoulderRightRef.current.rotation.x,
+            targetArmRestingRotations.shoulder_right.x + armSwayOffset,
+            smoothLerp
+          );
+        }
+
+        // === CUERPO - RESPIRACIÓN Y BALANCEO ===
         if (bodyTop1Ref.current && initialRotations.current.body_top1) {
-          const breathAmplitude = 0.004; // Muy sutil
-          const breathFreq = 0.6; // Respiración calmada
-          const breathCycle = Math.sin(time * breathFreq) * breathAmplitude;
+          const breathCycle = Math.sin(time * breathFreq) * 0.02; // Respiración visible
+          const bodySway = Math.sin(time * 0.4) * 0.01; // Leve balanceo
 
           bodyTop1Ref.current.rotation.x = THREE.MathUtils.lerp(
             bodyTop1Ref.current.rotation.x,
             initialRotations.current.body_top1.x + breathCycle,
-            microLerp
+            smoothLerp
+          );
+          bodyTop1Ref.current.rotation.z = THREE.MathUtils.lerp(
+            bodyTop1Ref.current.rotation.z,
+            initialRotations.current.body_top1.z + bodySway,
+            smoothLerp
           );
         }
 
-        return; // Skip otras animaciones más complejas
+        // === TORSO SUPERIOR - LEVE GIRO ===
+        if (bodyTop2Ref.current && initialRotations.current.body_top2) {
+          // El torso gira ligeramente siguiendo la mirada
+          const torsoTurn = Math.sin(time * lookAroundFreq) * 0.03;
+
+          bodyTop2Ref.current.rotation.y = THREE.MathUtils.lerp(
+            bodyTop2Ref.current.rotation.y,
+            initialRotations.current.body_top2.y + torsoTurn,
+            smoothLerp
+          );
+        }
+
+        return; // Skip otras animaciones
       }
 
       // Optimización: Actualizar mouse solo si ha cambiado significativamente
