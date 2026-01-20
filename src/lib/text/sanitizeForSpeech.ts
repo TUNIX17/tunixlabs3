@@ -23,25 +23,26 @@ export function sanitizeForSpeech(text: string): string {
 
   let sanitized = text;
 
-  // Remove bold markers (**text** or __text__)
-  sanitized = sanitized.replace(/\*\*([^*]+)\*\*/g, '$1');
-  sanitized = sanitized.replace(/__([^_]+)__/g, '$1');
-
-  // Remove italic markers (*text* or _text_) - careful not to match list items
-  // Only match single asterisks/underscores surrounded by text
-  sanitized = sanitized.replace(/(?<!\*)\*(?!\*)([^*\n]+)(?<!\*)\*(?!\*)/g, '$1');
-  sanitized = sanitized.replace(/(?<!_)_(?!_)([^_\n]+)(?<!_)_(?!_)/g, '$1');
-
-  // Remove strikethrough (~~text~~)
-  sanitized = sanitized.replace(/~~([^~]+)~~/g, '$1');
+  // Remove code blocks first (```code```) - before other processing
+  sanitized = sanitized.replace(/```[\s\S]*?```/g, '');
 
   // Remove inline code (`code`)
   sanitized = sanitized.replace(/`([^`]+)`/g, '$1');
 
-  // Remove code blocks (```code```)
-  sanitized = sanitized.replace(/```[\s\S]*?```/g, '');
+  // Remove bold markers (**text** or __text__)
+  sanitized = sanitized.replace(/\*\*([^*]+)\*\*/g, '$1');
+  sanitized = sanitized.replace(/__([^_]+)__/g, '$1');
 
-  // Remove list markers at start of lines and replace with periods for natural pauses
+  // Remove italic markers - simpler approach without lookbehind
+  // Match *text* where text doesn't contain * or newlines
+  sanitized = sanitized.replace(/\*([^*\n]+)\*/g, '$1');
+  // Match _text_ where text doesn't contain _ or newlines
+  sanitized = sanitized.replace(/_([^_\n]+)_/g, '$1');
+
+  // Remove strikethrough (~~text~~)
+  sanitized = sanitized.replace(/~~([^~]+)~~/g, '$1');
+
+  // Remove list markers at start of lines
   // Handles: * item, - item, + item, numbered lists (1. item)
   sanitized = sanitized.replace(/^\s*[\*\-\+]\s+/gm, '');
   sanitized = sanitized.replace(/^\s*\d+\.\s+/gm, '');
@@ -82,42 +83,7 @@ export function sanitizeForSpeech(text: string): string {
   // Remove leading/trailing whitespace
   sanitized = sanitized.trim();
 
-  // Ensure text ends properly (add period if it doesn't end with punctuation)
-  if (sanitized && !/[.!?]$/.test(sanitized)) {
-    sanitized += '.';
-  }
-
   return sanitized;
-}
-
-/**
- * Check if text contains markdown formatting that would affect TTS
- * Useful for debugging or conditional processing
- *
- * @param text - The text to check
- * @returns true if markdown markers are detected
- */
-export function containsMarkdown(text: string): boolean {
-  if (!text || typeof text !== 'string') {
-    return false;
-  }
-
-  const markdownPatterns = [
-    /\*\*[^*]+\*\*/,           // Bold
-    /__[^_]+__/,               // Bold (alt)
-    /(?<!\*)\*[^*\n]+\*(?!\*)/, // Italic
-    /(?<!_)_[^_\n]+_(?!_)/,    // Italic (alt)
-    /~~[^~]+~~/,               // Strikethrough
-    /`[^`]+`/,                 // Inline code
-    /^[\*\-\+]\s/m,            // Unordered list
-    /^\d+\.\s/m,               // Ordered list
-    /^#+\s/m,                  // Headers
-    /^>\s/m,                   // Blockquotes
-    /\[[^\]]+\]\([^)]+\)/,     // Links
-    /!\[[^\]]*\]\([^)]+\)/,    // Images
-  ];
-
-  return markdownPatterns.some(pattern => pattern.test(text));
 }
 
 export default sanitizeForSpeech;
