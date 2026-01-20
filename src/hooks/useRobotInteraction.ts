@@ -8,56 +8,9 @@ import { AudioPlayer } from '../lib/audio/player';
 import { ConversationSession, DEFAULT_SESSION_CONFIG } from '../lib/conversation';
 import { AgentStateTracker, ConversationPhase, getAgentPromptCache } from '../lib/agent';
 import { BARGEIN_VAD_CONFIG } from '../lib/audio/vadConfig';
-import { PauseTracker, PauseAction } from '../lib/audio/pauseDetection';
-import { validateTranscription } from '../lib/audio/transcriptionValidator';
-
-// Mapeo de nombres de idioma a códigos ISO para normalizar detección de STT
-const LANGUAGE_NAME_TO_CODE: Record<string, string> = {
-  'spanish': 'es',
-  'español': 'es',
-  'english': 'en',
-  'inglés': 'en',
-  'french': 'fr',
-  'français': 'fr',
-  'german': 'de',
-  'deutsch': 'de',
-  'portuguese': 'pt',
-  'português': 'pt',
-  'italian': 'it',
-  'italiano': 'it',
-};
 
 // Idiomas soportados por el sistema
 const SUPPORTED_LANGUAGES = ['es', 'en'];
-
-/**
- * Normaliza el código de idioma a formato ISO (es, en)
- * SOLO acepta español e inglés - otros idiomas retornan null
- */
-const normalizeLanguageCode = (lang: string): string | null => {
-  if (!lang) return 'es'; // Default a español
-
-  const langLower = lang.toLowerCase().trim();
-
-  // Si es un nombre de idioma conocido, convertir a código
-  if (LANGUAGE_NAME_TO_CODE[langLower]) {
-    return LANGUAGE_NAME_TO_CODE[langLower];
-  }
-
-  // Si ya es un código ISO (ej: es-ES, en-US), extraer la base
-  let langCode = langLower;
-  if (langLower.includes('-')) {
-    langCode = langLower.split('-')[0];
-  }
-
-  // Solo aceptar idiomas soportados (es, en)
-  if (SUPPORTED_LANGUAGES.includes(langCode)) {
-    return langCode;
-  }
-
-  // Idioma no soportado - retornar null para ignorarlo
-  return null;
-};
 
 // Interfaz para las animaciones del robot
 interface RobotAnimations {
@@ -268,9 +221,6 @@ export const useRobotInteraction = ({
       if (onError) onError(error);
     }
   });
-
-  // Ref para PauseTracker
-  const pauseTrackerRef = useRef<PauseTracker>(new PauseTracker());
 
   // Estado de calibración VAD
   const [isVADCalibrating, setIsVADCalibrating] = useState(false);
@@ -553,94 +503,19 @@ export const useRobotInteraction = ({
       setUserMessage(recognitionResult.text);
 
       // IDIOMA FIJO: El idioma se establece al inicio de la sesión basándose en la página
-      // y NO cambia durante la conversación, independientemente de lo que detecte el STT.
-      // Esto evita cambios de idioma por ruido ambiental o detecciones erróneas del STT.
-      const normalizedCurrentLang = normalizeLanguageCode(currentLanguage) || 'es';
-      const langForThisInteraction = normalizedCurrentLang;
-
-      // Log para debug - mostrar qué detectó el STT pero ignorarlo
-      const sttDetectedLang = recognitionResult.language;
-      if (sttDetectedLang) {
-        const normalizedSTTLang = normalizeLanguageCode(sttDetectedLang);
-        if (normalizedSTTLang && normalizedSTTLang !== normalizedCurrentLang) {
-          console.log('[RobotInteraction] STT detectó idioma diferente:', sttDetectedLang,
-            '- IGNORADO. Usando idioma fijo de sesión:', normalizedCurrentLang);
-        }
-      }
-      console.log('[RobotInteraction] Idioma fijo para esta sesión:', langForThisInteraction);
+      // y NO cambia durante la conversación. Simplicidad > complejidad.
+      const langForThisInteraction = SUPPORTED_LANGUAGES.includes(currentLanguage)
+        ? currentLanguage
+        : 'es';
+      console.log('[RobotInteraction] Idioma de sesión:', langForThisInteraction);
 
       if (recognitionResult.text) {
         console.log('[RobotInteraction] Texto reconocido:', recognitionResult.text);
 
-        // VALIDAR TRANSCRIPCIÓN - Detectar si el STT malinterpretó el audio
-        const validationResult = validateTranscription(recognitionResult.text, langForThisInteraction);
-        console.log('[RobotInteraction] Validación de transcripción:', {
-          isValid: validationResult.isValid,
-          confidence: validationResult.confidence.toFixed(2),
-          suggestedAction: validationResult.suggestedAction,
-          issues: validationResult.detectedIssues
-        });
+        // ARQUITECTURA 2026: Confiar en el STT (Groq Whisper) + Silero VAD
+        // El LLM puede pedir clarificación naturalmente si no entiende
+        // NO validamos texto manualmente - eliminada la sobreingeniería
 
-        // Si la transcripción es incoherente, pedir que repita SIN llamar al LLM
-        if (validationResult.suggestedAction === 'ask_repeat') {
-          console.log('[RobotInteraction] Transcripción incoherente detectada, pidiendo repetir');
-
-          // Detener animación de pensando
-          if (robotRef.current) {
-            robotRef.current.stopThinking();
-            executeAnimationWithCooldown(
-              () => robotRef.current?.startConfused?.(),
-              'startConfused'
-            );
-          }
-
-          // Mensaje de "no entendí"
-          const repeatMessage = translatorRef.current.translate('robot.did_not_understand', langForThisInteraction);
-          setRobotResponse(repeatMessage);
-
-          // Hablar el mensaje directamente con TTS (sin pasar por LLM)
-          if (typeof window !== 'undefined' && window.speechSynthesis) {
-            const utterance = new SpeechSynthesisUtterance(repeatMessage);
-            utterance.lang = langForThisInteraction === 'en' ? 'en-US' : 'es-ES';
-            utterance.rate = 1.15;
-            utterance.pitch = 1.4;
-
-            utterance.onstart = () => {
-              setInteractionState(RobotInteractionState.SPEAKING);
-              speakingStartTimeRef.current = Date.now();
-            };
-
-            utterance.onend = () => {
-              speakingStartTimeRef.current = null;
-              // Auto-restart listening para que el usuario pueda repetir
-              if (shouldAutoRestartRef.current && config.autoRestartListening) {
-                console.log('[RobotInteraction] Volviendo a escuchar después de pedir repetir');
-                setInteractionState(RobotInteractionState.LISTENING);
-                sessionRef.current?.startListening();
-              } else {
-                setInteractionState(RobotInteractionState.IDLE);
-              }
-            };
-
-            utterance.onerror = () => {
-              setInteractionState(RobotInteractionState.IDLE);
-            };
-
-            window.speechSynthesis.speak(utterance);
-          } else {
-            // Si no hay TTS disponible, volver a escuchar
-            if (shouldAutoRestartRef.current && config.autoRestartListening) {
-              setInteractionState(RobotInteractionState.LISTENING);
-              sessionRef.current?.startListening();
-            } else {
-              setInteractionState(RobotInteractionState.IDLE);
-            }
-          }
-
-          return; // NO continuar con el flujo normal (no llamar al LLM)
-        }
-
-        // Transcripción válida - continuar con el flujo normal
         // Extraer info del lead
         if (agentStateRef.current) {
           const extractedInfo = agentStateRef.current.extractLeadInfo(recognitionResult.text);

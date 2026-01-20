@@ -1,8 +1,8 @@
 # TunixLabs - Development State
 
 **Last Updated:** 2026-01-20
-**Current Phase:** Transcription Validation
-**Sprint:** 3.6 - Voice Agent Quality
+**Current Phase:** Voice Architecture Simplification
+**Sprint:** 3.7 - Voice System Refactor
 
 ---
 
@@ -162,19 +162,27 @@ TunixLabs es una plataforma web de consultoria en IA con:
     - `src/lib/animation/index.ts` - Fixed BONE_GROUPS export conflict
   - [x] Build verification: npm run build succeeds
   - [x] VAD engine selection via feature flag: VAD_ENGINE='rms'|'silero'|'auto'
-- [x] **Transcription Validation System** (2026-01-20)
-  - [x] Created transcription validator to detect STT misinterpretations
-  - [x] Detects language mixing (French/German/Italian + English patterns)
-  - [x] Detects suspicious patterns like "O'Hala?", "pour fin", "What's up"
-  - [x] Robot asks to repeat instead of sending incoherent text to LLM
-  - [x] Uses Web Speech TTS directly for "didn't understand" message (no LLM call)
-  - [x] Auto-restarts listening after asking to repeat
-  - [x] Added translations for "robot.did_not_understand" message
-  - [x] Files created:
-    - `src/lib/audio/transcriptionValidator.ts` - Validation logic (~200 lines)
-  - [x] Files modified:
-    - `src/hooks/useRobotInteraction.ts` - Integrated validation before LLM call
-    - `src/lib/language/translator.ts` - Added new translation keys
+- [x] **Transcription Validation System** (2026-01-20) - **REMOVED**
+  - [x] ~~Created transcription validator to detect STT misinterpretations~~
+  - [x] ~~Detects language mixing (French/German/Italian + English patterns)~~
+  - [x] **REMOVED 2026-01-20**: Over-engineered solution that blocked valid text
+  - [x] See "Voice Architecture Simplification" below for details
+- [x] **Voice Architecture Simplification** (2026-01-20)
+  - [x] **Problem**: TranscriptionValidator was blocking valid speech (false "didn't understand")
+  - [x] **Root Cause**: Static word lists + aggressive thresholds = over-engineering
+  - [x] **Solution (2026 Best Practices)**:
+    - Removed transcriptionValidator usage from useRobotInteraction.ts
+    - Trust STT (Groq Whisper) + LLM for semantic understanding
+    - LLM can naturally ask for clarification if needed
+    - Activated Silero VAD by default (ML-based, 95%+ accuracy)
+  - [x] **Files modified**:
+    - `src/hooks/useRobotInteraction.ts` - Removed validation, simplified language handling (~70 lines removed)
+    - `src/lib/config/featureFlags.ts` - Changed VAD_ENGINE default from 'rms' to 'auto'
+  - [x] **Files kept but unused**:
+    - `src/lib/audio/transcriptionValidator.ts` - Kept for reference, not imported
+    - `src/lib/audio/pauseDetection.ts` - Kept for reference, not imported
+  - [x] **Impact**: Simpler architecture, no false "didn't understand" messages
+  - [x] Build verification: npm run build succeeds (49 pages)
 - [x] **Language Lock Fix** (2026-01-19)
   - [x] Fixed robot language switching mid-conversation from noise/STT errors
   - [x] Language now locked to page-detected language at session start

@@ -13,8 +13,8 @@ export const FEATURE_FLAGS = {
   /** Enable language confirmation (2-3 turns before switching) */
   ENABLE_LANGUAGE_CONFIRMATION: process.env.NEXT_PUBLIC_ENABLE_LANGUAGE_CONFIRMATION === 'true',
 
-  /** VAD engine selection: 'rms' (current), 'silero' (new), or 'auto' (try silero, fallback to rms) */
-  VAD_ENGINE: (process.env.NEXT_PUBLIC_VAD_ENGINE || 'rms') as 'rms' | 'silero' | 'auto',
+  /** VAD engine selection: 'rms', 'silero' (ML-based, 95%+ accuracy), or 'auto' (default) */
+  VAD_ENGINE: (process.env.NEXT_PUBLIC_VAD_ENGINE || 'auto') as 'rms' | 'silero' | 'auto',
 
   /** Enable spring-damper smoothing for animations */
   ENABLE_SMOOTH_ROTATION: process.env.NEXT_PUBLIC_ENABLE_SMOOTH_ROTATION === 'true',
