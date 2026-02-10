@@ -17,11 +17,17 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
   // Check authentication on mount via server-side cookie check
   useEffect(() => {
     fetch('/api/auth/check')
-      .then(res => res.json())
+      .then(res => {
+        if (!res.ok) throw new Error(`Auth check failed: ${res.status}`);
+        return res.json();
+      })
       .then(data => {
         if (data.authenticated) setIsAuthenticated(true);
       })
-      .catch(() => {});
+      .catch((err) => {
+        console.error('[AdminLayout] Auth check failed:', err);
+        setError('No se pudo verificar la sesion. Intenta recargar la pagina.');
+      });
   }, []);
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -45,7 +51,15 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
   };
 
   const handleLogout = async () => {
-    await fetch('/api/auth/logout', { method: 'POST' });
+    try {
+      const res = await fetch('/api/auth/logout', { method: 'POST' });
+      if (!res.ok) {
+        console.error('[AdminLayout] Logout failed:', res.status);
+      }
+    } catch (err) {
+      console.error('[AdminLayout] Logout request failed:', err);
+    }
+    // Always clear client state -- fail-open for logout is correct
     setIsAuthenticated(false);
     setPassword('');
   };
