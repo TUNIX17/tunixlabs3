@@ -6,20 +6,33 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
-import { LeadStatus } from '@prisma/client';
+import { requireAuth, getClientIP } from '@/lib/auth';
+import { CreateLeadSchema, LeadQuerySchema } from '@/lib/validation/schemas';
+import { apiLimiter } from '@/lib/rateLimit';
 
 export async function GET(request: NextRequest) {
+  const authError = await requireAuth(request);
+  if (authError) return authError;
+
+  const ip = getClientIP(request);
+  const rl = apiLimiter.check(ip);
+  if (!rl.success) {
+    return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
+  }
+
   try {
     const { searchParams } = new URL(request.url);
 
-    // Parametros de filtro
-    const status = searchParams.get('status') as LeadStatus | null;
-    const search = searchParams.get('search');
-    const source = searchParams.get('source');
-    const startDate = searchParams.get('startDate');
-    const endDate = searchParams.get('endDate');
-    const page = parseInt(searchParams.get('page') || '1');
-    const limit = parseInt(searchParams.get('limit') || '20');
+    // Validate and parse query parameters with Zod
+    const parsed = LeadQuerySchema.safeParse(Object.fromEntries(searchParams));
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: 'Invalid query parameters' },
+        { status: 400 }
+      );
+    }
+
+    const { status, search, source, startDate, endDate, page, limit } = parsed.data;
 
     // Construir filtros
     const where: Record<string, unknown> = {};
@@ -79,55 +92,67 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     console.error('Error listando leads:', error);
     return NextResponse.json(
-      { error: 'Error interno del servidor' },
+      { error: 'Error loading leads' },
       { status: 500 }
     );
   }
 }
 
 export async function POST(request: NextRequest) {
+  const authError = await requireAuth(request);
+  if (authError) return authError;
+
+  const ip = getClientIP(request);
+  const rl = apiLimiter.check(ip);
+  if (!rl.success) {
+    return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
+  }
+
   try {
     const body = await request.json();
 
-    // Validar datos minimos
-    if (!body.name && !body.email) {
+    // Validate body with Zod
+    const parsed = CreateLeadSchema.safeParse(body);
+    if (!parsed.success) {
       return NextResponse.json(
-        { error: 'Se requiere nombre o email' },
+        { error: 'Invalid lead data' },
         { status: 400 }
       );
     }
 
+    const data = parsed.data;
+
     // Verificar si ya existe por email
-    if (body.email) {
+    if (data.email) {
       const existing = await prisma.lead.findFirst({
-        where: { email: body.email }
+        where: { email: data.email }
       });
 
       if (existing) {
         return NextResponse.json(
-          { error: 'Ya existe un lead con este email', leadId: existing.id },
+          { error: 'A lead with this email already exists' },
           { status: 409 }
         );
       }
     }
 
-    // Crear lead
+    // Crear lead - status always defaults to NEW (not settable from request)
     const lead = await prisma.lead.create({
       data: {
-        name: body.name,
-        company: body.company,
-        email: body.email,
-        phone: body.phone,
-        role: body.role,
-        interests: body.interests || [],
-        painPoints: body.painPoints || [],
-        budget: body.budget,
-        timeline: body.timeline,
-        companySize: body.companySize,
-        location: body.location,
-        source: body.source || 'manual',
-        notes: body.notes,
-        status: body.status || 'NEW'
+        name: data.name,
+        company: data.company,
+        email: data.email,
+        phone: data.phone,
+        role: data.role,
+        interests: data.interests || [],
+        painPoints: data.painPoints || [],
+        budget: data.budget,
+        timeline: data.timeline,
+        companySize: data.companySize,
+        location: data.location,
+        source: data.source || 'manual',
+        notes: data.notes,
+        status: 'NEW'
       }
     });
 
@@ -145,7 +170,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('Error creando lead:', error);
     return NextResponse.json(
-      { error: 'Error interno del servidor' },
+      { error: 'Error creating lead' },
       { status: 500 }
     );
   }

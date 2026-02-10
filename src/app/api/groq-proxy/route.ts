@@ -1,32 +1,46 @@
 import { NextRequest, NextResponse } from 'next/server';
 import axios from 'axios';
+import { requireProxyAuth, getClientIP } from '@/lib/auth';
+import { GroqProxySchema } from '@/lib/validation/schemas';
+import { proxyLimiter } from '@/lib/rateLimit';
 
 const GROQ_API_KEY = process.env.GROQ_API_KEY;
 const GROQ_API_URL = 'https://api.groq.com/openai/v1';
 
-type ResponseType = 'arraybuffer' | 'blob' | 'document' | 'json' | 'text' | 'stream';
-
-interface ProxyRequestBody {
-  endpoint: string;
-  payload: unknown;
-  method?: 'POST' | 'GET' | 'PUT' | 'DELETE';
-  responseType?: ResponseType;
-}
-
 export async function POST(request: NextRequest) {
+  // Auth check
+  const authError = requireProxyAuth(request);
+  if (authError) return authError;
+
+  // Rate limiting
+  const ip = getClientIP(request);
+  const rateCheck = proxyLimiter.check(ip);
+  if (!rateCheck.success) {
+    return NextResponse.json({ error: 'Rate limit exceeded' }, { status: 429 });
+  }
+
   if (!GROQ_API_KEY) {
     console.error("FATAL ERROR: La variable de entorno GROQ_API_KEY no está configurada en el servidor.");
-    return NextResponse.json({ error: 'Error de configuración del servidor: clave API no encontrada.' }, { status: 500 });
+    return NextResponse.json({ error: 'Server configuration error' }, { status: 500 });
   }
 
   try {
-    const body = await request.json() as ProxyRequestBody;
-    const { endpoint, payload, method = 'POST', responseType = 'json' } = body;
+    const body = await request.json();
+    const parseResult = GroqProxySchema.safeParse(body);
+    if (!parseResult.success) {
+      return NextResponse.json(
+        { error: 'Invalid request body' },
+        { status: 400 }
+      );
+    }
 
-    // Lista blanca de endpoints permitidos para mayor seguridad
-    const allowedEndpoints = ['/chat/completions', '/audio/speech', '/audio/transcriptions', '/models'];
-    if (!allowedEndpoints.includes(endpoint)) {
-      return NextResponse.json({ error: 'Endpoint no permitido a través del proxy.' }, { status: 403 });
+    const { endpoint, payload, method, responseType } = parseResult.data;
+
+    // Cap max_tokens if present
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const safePayload = { ...payload } as Record<string, any>;
+    if (safePayload?.max_tokens && safePayload.max_tokens > 2000) {
+      safePayload.max_tokens = 2000;
     }
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -40,10 +54,10 @@ export async function POST(request: NextRequest) {
       responseType: responseType,
     };
 
-    if (method === 'POST' || method === 'PUT') {
-      axiosConfig.data = payload;
-    } else if (method === 'GET' && payload) {
-      axiosConfig.params = payload;
+    if (method === 'POST') {
+      axiosConfig.data = safePayload;
+    } else if (method === 'GET' && safePayload) {
+      axiosConfig.params = safePayload;
     }
 
     const groqResponse = await axios(axiosConfig);
@@ -57,22 +71,15 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(groqResponse.data, { status: groqResponse.status });
 
-  } catch (error: any) {
-    console.error('Error en el proxy a Groq:', error.response?.data || error.message);
-    const status = error.response?.status || 500;
-    const errorData = error.response?.data || { message: 'Error interno del servidor al procesar la solicitud a Groq.' };
-    
-    // Si el error viene de Groq con una estructura específica, la reenviamos
-    if (error.response?.data?.error) {
-        return NextResponse.json({ error: error.response.data.error }, { status });
-    }
+  } catch (error: unknown) {
+    const axiosError = error as { response?: { status?: number; data?: { error?: unknown } }; message?: string };
+    console.error('Error en el proxy a Groq:', axiosError.response?.data || axiosError.message);
+    const status = axiosError.response?.status || 500;
 
+    // Generic error message - do not leak upstream details
     return NextResponse.json(
-      { error: 'Error al procesar la solicitud a Groq.', details: errorData },
+      { error: 'Error processing Groq request' },
       { status }
     );
   }
 }
-
-// Podrías añadir también un método GET si necesitas exponer alguna funcionalidad GET del proxy
-// export async function GET(request: NextRequest) { ... } 

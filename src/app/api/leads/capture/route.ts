@@ -6,46 +6,40 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { sendLeadNotification } from '@/lib/email/resend';
-
-interface CaptureLeadRequest {
-  // Datos del lead
-  name?: string;
-  company?: string;
-  email?: string;
-  phone?: string;
-  role?: string;
-  interests?: string[];
-  painPoints?: string[];
-  budget?: string;
-  timeline?: string;
-  companySize?: string;
-  location?: string;
-  meetingScheduled?: boolean;
-
-  // Datos de la sesion
-  sessionId?: string;
-  conversationPhase?: string;
-  turnCount?: number;
-  sessionDurationSeconds?: number;  // Duracion de la sesion en segundos
-  source?: string;
-
-  // Mensajes de la conversacion
-  messages?: Array<{
-    role: 'user' | 'assistant';
-    content: string;
-  }>;
-}
+import { requireProxyAuth, getClientIP } from '@/lib/auth';
+import { CaptureLeadSchema } from '@/lib/validation/schemas';
+import { captureLimiter } from '@/lib/rateLimit';
 
 export async function POST(request: NextRequest) {
+  const authError = requireProxyAuth(request);
+  if (authError) return authError;
+
+  const ip = getClientIP(request);
+  const rl = captureLimiter.check(ip);
+  if (!rl.success) {
+    return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
+  }
+
   try {
-    const body: CaptureLeadRequest = await request.json();
+    const body = await request.json();
+
+    // Validate body with Zod
+    const parsed = CaptureLeadSchema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: 'Invalid capture data' },
+        { status: 400 }
+      );
+    }
+
+    const data = parsed.data;
 
     // Validar que hay datos minimos
-    const hasMinimalData = body.name || body.email || (body.interests && body.interests.length > 0);
+    const hasMinimalData = data.name || data.email || (data.interests && data.interests.length > 0);
 
     if (!hasMinimalData) {
       return NextResponse.json(
-        { error: 'Se requiere al menos nombre, email o intereses' },
+        { error: 'At least name, email, or interests is required' },
         { status: 400 }
       );
     }
@@ -53,15 +47,15 @@ export async function POST(request: NextRequest) {
     // Buscar lead existente por sessionId o email
     let existingLead = null;
 
-    if (body.sessionId) {
+    if (data.sessionId) {
       existingLead = await prisma.lead.findFirst({
-        where: { sessionId: body.sessionId }
+        where: { sessionId: data.sessionId }
       });
     }
 
-    if (!existingLead && body.email) {
+    if (!existingLead && data.email) {
       existingLead = await prisma.lead.findFirst({
-        where: { email: body.email }
+        where: { email: data.email }
       });
     }
 
@@ -72,20 +66,19 @@ export async function POST(request: NextRequest) {
       lead = await prisma.lead.update({
         where: { id: existingLead.id },
         data: {
-          name: body.name || existingLead.name,
-          company: body.company || existingLead.company,
-          email: body.email || existingLead.email,
-          phone: body.phone || existingLead.phone,
-          role: body.role || existingLead.role,
-          interests: body.interests?.length ? body.interests : existingLead.interests,
-          painPoints: body.painPoints?.length ? body.painPoints : existingLead.painPoints,
-          budget: body.budget || existingLead.budget,
-          timeline: body.timeline || existingLead.timeline,
-          companySize: body.companySize || existingLead.companySize,
-          location: body.location || existingLead.location,
-          meetingScheduled: body.meetingScheduled ?? existingLead.meetingScheduled,
-          conversationPhase: body.conversationPhase || existingLead.conversationPhase,
-          turnCount: body.turnCount ?? existingLead.turnCount,
+          name: data.name || existingLead.name,
+          company: data.company || existingLead.company,
+          email: data.email || existingLead.email,
+          phone: data.phone || existingLead.phone,
+          role: data.role || existingLead.role,
+          interests: data.interests?.length ? data.interests : existingLead.interests,
+          painPoints: data.painPoints?.length ? data.painPoints : existingLead.painPoints,
+          budget: data.budget || existingLead.budget,
+          timeline: data.timeline || existingLead.timeline,
+          companySize: data.companySize || existingLead.companySize,
+          location: data.location || existingLead.location,
+          conversationPhase: data.conversationPhase || existingLead.conversationPhase,
+          turnCount: data.turnCount ?? existingLead.turnCount,
           updatedAt: new Date()
         }
       });
@@ -95,31 +88,31 @@ export async function POST(request: NextRequest) {
         data: {
           leadId: lead.id,
           type: 'lead_updated',
-          details: `Datos actualizados desde ${body.source || 'voice-agent'}`
+          details: `Datos actualizados desde ${data.source || 'voice-agent'}`
         }
       });
     } else {
       // Crear nuevo lead
       lead = await prisma.lead.create({
         data: {
-          name: body.name,
-          company: body.company,
-          email: body.email,
-          phone: body.phone,
-          role: body.role,
-          interests: body.interests || [],
-          painPoints: body.painPoints || [],
-          budget: body.budget,
-          timeline: body.timeline,
-          companySize: body.companySize,
-          location: body.location,
-          meetingScheduled: body.meetingScheduled || false,
-          sessionId: body.sessionId,
-          conversationPhase: body.conversationPhase,
-          turnCount: body.turnCount || 0,
-          sessionDurationSeconds: body.sessionDurationSeconds,
-          source: body.source || 'voice-agent',
-          score: calculateLeadScore(body)
+          name: data.name,
+          company: data.company,
+          email: data.email,
+          phone: data.phone,
+          role: data.role,
+          interests: data.interests || [],
+          painPoints: data.painPoints || [],
+          budget: data.budget,
+          timeline: data.timeline,
+          companySize: data.companySize,
+          location: data.location,
+          meetingScheduled: false,
+          sessionId: data.sessionId,
+          conversationPhase: data.conversationPhase,
+          turnCount: data.turnCount || 0,
+          sessionDurationSeconds: data.sessionDurationSeconds,
+          source: data.source || 'voice-agent',
+          score: calculateLeadScore(data)
         }
       });
 
@@ -128,12 +121,12 @@ export async function POST(request: NextRequest) {
         data: {
           leadId: lead.id,
           type: 'lead_created',
-          details: `Lead capturado desde ${body.source || 'voice-agent'}`
+          details: `Lead capturado desde ${data.source || 'voice-agent'}`
         }
       });
 
       // Enviar notificacion por email si hay datos relevantes
-      if (body.email || body.name) {
+      if (data.email || data.name) {
         try {
           await sendLeadNotification(lead);
 
@@ -152,9 +145,9 @@ export async function POST(request: NextRequest) {
     }
 
     // Guardar mensajes de la conversacion si los hay
-    if (body.messages && body.messages.length > 0) {
+    if (data.messages && data.messages.length > 0) {
       await prisma.message.createMany({
-        data: body.messages.map(msg => ({
+        data: data.messages.map(msg => ({
           leadId: lead.id,
           role: msg.role,
           content: msg.content
@@ -172,7 +165,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('Error capturando lead:', error);
     return NextResponse.json(
-      { error: 'Error interno del servidor' },
+      { error: 'Error capturing lead' },
       { status: 500 }
     );
   }
@@ -182,7 +175,21 @@ export async function POST(request: NextRequest) {
  * Calcular score del lead basado en datos disponibles
  * Score mejorado con factores de engagement
  */
-function calculateLeadScore(data: CaptureLeadRequest): number {
+function calculateLeadScore(data: {
+  name?: string;
+  email?: string;
+  phone?: string;
+  company?: string;
+  interests?: string[];
+  painPoints?: string[];
+  budget?: string;
+  timeline?: string;
+  companySize?: string;
+  turnCount?: number;
+  sessionDurationSeconds?: number;
+  meetingScheduled?: boolean;
+  conversationPhase?: string;
+}): number {
   let score = 0;
 
   // ===== DATOS DE CONTACTO (max 45) =====

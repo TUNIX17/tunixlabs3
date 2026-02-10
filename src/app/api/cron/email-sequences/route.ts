@@ -9,6 +9,7 @@
 
 import { NextResponse } from 'next/server';
 import { processEmailSequences } from '@/lib/email/sequences';
+import { requireCronAuth } from '@/lib/auth';
 
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60; // 60 segundos max
@@ -16,26 +17,9 @@ export const maxDuration = 60; // 60 segundos max
 export async function GET(request: Request) {
   console.log('[Cron] Email sequences job iniciado');
 
-  // Verificar autorizacion
-  const authHeader = request.headers.get('authorization');
-  const cronSecret = process.env.CRON_SECRET;
-
-  // Si hay CRON_SECRET configurado, verificar
-  if (cronSecret) {
-    if (authHeader !== `Bearer ${cronSecret}`) {
-      console.warn('[Cron] Intento no autorizado');
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
-    }
-  } else {
-    // Si no hay secret, permitir solo en desarrollo
-    if (process.env.NODE_ENV === 'production') {
-      console.warn('[Cron] CRON_SECRET no configurado en produccion');
-      // Permitir de todas formas por ahora, pero logear warning
-    }
-  }
+  // Verify authorization (denies access in production when CRON_SECRET is not set)
+  const authError = requireCronAuth(request);
+  if (authError) return authError;
 
   try {
     const startTime = Date.now();
@@ -60,7 +44,7 @@ export async function GET(request: Request) {
     return NextResponse.json(
       {
         success: false,
-        error: error instanceof Error ? error.message : 'Error desconocido',
+        error: 'Processing error',
         timestamp: new Date().toISOString()
       },
       { status: 500 }

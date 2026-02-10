@@ -3,25 +3,11 @@
  * Proporciona datos agregados para graficos del dashboard
  */
 
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import { requireAuth } from '@/lib/auth';
 
 export const dynamic = 'force-dynamic';
-
-interface ByStatusItem {
-  status: string;
-  _count: number;
-}
-
-interface ByDayItem {
-  date: string;
-  count: number;
-}
-
-interface ByScoreItem {
-  range: string;
-  count: number;
-}
 
 interface FunnelItem {
   stage: string;
@@ -29,7 +15,10 @@ interface FunnelItem {
   percentage: number;
 }
 
-export async function GET() {
+export async function GET(request: NextRequest) {
+  const authError = await requireAuth(request);
+  if (authError) return authError;
+
   try {
     // Obtener fecha hace 30 dias
     const thirtyDaysAgo = new Date();
@@ -167,10 +156,7 @@ export async function GET() {
   } catch (error) {
     console.error('[Analytics] Error:', error);
     return NextResponse.json(
-      {
-        success: false,
-        error: error instanceof Error ? error.message : 'Error desconocido'
-      },
+      { error: 'Error loading analytics' },
       { status: 500 }
     );
   }

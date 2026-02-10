@@ -5,8 +5,20 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import { requireAuth, getClientIP } from '@/lib/auth';
+import { exportLimiter } from '@/lib/rateLimit';
+import { sanitizeForCSV } from '@/lib/validation/sanitize';
 
 export async function GET(request: NextRequest) {
+  const authError = await requireAuth(request);
+  if (authError) return authError;
+
+  const ip = getClientIP(request);
+  const rl = exportLimiter.check(ip);
+  if (!rl.success) {
+    return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
+  }
+
   try {
     const { searchParams } = new URL(request.url);
 
@@ -32,10 +44,11 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    // Obtener todos los leads
+    // Obtener leads con hard limit
     const leads = await prisma.lead.findMany({
       where,
-      orderBy: { createdAt: 'desc' }
+      orderBy: { createdAt: 'desc' },
+      take: 10000
     });
 
     // Generar CSV
@@ -65,41 +78,33 @@ export async function GET(request: NextRequest) {
     ];
 
     const rows = leads.map(lead => [
-      lead.id,
-      lead.name || '',
-      lead.company || '',
-      lead.email || '',
-      lead.phone || '',
-      lead.role || '',
-      (lead.interests || []).join('; '),
-      (lead.painPoints || []).join('; '),
-      lead.budget || '',
-      lead.timeline || '',
-      lead.companySize || '',
-      lead.location || '',
-      lead.status,
-      lead.score.toString(),
-      lead.source || '',
-      lead.meetingScheduled ? 'Si' : 'No',
-      lead.meetingDate ? new Date(lead.meetingDate).toISOString() : '',
-      lead.conversationPhase || '',
-      lead.turnCount.toString(),
-      (lead.notes || '').replace(/"/g, '""'),
-      new Date(lead.createdAt).toISOString(),
-      new Date(lead.updatedAt).toISOString()
+      sanitizeForCSV(lead.id),
+      sanitizeForCSV(lead.name || ''),
+      sanitizeForCSV(lead.company || ''),
+      sanitizeForCSV(lead.email || ''),
+      sanitizeForCSV(lead.phone || ''),
+      sanitizeForCSV(lead.role || ''),
+      sanitizeForCSV((lead.interests || []).join('; ')),
+      sanitizeForCSV((lead.painPoints || []).join('; ')),
+      sanitizeForCSV(lead.budget || ''),
+      sanitizeForCSV(lead.timeline || ''),
+      sanitizeForCSV(lead.companySize || ''),
+      sanitizeForCSV(lead.location || ''),
+      sanitizeForCSV(lead.status),
+      sanitizeForCSV(lead.score.toString()),
+      sanitizeForCSV(lead.source || ''),
+      sanitizeForCSV(lead.meetingScheduled ? 'Si' : 'No'),
+      sanitizeForCSV(lead.meetingDate ? new Date(lead.meetingDate).toISOString() : ''),
+      sanitizeForCSV(lead.conversationPhase || ''),
+      sanitizeForCSV(lead.turnCount.toString()),
+      sanitizeForCSV(lead.notes || ''),
+      sanitizeForCSV(new Date(lead.createdAt).toISOString()),
+      sanitizeForCSV(new Date(lead.updatedAt).toISOString())
     ]);
-
-    // Escapar campos CSV
-    const escapeCSV = (field: string) => {
-      if (field.includes(',') || field.includes('"') || field.includes('\n')) {
-        return `"${field.replace(/"/g, '""')}"`;
-      }
-      return field;
-    };
 
     const csv = [
       headers.join(','),
-      ...rows.map(row => row.map(escapeCSV).join(','))
+      ...rows.map(row => row.join(','))
     ].join('\n');
 
     // Retornar como archivo CSV
@@ -116,7 +121,7 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     console.error('Error exportando leads:', error);
     return NextResponse.json(
-      { error: 'Error interno del servidor' },
+      { error: 'Error exporting leads' },
       { status: 500 }
     );
   }

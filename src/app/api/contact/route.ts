@@ -3,9 +3,12 @@
  * Receives contact form data and sends email via Resend
  */
 
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { Resend } from 'resend';
-import { z } from 'zod';
+import { ContactFormSchema } from '@/lib/validation/schemas';
+import { getClientIP } from '@/lib/auth';
+import { contactLimiter } from '@/lib/rateLimit';
+import { escapeHtml, sanitizeEmailSubject } from '@/lib/validation/sanitize';
 
 const resend = process.env.RESEND_API_KEY
   ? new Resend(process.env.RESEND_API_KEY)
@@ -13,16 +16,18 @@ const resend = process.env.RESEND_API_KEY
 
 const NOTIFICATION_EMAIL = process.env.NOTIFICATION_EMAIL || 'contacto@tunixlabs.com';
 
-// Validation schema for contact form
-const ContactFormSchema = z.object({
-  nombre: z.string().min(2, 'El nombre es muy corto'),
-  email: z.string().email('Email invalido'),
-  asunto: z.string().min(3, 'El asunto es muy corto'),
-  mensaje: z.string().min(10, 'El mensaje es muy corto'),
-});
-
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
+    // Rate limiting
+    const ip = getClientIP(request);
+    const rateCheck = contactLimiter.check(ip);
+    if (!rateCheck.success) {
+      return NextResponse.json(
+        { error: 'Too many messages. Please try again later.' },
+        { status: 429 }
+      );
+    }
+
     const body = await request.json();
 
     // Validate input
@@ -45,13 +50,24 @@ export async function POST(request: Request) {
       );
     }
 
+    // Sanitize all user inputs before using in HTML
+    const safeName = escapeHtml(nombre);
+    const safeEmail = escapeHtml(email);
+    const safeAsunto = escapeHtml(sanitizeEmailSubject(asunto));
+    const safeMensaje = escapeHtml(mensaje);
+
     // Send email
     const emailResult = await resend.emails.send({
       from: 'TunixLabs Web <noreply@tunixlabs.com>',
       to: NOTIFICATION_EMAIL,
       replyTo: email,
-      subject: `[Contacto Web] ${asunto}`,
-      html: generateContactEmailHtml({ nombre, email, asunto, mensaje }),
+      subject: `[Contacto Web] ${sanitizeEmailSubject(asunto)}`,
+      html: generateContactEmailHtml({
+        nombre: safeName,
+        email: safeEmail,
+        asunto: safeAsunto,
+        mensaje: safeMensaje,
+      }),
     });
 
     console.log('[Contact] Email enviado:', emailResult);

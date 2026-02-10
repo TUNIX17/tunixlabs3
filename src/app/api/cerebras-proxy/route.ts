@@ -1,40 +1,53 @@
 import { NextRequest, NextResponse } from 'next/server';
 import axios from 'axios';
+import { requireProxyAuth, getClientIP } from '@/lib/auth';
+import { CerebrasProxySchema } from '@/lib/validation/schemas';
+import { proxyLimiter } from '@/lib/rateLimit';
 
 const CEREBRAS_API_KEY = process.env.CEREBRAS_API_KEY;
 const CEREBRAS_API_URL = 'https://api.cerebras.ai/v1';
 
-interface ProxyRequestBody {
-  endpoint: string;
-  payload: unknown;
-  method?: 'POST' | 'GET' | 'PUT' | 'DELETE';
-}
-
 export async function POST(request: NextRequest) {
   console.log('[API Cerebras] Recibida solicitud');
+
+  // Auth check
+  const authError = requireProxyAuth(request);
+  if (authError) return authError;
+
+  // Rate limiting
+  const ip = getClientIP(request);
+  const rateCheck = proxyLimiter.check(ip);
+  if (!rateCheck.success) {
+    return NextResponse.json({ error: 'Rate limit exceeded' }, { status: 429 });
+  }
 
   if (!CEREBRAS_API_KEY) {
     console.error("[API Cerebras] FATAL ERROR: La variable de entorno CEREBRAS_API_KEY no está configurada en el servidor.");
     return NextResponse.json(
-      { error: 'Error de configuración del servidor: CEREBRAS_API_KEY no encontrada. Configura esta variable de entorno.' },
+      { error: 'Server configuration error' },
       { status: 500 }
     );
   }
 
   try {
-    const body = await request.json() as ProxyRequestBody;
-    const { endpoint, payload, method = 'POST' } = body;
+    const body = await request.json();
+    const parseResult = CerebrasProxySchema.safeParse(body);
+    if (!parseResult.success) {
+      return NextResponse.json(
+        { error: 'Invalid request body' },
+        { status: 400 }
+      );
+    }
+
+    const { endpoint, payload, method } = parseResult.data;
 
     console.log('[API Cerebras] Endpoint:', endpoint, ', Method:', method);
 
-    // Lista blanca de endpoints permitidos
-    const allowedEndpoints = ['/chat/completions', '/models'];
-    if (!allowedEndpoints.includes(endpoint)) {
-      console.warn('[API Cerebras] Endpoint no permitido:', endpoint);
-      return NextResponse.json(
-        { error: 'Endpoint no permitido a través del proxy de Cerebras.' },
-        { status: 403 }
-      );
+    // Cap max_tokens if present
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const safePayload = { ...payload } as Record<string, any>;
+    if (safePayload?.max_tokens && safePayload.max_tokens > 2000) {
+      safePayload.max_tokens = 2000;
     }
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -47,10 +60,10 @@ export async function POST(request: NextRequest) {
       },
     };
 
-    if (method === 'POST' || method === 'PUT') {
-      axiosConfig.data = payload;
-    } else if (method === 'GET' && payload) {
-      axiosConfig.params = payload;
+    if (method === 'POST') {
+      axiosConfig.data = safePayload;
+    } else if (method === 'GET' && safePayload) {
+      axiosConfig.params = safePayload;
     }
 
     const cerebrasResponse = await axios(axiosConfig);
@@ -86,7 +99,6 @@ export async function POST(request: NextRequest) {
     console.error('Error en el proxy a Cerebras:', axiosError.response?.data || axiosError.message);
 
     const status = axiosError.response?.status || 500;
-    const errorData = axiosError.response?.data || { message: 'Error interno del servidor al procesar la solicitud a Cerebras.' };
 
     // Propagar retry-after si existe (para rate limiting)
     const responseHeaders = new Headers();
@@ -95,16 +107,9 @@ export async function POST(request: NextRequest) {
       responseHeaders.set('retry-after', retryAfter);
     }
 
-    // Si el error viene de Cerebras con una estructura específica, la reenviamos
-    if (axiosError.response?.data?.error) {
-      return NextResponse.json(
-        { error: axiosError.response.data.error },
-        { status, headers: responseHeaders }
-      );
-    }
-
+    // Generic error message - do not leak upstream details
     return NextResponse.json(
-      { error: 'Error al procesar la solicitud a Cerebras.', details: errorData },
+      { error: 'Error processing Cerebras request' },
       { status, headers: responseHeaders }
     );
   }

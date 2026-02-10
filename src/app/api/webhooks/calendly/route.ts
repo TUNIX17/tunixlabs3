@@ -4,6 +4,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import crypto from 'crypto';
 import prisma from '@/lib/prisma';
 import { sendMeetingNotification } from '@/lib/email/resend';
 
@@ -32,19 +33,50 @@ interface CalendlyWebhookPayload {
   };
 }
 
+/**
+ * Verify Calendly HMAC webhook signature.
+ * Calendly signature format: t=timestamp,v1=signature
+ */
+function verifyCalendlySignature(rawBody: string, signatureHeader: string, secret: string): boolean {
+  try {
+    const parts: Record<string, string> = {};
+    signatureHeader.split(',').forEach(part => {
+      const [key, value] = part.split('=', 2);
+      parts[key] = value;
+    });
+
+    const timestamp = parts['t'];
+    const signature = parts['v1'];
+    if (!timestamp || !signature) return false;
+
+    const payload = `${timestamp}.${rawBody}`;
+    const expected = crypto.createHmac('sha256', secret).update(payload).digest('hex');
+
+    return crypto.timingSafeEqual(Buffer.from(expected, 'hex'), Buffer.from(signature, 'hex'));
+  } catch {
+    return false;
+  }
+}
+
 export async function POST(request: NextRequest) {
   try {
-    // Verificar webhook secret (opcional pero recomendado)
+    // Read raw body first for signature verification
+    const rawBody = await request.text();
+    const body: CalendlyWebhookPayload = JSON.parse(rawBody);
+
+    // Verify webhook signature
     const webhookSecret = process.env.CALENDLY_WEBHOOK_SECRET;
     const signature = request.headers.get('Calendly-Webhook-Signature');
 
-    if (webhookSecret && signature) {
-      // TODO: Implementar verificacion de firma HMAC
-      // Por ahora solo log
-      console.log('[Calendly] Webhook signature presente');
+    if (webhookSecret) {
+      if (!signature || !verifyCalendlySignature(rawBody, signature, webhookSecret)) {
+        console.warn('[Calendly] Invalid webhook signature');
+        return NextResponse.json({ error: 'Invalid signature' }, { status: 401 });
+      }
+    } else if (process.env.NODE_ENV === 'production') {
+      console.warn('[Calendly] CALENDLY_WEBHOOK_SECRET not configured');
+      return NextResponse.json({ error: 'Webhook not configured' }, { status: 503 });
     }
-
-    const body: CalendlyWebhookPayload = await request.json();
 
     console.log('[Calendly] Webhook recibido:', body.event);
 
@@ -119,25 +151,21 @@ export async function POST(request: NextRequest) {
       console.error('[Calendly] Error enviando notificacion:', emailError);
     }
 
-    return NextResponse.json({
-      received: true,
-      action: 'processed',
-      leadId: lead.id
-    });
+    return NextResponse.json({ received: true, action: 'processed' });
 
   } catch (error) {
     console.error('[Calendly] Error procesando webhook:', error);
     return NextResponse.json(
-      { error: 'Error procesando webhook' },
+      { error: 'Error processing webhook' },
       { status: 500 }
     );
   }
 }
 
-// Calendly puede enviar GET para verificar el endpoint
+// Return 405 Method Not Allowed for GET requests (prevent info disclosure)
 export async function GET() {
-  return NextResponse.json({
-    status: 'ok',
-    message: 'Calendly webhook endpoint activo'
-  });
+  return NextResponse.json(
+    { error: 'Method not allowed' },
+    { status: 405 }
+  );
 }

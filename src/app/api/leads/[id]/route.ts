@@ -7,12 +7,17 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import { requireAuth } from '@/lib/auth';
+import { UpdateLeadSchema } from '@/lib/validation/schemas';
 
 interface RouteParams {
   params: Promise<{ id: string }>;
 }
 
 export async function GET(request: NextRequest, { params }: RouteParams) {
+  const authError = await requireAuth(request);
+  if (authError) return authError;
+
   try {
     const { id } = await params;
 
@@ -30,7 +35,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 
     if (!lead) {
       return NextResponse.json(
-        { error: 'Lead no encontrado' },
+        { error: 'Lead not found' },
         { status: 404 }
       );
     }
@@ -40,16 +45,30 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
   } catch (error) {
     console.error('Error obteniendo lead:', error);
     return NextResponse.json(
-      { error: 'Error interno del servidor' },
+      { error: 'Error loading lead' },
       { status: 500 }
     );
   }
 }
 
 export async function PUT(request: NextRequest, { params }: RouteParams) {
+  const authError = await requireAuth(request);
+  if (authError) return authError;
+
   try {
     const { id } = await params;
     const body = await request.json();
+
+    // Validate body with Zod (UpdateLeadSchema does not allow score)
+    const parsed = UpdateLeadSchema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: 'Invalid update data' },
+        { status: 400 }
+      );
+    }
+
+    const data = parsed.data;
 
     // Verificar que existe
     const existing = await prisma.lead.findUnique({
@@ -58,40 +77,37 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
 
     if (!existing) {
       return NextResponse.json(
-        { error: 'Lead no encontrado' },
+        { error: 'Lead not found' },
         { status: 404 }
       );
     }
 
     // Track de cambios para actividad
     const changes: string[] = [];
-    if (body.status && body.status !== existing.status) {
-      changes.push(`Status: ${existing.status} → ${body.status}`);
+    if (data.status && data.status !== existing.status) {
+      changes.push(`Status: ${existing.status} → ${data.status}`);
     }
-    if (body.notes && body.notes !== existing.notes) {
+    if (data.notes && data.notes !== existing.notes) {
       changes.push('Notas actualizadas');
     }
 
-    // Actualizar lead
+    // Actualizar lead - score is never set from the request body
     const lead = await prisma.lead.update({
       where: { id },
       data: {
-        name: body.name ?? existing.name,
-        company: body.company ?? existing.company,
-        email: body.email ?? existing.email,
-        phone: body.phone ?? existing.phone,
-        role: body.role ?? existing.role,
-        interests: body.interests ?? existing.interests,
-        painPoints: body.painPoints ?? existing.painPoints,
-        budget: body.budget ?? existing.budget,
-        timeline: body.timeline ?? existing.timeline,
-        companySize: body.companySize ?? existing.companySize,
-        location: body.location ?? existing.location,
-        status: body.status ?? existing.status,
-        score: body.score ?? existing.score,
-        notes: body.notes ?? existing.notes,
-        meetingScheduled: body.meetingScheduled ?? existing.meetingScheduled,
-        meetingDate: body.meetingDate ? new Date(body.meetingDate) : existing.meetingDate
+        name: data.name ?? existing.name,
+        company: data.company ?? existing.company,
+        email: data.email ?? existing.email,
+        phone: data.phone ?? existing.phone,
+        role: data.role ?? existing.role,
+        interests: data.interests ?? existing.interests,
+        painPoints: data.painPoints ?? existing.painPoints,
+        budget: data.budget ?? existing.budget,
+        timeline: data.timeline ?? existing.timeline,
+        companySize: data.companySize ?? existing.companySize,
+        location: data.location ?? existing.location,
+        status: data.status ?? existing.status,
+        notes: data.notes ?? existing.notes,
       }
     });
 
@@ -100,7 +116,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
       await prisma.activity.create({
         data: {
           leadId: id,
-          type: body.status !== existing.status ? 'status_changed' : 'lead_updated',
+          type: data.status !== existing.status ? 'status_changed' : 'lead_updated',
           details: changes.join(', ')
         }
       });
@@ -111,13 +127,16 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
   } catch (error) {
     console.error('Error actualizando lead:', error);
     return NextResponse.json(
-      { error: 'Error interno del servidor' },
+      { error: 'Error updating lead' },
       { status: 500 }
     );
   }
 }
 
 export async function DELETE(request: NextRequest, { params }: RouteParams) {
+  const authError = await requireAuth(request);
+  if (authError) return authError;
+
   try {
     const { id } = await params;
 
@@ -128,7 +147,7 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
 
     if (!existing) {
       return NextResponse.json(
-        { error: 'Lead no encontrado' },
+        { error: 'Lead not found' },
         { status: 404 }
       );
     }
@@ -143,7 +162,7 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
   } catch (error) {
     console.error('Error eliminando lead:', error);
     return NextResponse.json(
-      { error: 'Error interno del servidor' },
+      { error: 'Error deleting lead' },
       { status: 500 }
     );
   }
