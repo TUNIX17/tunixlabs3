@@ -14,31 +14,38 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
   const [error, setError] = useState('');
   const pathname = usePathname();
 
-  // Check authentication on mount
+  // Check authentication on mount via server-side cookie check
   useEffect(() => {
-    const auth = sessionStorage.getItem('admin_auth');
-    if (auth === 'true') {
-      setIsAuthenticated(true);
-    }
+    fetch('/api/auth/check')
+      .then(res => res.json())
+      .then(data => {
+        if (data.authenticated) setIsAuthenticated(true);
+      })
+      .catch(() => {});
   }, []);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-
-    // Simple password check (in production, use proper auth)
-    const correctPassword = process.env.NEXT_PUBLIC_ADMIN_PASSWORD || 'admin123';
-
-    if (password === correctPassword) {
-      sessionStorage.setItem('admin_auth', 'true');
-      setIsAuthenticated(true);
-    } else {
-      setError('Contrasena incorrecta');
+    try {
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password }),
+      });
+      if (res.ok) {
+        setIsAuthenticated(true);
+      } else {
+        const data = await res.json();
+        setError(data.error || 'Credenciales invalidas');
+      }
+    } catch {
+      setError('Error de conexion');
     }
   };
 
-  const handleLogout = () => {
-    sessionStorage.removeItem('admin_auth');
+  const handleLogout = async () => {
+    await fetch('/api/auth/logout', { method: 'POST' });
     setIsAuthenticated(false);
     setPassword('');
   };

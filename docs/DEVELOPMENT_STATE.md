@@ -1,8 +1,8 @@
 # TunixLabs - Development State
 
-**Last Updated:** 2026-01-20
-**Current Phase:** Voice Architecture Simplification
-**Sprint:** 3.8 - TTS Text Sanitization
+**Last Updated:** 2026-02-10
+**Current Phase:** Security Hardening
+**Sprint:** 4.0 - Security Audit & Remediation (35 vulnerabilities fixed)
 
 ---
 
@@ -276,17 +276,65 @@ TunixLabs es una plataforma web de consultoria en IA con:
     - `src/lib/agent/prompts/commercialAgent.ts` - Contact info reinforcement
   - [x] Build verification: npm run build succeeds
 
+- [x] **Security Audit & Remediation** (2026-02-10)
+  - [x] Full security audit: 35 vulnerabilities found (7 CRITICAL, 12 HIGH, 10 MEDIUM, 6 LOW)
+  - [x] Audit report: `docs/SECURITY_AUDIT_2026-02-10.md`
+  - [x] **Auth System Overhaul**:
+    - Created cookie-based session management (HMAC-SHA256 signed, HttpOnly, Secure, SameSite=Strict)
+    - Replaced NEXT_PUBLIC_ADMIN_PASSWORD/sessionStorage with server-side auth
+    - New endpoints: /api/auth/login, /api/auth/logout, /api/auth/check
+    - Admin layout uses server cookie auth (no more client-side password)
+    - Files created: `src/lib/auth/session.ts`, `src/lib/auth/password.ts`, `src/lib/auth/authCheck.ts`, `src/lib/auth/index.ts`
+    - Files created: `src/app/api/auth/login/route.ts`, `src/app/api/auth/logout/route.ts`, `src/app/api/auth/check/route.ts`
+    - Files modified: `src/app/admin/layout.tsx`
+  - [x] **Input Validation (Zod)**:
+    - Centralized Zod schemas for ALL API inputs with max length constraints
+    - Schemas: CreateLeadSchema, UpdateLeadSchema, CaptureLeadSchema, LeadQuerySchema, CerebrasProxySchema, GroqProxySchema, CalendlyWebhookSchema, ContactFormSchema, LoginSchema
+    - Files created: `src/lib/validation/schemas.ts`, `src/lib/validation/sanitize.ts`, `src/lib/validation/index.ts`
+  - [x] **Rate Limiting**:
+    - In-memory rate limiter (per-IP) with auto-cleanup
+    - Pre-configured: login (5/15min), api (60/min), proxy (20/min), contact (3/10min), capture (30/min), export (5/min)
+    - Applied to ALL API routes
+    - File created: `src/lib/rateLimit.ts`
+  - [x] **Route Hardening** (all 13 API routes secured):
+    - /api/leads/* (5 routes) - requireAuth + Zod + rate limiting
+    - /api/cerebras-proxy - requireProxyAuth + Zod + rate limiting + max_tokens cap (2000)
+    - /api/groq-proxy - requireProxyAuth + Zod + rate limiting + max_tokens cap (2000)
+    - /api/transcribe-audio - requireProxyAuth + rate limiting + file size/type validation + model allowlist
+    - /api/cron/email-sequences - requireCronAuth (Bearer token, denies in prod when unconfigured)
+    - /api/webhooks/calendly - HMAC-SHA256 signature verification + 503 in prod when unconfigured
+    - /api/contact - rate limiting + HTML escaping + email subject sanitization
+  - [x] **Output Sanitization**:
+    - CSV export: sanitizeForCSV() on all cells (prevents formula injection)
+    - Contact email: escapeHtml() on all user inputs (prevents XSS)
+    - Email subjects: sanitizeEmailSubject() strips newlines/null bytes (prevents header injection)
+    - All error responses use generic messages (no stack traces, no Prisma errors, no upstream details)
+  - [x] **Security Headers** (next.config.js):
+    - HSTS (1 year, includeSubDomains, preload)
+    - X-Frame-Options: DENY
+    - X-Content-Type-Options: nosniff
+    - Referrer-Policy: strict-origin-when-cross-origin
+    - Permissions-Policy: camera=(), microphone=(self), geolocation=()
+    - poweredByHeader: false
+  - [x] **Dependency Updates**:
+    - axios updated to latest (fixed 2 HIGH CVEs)
+    - bcryptjs added for password hashing
+  - [x] **Railway Environment Variables Set**:
+    - CRON_SECRET (32-byte random base64)
+    - AUTH_SECRET (48-byte random base64)
+    - ADMIN_PASSWORD (16-byte random base64)
+  - [x] Build verification: npm run build succeeds (52 pages)
+  - [x] Remaining npm audit: 6 vulnerabilities all in Next.js 13.4 (requires major version upgrade)
+
 ### In Progress
-- [ ] Configurar variables de entorno en Railway:
-  - [ ] RESEND_API_KEY
-  - [ ] CRON_SECRET (para secuencias de email)
-  - [ ] CALENDLY_LINK
-  - [ ] CALENDLY_WEBHOOK_SECRET
-  - [ ] ADMIN_PASSWORD
-  - [ ] NEXT_PUBLIC_ADMIN_PASSWORD
+- [ ] Deploy security fixes to Railway production
+- [ ] Remove NEXT_PUBLIC_ADMIN_PASSWORD from Railway after verifying new auth works
 
 ### Pending
-- [ ] Testing del sistema completo en producción
+- [ ] Upgrade Next.js 13.4 to latest (addresses 6 remaining CVEs including 1 CRITICAL auth bypass)
+- [ ] Rotate API keys: CEREBRAS_API_KEY, GROQ_API_KEY, DATABASE_URL password
+- [ ] Configure CALENDLY_WEBHOOK_SECRET on Railway
+- [ ] Testing del sistema completo en produccion
 - [ ] Conectar dominio tunixlabs.com
 - [ ] Testing setup (Jest + Playwright)
 - [ ] CI/CD pipeline
@@ -475,7 +523,7 @@ AI Services:
 CRM Services:
   Email: Resend (transaccional)
   Calendar: Calendly (webhooks)
-  Auth: Password simple (sessionStorage)
+  Auth: Cookie-based sessions (HMAC-SHA256, HttpOnly, Secure)
 
 Infrastructure:
   Avatar: Ready Player Me
@@ -499,28 +547,33 @@ Infrastructure:
 DATABASE_URL=postgresql://postgres:***@shortline.proxy.rlwy.net:44455/railway
 ```
 
+### Configuradas (Security - 2026-02-10)
+```bash
+CRON_SECRET=<set - random 32-byte base64>
+AUTH_SECRET=<set - random 48-byte base64>
+ADMIN_PASSWORD=<set - random 16-byte base64>
+```
+
 ### Pendientes de configurar en Railway
 ```bash
 # LLM - Cerebras (REQUERIDO para conversación)
-# Get key at: https://cloud.cerebras.ai/
 CEREBRAS_API_KEY=
 
 # STT - Groq Whisper (REQUERIDO para transcripción)
-# Get key at: https://console.groq.com/
 GROQ_API_KEY=
 
-# Email Notifications - Resend (para notificar nuevos leads)
-# Get key at: https://resend.com/
+# Email Notifications - Resend
 RESEND_API_KEY=
 NOTIFICATION_EMAIL=contacto@tunixlabs.com
 
-# Calendly Integration (para agendar reuniones)
+# Calendly Integration
 CALENDLY_LINK=https://calendly.com/tunixlabs/discovery
-CALENDLY_WEBHOOK_SECRET=
+CALENDLY_WEBHOOK_SECRET=  # REQUIRED for production webhook verification
+```
 
-# Admin Dashboard Auth
-ADMIN_PASSWORD=tu_password_seguro
-NEXT_PUBLIC_ADMIN_PASSWORD=tu_password_seguro  # Para client-side
+### Pendientes de ELIMINAR de Railway
+```bash
+NEXT_PUBLIC_ADMIN_PASSWORD  # DEPRECATED - replaced by ADMIN_PASSWORD + cookie auth
 ```
 
 Para configurar: `railway variables --set VARIABLE_NAME=value`
