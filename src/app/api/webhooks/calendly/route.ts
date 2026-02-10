@@ -53,7 +53,8 @@ function verifyCalendlySignature(rawBody: string, signatureHeader: string, secre
     const expected = crypto.createHmac('sha256', secret).update(payload).digest('hex');
 
     return crypto.timingSafeEqual(Buffer.from(expected, 'hex'), Buffer.from(signature, 'hex'));
-  } catch {
+  } catch (error) {
+    console.error('[Calendly] Signature verification error:', error);
     return false;
   }
 }
@@ -62,7 +63,13 @@ export async function POST(request: NextRequest) {
   try {
     // Read raw body first for signature verification
     const rawBody = await request.text();
-    const body: CalendlyWebhookPayload = JSON.parse(rawBody);
+    let body: CalendlyWebhookPayload;
+    try {
+      body = JSON.parse(rawBody);
+    } catch {
+      console.warn('[Calendly] Invalid JSON body');
+      return NextResponse.json({ error: 'Invalid request body' }, { status: 400 });
+    }
 
     // Verify webhook signature
     const webhookSecret = process.env.CALENDLY_WEBHOOK_SECRET;

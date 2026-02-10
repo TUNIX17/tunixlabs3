@@ -28,6 +28,31 @@ The TunixLabs platform has **catastrophic security vulnerabilities** across ever
 
 ---
 
+## REMEDIATION STATUS (Updated 2026-02-10)
+
+| Finding | Status | Notes |
+|---------|--------|-------|
+| C-001: Zero Auth on API Routes | FIXED | All 13 API routes now require cookie-based auth, cron auth, or proxy auth |
+| C-002: Admin Password Exposed | FIXED | Server-side cookie auth with HMAC-signed tokens, httpOnly/secure/sameSite cookies |
+| C-003: Open LLM Proxy | FIXED | Origin-based proxy auth + rate limiting (20 req/min) |
+| C-004: Next.js CVEs | OPEN | Next.js 13.4.x still in use; upgrade planned |
+| H-001: No Security Headers | FIXED | HSTS, X-Frame-Options, X-Content-Type-Options, Referrer-Policy, Permissions-Policy |
+| H-002: Calendly Webhook No Verification | FIXED | HMAC-SHA256 signature verification implemented |
+| H-003: No Input Validation | FIXED | Centralized Zod schemas for all API inputs |
+| H-004: No Rate Limiting | FIXED | Per-IP rate limiters on all routes (login, API, proxy, contact, capture, export) |
+| H-005: CSV Injection | FIXED | sanitizeForCSV with formula prefix prevention |
+| M-001: Dependency Vulnerabilities | PARTIAL | bcryptjs added; Next.js core vulns remain |
+| M-002: XSS in Email Templates | FIXED | escapeHtml + sanitizeEmailSubject applied |
+| M-003: CRON No Auth | FIXED | Bearer token auth via CRON_SECRET |
+| M-004: No Pagination Limit | FIXED | Hard limit of 100 per page via Zod schema |
+| M-005: drei Vulnerability | OPEN | Upstream lodash.pick dependency |
+| M-006: DB Credentials in .env | N/A | .env is gitignored; credential redacted from this document |
+| L-001: Verbose Logging | PARTIAL | Generic error messages returned; server-side logging kept for ops |
+| L-002: No CSRF Protection | PARTIAL | sameSite: strict cookies + origin checks on proxy routes |
+| L-003: No CSP Header | OPEN | CSP not yet added due to inline styles/scripts complexity |
+
+---
+
 ## VULNERABILITY FINDINGS
 
 ### CRITICAL SEVERITY (CVSS 9.0+)
@@ -106,7 +131,7 @@ const correctPassword = process.env.NEXT_PUBLIC_ADMIN_PASSWORD || 'admin123';
 
 **Additional Issues:**
 - Fallback password is `admin123` if env var is not set
-- Password in production is `Rancagua3!` (weak, guessable, likely derived from a city name)
+- Password in production was weak and guessable (now replaced with strong random value)
 - Authentication is purely client-side using `sessionStorage.setItem('admin_auth', 'true')`
 - Anyone can bypass by running `sessionStorage.setItem('admin_auth', 'true')` in browser console
 - No brute force protection
@@ -470,7 +495,7 @@ An attacker could request `?limit=999999` to dump the entire database.
 **Description:**
 The `.env` file contains the real production DATABASE_URL with password:
 ```
-DATABASE_URL="postgresql://postgres:QZmkAPduIDaEdKSRGXZsHctMNZpBKZCt@shortline.proxy.rlwy.net:44455/railway"
+DATABASE_URL="postgresql://postgres:REDACTED@shortline.proxy.rlwy.net:44455/railway"
 ```
 
 While `.env` is in `.gitignore`, this is a risk if the machine is compromised.
