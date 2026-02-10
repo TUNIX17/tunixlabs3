@@ -4,10 +4,11 @@ import { isAuthenticatedFromRequest } from './session';
 /**
  * Check admin authentication for API routes.
  * Returns null if authenticated, or a 401 NextResponse if not.
+ * Synchronous - uses cookie-based session validation.
  */
-export async function requireAuth(request: NextRequest): Promise<NextResponse | null> {
+export function requireAuth(request: NextRequest): NextResponse | null {
   if (isAuthenticatedFromRequest(request)) {
-    return null; // Authenticated
+    return null;
   }
   return NextResponse.json(
     { error: 'Authentication required' },
@@ -37,13 +38,14 @@ export function requireCronAuth(request: Request): NextResponse | null {
 }
 
 /**
- * Check auth for proxy/voice routes - allows same-origin requests or authenticated sessions.
+ * Check auth for proxy/voice routes.
+ * In production, verifies that the request originates from an allowed domain
+ * (tunixlabs.com or Railway deployment URL) via Origin/Referer header inspection.
+ * Also accepts authenticated admin sessions. In development, all requests are permitted.
  */
 export function requireProxyAuth(request: NextRequest): NextResponse | null {
-  // Allow authenticated admin sessions
   if (isAuthenticatedFromRequest(request)) return null;
 
-  // In production, check that request comes from our own origin
   const origin = request.headers.get('origin');
   const referer = request.headers.get('referer');
   const allowedOrigins = [
@@ -55,13 +57,21 @@ export function requireProxyAuth(request: NextRequest): NextResponse | null {
   ].filter(Boolean);
 
   if (process.env.NODE_ENV === 'production') {
-    const requestOrigin = origin || (referer ? new URL(referer).origin : null);
+    let requestOrigin = origin;
+    if (!requestOrigin && referer) {
+      try {
+        requestOrigin = new URL(referer).origin;
+      } catch {
+        console.warn('[Auth] Malformed Referer header:', referer);
+        requestOrigin = null;
+      }
+    }
     if (!requestOrigin || !allowedOrigins.some(o => requestOrigin === o)) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
   }
 
-  return null; // Allowed
+  return null;
 }
 
 /**
