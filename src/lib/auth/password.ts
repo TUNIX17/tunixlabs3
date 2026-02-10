@@ -11,18 +11,18 @@ export async function verifyPassword(input: string, hash: string): Promise<boole
   return bcrypt.compare(input, hash);
 }
 
-// For the initial simple auth (ADMIN_PASSWORD env var is plaintext for now)
-// This compares against the env var directly but uses timing-safe comparison
+// Compares input against ADMIN_PASSWORD env var using constant-time comparison.
+// Both values are hashed to SHA-256 to ensure equal-length buffers and prevent
+// timing leaks from length mismatch early returns.
 export function verifyAdminPassword(input: string): boolean {
   const adminPassword = process.env.ADMIN_PASSWORD;
   if (!adminPassword) return false;
-  if (input.length !== adminPassword.length) return false;
   try {
-    return crypto.timingSafeEqual(
-      Buffer.from(input),
-      Buffer.from(adminPassword)
-    );
-  } catch {
+    const inputHash = crypto.createHash('sha256').update(input).digest();
+    const expectedHash = crypto.createHash('sha256').update(adminPassword).digest();
+    return crypto.timingSafeEqual(inputHash, expectedHash);
+  } catch (error) {
+    console.error('[Auth] Password verification error:', error);
     return false;
   }
 }
