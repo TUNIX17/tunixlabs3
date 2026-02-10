@@ -24,23 +24,21 @@ const MAX_FILE_SIZE = 25 * 1024 * 1024; // 25MB
 export async function POST(request: NextRequest) {
   console.log('[API Transcribe] Recibida solicitud de transcripcion');
 
-  // Auth check
-  const authError = requireProxyAuth(request);
-  if (authError) return authError;
-
-  // Rate limiting
-  const ip = getClientIP(request);
-  const rateCheck = proxyLimiter.check(ip);
-  if (!rateCheck.success) {
-    return NextResponse.json({ error: 'Rate limit exceeded' }, { status: 429 });
-  }
-
-  if (!GROQ_API_KEY) {
-    console.error("[API Transcribe] FATAL ERROR: La variable de entorno GROQ_API_KEY no está configurada en el servidor.");
-    return NextResponse.json({ error: 'Server configuration error' }, { status: 500 });
-  }
-
   try {
+    const authError = requireProxyAuth(request);
+    if (authError) return authError;
+
+    const ip = getClientIP(request);
+    const rateCheck = proxyLimiter.check(ip);
+    if (!rateCheck.success) {
+      return NextResponse.json({ error: 'Rate limit exceeded' }, { status: 429 });
+    }
+
+    if (!GROQ_API_KEY) {
+      console.error("[API Transcribe] FATAL ERROR: La variable de entorno GROQ_API_KEY no está configurada en el servidor.");
+      return NextResponse.json({ error: 'Server configuration error' }, { status: 500 });
+    }
+
     const incomingFormData = await request.formData();
     const file = incomingFormData.get('file') as File | null;
     const model = incomingFormData.get('model') as string | null;

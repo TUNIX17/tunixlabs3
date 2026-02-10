@@ -10,26 +10,24 @@ const CEREBRAS_API_URL = 'https://api.cerebras.ai/v1';
 export async function POST(request: NextRequest) {
   console.log('[API Cerebras] Recibida solicitud');
 
-  // Auth check
-  const authError = requireProxyAuth(request);
-  if (authError) return authError;
-
-  // Rate limiting
-  const ip = getClientIP(request);
-  const rateCheck = proxyLimiter.check(ip);
-  if (!rateCheck.success) {
-    return NextResponse.json({ error: 'Rate limit exceeded' }, { status: 429 });
-  }
-
-  if (!CEREBRAS_API_KEY) {
-    console.error("[API Cerebras] FATAL ERROR: La variable de entorno CEREBRAS_API_KEY no está configurada en el servidor.");
-    return NextResponse.json(
-      { error: 'Server configuration error' },
-      { status: 500 }
-    );
-  }
-
   try {
+    const authError = requireProxyAuth(request);
+    if (authError) return authError;
+
+    const ip = getClientIP(request);
+    const rateCheck = proxyLimiter.check(ip);
+    if (!rateCheck.success) {
+      return NextResponse.json({ error: 'Rate limit exceeded' }, { status: 429 });
+    }
+
+    if (!CEREBRAS_API_KEY) {
+      console.error("[API Cerebras] FATAL ERROR: La variable de entorno CEREBRAS_API_KEY no está configurada en el servidor.");
+      return NextResponse.json(
+        { error: 'Server configuration error' },
+        { status: 500 }
+      );
+    }
+
     const body = await request.json();
     const parseResult = CerebrasProxySchema.safeParse(body);
     if (!parseResult.success) {

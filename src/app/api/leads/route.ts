@@ -11,16 +11,16 @@ import { CreateLeadSchema, LeadQuerySchema } from '@/lib/validation/schemas';
 import { apiLimiter } from '@/lib/rateLimit';
 
 export async function GET(request: NextRequest) {
-  const authError = await requireAuth(request);
-  if (authError) return authError;
-
-  const ip = getClientIP(request);
-  const rl = apiLimiter.check(ip);
-  if (!rl.success) {
-    return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
-  }
-
   try {
+    const authError = requireAuth(request);
+    if (authError) return authError;
+
+    const ip = getClientIP(request);
+    const rl = apiLimiter.check(ip);
+    if (!rl.success) {
+      return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
+    }
+
     const { searchParams } = new URL(request.url);
 
     // Validate and parse query parameters with Zod
@@ -99,16 +99,16 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
-  const authError = await requireAuth(request);
-  if (authError) return authError;
-
-  const ip = getClientIP(request);
-  const rl = apiLimiter.check(ip);
-  if (!rl.success) {
-    return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
-  }
-
   try {
+    const authError = requireAuth(request);
+    if (authError) return authError;
+
+    const ip = getClientIP(request);
+    const rl = apiLimiter.check(ip);
+    if (!rl.success) {
+      return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
+    }
+
     const body = await request.json();
 
     // Validate body with Zod

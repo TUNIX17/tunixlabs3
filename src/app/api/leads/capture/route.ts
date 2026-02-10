@@ -11,16 +11,16 @@ import { CaptureLeadSchema } from '@/lib/validation/schemas';
 import { captureLimiter } from '@/lib/rateLimit';
 
 export async function POST(request: NextRequest) {
-  const authError = requireProxyAuth(request);
-  if (authError) return authError;
-
-  const ip = getClientIP(request);
-  const rl = captureLimiter.check(ip);
-  if (!rl.success) {
-    return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
-  }
-
   try {
+    const authError = requireProxyAuth(request);
+    if (authError) return authError;
+
+    const ip = getClientIP(request);
+    const rl = captureLimiter.check(ip);
+    if (!rl.success) {
+      return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
+    }
+
     const body = await request.json();
 
     // Validate body with Zod

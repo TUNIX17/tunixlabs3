@@ -10,16 +10,16 @@ import { exportLimiter } from '@/lib/rateLimit';
 import { sanitizeForCSV } from '@/lib/validation/sanitize';
 
 export async function GET(request: NextRequest) {
-  const authError = await requireAuth(request);
-  if (authError) return authError;
-
-  const ip = getClientIP(request);
-  const rl = exportLimiter.check(ip);
-  if (!rl.success) {
-    return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
-  }
-
   try {
+    const authError = requireAuth(request);
+    if (authError) return authError;
+
+    const ip = getClientIP(request);
+    const rl = exportLimiter.check(ip);
+    if (!rl.success) {
+      return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
+    }
+
     const { searchParams } = new URL(request.url);
 
     // Parametros de filtro opcionales
@@ -103,7 +103,7 @@ export async function GET(request: NextRequest) {
     ]);
 
     const csv = [
-      headers.join(','),
+      headers.map(h => sanitizeForCSV(h)).join(','),
       ...rows.map(row => row.join(','))
     ].join('\n');
 

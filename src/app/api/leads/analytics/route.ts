@@ -16,10 +16,10 @@ interface FunnelItem {
 }
 
 export async function GET(request: NextRequest) {
-  const authError = await requireAuth(request);
-  if (authError) return authError;
-
   try {
+    const authError = requireAuth(request);
+    if (authError) return authError;
+
     // Obtener fecha hace 30 dias
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);

@@ -8,23 +8,21 @@ const GROQ_API_KEY = process.env.GROQ_API_KEY;
 const GROQ_API_URL = 'https://api.groq.com/openai/v1';
 
 export async function POST(request: NextRequest) {
-  // Auth check
-  const authError = requireProxyAuth(request);
-  if (authError) return authError;
-
-  // Rate limiting
-  const ip = getClientIP(request);
-  const rateCheck = proxyLimiter.check(ip);
-  if (!rateCheck.success) {
-    return NextResponse.json({ error: 'Rate limit exceeded' }, { status: 429 });
-  }
-
-  if (!GROQ_API_KEY) {
-    console.error("FATAL ERROR: La variable de entorno GROQ_API_KEY no está configurada en el servidor.");
-    return NextResponse.json({ error: 'Server configuration error' }, { status: 500 });
-  }
-
   try {
+    const authError = requireProxyAuth(request);
+    if (authError) return authError;
+
+    const ip = getClientIP(request);
+    const rateCheck = proxyLimiter.check(ip);
+    if (!rateCheck.success) {
+      return NextResponse.json({ error: 'Rate limit exceeded' }, { status: 429 });
+    }
+
+    if (!GROQ_API_KEY) {
+      console.error("FATAL ERROR: La variable de entorno GROQ_API_KEY no está configurada en el servidor.");
+      return NextResponse.json({ error: 'Server configuration error' }, { status: 500 });
+    }
+
     const body = await request.json();
     const parseResult = GroqProxySchema.safeParse(body);
     if (!parseResult.success) {

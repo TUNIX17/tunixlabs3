@@ -17,11 +17,11 @@ export const maxDuration = 60; // 60 segundos max
 export async function GET(request: Request) {
   console.log('[Cron] Email sequences job iniciado');
 
-  // Verify authorization (denies access in production when CRON_SECRET is not set)
-  const authError = requireCronAuth(request);
-  if (authError) return authError;
-
   try {
+    // Verify authorization (denies access in production when CRON_SECRET is not set)
+    const authError = requireCronAuth(request);
+    if (authError) return authError;
+
     const startTime = Date.now();
 
     // Procesar secuencias

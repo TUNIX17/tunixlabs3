@@ -15,10 +15,10 @@ interface RouteParams {
 }
 
 export async function GET(request: NextRequest, { params }: RouteParams) {
-  const authError = await requireAuth(request);
-  if (authError) return authError;
-
   try {
+    const authError = requireAuth(request);
+    if (authError) return authError;
+
     const { id } = await params;
 
     const lead = await prisma.lead.findUnique({
@@ -52,10 +52,10 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 }
 
 export async function PUT(request: NextRequest, { params }: RouteParams) {
-  const authError = await requireAuth(request);
-  if (authError) return authError;
-
   try {
+    const authError = requireAuth(request);
+    if (authError) return authError;
+
     const { id } = await params;
     const body = await request.json();
 
@@ -134,10 +134,10 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
 }
 
 export async function DELETE(request: NextRequest, { params }: RouteParams) {
-  const authError = await requireAuth(request);
-  if (authError) return authError;
-
   try {
+    const authError = requireAuth(request);
+    if (authError) return authError;
+
     const { id } = await params;
 
     // Verificar que existe
