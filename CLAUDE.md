@@ -366,6 +366,44 @@ El symlink `.venv` en el proyecto apunta a esta ubicacion.
 
 ---
 
+## Quality Mode
+medium
+
+## Closing Pipeline
+```bash
+# Run from project root. Must exit 0. In order.
+# Tunixlabsweb is Next.js + Prisma. No vitest/jest config exists yet — the
+# `test` gate is currently a no-op stub. Add real tests as a follow-up to
+# promote this project to strict.
+type_check: npx tsc --noEmit
+lint: npm run lint
+build: npm run build
+test: echo "GAP: no test infrastructure configured yet" && true
+```
+
+## CI
+```yaml
+# Medium mode: watch_ci is SKIPPED per the canonical mode table in
+# Agente_Tunix/.claude/rules/closing-pipeline.md.
+workflow: NOT_CONFIGURED
+watch_timeout_seconds: 0
+expect_conclusion: skipped
+deploy_convention: direct-push  # Railway auto-deploys, public marketing site
+```
+
+## Notes
+- This project was added to the Agente_Tunix meta-system contract on 2026-04-07
+  after being identified as a scope-drift omission of the zero-debt-upgrade sprint
+  (the meta-system tracked 7 projects in MEMORY.md but `monitoring/state/Tunixlabsweb.json`
+  exists, so the omission was in the documentation, not the operational layer).
+- Stack: Next.js + Prisma. No test infrastructure configured yet — the `test` gate
+  is a placeholder until vitest or playwright is set up. Add real tests as a
+  follow-up to promote this project from medium to strict mode.
+- `npx tsc --noEmit` is the type-check gate (no `type-check` script in package.json).
+- See `Agente_Tunix/.claude/rules/closing-pipeline.md` for the canonical contract.
+
+---
+
 ## RECORDATORIO FINAL:
 
 Este archivo es tu contrato con el proyecto. Seguir estas reglas garantiza:
