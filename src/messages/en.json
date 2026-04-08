@@ -86,7 +86,7 @@
         "fernandezMetallurgic": {
           "client": "Fernandez Metallurgic (50-year-old industrial company)",
           "problem": "A 50-year-old metallurgic company running its entire operation on Excel — HR, attendance, finance, document management, project control, CRM — during a period when the owners were absent and operational continuity was at risk.",
-          "solution": "Custom AI-powered ERP that replaced Excel across every critical area. OCR, QR and LLM Vision pipelines for on-floor document digitization, full Chilean SII integration for invoicing and tax compliance, and a project control module built for metallurgy, not for SaaS. Acted as interim general manager during the owners' absence to ensure operational continuity.",
+          "solution": "Custom AI-powered ERP that replaced Excel across every critical area. OCR, QR and LLM Vision pipelines for on-floor document digitization, full Chilean SII integration for invoicing and tax compliance, and a project control module built for metallurgy, not for SaaS. Led the end-to-end digital transformation while the owners were away.",
           "metric": "Full ERP shipped solo · SII integration in production · OCR + QR + LLM Vision pipelines live",
           "stack": [
             "Next.js",
@@ -128,7 +128,7 @@
       "title": "Not a studio. One operator who ships.",
       "name": "Alejandro Moyano Foncea",
       "roleLine": "MSc Finance (UAI) · MIT Professional Education · 15 years running operations, now shipping the code",
-      "bioParagraph1": "I come from the business side. Bachelor's in Business Administration and MSc in Finance from Universidad Adolfo Ibáñez, plus <mit>MIT Professional Education</mit> in AI/ML in 2024 (80 hours on Dataiku DSS). Fifteen years running real operations before shipping production code: co-founder of Highlands Coffee & Tea for 9 years, Project Management Controller at MSCO, interim general manager at Fernandez Metallurgic during the owners' absence. English is native — I spent my senior year of high school at Ukiah High School, California (2000).",
+      "bioParagraph1": "I come from the business side. Bachelor's in Business Administration and MSc in Finance from Universidad Adolfo Ibáñez, plus <mit>MIT Professional Education</mit> in AI/ML in 2024 (80 hours on Dataiku DSS). Fifteen years running real operations before shipping production code: co-founder of Highlands Coffee & Tea for 9 years, Project Management Controller at MSCO, digital transformation lead at Fernandez Metallurgic. English is native — I spent my senior year of high school at Ukiah High School, California (2000).",
       "bioParagraph2": "After MIT I replicated those ML models in Python with Claude as coding assistant. Today I ship production systems with agentic workflows: field Voice AI at Schwager (195+ field workers, 4,000+ daily route sheets), SIME (19,778 work orders), Apoderapp with its sii-factura library. Claude Code is 80% of my stack — that's why what I deliver is running in production, not sitting in a pitch deck. US time zone overlap (0–2h from East/Central) and rates 3–5x below comparable SF/NYC shops, without giving up senior ownership.",
       "linkedinLabel": "View on LinkedIn",
       "linkedinUrl": "https://www.linkedin.com/in/alejandro-moyano/"

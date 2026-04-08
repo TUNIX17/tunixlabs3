@@ -36,6 +36,15 @@
 /* Estilos generales para todos los navegadores */
 html {
   box-sizing: border-box;
+  /*
+    overflow-x: hidden is load-bearing. The aurora-blob decorative shapes are
+    absolutely positioned and their keyframes animate them to positions like
+    `left: 70%` and `right: -10%`, which combined with their 200-250px widths
+    push past 100vw. Without this clip, the page gets a horizontal scrollbar
+    and mobile users see content that shifts as the blobs cycle. This fix
+    landed on 2026-04-08 after user report of scroll lateral.
+  */
+  overflow-x: hidden;
   -webkit-text-size-adjust: 100%;
   -ms-text-size-adjust: 100%;
   -ms-overflow-style: scrollbar;
@@ -50,6 +59,8 @@ html {
 
 body {
   margin: 0;
+  /* Belt-and-suspenders: some browsers honor overflow-x on body but not html. */
+  overflow-x: hidden;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;

@@ -86,8 +86,8 @@
         "fernandezMetallurgic": {
           "client": "Maestranza Fernández (empresa metalúrgica, 50 años)",
           "problem": "Operación completa corriendo en Excel — RRHH, asistencia, finanzas, control de proyectos, CRM — durante ausencia de los dueños, sin un ERP que reflejara el estado real del negocio.",
-          "solution": "ERP custom con IA que reemplazó el Excel en cada área. Pipelines de OCR, QR y LLM Vision para digitalizar documentos en planta. Actué como gerente general interino durante el desarrollo.",
-          "metric": "ERP full-stack shippeado solo · OCR + QR + LLM Vision en producción · gerente general interino",
+          "solution": "ERP custom con IA que reemplazó el Excel en cada área. Pipelines de OCR, QR y LLM Vision para digitalizar documentos en planta. Lideré la transformación digital end-to-end durante el desarrollo.",
+          "metric": "ERP full-stack shippeado solo · OCR + QR + LLM Vision en producción · transformación digital end-to-end",
           "stack": [
             "Next.js",
             "Prisma",
@@ -128,7 +128,7 @@
       "title": "No soy un studio. Soy una persona que construye.",
       "name": "Alejandro Moyano Foncea",
       "roleLine": "MSc Finanzas UAI · MIT Professional Education · 15 años liderando proyectos, hoy shippeando código",
-      "bioParagraph1": "Vengo del lado del negocio. Bachelor en Administración y MSc en Finanzas en UAI, más <mit>MIT Professional Education</mit> en AI/ML (2024, 80 horas sobre Dataiku DSS). 15 años liderando proyectos reales antes de shippear código en serio: co-fundador de Highlands Coffee & Tea durante 9 años, Project Management Controller en MSCO, gerente general interino en Maestranza Fernández.",
+      "bioParagraph1": "Vengo del lado del negocio. Bachelor en Administración y MSc en Finanzas en UAI, más <mit>MIT Professional Education</mit> en AI/ML (2024, 80 horas sobre Dataiku DSS). 15 años liderando proyectos reales antes de shippear código en serio: co-fundador de Highlands Coffee & Tea durante 9 años, Project Management Controller en MSCO, líder de transformación digital en Maestranza Fernández.",
       "bioParagraph2": "Después del MIT repliqué esos modelos en Python con Claude como coding assistant. Hoy shippeo sistemas de producción con workflows agénticos: Voice AI de faena en Schwager (195+ operarios, 4,000+ rutas diarias), SIME (19,778 órdenes de trabajo), Apoderapp con su librería sii-factura. Claude Code es el 80% de mi stack — por eso lo que entrego está operando hoy, no en un pitch deck.",
       "linkedinLabel": "Ver en LinkedIn",
       "linkedinUrl": "https://www.linkedin.com/in/alejandro-moyano/"
