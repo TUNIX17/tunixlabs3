@@ -45,6 +45,20 @@ export default async function LocaleLayout({ children, params: { locale } }: Pro
         <link rel="alternate" hrefLang="es" href="https://tunixlabs.com/es" />
         <link rel="alternate" hrefLang="en" href="https://tunixlabs.com/en" />
         <link rel="alternate" hrefLang="x-default" href="https://tunixlabs.com/es" />
+        {/*
+          Plausible analytics. Only injected when NEXT_PUBLIC_PLAUSIBLE_DOMAIN
+          is set (production) so local dev never hits plausible.io. The
+          `tagged-events` build lets us track clicks on elements tagged with
+          `plausible-event-name=...` classes without importing a JS SDK.
+          Events are fired via `src/lib/analytics/track.ts`.
+        */}
+        {process.env.NEXT_PUBLIC_PLAUSIBLE_DOMAIN && (
+          <script
+            defer
+            data-domain={process.env.NEXT_PUBLIC_PLAUSIBLE_DOMAIN}
+            src="https://plausible.io/js/script.outbound-links.tagged-events.js"
+          />
+        )}
       </head>
       <body>
         <NextIntlClientProvider messages={messages}>

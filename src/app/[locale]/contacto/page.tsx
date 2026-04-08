@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { FiMail, FiMessageCircle, FiSend, FiCheck, FiAlertCircle } from 'react-icons/fi';
 import { BsWhatsapp } from 'react-icons/bs';
+import { trackEvent, Events } from '@/lib/analytics/track';
 
 type FormStatus = 'idle' | 'loading' | 'success' | 'error';
 
@@ -36,6 +37,7 @@ export default function ContactoPage() {
     e.preventDefault();
     setStatus('loading');
     setErrorMessage('');
+    trackEvent(Events.CONTACT_FORM_SUBMIT);
 
     try {
       const response = await fetch('/api/contact', {
@@ -52,9 +54,12 @@ export default function ContactoPage() {
 
       setStatus('success');
       setFormData({ nombre: '', email: '', asunto: '', mensaje: '' });
+      trackEvent(Events.CONTACT_FORM_SUCCESS);
     } catch (error) {
       setStatus('error');
-      setErrorMessage(error instanceof Error ? error.message : 'Error desconocido');
+      const message = error instanceof Error ? error.message : 'Error desconocido';
+      setErrorMessage(message);
+      trackEvent(Events.CONTACT_FORM_ERROR, { reason: message });
     }
   };
 
@@ -210,7 +215,7 @@ export default function ContactoPage() {
                 <span style={{ color: 'var(--text-muted)' }}>contacto@tunixlabs.com</span>
               </div>
               <a
-                href="https://wa.me/56930367979?text=Hola,%20me%20gustaría%20obtener%20más%20información%20sobre%20sus%20servicios%20de%20IA."
+                href={`https://wa.me/56930367979?text=${encodeURIComponent(t('directContact.whatsappInfoMessage'))}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-3 group"
@@ -227,7 +232,7 @@ export default function ContactoPage() {
           <div className="neu-pressed p-6 rounded-xl text-center">
             <p className="text-lg font-semibold mb-3 neu-gradient-text">{t('directContact.meetingQuestion')}</p>
             <a
-              href="https://wa.me/56930367979?text=Hola,%20me%20gustaría%20agendar%20una%20reunión%20para%20discutir%20mi%20proyecto."
+              href={`https://wa.me/56930367979?text=${encodeURIComponent(t('directContact.whatsappScheduleMessage'))}`}
               target="_blank"
               rel="noopener noreferrer"
               className="neu-btn-primary inline-flex items-center gap-2"
