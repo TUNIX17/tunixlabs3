@@ -22,6 +22,7 @@ import TrustedBy from '@/components/TrustedBy';
 import CaseStudies from '@/components/CaseStudies';
 import ProductShowcase from '@/components/ProductShowcase';
 import AboutFounder from '@/components/AboutFounder';
+import { useScrollReveal } from '@/hooks/useScrollReveal';
 import { trackEvent, Events } from '@/lib/analytics/track';
 
 /**
@@ -31,9 +32,10 @@ import { trackEvent, Events } from '@/lib/analytics/track';
  *   Hero + ProductShowcase  (replaces former 3D robot that killed LCP)
  *   TrustedBy               (logo strip of direct partners)
  *   CaseStudies             (4 real cards with indirect attribution)
- *   AboutFounder            (bio + MIT credential modal trigger)
  *   Services                (7 anchored services, grid 3x3)
- *   CTA                     (WhatsApp + email + full form link)
+ *   AboutFounder            (bio + MIT credential modal trigger, now at the end
+ *                            acting as the closing-argument before CTA)
+ *   CTA                     (WhatsApp + full form link, no more mailto)
  *   Footer                  (disclaimer + copyright)
  *
  * Services reduced from 9 to 7: dropped automatizacion-marketing-ia and
@@ -45,6 +47,9 @@ export default function HomePage() {
   const t = useTranslations('HomePage');
   const [scrolled, setScrolled] = useState(false);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  // Scroll-reveal container — any descendant `.reveal` fades in as it enters
+  // the viewport. Reduced-motion users skip the observer entirely.
+  const revealRootRef = useScrollReveal<HTMLDivElement>();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -175,6 +180,7 @@ export default function HomePage() {
 
   return (
     <div
+      ref={revealRootRef}
       className="min-h-screen relative neu-bg"
       style={{ backgroundColor: 'var(--neu-bg)' }}
     >
@@ -188,8 +194,7 @@ export default function HomePage() {
         className="absolute inset-0 z-0 opacity-30"
       />
 
-      <div className="parallax-wrapper">
-        {/* HERO */}
+      {/* HERO */}
         <section className="relative pt-20 pb-24">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             <div className="lg:grid lg:grid-cols-12 lg:gap-8 items-center">
@@ -247,9 +252,6 @@ export default function HomePage() {
           <CaseStudies />
         </div>
 
-        {/* Founder bio with MIT credential modal */}
-        <AboutFounder />
-
         {/* Services grid — 7 anchored services */}
         <section id="servicios" className="py-16 neu-bg">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -273,7 +275,7 @@ export default function HomePage() {
 
             <div className="mt-12">
               <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                {services.map((service) => {
+                {services.map((service, idx) => {
                   const Icon = service.icon;
                   return (
                     <Link
@@ -285,7 +287,10 @@ export default function HomePage() {
                         })
                       }
                     >
-                      <div className="neu-raised p-6 rounded-2xl group cursor-pointer transition-all duration-300 hover:-translate-y-1 h-full">
+                      <div
+                        className="reveal neu-raised p-6 rounded-2xl group cursor-pointer h-full"
+                        data-reveal-delay={((idx % 4) + 1) as 1 | 2 | 3 | 4}
+                      >
                         <div className="neu-service-icon">
                           <Icon
                             className="h-8 w-8"
@@ -329,7 +334,14 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* CTA — WhatsApp + email + full form */}
+        {/* Founder bio with MIT credential modal — moved to the end of the
+            page as the closing-argument right before the CTA. The visitor
+            has seen cases + services; this is the trust-close. */}
+        <AboutFounder />
+
+        {/* CTA — WhatsApp + full form (the email mailto was removed because
+            mailto: hands off to Outlook/Mail clients that aren't always
+            configured; the user loses the intent instead of converting). */}
         <section
           id="contacto"
           className="py-20 neu-bg relative overflow-hidden"
@@ -352,7 +364,7 @@ export default function HomePage() {
                 href={whatsappHref}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="neu-raised rounded-2xl p-6 flex flex-col items-center justify-center text-center transition-all duration-300 hover:-translate-y-1 group"
+                className="neu-raised rounded-2xl p-6 flex flex-col items-center justify-center text-center group"
                 style={{
                   background: 'linear-gradient(145deg, #25D366, #128C7E)',
                 }}
@@ -367,17 +379,20 @@ export default function HomePage() {
                 </span>
               </a>
 
-              <a
-                href="mailto:contacto@tunixlabs.com"
+              <Link
+                href="/contacto"
                 className="neu-btn-primary rounded-2xl p-6 flex flex-col items-center justify-center text-center transition-all duration-300 hover:-translate-y-1 group"
                 data-cta="email"
                 onClick={() =>
-                  trackEvent(Events.CTA_EMAIL_CLICK, { location: 'home' })
+                  trackEvent(Events.CTA_EMAIL_CLICK, {
+                    location: 'home_cta_grid',
+                    destination: 'contact_form',
+                  })
                 }
               >
                 <FiMail className="h-10 w-10 mb-3" />
                 <span className="text-lg font-bold">{t('cta.email')}</span>
-              </a>
+              </Link>
             </div>
 
             <div className="mt-8 text-center">
@@ -420,7 +435,6 @@ export default function HomePage() {
           </p>
           <p>&copy; 2026 {t('footer.copyright')}</p>
         </footer>
-      </div>
     </div>
   );
 }

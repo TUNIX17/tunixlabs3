@@ -2,6 +2,7 @@
 
 import { useTranslations } from 'next-intl';
 import { trackEvent, Events } from '@/lib/analytics/track';
+import { useScrollReveal } from '@/hooks/useScrollReveal';
 
 /**
  * CaseStudies — "Casos en produccion" section rendered on the home page.
@@ -32,9 +33,14 @@ const cardKeys = ['sime', 'schwager', 'gasDistribution', 'apoderapp'] as const;
 
 export default function CaseStudies() {
   const t = useTranslations('HomePage.caseStudies');
+  const rootRef = useScrollReveal<HTMLElement>();
 
   return (
-    <section aria-labelledby="case-studies-title" className="py-16 neu-bg">
+    <section
+      ref={rootRef}
+      aria-labelledby="case-studies-title"
+      className="py-16 neu-bg"
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
           <span
@@ -55,16 +61,17 @@ export default function CaseStudies() {
         </div>
 
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
-          {cardKeys.map((key) => {
+          {cardKeys.map((key, idx) => {
             // `t.raw` returns the parsed JSON value, used for the string[] stack field.
             const stack = t.raw(`cards.${key}.stack`) as string[];
             return (
               <article
                 key={key}
+                data-reveal-delay={Math.min(idx + 1, 4)}
                 onClick={() =>
                   trackEvent(Events.CASE_STUDY_CLICK, { case: key })
                 }
-                className="neu-raised rounded-2xl p-6 flex flex-col transition-all duration-300 hover:-translate-y-1 cursor-pointer"
+                className="reveal neu-raised rounded-2xl p-6 flex flex-col cursor-pointer"
               >
                 <h3 className="text-lg font-bold mb-4 neu-gradient-text leading-snug">
                   {t(`cards.${key}.client`)}

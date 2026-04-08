@@ -118,7 +118,7 @@ export default function MITCredentialBadge({ children }: Props) {
         type="button"
         onClick={handleOpen}
         aria-label={t('open')}
-        className="inline-flex items-center gap-1 border-b border-dotted border-current pb-[1px] font-semibold transition-colors duration-200 hover:text-purple-600 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 rounded-sm"
+        className="mit-credential-badge inline-flex items-center gap-1 border-b border-dotted border-current pb-[1px] font-semibold transition-colors duration-200 hover:text-purple-600 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 rounded-sm"
         style={{ color: 'var(--neu-primary)' }}
       >
         {children}

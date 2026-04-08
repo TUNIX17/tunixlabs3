@@ -558,35 +558,6 @@ body {
   animation-duration: 15s;
 }
 
-/* Parallax Effect */
-.parallax-wrapper {
-  height: 100vh;
-  overflow-x: hidden;
-  overflow-y: auto;
-  perspective: 10px;
-}
-
-.parallax-layer {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  transform-style: preserve-3d;
-}
-
-.parallax-bg {
-  transform: translateZ(-10px) scale(2);
-}
-
-.parallax-mid {
-  transform: translateZ(-5px) scale(1.5);
-}
-
-.parallax-front {
-  transform: translateZ(0);
-}
-
 /* Efectos de texto y sombras universales - Aurora Theme */
 .neon-text {
   text-shadow: 0 0 5px rgba(124, 58, 237, 0.7),

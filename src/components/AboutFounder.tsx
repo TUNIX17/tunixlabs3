@@ -1,6 +1,7 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
+import { FiExternalLink } from 'react-icons/fi';
 import MITCredentialBadge from './MITCredentialBadge';
 
 /**
@@ -71,7 +72,7 @@ export default function AboutFounder() {
                 width={360}
                 height={480}
                 priority={false}
-                className="w-full h-auto max-w-[320px] rounded-2xl"
+                className="about-founder__photo w-full h-auto max-w-[320px] rounded-2xl"
                 style={{ objectFit: 'contain' }}
               />
             </div>
@@ -109,6 +110,22 @@ export default function AboutFounder() {
             >
               {t('bioParagraph2')}
             </p>
+
+            {/*
+              LinkedIn outbound link — appears at the bottom of the bio as a
+              "verify this claim" signal. Target=_blank so visitors don't lose
+              the Tunixlabsweb tab, noopener+noreferrer for security.
+            */}
+            <a
+              href={t('linkedinUrl')}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 mt-6 text-sm font-semibold transition-colors duration-200 hover:underline"
+              style={{ color: 'var(--neu-primary)' }}
+            >
+              {t('linkedinLabel')}
+              <FiExternalLink className="h-3.5 w-3.5" aria-hidden="true" />
+            </a>
           </div>
         </div>
       </div>

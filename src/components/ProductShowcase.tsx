@@ -7,34 +7,50 @@ import { useTranslations } from 'next-intl';
 /**
  * ProductShowcase
  * ----------------------------------------------------------------------------
- * Reemplazo del 3D RobotModel (Three.js, ~2200 LOC) por un mosaic de 4
- * screenshots reales de productos Tunixlabs. Diseñado para LCP bajo:
+ * Mosaic of 5 real product screenshots from Tunixlabs portfolio. Replaces the
+ * former 3D RobotModel (Three.js, ~2200 LOC, LCP killer).
  *
+ * Slot composition (cycle 2):
+ *   1. sgmSchwager       — SGM "Bienvenido" hero, the wow shot, LCP priority
+ *   2. apoderappDark     — Apoderapp Dashboard Presidencial dark
+ *   3. fernandezErp      — Fernandez Metallurgic ERP dashboard dark
+ *   4. speakly           — Speakly AI English landing
+ *   5. gasDistribution   — BOT_GASCO dashboard anonimizado
+ *
+ * Previous cycle had two Apoderapp slots and no SIME/Schwager/SOMA
+ * representation. User fed back: "hay dos imagenes de apoderap, ninguna de
+ * schwager, sime, o soma". SGM (Schwager) is the lead; SIME is represented
+ * indirectly through the dark-theme "industrial serious" vibe of the
+ * Fernandez ERP (the literal SIME UI can't be shown because of the Codelco
+ * attribution rule). SOMA stays excluded because there's no public asset yet.
+ *
+ * Layouts:
  *   - Desktop (lg+): rotating autoplay 5s, pause-on-hover, dots navigation,
- *     cross-fade via opacity. Solo slot activo visible.
- *   - Tablet (md):   grid 2x2 estatico, todos los slots render en una sola vista.
- *   - Mobile (sm):   stack 1x4 vertical, scroll natural, sin carousel.
+ *     cross-fade via opacity + subtle Ken-Burns zoom on the active layer.
+ *     Only slot active visible.
+ *   - Tablet (md):   grid 3-up top + 2-up bottom to accommodate 5 slots.
+ *   - Mobile (sm):   stack 1x5 vertical, scroll natural, sin carousel.
  *
  * Prioridades de imagen:
- *   - Slot 0 (Apoderapp landing-hero) usa `priority` → LCP candidate.
- *   - Slots 1-3 lazy con `loading="lazy"`.
+ *   - Slot 0 (sgmSchwager) usa `priority` → LCP candidate.
+ *   - Slots 1-4 lazy con `loading="lazy"`.
  *
  * Accesibilidad:
  *   - region con aria-label + aria-roledescription="carousel".
  *   - Prev/Next + arrow keys cuando el slot esta focado.
  *   - `prefers-reduced-motion`: desactiva autoplay, desactiva cross-fade,
- *     muestra los 4 slots como grid 2x2 (equivale al layout tablet).
+ *     desactiva Ken-Burns, muestra los 5 slots como grid estatico.
  *   - aria-live="polite" para anunciar el slot activo en rotativo.
  *
  * Performance:
  *   - next/image con `sizes` estricto → sirve webp/avif optimizado via Next.
- *   - aspect-ratio reservado (1280/800) para evitar CLS.
+ *   - aspect-ratio reservado (16/10) para evitar CLS.
  *   - Sin framer-motion, sin libs externas. Solo CSS + React state.
  *
- * El i18n keys (`HomePage.caseStudies.cards.{key}`) son generados por tunix-cro
- * en paralelo. Si todavia no existen, fallback a labels hardcoded via try/catch
- * con defaultMessages. next-intl lanza si la key no existe; usamos
- * `useTranslations` con default namespace + lookup defensivo.
+ * I18n keys (`HomePage.productShowcase.slots.<slotKey>.{label,metric}`) son
+ * generadas por tunix-cro en paralelo. Usamos `t.has()` de next-intl v4 con
+ * fallback a strings hardcoded si la key todavia no existe. Esto evita que el
+ * componente explote durante el rollout coordinado.
  */
 
 type ShowcaseSlot = {
@@ -47,32 +63,39 @@ type ShowcaseSlot = {
 
 const SLOTS: ShowcaseSlot[] = [
   {
-    key: 'apoderapp',
-    src: '/case-studies/apoderapp-landing-hero.png',
-    alt: 'Apoderapp landing — Chilean tax compliance SaaS with SII DTE in production',
-    fallbackLabel: 'Chilean tax compliance SaaS',
-    fallbackMetric: 'SII DTE certified in production',
+    key: 'sgmSchwager',
+    src: '/case-studies/sgm-schwager-hero.png',
+    alt: 'SGM Schwager — welcome dashboard with 8 operational modules',
+    fallbackLabel: 'SGM · Gestion operacional minera',
+    fallbackMetric: '8 modulos en produccion',
   },
   {
-    key: 'apoderappFeatures',
-    src: '/case-studies/apoderapp-features.png',
-    alt: 'Apoderapp features grid — 8 core product capabilities',
-    fallbackLabel: 'Feature-rich platform',
-    fallbackMetric: '8 core capabilities shipped',
+    key: 'apoderappDark',
+    src: '/case-studies/apoderapp-presidenta-dark.png',
+    alt: 'Apoderapp presidential dashboard — leadership and engagement KPIs',
+    fallbackLabel: 'Apoderapp · Dashboard Presidencial',
+    fallbackMetric: 'KPIs liderazgo 96.7% · engagement 89.3%',
+  },
+  {
+    key: 'fernandezErp',
+    src: '/case-studies/fernandez-erp-dashboard.png',
+    alt: 'Fernandez Metallurgic ERP — dark-theme production dashboard',
+    fallbackLabel: 'Fernandez Metallurgic · ERP',
+    fallbackMetric: 'Operaciones, proyectos y finanzas en un solo panel',
   },
   {
     key: 'speakly',
     src: '/case-studies/speakly-landing.png',
     alt: 'Speakly landing — AI English learning with Voice AI and personalized paths',
-    fallbackLabel: 'AI English learning',
-    fallbackMetric: 'Voice AI + personalized paths',
+    fallbackLabel: 'Speakly · Ingles con IA',
+    fallbackMetric: 'Voice AI + rutas personalizadas',
   },
   {
     key: 'gasDistribution',
     src: '/case-studies/bot-gas-distribution.png',
     alt: 'Gas distribution automation dashboard with code processing analytics',
-    fallbackLabel: 'Gas distribution automation',
-    fallbackMetric: '4,040 codes · 88.7% success',
+    fallbackLabel: 'Distribucion de gas · Automatizacion',
+    fallbackMetric: '4,040 codigos · 88.7% exito',
   },
 ];
 
@@ -83,8 +106,7 @@ type SlotCardProps = {
   index: number;
   active: boolean;
   priority: boolean;
-  /** Cuando `true`, el nodo se renderiza con display: none para
-   * tablet/desktop rotativo. */
+  /** When `true`, the node is part of the rotating desktop stage. */
   hiddenOnRotating: boolean;
   label: string;
   metric: string;
@@ -111,7 +133,7 @@ function SlotCard({
       aria-hidden={hiddenOnRotating && !active ? 'true' : undefined}
       data-slot-index={index}
     >
-      <div className="relative aspect-[16/10] w-full">
+      <div className="product-showcase__frame relative aspect-[16/10] w-full">
         <Image
           src={slot.src}
           alt={slot.alt}
@@ -119,7 +141,7 @@ function SlotCard({
           priority={priority}
           loading={priority ? undefined : 'lazy'}
           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 640px"
-          className="object-cover object-top"
+          className="product-showcase__img object-cover object-top"
         />
         <div
           aria-hidden="true"
@@ -139,20 +161,18 @@ function SlotCard({
 }
 
 /**
- * Resuelve label + metric para cada slot. Usa next-intl si la key existe
- * (detectado via t.has), fallback a los strings hardcoded del slot si no.
- * next-intl v4 expone `t.has(key)` de forma estable — no usamos try/catch
- * ni violamos reglas de hooks.
+ * Resolves label + metric for each slot. Uses next-intl if the key exists
+ * (detected via t.has), fallback to the slot's hardcoded strings otherwise.
+ * next-intl v4 exposes `t.has(key)` as a stable API — no try/catch, no hook
+ * rule violation. The `HomePage.productShowcase.slots.<key>` namespace is
+ * owned by tunix-cro and lives in parallel to `HomePage.caseStudies`.
  */
 function useResolvedSlotCopy(): Array<{ label: string; metric: string }> {
   const t = useTranslations();
   return SLOTS.map((slot) => {
-    const baseKey = `HomePage.caseStudies.cards.${slot.key}`;
+    const baseKey = `HomePage.productShowcase.slots.${slot.key}`;
     const labelKey = `${baseKey}.label`;
     const metricKey = `${baseKey}.metric`;
-    // next-intl v4: t.has() devuelve boolean sin throw.
-    // Si el hook no expone has (pre-v4), el typeof check lo desactiva
-    // y caemos a fallback silenciosamente.
     const has: ((k: string) => boolean) | undefined =
       typeof (t as unknown as { has?: (k: string) => boolean }).has === 'function'
         ? (t as unknown as { has: (k: string) => boolean }).has
@@ -173,8 +193,8 @@ export default function ProductShowcase() {
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const copy = useResolvedSlotCopy();
 
-  // Detectar prefers-reduced-motion (runtime) — si true, apagamos autoplay
-  // y dejamos el grid 2x2 estatico activo en todos los breakpoints md+.
+  // Detect prefers-reduced-motion at runtime — if true, we kill autoplay and
+  // fall back to a static grid on md+ breakpoints.
   useEffect(() => {
     if (typeof window === 'undefined') return;
     const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -231,7 +251,7 @@ export default function ProductShowcase() {
       onKeyDown={onKeyDown}
       tabIndex={0}
     >
-      {/* Mobile (sm): stack 1x4 vertical */}
+      {/* Mobile (sm): stack 1x5 vertical */}
       <div className="product-showcase__mobile grid grid-cols-1 gap-4 sm:hidden">
         {SLOTS.map((slot, i) => (
           <SlotCard
@@ -247,24 +267,31 @@ export default function ProductShowcase() {
         ))}
       </div>
 
-      {/* Tablet (md): grid 2x2 estatico */}
-      <div className="product-showcase__tablet hidden sm:grid lg:hidden grid-cols-2 gap-4">
+      {/* Tablet (md): 3-up row then 2-up row for the 5 slots. */}
+      <div className="product-showcase__tablet hidden sm:grid lg:hidden grid-cols-6 gap-4">
         {SLOTS.map((slot, i) => (
-          <SlotCard
+          <div
             key={`tab-${slot.key}`}
-            slot={slot}
-            index={i}
-            active={false}
-            priority={i === 0}
-            hiddenOnRotating={false}
-            label={copy[i].label}
-            metric={copy[i].metric}
-          />
+            className={
+              // First 3 slots → 2 cols each (3*2=6); last 2 slots → 3 cols each (2*3=6)
+              i < 3 ? 'col-span-2' : 'col-span-3'
+            }
+          >
+            <SlotCard
+              slot={slot}
+              index={i}
+              active={false}
+              priority={i === 0}
+              hiddenOnRotating={false}
+              label={copy[i].label}
+              metric={copy[i].metric}
+            />
+          </div>
         ))}
       </div>
 
-      {/* Desktop (lg+): rotativo con cross-fade.
-          Si reducedMotion es true, degradamos a grid 2x2. */}
+      {/* Desktop (lg+): rotating with cross-fade + Ken-Burns on active.
+          If reducedMotion is true, degrade to static 3+2 grid. */}
       <div
         className={[
           'product-showcase__desktop hidden lg:block',
@@ -274,18 +301,22 @@ export default function ProductShowcase() {
           .join(' ')}
       >
         {reducedMotion ? (
-          <div className="grid grid-cols-2 gap-5">
+          <div className="grid grid-cols-6 gap-5">
             {SLOTS.map((slot, i) => (
-              <SlotCard
+              <div
                 key={`desk-static-${slot.key}`}
-                slot={slot}
-                index={i}
-                active={false}
-                priority={i === 0}
-                hiddenOnRotating={false}
-                label={copy[i].label}
-                metric={copy[i].metric}
-              />
+                className={i < 3 ? 'col-span-2' : 'col-span-3'}
+              >
+                <SlotCard
+                  slot={slot}
+                  index={i}
+                  active={false}
+                  priority={i === 0}
+                  hiddenOnRotating={false}
+                  label={copy[i].label}
+                  metric={copy[i].metric}
+                />
+              </div>
             ))}
           </div>
         ) : (
@@ -307,7 +338,7 @@ export default function ProductShowcase() {
                     position: i === 0 ? 'relative' : 'absolute',
                     inset: i === 0 ? undefined : 0,
                     opacity: i === activeIndex ? 1 : 0,
-                    transition: 'opacity 600ms ease-in-out',
+                    transition: 'opacity 700ms ease-in-out',
                     pointerEvents: i === activeIndex ? 'auto' : 'none',
                   }}
                 >
@@ -343,7 +374,7 @@ export default function ProductShowcase() {
                     className={[
                       'product-showcase__dot h-3 w-3 rounded-full transition-all duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2',
                       isActive
-                        ? 'neu-pressed scale-110'
+                        ? 'neu-pressed scale-125'
                         : 'neu-raised opacity-60 hover:opacity-100',
                     ].join(' ')}
                     style={{
