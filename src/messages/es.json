@@ -1,7 +1,7 @@
 {
   "Metadata": {
-    "title": "TunixLabs - SaaS verticales con IA para industrias reguladas",
-    "description": "Construimos SaaS verticales con IA en produccion para mineria, energia, educacion y compliance tributario. Mas de 5 sistemas operando 24/7."
+    "title": "TunixLabs — Software a medida para industrias reguladas",
+    "description": "Un operador chileno que shippea software a medida para industrias reguladas. Minería, metalurgia, retail, compliance tributario. 15 años liderando proyectos + MIT Professional Education ML."
   },
   "Layout": {
     "nav": {
@@ -12,63 +12,126 @@
   },
   "HomePage": {
     "hero": {
-      "title1": "Construimos",
-      "title2": "SaaS verticales con IA",
+      "title1": "Software",
+      "title2": "que opera en producción",
       "title3": "para industrias reguladas",
-      "description": "Sistemas en produccion 24/7 para contratistas mineros, empresas de energia, firmas auditoras y compliance tributario chileno. No hacemos demos: entregamos software que opera todos los dias.",
+      "description": "Soy Alejandro. 15 años corriendo proyectos reales — maestranza, retail, minería — y hoy shippeo software de producción con workflows agénticos sobre Claude Code. Trabajo con contratistas mineros, firmas auditoras y mi propio SaaS de gestión escolar.",
       "cta": {
-        "contact": "Hablemos de tu proyecto",
-        "services": "Ver casos en produccion"
+        "contact": "Hablemos por WhatsApp",
+        "services": "Ver lo que construí"
       },
-      "loading3D": "Cargando modelo 3D..."
+      "loading3D": "Cargando..."
     },
     "trustedBy": {
-      "title": "Equipos que han trabajado con TunixLabs"
+      "title": "Equipos para los que he shippeado"
     },
     "caseStudies": {
-      "badge": "Casos en produccion",
-      "title": "Software que opera 24/7",
-      "subtitle": "5+ sistemas en produccion para clientes en industrias reguladas",
+      "badge": "En producción",
+      "title": "Sistemas reales, no demos de pitch",
+      "subtitle": "Software que una persona revisa todos los días a las 7 de la mañana.",
       "stack": "Stack",
-      "disclaimer": "TunixLabs actua como partner tecnico de firmas seleccionadas. Los nombres de clientes en estos casos refieren al partner directo que encarga el desarrollo, no al usuario final del software.",
+      "disclaimer": "TunixLabs actúa como partner técnico de firmas seleccionadas. Los nombres de clientes en estos casos refieren al partner directo que encarga el desarrollo, no al usuario final del software.",
       "cards": {
         "sime": {
-          "client": "Contratistas en operaciones mineras criticas (Chile)",
-          "problem": "Gestion de pautas de seguridad, mantenciones y ordenes de trabajo sin trazabilidad digital end-to-end en faenas mineras.",
-          "solution": "Plataforma integral de seguridad minera: 1,056 pautas, checklists de actividades, PDFs firmados con QR, dashboard ejecutivo y auditoria completa.",
-          "metric": "115K+ actividades · 19,778 ordenes de trabajo · 24/7 en Railway",
-          "stack": ["Turborepo", "Fastify 5", "React 19", "PostgreSQL", "AWS S3"]
+          "client": "Contratistas en operaciones mineras criticas en Chile",
+          "problem": "Pautas de seguridad, mantenciones preventivas y órdenes de trabajo corriendo en papel y planillas, sin trazabilidad digital entre la faena y la oficina central.",
+          "solution": "Reemplazo completo del sistema legacy: 1,056 pautas, checklists por actividad, PDFs firmados con QR, navegación histórica de KPIs y auditoría completa por turno minero.",
+          "metric": "19,778 órdenes de trabajo · 115K+ actividades · 116K+ sub-actividades",
+          "stack": [
+            "Turborepo",
+            "Fastify",
+            "React",
+            "PostgreSQL",
+            "AWS S3"
+          ]
         },
         "schwager": {
-          "client": "Schwager Energy (via partner tecnico)",
-          "problem": "Firmas legales de faena en ubicaciones remotas con conectividad intermitente y formularios en papel que se extraviaban.",
-          "solution": "App offline-first con Voice AI (Gemini 2.5 Flash), 9 agentes especializados, firma digital auditable y sincronizacion diferida al volver cobertura.",
-          "metric": "210 firmas legales procesadas · Voice AI <2s latencia · 9 agentes en produccion",
-          "stack": ["Express", "React", "Capacitor", "Gemini 2.5", "Prisma"]
+          "client": "Schwager (servicios mineros, vía partner técnico)",
+          "problem": "Firmas legales de mantención en faenas mineras remotas, con conectividad intermitente y formularios en papel que se extraviaban antes de llegar a auditoría.",
+          "solution": "App mobile offline-first con Voice AI sobre Google Gemini — los operarios completan formularios de seguridad hablando, sin sacarse los guantes. Firma multicanal (email, WhatsApp, web, mobile) con audit trail completo y parser inteligente de exports SAP que detecta órdenes canceladas.",
+          "metric": "195+ operarios de faena · 7 cuadrillas de mantenimiento · 4,000+ rutas y firmas diarias · 90%+ reducción de uso de memoria · respuestas bajo 100ms",
+          "stack": [
+            "React",
+            "TypeScript",
+            "PostgreSQL",
+            "Google Gemini",
+            "Capacitor"
+          ]
         },
         "gasDistribution": {
           "client": "Distribuidora regional de gas en Chile",
-          "problem": "Validacion manual de codigos de quema y 14 rutas de reparto con errores de transcripcion y re-procesos diarios.",
-          "solution": "Bot de procesamiento automatico de codigos con validacion contra reglas de negocio, dashboard de metricas y reporteria por ruta.",
-          "metric": "4,040 codigos procesados · 88.7% tasa de exito · 14 rutas automatizadas",
-          "stack": ["Express 5", "Prisma", "React 18", "PostgreSQL"]
+          "problem": "Validación manual de códigos de quema en 14 rutas de reparto, con errores de transcripción y horas diarias de re-proceso antes de facturar.",
+          "solution": "Bot de procesamiento automático con validación contra reglas de negocio, dashboard de métricas por ruta y reportería diaria. Commodity hardware, sin licencias enterprise.",
+          "metric": "4,040 códigos procesados · 88.7% tasa de éxito · 14 rutas automatizadas",
+          "stack": [
+            "Express",
+            "Prisma",
+            "React",
+            "PostgreSQL"
+          ]
         },
         "apoderapp": {
           "client": "Apoderapp (producto propio)",
-          "problem": "Colegios y apoderados sin un canal digital para gestionar cuotas, pagos y boletas integrado al SII chileno.",
-          "solution": "Plataforma SaaS con integracion nativa al SII (tipos 33/39/61/56), firma XMLDSig, CAF, Libros IVA, validacion de schemas y asistente WhatsApp con IA.",
-          "metric": "Certificacion SII completa · DTE en produccion · Libros Ventas/Compras LOK",
-          "stack": ["Next.js", "React", "Prisma", "SII XML/CAF", "Claude"]
+          "problem": "Centros de padres de colegios chilenos sin canal digital para cuotas, pagos y votaciones, corriendo todo en Excel y WhatsApp.",
+          "solution": "PWA construida con pipelines de agentic coding sobre Claude Code — 5 agentes especializados. Como feature de compliance, incluye una librería sii-factura reusable (facturación electrónica chilena con 88+ tests), pero el core es la gestión del centro de padres. Diseñado para escalar a LATAM.",
+          "metric": "PWA en producción · 5 agentes Claude Code · sii-factura library con 88+ tests como feature",
+          "stack": [
+            "Next.js",
+            "React",
+            "Prisma",
+            "SII XML/CAF",
+            "Claude Code"
+          ]
+        },
+        "fernandezMetallurgic": {
+          "client": "Maestranza Fernández (empresa metalúrgica, 50 años)",
+          "problem": "Operación completa corriendo en Excel — RRHH, asistencia, finanzas, control de proyectos, CRM — durante ausencia de los dueños, sin un ERP que reflejara el estado real del negocio.",
+          "solution": "ERP custom con IA que reemplazó el Excel en cada área. Pipelines de OCR, QR y LLM Vision para digitalizar documentos en planta. Actué como gerente general interino durante el desarrollo.",
+          "metric": "ERP full-stack shippeado solo · OCR + QR + LLM Vision en producción · gerente general interino",
+          "stack": [
+            "Next.js",
+            "Prisma",
+            "PostgreSQL",
+            "Claude Code",
+            "SII XML"
+          ]
+        }
+      }
+    },
+    "productShowcase": {
+      "title": "Portafolio en producción",
+      "slots": {
+        "sgmSchwager": {
+          "label": "Gestión de mantenimiento en faena",
+          "metric": "195+ operarios · 4,000+ rutas diarias · Voice AI con Google Gemini"
+        },
+        "apoderappDark": {
+          "label": "SaaS de gestión para centros de padres",
+          "metric": "PWA propia · 5 agentes Claude Code · feature sii-factura con 88+ tests"
+        },
+        "fernandezErp": {
+          "label": "ERP a medida para maestranza",
+          "metric": "50 años de empresa · Excel reemplazado área por área · OCR + QR + LLM Vision"
+        },
+        "speakly": {
+          "label": "Aprender inglés con IA",
+          "metric": "Producto propio · Turborepo + Voice AI · rutas personalizadas"
+        },
+        "gasDistribution": {
+          "label": "Automatización de distribución de gas",
+          "metric": "4,040 códigos · 88.7% de éxito · 14 rutas automatizadas"
         }
       }
     },
     "about": {
       "badge": "Sobre el founder",
-      "title": "Ingenieria senior, no promesas",
+      "title": "No soy un studio. Soy una persona que construye.",
       "name": "Alejandro Moyano Foncea",
-      "roleLine": "Fundador · 10+ anos construyendo software que opera en produccion",
-      "bioParagraph1": "Formacion en Machine Learning via <mit>MIT Professional Education</mit>: programa \"No Code AI and Machine Learning: Building Data Science Solutions\", 80 horas de trabajo con Dataiku DSS (Feb–May 2024). Ese background ancla la parte de ML clasico; el stack moderno de LLMs y agentes llego despues.",
-      "bioParagraph2": "Hoy TunixLabs es un studio boutique chileno enfocado en industrias reguladas: mineria, energia, compliance tributario, auditoria. Escribimos codigo que tiene que pasar auditoria y operar los 365 dias del ano. No hacemos landings ni demos bonitas: entregamos sistemas que una persona revisa todos los dias a las 7am."
+      "roleLine": "MSc Finanzas UAI · MIT Professional Education · 15 años liderando proyectos, hoy shippeando código",
+      "bioParagraph1": "Vengo del lado del negocio. Bachelor en Administración y MSc en Finanzas en UAI, más <mit>MIT Professional Education</mit> en AI/ML (2024, 80 horas sobre Dataiku DSS). 15 años liderando proyectos reales antes de shippear código en serio: co-fundador de Highlands Coffee & Tea durante 9 años, Project Management Controller en MSCO, gerente general interino en Maestranza Fernández.",
+      "bioParagraph2": "Después del MIT repliqué esos modelos en Python con Claude como coding assistant. Hoy shippeo sistemas de producción con workflows agénticos: Voice AI de faena en Schwager (195+ operarios, 4,000+ rutas diarias), SIME (19,778 órdenes de trabajo), Apoderapp con su librería sii-factura. Claude Code es el 80% de mi stack — por eso lo que entrego está operando hoy, no en un pitch deck.",
+      "linkedinLabel": "Ver en LinkedIn",
+      "linkedinUrl": "https://www.linkedin.com/in/alejandro-moyano/"
     },
     "credentials": {
       "modalTitle": "Credencial MIT Professional Education",
@@ -78,70 +141,115 @@
       "altText": "Diploma de MIT Professional Education a nombre de Alejandro Moyano Foncea"
     },
     "services": {
-      "badge": "Que hacemos",
-      "title": "Lo que construimos",
-      "subtitle": "7 areas ancladas a proyectos reales en produccion. Sin buzzwords genericos, sin stacks inventados.",
-      "learnMore": "Saber mas",
+      "badge": "Qué hago",
+      "title": "Lo que construyo",
+      "subtitle": "7 áreas ancladas a proyectos reales en producción. Sin buzzwords, sin stacks inventados.",
+      "learnMore": "Saber más",
       "items": {
         "aiAssistants": {
           "title": "Asistentes conversacionales y Voice AI",
-          "shortDescription": "Agentes de voz y chatbots con LLMs reales, no flujos rigidos. Voice AI con <2s de latencia en produccion.",
-          "longDescription": "Construimos asistentes conversacionales para operaciones reales: voice AI para faenas de energia, chatbots WhatsApp con IA para soporte de productos SaaS y agentes Claude integrados al backend del cliente. No usamos Dialogflow ni Rasa: trabajamos con LLMs frontera (Claude, Gemini) y construimos la orquestacion sobre tu stack.",
-          "stack": ["Claude", "Gemini 2.5 Flash", "Next.js", "Fastify", "Voice AI pipelines"],
-          "anchorProject": "En produccion: Voice AI de faena con 9 agentes especializados para una empresa de energia (latencia <2s, Gemini 2.5 Flash, session resumption)."
+          "shortDescription": "Agentes de voz y chatbots con LLMs frontera, no flujos rígidos. Voice AI corriendo en faena, no en demo.",
+          "longDescription": "Construyo asistentes conversacionales para operaciones reales: Voice AI de faena para que los operarios completen formularios de seguridad hablando (sin sacarse los guantes), chatbots WhatsApp para soporte y agentes Claude integrados al backend del cliente. Nada de Dialogflow ni Rasa: LLMs frontera orquestados sobre tu stack existente.",
+          "stack": [
+            "Claude",
+            "Google Gemini",
+            "Next.js",
+            "Fastify",
+            "Pipelines de Voice AI"
+          ],
+          "anchorProject": "En producción: Voice AI de faena para un contratista de servicios mineros — 195+ operarios, 7 cuadrillas de mantenimiento, 4,000+ rutas diarias, tiempo de respuesta bajo 100ms."
         },
         "businessIntelligence": {
           "title": "Business Intelligence y dashboards operacionales",
-          "shortDescription": "Dashboards para directores de operaciones que efectivamente los miran. KPIs con data real, no placeholders.",
-          "longDescription": "Construimos dashboards operacionales y pipelines ETL para equipos que necesitan ver la realidad de su operacion antes del cafe. Calendarios 20-20, vistas mensuales, comparativas historicas, backfills. Hechos para equipos que trabajan en faena, no para investors deck.",
-          "stack": ["Next.js", "React 19", "Prisma", "PostgreSQL", "ETL multi-year", "Gantt charts"],
-          "anchorProject": "En produccion: plataformas BI con 115K+ actividades trackeadas, 1,056 pautas y 19,778 ordenes de trabajo para contratistas mineros; dashboards de 103 estandares de auditoria para una firma que reporta a operadores mineros."
+          "shortDescription": "Dashboards que los directores de operaciones efectivamente miran. Data real, cero placeholders.",
+          "longDescription": "Construyo dashboards operacionales y pipelines ETL para equipos que necesitan ver la realidad de su operación antes del café. Calendarios 20-20, vistas mensuales, comparativas históricas, backfills, KPIs de minería (OEE, MTBF, MTTR, disponibilidad, CAUE, matrices de criticidad ABC). Hechos para gente que trabaja en faena, no para pitch decks.",
+          "stack": [
+            "Next.js",
+            "React",
+            "Prisma",
+            "PostgreSQL",
+            "ETL multi-year",
+            "Gantt charts"
+          ],
+          "anchorProject": "En producción: plataformas BI con 115K+ actividades, 1,056 pautas y 19,778 órdenes de trabajo para contratistas mineros; dashboards de 103+ estándares de auditoría para una firma que reporta a operadores mineros; planning multi-year con timelines Gantt sobre data cruda de SAP."
         },
         "webDev": {
           "title": "Desarrollo web y SaaS verticales",
-          "shortDescription": "Plataformas SaaS completas: backend, frontend, integraciones, CI/CD y deploy. Especializados en industrias reguladas.",
-          "longDescription": "Construimos SaaS verticales end-to-end. No hacemos landings marketing-only: construimos el producto completo — auth, billing, admin panels, integraciones con sistemas legacy y APIs gubernamentales. Stack moderno con TypeScript estricto, testing real y deploy automatizado.",
-          "stack": ["Next.js 14 App Router", "Fastify 5", "React 19", "Prisma", "PostgreSQL", "Railway", "Turborepo"],
-          "anchorProject": "En produccion: Apoderapp (compliance tributario SII chileno), Speakly (plataforma de aprendizaje de ingles con IA en Turborepo) y este mismo sitio que estas leyendo."
+          "shortDescription": "Plataformas SaaS completas: backend, frontend, integraciones, CI/CD y deploy. Enfocado en industrias reguladas.",
+          "longDescription": "Construyo SaaS verticales end-to-end. No hago landings de marketing: construyo el producto completo — auth, pagos, panel de admin, integraciones con sistemas legacy y APIs gubernamentales cuando se necesita. Stack moderno con TypeScript estricto, testing real y deploy automatizado. Código escrito para pasar auditoría, no para impresionar inversionistas.",
+          "stack": [
+            "Next.js",
+            "Fastify",
+            "React",
+            "Prisma",
+            "PostgreSQL",
+            "Railway",
+            "Turborepo"
+          ],
+          "anchorProject": "En producción: Apoderapp (PWA de gestión para centros de padres con sii-factura library como feature), Speakly (plataforma propia de inglés con IA en Turborepo), ERP custom para Maestranza Fernández (empresa metalúrgica de 50 años) y el sitio que estás leyendo."
         },
         "aiConsulting": {
-          "title": "Consultoria de IA y auditorias tecnicas",
-          "shortDescription": "Evaluamos tu arquitectura de IA actual, encontramos el scope drift y proponemos el approach mas barato que funciona.",
-          "longDescription": "Hacemos auditorias adversariales de sistemas de IA ya desplegados: que tan solido es tu pipeline, donde esta la deuda tecnica escondida, cuando tiene sentido un LLM y cuando un modelo clasico es mejor. Tambien diseniamos arquitecturas multi-agente desde cero para clientes que ya tienen data y saben que problema quieren resolver.",
-          "stack": ["Claude Code", "Sistemas multi-agente", "RAG", "Closing pipelines", "Playwright testing"],
-          "anchorProject": "Experiencia propia: meta-sistema Agente_Tunix que orquesta 7 proyectos en produccion via agentes Claude jerarquicos, cada uno con su propio closing pipeline (type_check → lint → build → test → audit) y PR review automatizado."
+          "title": "Consultoría de IA y auditorías técnicas",
+          "shortDescription": "Reviso tu arquitectura de IA, encuentro la deuda escondida y propongo el approach más barato que funciona.",
+          "longDescription": "Auditorías adversariales de sistemas de IA ya desplegados: qué tan sólido es tu pipeline, dónde está la deuda técnica escondida, cuándo tiene sentido un LLM y cuándo un modelo clásico es mejor. También diseño arquitecturas multi-agente desde cero para clientes que ya tienen data y saben qué problema quieren resolver. El diferenciador honesto: 15 años corriendo proyectos reales antes de shippear la primera línea de código — sé distinguir entre un problema de software y un problema de proceso.",
+          "stack": [
+            "Claude Code",
+            "Sistemas multi-agente",
+            "RAG",
+            "Closing pipelines",
+            "Playwright testing"
+          ],
+          "anchorProject": "Experiencia propia: meta-sistema Agente_Tunix que orquesta 7 proyectos en producción vía agentes Claude jerárquicos, cada uno con su propio closing pipeline (type_check → lint → build → test → audit) y PR review automatizado."
         },
         "rpa": {
-          "title": "Automatizacion de procesos (RPA con IA)",
-          "shortDescription": "Automatizamos procesos repetitivos con codigo, no con plataformas RPA carisimas. Integracion directa con tus APIs.",
-          "longDescription": "Cuando tu equipo gasta horas procesando archivos Excel, validando codigos manualmente o reenviando mails, construimos un bot que lo hace en segundos. No usamos UiPath ni Power Automate: escribimos un servicio en Node/Python que corre en tu infra y se integra con tus sistemas existentes. Mas barato, mas auditable, y no depende de licencias enterprise.",
-          "stack": ["Node.js", "Python", "Playwright", "Prisma", "Docker", "Claude"],
-          "anchorProject": "En produccion: bot de procesamiento de codigos para una distribuidora regional de gas en Chile. 4,040 codigos procesados, 88.7% de tasa de exito, 14 rutas de reparto automatizadas, dashboard de metricas por ruta y reporteria diaria."
+          "title": "Automatización de procesos (RPA con IA)",
+          "shortDescription": "Automatizo procesos repetitivos con código, no con plataformas RPA carísimas. Integración directa con tus APIs.",
+          "longDescription": "Cuando tu equipo gasta horas procesando archivos Excel, validando códigos a mano o reenviando mails, escribo un bot que lo hace en segundos. Nada de UiPath ni Power Automate: un servicio en Node o Python que corre en tu infra y se integra con tus sistemas existentes. Más barato, más auditable, y no depende de licencias enterprise.",
+          "stack": [
+            "Node.js",
+            "Python",
+            "Playwright",
+            "Prisma",
+            "Docker",
+            "Claude"
+          ],
+          "anchorProject": "En producción: bot de procesamiento de códigos para una distribuidora regional de gas en Chile — 4,040 códigos, 88.7% de éxito, 14 rutas automatizadas. También pipelines OCR + QR + LLM Vision para digitalizar documentos en planta de una empresa metalúrgica de 50 años."
         },
         "machineLearning": {
           "title": "Machine Learning y data science aplicado",
-          "shortDescription": "ML clasico + LLM stack combinados. Formacion en MIT Professional Education y trabajo con Dataiku + Python.",
-          "longDescription": "Diferencia honesta vs consultoras que solo conocen LLMs: tenemos background real en ML clasico (feature engineering, seleccion de modelos, cross-validation) ANTES del boom de GPT. Eso significa que si tu problema es prediccion sobre data estructurada, no vamos a vendarte un LLM que alucina: vamos a construir un modelo que funciona y se audita. La formacion es MIT Professional Education — 80 horas de trabajo sobre Dataiku DSS entre febrero y mayo de 2024.",
-          "stack": ["Python (scikit-learn, pandas)", "Dataiku DSS", "Claude como coding assistant", "PostgreSQL", "Jupyter"],
-          "anchorProject": "Formacion: programa MIT Professional Education \"No Code AI and Machine Learning: Building Data Science Solutions\" (80h, 2024) trabajando con Dataiku DSS, luego replicacion de los modelos en Python con Claude como coding assistant."
+          "shortDescription": "ML clásico + stack LLM moderno. Formado en MIT Professional Education sobre Dataiku DSS, después replicado en Python.",
+          "longDescription": "Diferencia honesta contra las consultoras que aparecieron post-ChatGPT: tengo fundamentos de ML clásico (feature engineering, selección de modelos, cross-validation) previos al boom de GPT — más fundamentos de finanzas de un MSc en UAI. Si tu problema es predicción sobre data estructurada, no te voy a vender un LLM que alucina: voy a construir un modelo que funciona y se audita. La formación es MIT Professional Education — 80 horas sobre Dataiku DSS entre febrero y mayo de 2024.",
+          "stack": [
+            "Python (scikit-learn, pandas)",
+            "Dataiku DSS",
+            "Claude como coding assistant",
+            "PostgreSQL",
+            "Jupyter"
+          ],
+          "anchorProject": "Formación: programa MIT Professional Education \"No Code AI and Machine Learning: Building Data Science Solutions\" (80h, 2024) sobre Dataiku DSS, luego replicación de los modelos en Python con Claude como coding assistant."
         },
         "computerVision": {
-          "title": "Vision artificial (capability en construccion)",
-          "shortDescription": "Framing honesto: tenemos los fundamentos tecnicos y el interes, pero aun sin proyectos de CV en produccion propios.",
-          "longDescription": "Seccion honesta: la vision artificial es un area de interes personal del founder desde el inicio del journey IA y tenemos los fundamentos tecnicos del entrenamiento de modelos. Sin embargo, todavia no hay proyectos de CV en produccion en el portafolio. Si tu proyecto necesita CV critica, recomendamos trabajar con un especialista dedicado o conversar con nosotros para colaboraciones experimentales donde el alcance sea claro.",
-          "stack": ["Python", "PyTorch / TensorFlow (fundamentos)", "OpenCV (basico)", "Claude"],
-          "anchorProject": "Honesto: sin proyectos CV en produccion propios. Tomamos este servicio como experimental / colaborativo con especialistas. Si es critico para tu proyecto, te derivamos a quien corresponde."
+          "title": "Visión artificial (capability en construcción)",
+          "shortDescription": "Framing honesto: tengo los fundamentos y el interés, pero todavía no hay proyectos de CV en producción propios.",
+          "longDescription": "Sección honesta: la visión artificial es un área que me interesa desde el inicio del journey IA y entiendo los fundamentos del entrenamiento de modelos. Pero todavía no hay proyectos de CV críticos en producción en mi portafolio. Si tu proyecto necesita CV de misión crítica, te recomiendo trabajar con un especialista dedicado o conversar conmigo para una colaboración experimental con entregables acotados.",
+          "stack": [
+            "Python",
+            "PyTorch / TensorFlow (fundamentos)",
+            "OpenCV (básico)",
+            "Claude"
+          ],
+          "anchorProject": "Honesto: sin proyectos CV en producción propios. Si es crítico para tu proyecto, te derivo a quien corresponde."
         }
       }
     },
     "cta": {
-      "title": "Listo para construir tu proximo SaaS?",
-      "subtitle": "Respondemos en menos de 24h",
-      "whatsapp": "Hablar por WhatsApp",
-      "email": "Enviar email",
-      "fullForm": "Tambien podes usar el formulario completo \u2192"
+      "title": "Tenés un proyecto que necesita shippear?",
+      "subtitle": "Respondo en menos de 24h. Escríbeme directo por WhatsApp.",
+      "whatsapp": "Escríbeme por WhatsApp",
+      "email": "Ir al formulario",
+      "fullForm": "O usa el formulario completo →"
     },
-    "whatsappMessage": "Hola, vengo de tunixlabs.com. Me interesa conversar sobre un proyecto de SaaS vertical con IA.",
+    "whatsappMessage": "Hola Alejandro, vengo de tunixlabs.com. Me gustaría conversar sobre un proyecto.",
     "contact": {
       "badge": "Contacto",
       "title": "Hablemos de tu proximo producto",
@@ -168,13 +276,13 @@
     },
     "footer": {
       "copyright": "TunixLabs. Todos los derechos reservados.",
-      "disclaimer": "TunixLabs actua como partner tecnico de firmas seleccionadas. Los nombres de clientes en casos de estudio refieren al partner directo que encarga el desarrollo, no al usuario final del software."
+      "disclaimer": "TunixLabs actúa como partner técnico de firmas seleccionadas. Los nombres de clientes en casos de estudio refieren al partner directo que encarga el desarrollo, no al usuario final del software."
     }
   },
   "ContactPage": {
     "hero": {
       "title": "Hablemos de tu proyecto",
-      "description": "Completa el formulario o escribenos directamente. Nuestro equipo te respondera en menos de 24h."
+      "description": "Completa el formulario o escríbeme directamente. Respondo en menos de 24h."
     },
     "form": {
       "title": "Envianos un mensaje",
@@ -185,75 +293,75 @@
       "subject": "Asunto",
       "subjectPlaceholder": "Sobre que quieres hablar?",
       "message": "Mensaje",
-      "messagePlaceholder": "Cuentanos tu idea o consulta...",
+      "messagePlaceholder": "Cuéntame tu idea o consulta...",
       "submit": "Enviar mensaje",
       "sending": "Enviando...",
       "successTitle": "Mensaje enviado",
-      "successMessage": "Te responderemos pronto a tu correo.",
+      "successMessage": "Te responderé pronto a tu correo.",
       "sendAnother": "Enviar otro mensaje"
     },
     "directContact": {
       "title": "Contacto directo",
-      "whatsapp": "Escribenos por WhatsApp",
-      "whatsappInfoMessage": "Hola, vengo de tunixlabs.com y me gustaria mas informacion sobre sus SaaS verticales con IA.",
-      "whatsappScheduleMessage": "Hola, vengo de tunixlabs.com y me gustaria agendar una reunion para discutir mi proyecto.",
+      "whatsapp": "Escríbeme por WhatsApp",
+      "whatsappInfoMessage": "Hola, vengo de tunixlabs.com y me gustaría más información sobre tus servicios.",
+      "whatsappScheduleMessage": "Hola, vengo de tunixlabs.com y me gustaría agendar una reunión para discutir mi proyecto.",
       "socialMedia": "Redes sociales",
-      "meetingQuestion": "Prefieres una reunion?",
+      "meetingQuestion": "Prefieres una reunión?",
       "scheduleCall": "Agenda una videollamada"
     }
   },
   "Footer": {
     "companyName": "TunixLabs",
-    "companyDescription": "Studio boutique chileno especializado en SaaS verticales con IA para industrias reguladas.",
+    "companyDescription": "Un operador chileno que shippea software a medida para industrias reguladas. Minería, metalurgia, retail, compliance tributario.",
     "contactTitle": "Contacto",
     "linksTitle": "Enlaces",
     "home": "Inicio",
     "services": "Servicios",
     "contact": "Contacto",
     "copyright": "TunixLabs. Todos los derechos reservados.",
-    "disclaimer": "TunixLabs actua como partner tecnico de firmas seleccionadas. Los nombres de clientes en casos de estudio refieren al partner directo que encarga el desarrollo, no al usuario final del software."
+    "disclaimer": "TunixLabs actúa como partner técnico de firmas seleccionadas. Los nombres de clientes en casos de estudio refieren al partner directo que encarga el desarrollo, no al usuario final del software."
   },
   "Services": {
     "backToServices": "Volver",
     "ourServicesBadge": "Nuestros Servicios",
     "sections": {
-      "overview": "Vision general",
+      "overview": "Visión general",
       "stack": "Stack real que usamos",
-      "anchorProject": "Proyecto ancla en produccion",
+      "anchorProject": "Proyecto ancla en producción",
       "cta": "Hablemos"
     },
     "backHome": "Volver a Inicio",
     "webDev": {
       "meta": {
         "title": "Desarrollo web y SaaS verticales | TunixLabs",
-        "description": "SaaS verticales end-to-end para industrias reguladas. Apoderapp (SII), Speakly (AI learning) y mas en produccion."
+        "description": "SaaS verticales end-to-end para industrias reguladas. Apoderapp, Speakly, ERP custom — todo en producción."
       },
       "hero": {
         "badge": "Desarrollo web",
         "title": "Desarrollo web y SaaS verticales",
-        "description": "Construimos plataformas SaaS completas: backend, frontend, integraciones con APIs gubernamentales, CI/CD y deploy. No hacemos landings: construimos productos que sus duenos revisan todos los dias."
+        "description": "Construyo plataformas SaaS completas: backend, frontend, integraciones, CI/CD y deploy. No hago landings: construyo productos que sus dueños revisan todos los días."
       }
     },
     "machineLearning": {
       "meta": {
         "title": "Machine Learning aplicado | TunixLabs",
-        "description": "ML clasico + LLM stack. Formacion en MIT Professional Education, trabajo real con Dataiku DSS y Python."
+        "description": "ML clásico + LLM stack. Formación en MIT Professional Education, trabajo real con Dataiku DSS y Python."
       },
       "hero": {
         "badge": "Machine Learning",
         "title": "Machine Learning y data science aplicado",
-        "description": "ML clasico con raices en MIT Professional Education + stack moderno de LLMs. Si tu problema es prediccion sobre data estructurada, no te vamos a vendar un LLM: vamos a construir el modelo que corresponde."
+        "description": "ML clásico con raíces en MIT Professional Education + stack moderno de LLMs. Si tu problema es predicción sobre data estructurada, no te voy a vender un LLM: voy a construir el modelo que corresponde."
       }
     },
     "aiAssistants": {
       "meta": {
         "title": "Asistentes conversacionales y Voice AI | TunixLabs",
-        "description": "Voice AI con <2s de latencia en produccion. Chatbots WhatsApp con LLMs reales. Agentes Claude integrados a tu operacion."
+        "description": "Voice AI en producción. Chatbots WhatsApp con LLMs reales. Agentes Claude integrados a tu operación."
       },
       "hero": {
         "badge": "Asistentes IA",
         "title": "Asistentes conversacionales y Voice AI",
-        "description": "Voice AI, chatbots y agentes Claude para operaciones reales. Sin flujos rigidos pre-programados: LLMs frontera orquestados sobre tu stack existente."
+        "description": "Voice AI, chatbots y agentes Claude para operaciones reales. Sin flujos rígidos pre-programados: LLMs frontera orquestados sobre tu stack existente."
       }
     },
     "businessIntelligence": {
@@ -264,51 +372,51 @@
       "hero": {
         "badge": "Business Intelligence",
         "title": "Business Intelligence y dashboards operacionales",
-        "description": "Dashboards para equipos que trabajan en faena, no para investor decks. Calendarios 20-20, vistas mensuales, comparativas historicas. Data real, cero placeholders."
+        "description": "Dashboards para equipos que trabajan en faena, no para investor decks. Calendarios 20-20, vistas mensuales, comparativas históricas. Data real, cero placeholders."
       }
     },
     "computerVision": {
       "meta": {
-        "title": "Vision artificial | TunixLabs",
-        "description": "Seccion honesta: capability en construccion, sin proyectos de CV en produccion propios todavia. Para proyectos CV criticos trabajamos con especialistas dedicados."
+        "title": "Visión artificial | TunixLabs",
+        "description": "Sección honesta: capability en construcción, sin proyectos de CV en producción propios todavía. Para proyectos CV críticos trabajamos con especialistas dedicados."
       },
       "hero": {
         "badge": "Vision artificial",
-        "title": "Vision artificial",
-        "description": "Seccion honesta: tenemos los fundamentos tecnicos y el interes, pero aun sin proyectos de CV en produccion propios. Si tu proyecto necesita CV critica, te recomendamos un especialista dedicado o una colaboracion experimental con nosotros."
+        "title": "Visión artificial",
+        "description": "Sección honesta: tengo los fundamentos técnicos y el interés, pero aún sin proyectos de CV en producción propios. Si tu proyecto necesita CV crítica, te recomiendo un especialista dedicado o una colaboración experimental con entregables acotados."
       }
     },
     "aiConsulting": {
       "meta": {
-        "title": "Consultoria IA y auditorias tecnicas | TunixLabs",
-        "description": "Auditorias adversariales de sistemas de IA. Disenamos arquitecturas multi-agente. Encontramos scope drift y deuda tecnica escondida."
+        "title": "Consultoría IA y auditorías técnicas | TunixLabs",
+        "description": "Auditorías adversariales de sistemas de IA. Diseño arquitecturas multi-agente. Encuentro scope drift y deuda técnica escondida."
       },
       "hero": {
         "badge": "Consultoria IA",
-        "title": "Consultoria IA y auditorias tecnicas",
-        "description": "Evaluamos tu arquitectura de IA, encontramos deuda tecnica escondida y proponemos el approach mas barato que funciona. Tambien disenamos sistemas multi-agente desde cero."
+        "title": "Consultoría IA y auditorías técnicas",
+        "description": "Evalúo tu arquitectura de IA, encuentro deuda técnica escondida y propongo el approach más barato que funciona. También diseño sistemas multi-agente desde cero."
       }
     },
     "rpa": {
       "meta": {
-        "title": "Automatizacion de procesos (RPA con IA) | TunixLabs",
-        "description": "Automatizamos procesos repetitivos con codigo, no con UiPath. Integracion directa con tus APIs y sistemas legacy."
+        "title": "Automatización de procesos (RPA con IA) | TunixLabs",
+        "description": "Automatizo procesos repetitivos con código, no con UiPath. Integración directa con tus APIs y sistemas legacy."
       },
       "hero": {
         "badge": "RPA",
-        "title": "Automatizacion de procesos con IA",
-        "description": "Cuando tu equipo gasta horas procesando archivos o validando codigos a mano, escribimos un bot que lo hace en segundos. Sin licencias enterprise carisimas: codigo en tu infra que se integra con tus sistemas."
+        "title": "Automatización de procesos con IA",
+        "description": "Cuando tu equipo gasta horas procesando archivos o validando códigos a mano, escribo un bot que lo hace en segundos. Sin licencias enterprise carísimas: código en tu infra que se integra con tus sistemas."
       }
     }
   },
   "ServiceLayout": {
     "backButton": "Volver a Inicio",
-    "overviewTitle": "Que hacemos en esta area",
-    "stackTitle": "Stack real que usamos",
-    "anchorTitle": "Proyecto ancla en produccion",
-    "ctaTitle": "Tenes un proyecto en esta area?",
+    "overviewTitle": "Qué hago en esta área",
+    "stackTitle": "Stack real que uso",
+    "anchorTitle": "Proyecto ancla en producción",
+    "ctaTitle": "Tenés un proyecto en esta área?",
     "ctaButton": "Hablemos por WhatsApp",
-    "ctaSecondary": "O envianos un mensaje"
+    "ctaSecondary": "O envíame un mensaje"
   },
   "VoiceInterface": {
     "startRecording": "Haz clic para comenzar a grabar",

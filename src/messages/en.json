@@ -1,7 +1,7 @@
 {
   "Metadata": {
-    "title": "TunixLabs — Senior nearshore engineering from Chile · MIT-trained ML",
-    "description": "Boutique Chile-based studio building vertical AI SaaS for regulated industries. 5+ production systems, MIT Professional Education ML training, US time-zone overlap."
+    "title": "TunixLabs — One operator, shipping production systems from Chile",
+    "description": "Not a studio. One operator with 15 years of operations leadership and MIT Professional Education ML training, shipping AI-powered systems for regulated industries. US time zones, English-fluent, production-ready."
   },
   "Layout": {
     "nav": {
@@ -12,63 +12,126 @@
   },
   "HomePage": {
     "hero": {
-      "title1": "Senior nearshore engineering",
-      "title2": "Vertical AI SaaS",
-      "title3": "built from Chile, US time zones",
-      "description": "Boutique studio led by an engineer with MIT Professional Education ML training. 5+ production systems in mining, energy, tax compliance and education. English-fluent, 0–2h timezone overlap with US East/Central, engagements typically USD 15k–60k.",
+      "title1": "Not a studio.",
+      "title2": "One operator",
+      "title3": "shipping production systems from Chile.",
+      "description": "I'm Alejandro. 15 years running real operations — metallurgy, retail, mining contractors — and now shipping AI-powered production systems with Claude Code agentic workflows. MSc Finance (UAI) + MIT Professional Education ML training. Based in Chile, fluent English (Ukiah High School, California), US time zones. Engagements typically USD 15k–60k.",
       "cta": {
         "contact": "Book a discovery call",
-        "services": "See production cases"
+        "services": "See what I've shipped"
       },
-      "loading3D": "Loading 3D model..."
+      "loading3D": "Loading..."
     },
     "trustedBy": {
-      "title": "Teams TunixLabs has shipped for"
+      "title": "Teams I've shipped for"
     },
     "caseStudies": {
       "badge": "In production",
       "title": "Production systems, not prototypes",
-      "subtitle": "5+ systems operating 24/7 for clients in regulated industries",
+      "subtitle": "Software someone opens every morning at 7am. Real users, real numbers, real audit trails.",
       "stack": "Stack",
       "disclaimer": "TunixLabs acts as technical partner for selected firms. Client names in these case studies refer to the direct commissioning partner, not the end-user of the software.",
       "cards": {
         "sime": {
           "client": "Contractors at Chile's largest copper mining operations",
-          "problem": "Safety checklists, preventive maintenance plans and work orders were tracked on paper and spreadsheets across remote mining sites with no end-to-end digital audit trail.",
-          "solution": "End-to-end mining safety platform: 1,056 inspection protocols, activity checklists, QR-signed PDFs, executive dashboard and full audit log.",
-          "metric": "115K+ activities tracked · 19,778 work orders · 24/7 on Railway",
-          "stack": ["Turborepo", "Fastify 5", "React 19", "PostgreSQL", "AWS S3"]
+          "problem": "Safety inspections, preventive maintenance plans and work orders were tracked on paper and spreadsheets across remote mining sites, with no end-to-end digital audit trail between the field and the head office.",
+          "solution": "Full rebuild of an aging legacy system into a modern TypeScript platform. Every legacy feature preserved, plus QR-signed PDFs archived on AWS S3, mobile-friendly batch approvals via shareable links, KPI dashboards with historical navigation, and period comparisons built around mining shift cycles.",
+          "metric": "19,778 work orders · 115K+ activities · 116K+ sub-activities in production",
+          "stack": [
+            "Turborepo",
+            "Fastify",
+            "React",
+            "PostgreSQL",
+            "AWS S3"
+          ]
         },
         "schwager": {
-          "client": "Schwager Energy (via technical partner)",
-          "problem": "Legal field signatures collected on paper in remote sites with intermittent connectivity — forms lost, audit trail missing.",
-          "solution": "Offline-first mobile app with Voice AI (Gemini 2.5 Flash), 9 specialized agents, persistent digital signatures and deferred sync when coverage returns.",
-          "metric": "210 legal signatures processed · Voice AI <2s latency · 9 production agents",
-          "stack": ["Express", "React", "Capacitor", "Gemini 2.5", "Prisma"]
+          "client": "Schwager (mining services, via technical partner)",
+          "problem": "Legal maintenance sign-offs collected on paper at remote mining field sites with intermittent connectivity. Forms were lost before reaching audit, supervisors spent hours chasing approvals, and SAP exports of cancelled work orders slipped through.",
+          "solution": "Offline-first mobile app (iOS + Android) with Voice AI powered by Google Gemini — field workers complete safety forms hands-free in gloves, rain, and vibration. Multi-channel digital signatures (email, WhatsApp, web, mobile) with full audit trail, and a smart Excel parser that reads SAP exports and detects cancelled work orders automatically.",
+          "metric": "195+ field workers · 7 maintenance teams · 4,000+ daily route sheets · >90% memory usage reduction · response times under 100ms",
+          "stack": [
+            "React",
+            "TypeScript",
+            "PostgreSQL",
+            "Google Gemini",
+            "Capacitor"
+          ]
         },
         "gasDistribution": {
           "client": "Regional gas distribution operator in Chile",
-          "problem": "Manual validation of burn codes and 14 distribution routes with daily transcription errors and hours of rework.",
-          "solution": "Automated code processing bot with business-rule validation, per-route metrics dashboard and daily reporting.",
+          "problem": "Manual validation of burn codes across 14 delivery routes, with daily transcription errors and hours of rework before billing.",
+          "solution": "Automated code processing bot with business-rule validation, per-route metrics dashboard and daily reporting. Commodity stack, no enterprise licensing lock-in.",
           "metric": "4,040 codes processed · 88.7% success rate · 14 routes automated",
-          "stack": ["Express 5", "Prisma", "React 18", "PostgreSQL"]
+          "stack": [
+            "Express",
+            "Prisma",
+            "React",
+            "PostgreSQL"
+          ]
         },
         "apoderapp": {
           "client": "Apoderapp (own product)",
-          "problem": "Chilean schools and parents had no digital channel for fees, payments and electronic invoicing integrated with the national tax authority (SII).",
-          "solution": "SaaS platform with native SII integration (DTE types 33/39/61/56), XMLDSig signing, CAF handling, VAT ledgers and an AI-assisted WhatsApp helper.",
-          "metric": "Full SII certification passed · DTE in production · Sales/Purchase ledgers LOK",
-          "stack": ["Next.js", "React", "Prisma", "SII XML/CAF", "Claude"]
+          "problem": "Chilean parent-teacher associations had no digital channel for fees, payments and voting — everything lived in spreadsheets and WhatsApp.",
+          "solution": "PWA built end-to-end using agentic coding pipelines on Claude Code, with a 5-agent multi-agent architecture. Ships with a reusable sii-factura library (Chilean electronic invoicing, 88+ tests) as a compliance feature, but the core value is association management. Designed for LATAM-wide expansion.",
+          "metric": "PWA in production · 5 Claude Code agents · sii-factura library with 88+ tests as a feature",
+          "stack": [
+            "Next.js",
+            "React",
+            "Prisma",
+            "SII XML/CAF",
+            "Claude Code"
+          ]
+        },
+        "fernandezMetallurgic": {
+          "client": "Fernandez Metallurgic (50-year-old industrial company)",
+          "problem": "A 50-year-old metallurgic company running its entire operation on Excel — HR, attendance, finance, document management, project control, CRM — during a period when the owners were absent and operational continuity was at risk.",
+          "solution": "Custom AI-powered ERP that replaced Excel across every critical area. OCR, QR and LLM Vision pipelines for on-floor document digitization, full Chilean SII integration for invoicing and tax compliance, and a project control module built for metallurgy, not for SaaS. Acted as interim general manager during the owners' absence to ensure operational continuity.",
+          "metric": "Full ERP shipped solo · SII integration in production · OCR + QR + LLM Vision pipelines live",
+          "stack": [
+            "Next.js",
+            "Prisma",
+            "PostgreSQL",
+            "Claude Code",
+            "SII XML"
+          ]
+        }
+      }
+    },
+    "productShowcase": {
+      "title": "Production portfolio",
+      "slots": {
+        "sgmSchwager": {
+          "label": "Field maintenance management",
+          "metric": "195+ field workers · 4,000+ daily route sheets · Voice AI on Google Gemini"
+        },
+        "apoderappDark": {
+          "label": "SaaS for Chilean school associations",
+          "metric": "Own PWA · 5 Claude Code agents · sii-factura library with 88+ tests as a feature"
+        },
+        "fernandezErp": {
+          "label": "Custom ERP for metallurgy",
+          "metric": "50-year-old company · Excel replaced area by area · OCR + QR + LLM Vision"
+        },
+        "speakly": {
+          "label": "AI English learning",
+          "metric": "Own product · Turborepo + Voice AI · personalized learning paths"
+        },
+        "gasDistribution": {
+          "label": "Gas distribution automation",
+          "metric": "4,040 codes · 88.7% success · 14 delivery routes automated"
         }
       }
     },
     "about": {
       "badge": "About the founder",
-      "title": "Senior engineering, not promises",
+      "title": "Not a studio. One operator who ships.",
       "name": "Alejandro Moyano Foncea",
-      "roleLine": "Founder · 10+ years shipping production software",
-      "bioParagraph1": "Machine learning training through <mit>MIT Professional Education</mit> — \"No Code AI and Machine Learning: Building Data Science Solutions\", 80 hours of effort on Dataiku DSS (Feb–May 2024). That program anchors the classical ML side; the modern LLM and multi-agent stack came after.",
-      "bioParagraph2": "TunixLabs is a boutique Chile-based studio focused on regulated industries: mining, energy, tax compliance, auditing. We write code that has to pass audits and run 365 days a year. Chile-based means 0–2h timezone overlap with US East/Central, fluent English in every standup, and engineering rates that run 3–5x below comparable SF/NYC dev shops — without compromising on senior-level ownership."
+      "roleLine": "MSc Finance (UAI) · MIT Professional Education · 15 years running operations, now shipping the code",
+      "bioParagraph1": "I come from the business side. Bachelor's in Business Administration and MSc in Finance from Universidad Adolfo Ibáñez, plus <mit>MIT Professional Education</mit> in AI/ML in 2024 (80 hours on Dataiku DSS). Fifteen years running real operations before shipping production code: co-founder of Highlands Coffee & Tea for 9 years, Project Management Controller at MSCO, interim general manager at Fernandez Metallurgic during the owners' absence. English is native — I spent my senior year of high school at Ukiah High School, California (2000).",
+      "bioParagraph2": "After MIT I replicated those ML models in Python with Claude as coding assistant. Today I ship production systems with agentic workflows: field Voice AI at Schwager (195+ field workers, 4,000+ daily route sheets), SIME (19,778 work orders), Apoderapp with its sii-factura library. Claude Code is 80% of my stack — that's why what I deliver is running in production, not sitting in a pitch deck. US time zone overlap (0–2h from East/Central) and rates 3–5x below comparable SF/NYC shops, without giving up senior ownership.",
+      "linkedinLabel": "View on LinkedIn",
+      "linkedinUrl": "https://www.linkedin.com/in/alejandro-moyano/"
     },
     "credentials": {
       "modalTitle": "MIT Professional Education credential",
@@ -78,70 +141,115 @@
       "altText": "MIT Professional Education credential issued to Alejandro Moyano Foncea"
     },
     "services": {
-      "badge": "What we do",
-      "title": "What we build",
-      "subtitle": "7 practice areas, each anchored to a real production project. No buzzwords, no invented stacks.",
+      "badge": "What I do",
+      "title": "What I build",
+      "subtitle": "Seven practice areas, each anchored to a real production project. No buzzwords, no invented stacks.",
       "learnMore": "Learn more",
       "items": {
         "aiAssistants": {
           "title": "Conversational assistants & Voice AI",
-          "shortDescription": "Voice agents and chatbots powered by frontier LLMs, not rigid flows. Voice AI running under 2s latency in production.",
-          "longDescription": "We build conversational assistants for real operations: voice AI for energy field work, WhatsApp chatbots for SaaS product support, and Claude agents integrated into your backend. We don't use Dialogflow or Rasa — we work with frontier LLMs (Claude, Gemini) and orchestrate them on top of your stack.",
-          "stack": ["Claude", "Gemini 2.5 Flash", "Next.js", "Fastify", "Voice AI pipelines"],
-          "anchorProject": "In production: field Voice AI with 9 specialized agents for an energy utility (<2s latency, Gemini 2.5 Flash, session resumption)."
+          "shortDescription": "Voice agents and chatbots powered by frontier LLMs, not rigid flows. Running in the field today, not in a demo.",
+          "longDescription": "I build conversational assistants for real operations: field Voice AI so workers can complete safety forms hands-free — in gloves, rain and vibration — WhatsApp chatbots for SaaS product support, and Claude agents integrated directly into your backend. No Dialogflow, no Rasa: frontier LLMs (Claude, Google Gemini) orchestrated on top of your existing stack.",
+          "stack": [
+            "Claude",
+            "Google Gemini",
+            "Next.js",
+            "Fastify",
+            "Voice AI pipelines"
+          ],
+          "anchorProject": "In production: field Voice AI for a mining services contractor — 195+ field workers across 7 maintenance teams, 4,000+ daily route sheets, response times under 100ms."
         },
         "businessIntelligence": {
           "title": "Operational BI and dashboards",
-          "shortDescription": "Dashboards ops directors actually open. Real data, real numbers — no placeholders.",
-          "longDescription": "We build operational dashboards and ETL pipelines for teams that need to see their operation's reality before morning coffee. 20-20 calendars, monthly views, historical comparisons, backfills. Built for people running field operations, not for pitch decks.",
-          "stack": ["Next.js", "React 19", "Prisma", "PostgreSQL", "Multi-year ETL", "Gantt charts"],
-          "anchorProject": "In production: BI platforms tracking 115K+ activities, 1,056 inspection protocols and 19,778 work orders for contractors at Chile's largest copper mining operations; audit dashboards tracking 103+ safety standards for an auditing firm serving major mining operators."
+          "shortDescription": "Dashboards ops directors actually open. Real data, real numbers, zero placeholders.",
+          "longDescription": "I build operational dashboards and ETL pipelines for teams that need to see their operation's reality before morning coffee. Standard mining KPIs out of the box — OEE, MTBF, MTTR, Availability, CAUE, plan compliance, ABC criticality matrices — plus multi-year planning views with Gantt timelines and historical comparisons. Built for planners who live in SAP, not for pitch decks.",
+          "stack": [
+            "Next.js",
+            "React",
+            "Prisma",
+            "PostgreSQL",
+            "Multi-year ETL",
+            "Gantt charts"
+          ],
+          "anchorProject": "In production: BI platforms tracking 115K+ activities, 1,056 inspection protocols and 19,778 work orders for contractors at Chile's largest copper mining operations; audit dashboards tracking 103+ safety standards for an auditing firm serving major mining operators; multi-year planning views built directly from raw SAP data."
         },
         "webDev": {
           "title": "Web development & vertical SaaS",
           "shortDescription": "Full SaaS platforms: backend, frontend, integrations, CI/CD and deploy. Specialized in regulated industries.",
-          "longDescription": "We build vertical SaaS end-to-end. Not marketing landings — the actual product: auth, billing, admin panels, integrations with legacy systems and government APIs. Strict TypeScript, real testing, automated deploy. Code written to pass audits, not to impress investors.",
-          "stack": ["Next.js 14 App Router", "Fastify 5", "React 19", "Prisma", "PostgreSQL", "Railway", "Turborepo"],
-          "anchorProject": "In production: Apoderapp (Chilean SII tax compliance platform), Speakly (AI English-learning platform on Turborepo) and the site you are reading right now."
+          "longDescription": "I build vertical SaaS end-to-end. Not marketing landings — the actual product: auth, billing, admin panels, integrations with legacy systems and government APIs (Chilean SII). Strict TypeScript, real testing, automated deploy. Code written to pass audits, not to impress investors.",
+          "stack": [
+            "Next.js",
+            "Fastify",
+            "React",
+            "Prisma",
+            "PostgreSQL",
+            "Railway",
+            "Turborepo"
+          ],
+          "anchorProject": "In production: Apoderapp (Chilean SII tax compliance, sii-factura library with 88+ tests), Speakly (own AI English-learning platform on Turborepo), a custom AI-powered ERP for a 50-year-old metallurgic company, and the site you're reading right now."
         },
         "aiConsulting": {
           "title": "AI consulting & adversarial audits",
-          "shortDescription": "We audit your existing AI architecture, find hidden scope drift and propose the cheapest approach that actually works.",
-          "longDescription": "Adversarial audits of deployed AI systems: how solid is your pipeline, where is the hidden tech debt, when does an LLM make sense and when does a classical model win. We also design multi-agent architectures from scratch for clients who already have data and a clearly-scoped problem.",
-          "stack": ["Claude Code", "Multi-agent systems", "RAG", "Closing pipelines", "Playwright testing"],
+          "shortDescription": "I audit your existing AI architecture, find hidden scope drift and propose the cheapest approach that actually works.",
+          "longDescription": "Adversarial audits of deployed AI systems: how solid is your pipeline, where is the hidden tech debt, when does an LLM make sense and when does a classical model win. I also design multi-agent architectures from scratch for clients who already have data and a clearly-scoped problem. The honest differentiator: 15 years of operations leadership before the first line of production code — I can tell the difference between a software problem and a process problem.",
+          "stack": [
+            "Claude Code",
+            "Multi-agent systems",
+            "RAG",
+            "Closing pipelines",
+            "Playwright testing"
+          ],
           "anchorProject": "Own experience: Agente_Tunix meta-system that orchestrates 7 production projects via hierarchical Claude agents, each with its own closing pipeline (type_check → lint → build → test → audit) and automated PR review."
         },
         "rpa": {
           "title": "Process automation (RPA with AI)",
-          "shortDescription": "We automate repetitive processes with code, not with expensive RPA suites. Direct integration with your APIs.",
-          "longDescription": "When your team burns hours processing Excel files, validating codes by hand or re-sending emails, we build a bot that does it in seconds. We don't use UiPath or Power Automate: we write a Node/Python service that runs on your infra and integrates with your existing systems. Cheaper, more auditable, and no enterprise licensing lock-in.",
-          "stack": ["Node.js", "Python", "Playwright", "Prisma", "Docker", "Claude"],
-          "anchorProject": "In production: code processing bot for a regional gas distribution operator in Chile. 4,040 codes processed, 88.7% success rate, 14 delivery routes automated, per-route metrics dashboard and daily reporting."
+          "shortDescription": "I automate repetitive processes with code, not with expensive RPA suites. Direct integration with your APIs.",
+          "longDescription": "When your team burns hours processing Excel files, validating codes by hand or re-sending emails, I write a bot that does it in seconds. No UiPath, no Power Automate: a Node or Python service that runs on your infra and integrates with your existing systems. Cheaper, more auditable, and no enterprise licensing lock-in.",
+          "stack": [
+            "Node.js",
+            "Python",
+            "Playwright",
+            "Prisma",
+            "Docker",
+            "Claude"
+          ],
+          "anchorProject": "In production: code processing bot for a regional gas distribution operator in Chile — 4,040 codes, 88.7% success rate, 14 delivery routes automated. Plus OCR + QR + LLM Vision document digitization pipelines on the shop floor of a 50-year-old metallurgic company."
         },
         "machineLearning": {
           "title": "Machine learning & applied data science",
-          "shortDescription": "Classical ML plus modern LLM stack. Founder trained through MIT Professional Education on Dataiku DSS and Python.",
-          "longDescription": "Honest differentiator vs AI consultancies that only know LLMs: the founder has classical ML fundamentals (feature engineering, model selection, cross-validation) that predate the GPT boom. That means if your problem is prediction on structured data, we won't push an LLM that hallucinates — we'll build a model that works and can be audited. Training was MIT Professional Education, 80 hours of effort on Dataiku DSS, Feb–May 2024.",
-          "stack": ["Python (scikit-learn, pandas)", "Dataiku DSS", "Claude as coding assistant", "PostgreSQL", "Jupyter"],
+          "shortDescription": "Classical ML plus modern LLM stack. Trained through MIT Professional Education on Dataiku DSS, then replicated in Python.",
+          "longDescription": "Honest differentiator vs the AI consultancies that appeared post-ChatGPT: I have classical ML fundamentals (feature engineering, model selection, cross-validation) that predate the GPT boom, plus finance fundamentals from a finance MSc. If your problem is prediction on structured data, I won't push an LLM that hallucinates — I'll build a model that works and can be audited. Training was MIT Professional Education, 80 hours of effort on Dataiku DSS, Feb–May 2024.",
+          "stack": [
+            "Python (scikit-learn, pandas)",
+            "Dataiku DSS",
+            "Claude as coding assistant",
+            "PostgreSQL",
+            "Jupyter"
+          ],
           "anchorProject": "Training: MIT Professional Education program \"No Code AI and Machine Learning: Building Data Science Solutions\" (80h, 2024) on Dataiku DSS, then replicated models in Python with Claude as coding assistant."
         },
         "computerVision": {
           "title": "Computer vision (capability in progress)",
-          "shortDescription": "Honest framing: we have the technical fundamentals and interest, but no computer vision projects in production yet.",
-          "longDescription": "Honest section: computer vision has been a personal interest of the founder since the start of the AI journey, and we understand the fundamentals of training vision models. That said, we don't have CV projects in production yet. If your project needs mission-critical computer vision, we recommend working with a dedicated CV specialist or talking to us about an experimental collaboration with clearly-scoped deliverables.",
-          "stack": ["Python", "PyTorch / TensorFlow (fundamentals)", "OpenCV (basic)", "Claude"],
-          "anchorProject": "Honest: no CV projects in production yet. We treat this as an experimental / collaborative service. For mission-critical CV we'll refer you to a dedicated specialist."
+          "shortDescription": "Honest framing: I have the fundamentals and the interest, but no production CV projects of my own yet.",
+          "longDescription": "Honest section: computer vision has been a personal interest since the start of my AI journey, and I understand the fundamentals of training vision models. That said, I don't have mission-critical CV projects in production yet. If your project needs production-grade computer vision, I recommend working with a dedicated CV specialist or talking to me about an experimental collaboration with clearly-scoped deliverables.",
+          "stack": [
+            "Python",
+            "PyTorch / TensorFlow (fundamentals)",
+            "OpenCV (basic)",
+            "Claude"
+          ],
+          "anchorProject": "Honest: no production CV projects of my own yet. For mission-critical CV I'll refer you to a dedicated specialist."
         }
       }
     },
     "cta": {
-      "title": "Ready to build your next SaaS?",
-      "subtitle": "We reply in under 24h",
-      "whatsapp": "Chat on WhatsApp",
-      "email": "Send email",
-      "fullForm": "Or use the full contact form \u2192"
+      "title": "Have a project that needs to ship?",
+      "subtitle": "I reply in under 24h. Book a 30-minute discovery call.",
+      "whatsapp": "Book a discovery call",
+      "email": "Send an email",
+      "fullForm": "Or use the full contact form →"
     },
-    "whatsappMessage": "Hi, I'm coming from tunixlabs.com. I'd like to talk about a vertical AI SaaS project.",
+    "whatsappMessage": "Hi Alejandro, I'm coming from tunixlabs.com. I'd like to talk about a project.",
     "contact": {
       "badge": "Contact",
       "title": "Let's talk about your next product",
@@ -204,7 +312,7 @@
   },
   "Footer": {
     "companyName": "TunixLabs",
-    "companyDescription": "Boutique Chile-based studio building vertical AI SaaS for regulated industries.",
+    "companyDescription": "One operator shipping production systems from Chile. Mining, energy, tax compliance, custom ERP. US time zones, English-fluent.",
     "contactTitle": "Contact",
     "linksTitle": "Links",
     "home": "Home",
@@ -226,12 +334,12 @@
     "webDev": {
       "meta": {
         "title": "Web development & vertical SaaS | TunixLabs",
-        "description": "End-to-end vertical SaaS for regulated industries. Apoderapp (SII tax), Speakly (AI learning), and more in production."
+        "description": "End-to-end vertical SaaS for regulated industries. Apoderapp (Chilean SII tax), Speakly (AI English learning), custom ERPs — all in production."
       },
       "hero": {
         "badge": "Web development",
         "title": "Web development & vertical SaaS",
-        "description": "We build complete SaaS platforms: backend, frontend, integrations with government APIs, CI/CD and deploy. Not landings — products their owners open every day."
+        "description": "I build complete SaaS platforms: backend, frontend, integrations with government APIs, CI/CD and deploy. Not landings — products their owners open every day."
       }
     },
     "machineLearning": {
@@ -242,13 +350,13 @@
       "hero": {
         "badge": "Machine Learning",
         "title": "Machine learning & applied data science",
-        "description": "Classical ML rooted in MIT Professional Education training plus modern LLM stack. If your problem is prediction over structured data, we won't push an LLM — we'll build the model that fits."
+        "description": "Classical ML fundamentals from MIT Professional Education training, plus modern LLM stack. If your problem is prediction over structured data, I won't push an LLM — I'll build the model that fits and can be audited."
       }
     },
     "aiAssistants": {
       "meta": {
         "title": "Conversational assistants & Voice AI | TunixLabs",
-        "description": "Voice AI running under 2s latency in production. WhatsApp chatbots with real LLMs. Claude agents integrated into your ops."
+        "description": "Field Voice AI in production for 195+ workers. WhatsApp chatbots with frontier LLMs. Claude agents integrated into your ops."
       },
       "hero": {
         "badge": "AI Assistants",
@@ -259,34 +367,34 @@
     "businessIntelligence": {
       "meta": {
         "title": "Operational Business Intelligence | TunixLabs",
-        "description": "Dashboards ops directors actually open. Real data, multi-year ETL, Gantt charts, historical comparisons."
+        "description": "Dashboards ops directors actually open. Real data, multi-year ETL, Gantt charts, historical comparisons, mining KPIs out of the box."
       },
       "hero": {
         "badge": "Business Intelligence",
         "title": "Operational BI and dashboards",
-        "description": "Dashboards for teams running real operations, not for pitch decks. 20-20 calendars, monthly views, historical comparisons. Real data, zero placeholders."
+        "description": "Dashboards for teams running real operations, not for pitch decks. 20-20 calendars, monthly views, historical comparisons, mining KPIs (OEE, MTBF, MTTR, availability). Real data, zero placeholders."
       }
     },
     "computerVision": {
       "meta": {
         "title": "Computer vision | TunixLabs",
-        "description": "Honest framing: capability in progress, no CV projects in production yet. For mission-critical CV we work with dedicated specialists."
+        "description": "Honest framing: capability in progress, no production CV projects of my own yet. For mission-critical CV I work with dedicated specialists."
       },
       "hero": {
         "badge": "Computer vision",
         "title": "Computer vision",
-        "description": "Honest section: we have the technical fundamentals and interest, but no CV projects in production yet. For mission-critical CV we recommend a dedicated specialist or an experimental collaboration with us."
+        "description": "Honest section: I have the technical fundamentals and the interest, but no production CV projects of my own yet. For mission-critical CV I recommend a dedicated specialist, or an experimental collaboration with clearly-scoped deliverables."
       }
     },
     "aiConsulting": {
       "meta": {
         "title": "AI consulting & adversarial audits | TunixLabs",
-        "description": "Adversarial audits of deployed AI systems. Multi-agent architecture design. We find scope drift and hidden tech debt."
+        "description": "Adversarial audits of deployed AI systems. Multi-agent architecture design. Scope drift and hidden tech debt found in the first week."
       },
       "hero": {
         "badge": "AI Consulting",
         "title": "AI consulting & adversarial audits",
-        "description": "We audit your AI architecture, find hidden tech debt and propose the cheapest approach that actually works. We also design multi-agent systems from scratch."
+        "description": "I audit your AI architecture, find hidden tech debt and propose the cheapest approach that actually works. I also design multi-agent systems from scratch — with 15 years of operations leadership on top, so I can tell a software problem from a process problem."
       }
     },
     "rpa": {
@@ -297,7 +405,7 @@
       "hero": {
         "badge": "RPA",
         "title": "Process automation with AI",
-        "description": "When your team burns hours on file processing or manual code validation, we write a bot that does it in seconds. No enterprise licensing: code on your infra that integrates with your systems."
+        "description": "When your team burns hours on file processing or manual code validation, I write a bot that does it in seconds. No enterprise licensing: code on your infra that integrates with your existing systems."
       }
     }
   },
