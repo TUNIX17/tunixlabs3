@@ -1,46 +1,65 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { useTranslations, useLocale } from 'next-intl';
+import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/navigation';
 import type { Pathnames } from '@/i18n/routing';
-import { HiOutlineGlobeAlt, HiOutlineChartBar, HiOutlineChatBubbleLeftRight, HiOutlinePresentationChartBar, HiOutlineCamera, HiOutlineLightBulb, HiOutlineCog8Tooth, HiOutlinePencilSquare, HiOutlineMegaphone } from 'react-icons/hi2';
+import {
+  HiOutlineGlobeAlt,
+  HiOutlineChatBubbleLeftRight,
+  HiOutlineCog8Tooth,
+} from 'react-icons/hi2';
+import {
+  FiMail,
+  FiBarChart2,
+  FiZap,
+  FiTrendingUp,
+  FiEye,
+} from 'react-icons/fi';
 import { BsWhatsapp } from 'react-icons/bs';
 import React from 'react';
-import dynamic from 'next/dynamic';
+import TrustedBy from '@/components/TrustedBy';
+import CaseStudies from '@/components/CaseStudies';
+import ProductShowcase from '@/components/ProductShowcase';
+import AboutFounder from '@/components/AboutFounder';
+import { trackEvent, Events } from '@/lib/analytics/track';
 
-const RobotModel = dynamic(() => import('@/components/RobotModel'), {
-  ssr: false,
-  loading: () => null, // RobotModel handles its own loading with TerminalLoading
-});
-
+/**
+ * HomePage — portfolio-first restructure (sprint 2026-04-08).
+ *
+ * Section flow:
+ *   Hero + ProductShowcase  (replaces former 3D robot that killed LCP)
+ *   TrustedBy               (logo strip of direct partners)
+ *   CaseStudies             (4 real cards with indirect attribution)
+ *   AboutFounder            (bio + MIT credential modal trigger)
+ *   Services                (7 anchored services, grid 3x3)
+ *   CTA                     (WhatsApp + email + full form link)
+ *   Footer                  (disclaimer + copyright)
+ *
+ * Services reduced from 9 to 7: dropped automatizacion-marketing-ia and
+ * generacion-contenido-ia (both marked "no funciona bien + no me gusta"
+ * by the user in the sprint conversation). Dropped routes redirect to
+ * this page's #servicios section via next.config.js.
+ */
 export default function HomePage() {
   const t = useTranslations('HomePage');
-  const locale = useLocale(); // Obtener el locale actual de la página
   const [scrolled, setScrolled] = useState(false);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
-    setIsMounted(true);
-
     const handleScroll = () => {
       const isScrolled = window.scrollY > 50;
       if (isScrolled !== scrolled) {
         setScrolled(isScrolled);
       }
     };
-
     window.addEventListener('scroll', handleScroll);
-
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-    };
+    return () => window.removeEventListener('scroll', handleScroll);
   }, [scrolled]);
 
+  // Background neural network canvas (purely decorative).
   useEffect(() => {
     if (!canvasRef.current) return;
-
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
@@ -49,43 +68,36 @@ export default function HomePage() {
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
     };
-
     window.addEventListener('resize', handleResize);
     handleResize();
 
     const nodes: { x: number; y: number; vx: number; vy: number; radius: number }[] = [];
     const nodeCount = Math.min(Math.floor(window.innerWidth / 100), 20);
-
     for (let i = 0; i < nodeCount; i++) {
       nodes.push({
         x: Math.random() * canvas.width,
         y: Math.random() * canvas.height,
         vx: (Math.random() - 0.5) * 0.5,
         vy: (Math.random() - 0.5) * 0.5,
-        radius: Math.random() * 2 + 1
+        radius: Math.random() * 2 + 1,
       });
     }
 
+    let raf = 0;
     const drawNetwork = () => {
-      if (!ctx) return;
-
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-
       ctx.strokeStyle = 'rgba(124, 58, 237, 0.1)';
       ctx.lineWidth = 0.5;
 
       for (let i = 0; i < nodes.length; i++) {
-        const nodeA = nodes[i];
         for (let j = i + 1; j < nodes.length; j++) {
-          const nodeB = nodes[j];
-          const distance = Math.sqrt(
-            Math.pow(nodeA.x - nodeB.x, 2) + Math.pow(nodeA.y - nodeB.y, 2)
-          );
-
+          const a = nodes[i];
+          const b = nodes[j];
+          const distance = Math.hypot(a.x - b.x, a.y - b.y);
           if (distance < 200) {
             ctx.beginPath();
-            ctx.moveTo(nodeA.x, nodeA.y);
-            ctx.lineTo(nodeB.x, nodeB.y);
+            ctx.moveTo(a.x, a.y);
+            ctx.lineTo(b.x, b.y);
             ctx.stroke();
           }
         }
@@ -96,70 +108,121 @@ export default function HomePage() {
         ctx.arc(node.x, node.y, node.radius, 0, Math.PI * 2);
         ctx.fillStyle = 'rgba(124, 58, 237, 0.4)';
         ctx.fill();
-
         node.x += node.vx;
         node.y += node.vy;
-
         if (node.x < 0 || node.x > canvas.width) node.vx *= -1;
         if (node.y < 0 || node.y > canvas.height) node.vy *= -1;
       }
 
-      requestAnimationFrame(drawNetwork);
+      raf = requestAnimationFrame(drawNetwork);
     };
 
     drawNetwork();
 
     return () => {
       window.removeEventListener('resize', handleResize);
+      cancelAnimationFrame(raf);
     };
   }, []);
 
-  const services: Array<{ key: string; icon: typeof HiOutlineGlobeAlt; href: Pathnames }> = [
-    { key: 'webDev', icon: HiOutlineGlobeAlt, href: '/servicios/desarrollos-web' },
-    { key: 'machineLearning', icon: HiOutlineChartBar, href: '/servicios/machine-learning' },
-    { key: 'aiAssistants', icon: HiOutlineChatBubbleLeftRight, href: '/servicios/asistentes-ia' },
-    { key: 'businessIntelligence', icon: HiOutlinePresentationChartBar, href: '/servicios/business-intelligence' },
-    { key: 'computerVision', icon: HiOutlineCamera, href: '/servicios/vision-artificial' },
-    { key: 'aiConsulting', icon: HiOutlineLightBulb, href: '/servicios/consultoria-ia' },
-    { key: 'rpa', icon: HiOutlineCog8Tooth, href: '/servicios/rpa' },
-    { key: 'contentGeneration', icon: HiOutlinePencilSquare, href: '/servicios/generacion-contenido-ia' },
-    { key: 'marketingAutomation', icon: HiOutlineMegaphone, href: '/servicios/automatizacion-marketing-ia' },
+  // 7 services, each anchored to a real project in production.
+  // Key matches HomePage.services.items.<key> in both es.json and en.json.
+  const services: Array<{
+    key: string;
+    icon: typeof HiOutlineGlobeAlt;
+    href: Pathnames;
+  }> = [
+    {
+      key: 'aiAssistants',
+      icon: HiOutlineChatBubbleLeftRight,
+      href: '/servicios/asistentes-ia',
+    },
+    {
+      key: 'businessIntelligence',
+      icon: FiBarChart2,
+      href: '/servicios/business-intelligence',
+    },
+    {
+      key: 'webDev',
+      icon: HiOutlineGlobeAlt,
+      href: '/servicios/desarrollos-web',
+    },
+    {
+      key: 'aiConsulting',
+      icon: FiZap,
+      href: '/servicios/consultoria-ia',
+    },
+    {
+      key: 'rpa',
+      icon: HiOutlineCog8Tooth,
+      href: '/servicios/rpa',
+    },
+    {
+      key: 'machineLearning',
+      icon: FiTrendingUp,
+      href: '/servicios/machine-learning',
+    },
+    {
+      key: 'computerVision',
+      icon: FiEye,
+      href: '/servicios/vision-artificial',
+    },
   ];
 
-  return (
-      <div className="min-h-screen relative neu-bg" style={{backgroundColor: 'var(--neu-bg)'}}>
-        {/* Aurora Blobs - Floating animated shapes */}
-        <div className="aurora-blob aurora-blob-1"></div>
-        <div className="aurora-blob aurora-blob-2"></div>
-        <div className="aurora-blob aurora-blob-3"></div>
-        <div className="aurora-blob aurora-blob-4"></div>
-        <canvas
-          ref={canvasRef}
-          className="absolute inset-0 z-0 opacity-30"
-        />
+  const whatsappNumber = '56930367979';
+  const whatsappMessage = encodeURIComponent(t('whatsappMessage'));
+  const whatsappHref = `https://wa.me/${whatsappNumber}?text=${whatsappMessage}`;
 
-        <div className="parallax-wrapper">
-          <section className="relative pt-20 pb-32">
+  return (
+    <div
+      className="min-h-screen relative neu-bg"
+      style={{ backgroundColor: 'var(--neu-bg)' }}
+    >
+      {/* Aurora Blobs - Floating animated shapes */}
+      <div className="aurora-blob aurora-blob-1"></div>
+      <div className="aurora-blob aurora-blob-2"></div>
+      <div className="aurora-blob aurora-blob-3"></div>
+      <div className="aurora-blob aurora-blob-4"></div>
+      <canvas
+        ref={canvasRef}
+        className="absolute inset-0 z-0 opacity-30"
+      />
+
+      <div className="parallax-wrapper">
+        {/* HERO */}
+        <section className="relative pt-20 pb-24">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             <div className="lg:grid lg:grid-cols-12 lg:gap-8 items-center">
               <div className="sm:text-center md:max-w-2xl md:mx-auto lg:col-span-6 lg:text-left">
                 <div className="mt-16 lg:mt-20">
-                  <h1 className="text-4xl tracking-tight font-extrabold sm:text-5xl md:text-6xl lg:text-5xl xl:text-6xl" style={{color: '#2d3748'}}>
+                  <h1
+                    className="text-4xl tracking-tight font-extrabold sm:text-5xl md:text-6xl lg:text-5xl xl:text-6xl"
+                    style={{ color: '#2d3748' }}
+                  >
                     <span className="block">{t('hero.title1')}</span>
                     <span className="block neu-gradient-text">
                       {t('hero.title2')}
                     </span>
                     <span className="block">{t('hero.title3')}</span>
                   </h1>
-                  <p className="mt-3 text-base sm:mt-5 sm:text-xl lg:text-lg xl:text-xl" style={{color: '#718096', lineHeight: '1.7'}}>
+                  <p
+                    className="mt-3 text-base sm:mt-5 sm:text-xl lg:text-lg xl:text-xl"
+                    style={{ color: '#718096', lineHeight: '1.7' }}
+                  >
                     {t('hero.description')}
                   </p>
                   <div className="mt-8 sm:max-w-lg sm:mx-auto sm:text-center lg:text-left lg:mx-0">
                     <div className="mt-5 sm:mt-8 flex flex-col sm:flex-row sm:justify-center lg:justify-start gap-4">
-                      <Link href="/contacto" className="neu-btn-primary text-center">
+                      <Link
+                        href="/contacto"
+                        className="neu-btn-primary text-center"
+                      >
                         {t('hero.cta.contact')}
                       </Link>
-                      <a href="#servicios" className="neu-btn-secondary text-center">
+                      <a
+                        href="#casos"
+                        className="neu-btn-secondary text-center"
+                      >
                         {t('hero.cta.services')}
                       </a>
                     </div>
@@ -167,29 +230,43 @@ export default function HomePage() {
                 </div>
               </div>
 
-              <div className="mt-12 relative sm:mx-auto lg:mt-0 lg:col-span-6 lg:flex lg:items-center lg:justify-center">
-                <div className="neu-robot-container">
-                  <div className="neu-robot-avatar">
-                    <div className="robot-canvas-wrapper">
-                      <RobotModel locale={locale} />
-                    </div>
-                  </div>
-                </div>
+              {/* ProductShowcase replaces former 3D robot (LCP killer).
+                  Self-contained component with its own responsive layout. */}
+              <div className="mt-12 lg:mt-0 lg:col-span-6">
+                <ProductShowcase />
               </div>
             </div>
           </div>
         </section>
 
+        {/* TrustedBy logo strip (direct partners only — no Codelco) */}
+        <TrustedBy />
+
+        {/* Case studies — 4 cards with indirect attribution */}
+        <div id="casos">
+          <CaseStudies />
+        </div>
+
+        {/* Founder bio with MIT credential modal */}
+        <AboutFounder />
+
+        {/* Services grid — 7 anchored services */}
         <section id="servicios" className="py-16 neu-bg">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center">
-              <span className="neu-pressed inline-block px-4 py-2 rounded-full text-sm font-semibold tracking-wide uppercase" style={{ color: 'var(--neu-primary)' }}>
+              <span
+                className="neu-pressed inline-block px-4 py-2 rounded-full text-sm font-semibold tracking-wide uppercase"
+                style={{ color: 'var(--neu-primary)' }}
+              >
                 {t('services.badge')}
               </span>
               <h2 className="mt-4 text-3xl font-extrabold sm:text-4xl neu-gradient-text">
                 {t('services.title')}
               </h2>
-              <p className="mt-3 max-w-2xl mx-auto text-xl" style={{ color: '#718096' }}>
+              <p
+                className="mt-3 max-w-2xl mx-auto text-xl"
+                style={{ color: '#718096' }}
+              >
                 {t('services.subtitle')}
               </p>
             </div>
@@ -199,21 +276,48 @@ export default function HomePage() {
                 {services.map((service) => {
                   const Icon = service.icon;
                   return (
-                    <Link key={service.key} href={service.href}>
-                      <div className="neu-raised p-6 rounded-2xl group cursor-pointer transition-all duration-300 hover:-translate-y-1">
+                    <Link
+                      key={service.key}
+                      href={service.href}
+                      onClick={() =>
+                        trackEvent(Events.SERVICE_CARD_CLICK, {
+                          service: service.key,
+                        })
+                      }
+                    >
+                      <div className="neu-raised p-6 rounded-2xl group cursor-pointer transition-all duration-300 hover:-translate-y-1 h-full">
                         <div className="neu-service-icon">
-                          <Icon className="h-8 w-8" style={{ color: 'var(--neu-primary)' }} />
+                          <Icon
+                            className="h-8 w-8"
+                            style={{ color: 'var(--neu-primary)' }}
+                          />
                         </div>
-                        <h3 className="text-xl font-bold mt-4" style={{ color: '#2d3748' }}>
+                        <h3
+                          className="text-xl font-bold mt-4"
+                          style={{ color: '#2d3748' }}
+                        >
                           {t(`services.items.${service.key}.title`)}
                         </h3>
-                        <p className="mt-2 text-sm" style={{ color: '#718096' }}>
-                          {t(`services.items.${service.key}.description`)}
+                        <p
+                          className="mt-2 text-sm"
+                          style={{ color: '#718096' }}
+                        >
+                          {t(`services.items.${service.key}.shortDescription`)}
                         </p>
                         <span className="inline-flex items-center mt-4 text-sm font-medium neu-gradient-text group-hover:underline">
                           {t('services.learnMore')}
-                          <svg className="ml-2 h-4 w-4 transform group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+                          <svg
+                            className="ml-2 h-4 w-4 transform group-hover:translate-x-1 transition-transform duration-300"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth="2"
+                              d="M14 5l7 7m0 0l-7 7m7-7H3"
+                            ></path>
                           </svg>
                         </span>
                       </div>
@@ -225,122 +329,95 @@ export default function HomePage() {
           </div>
         </section>
 
-        <section id="contacto" className="py-16 neu-bg relative overflow-hidden">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-            <div className="text-center mb-12">
-              <span className="neu-pressed inline-block px-4 py-2 rounded-full text-sm font-semibold tracking-wide uppercase" style={{ color: 'var(--neu-primary)' }}>
-                {t('contact.badge')}
-              </span>
-              <h2 className="mt-4 text-3xl font-extrabold sm:text-4xl lg:text-5xl neu-gradient-text">
-                {t('contact.title')}
+        {/* CTA — WhatsApp + email + full form */}
+        <section
+          id="contacto"
+          className="py-20 neu-bg relative overflow-hidden"
+        >
+          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div className="text-center mb-10">
+              <h2 className="text-3xl font-extrabold sm:text-4xl lg:text-5xl neu-gradient-text">
+                {t('cta.title')}
               </h2>
-              <p className="mt-3 max-w-2xl mx-auto text-xl" style={{ color: '#718096' }}>
-                {t('contact.subtitle')}
+              <p
+                className="mt-4 max-w-2xl mx-auto text-xl"
+                style={{ color: '#718096' }}
+              >
+                {t('cta.subtitle')}
               </p>
             </div>
 
-            <div className="lg:grid lg:grid-cols-2 lg:gap-12 items-start">
-              <div className="neu-raised p-6 sm:p-8 rounded-2xl mb-10 lg:mb-0">
-                <div className="mb-6">
-                  <h3 className="text-xl font-semibold" style={{ color: '#2d3748' }}>{t('contact.form.title')}</h3>
-                  <p className="mt-2 text-sm" style={{ color: '#718096' }}>
-                    {t('contact.form.description')}
-                  </p>
-                </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-2xl mx-auto">
+              <a
+                href={whatsappHref}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="neu-raised rounded-2xl p-6 flex flex-col items-center justify-center text-center transition-all duration-300 hover:-translate-y-1 group"
+                style={{
+                  background: 'linear-gradient(145deg, #25D366, #128C7E)',
+                }}
+                data-cta="whatsapp"
+                onClick={() =>
+                  trackEvent(Events.CTA_WHATSAPP_CLICK, { location: 'home' })
+                }
+              >
+                <BsWhatsapp className="h-10 w-10 text-white mb-3" />
+                <span className="text-lg font-bold text-white">
+                  {t('cta.whatsapp')}
+                </span>
+              </a>
 
-                <div className="space-y-4">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                      <label htmlFor="name" className="block text-sm font-medium mb-2" style={{ color: '#2d3748' }}>{t('contact.form.name')}</label>
-                      <input
-                        type="text"
-                        id="name"
-                        className="neu-input"
-                        placeholder={t('contact.form.namePlaceholder')}
-                      />
-                    </div>
-                    <div>
-                      <label htmlFor="email" className="block text-sm font-medium mb-2" style={{ color: '#2d3748' }}>{t('contact.form.email')}</label>
-                      <input
-                        type="email"
-                        id="email"
-                        className="neu-input"
-                        placeholder={t('contact.form.emailPlaceholder')}
-                      />
-                    </div>
-                  </div>
+              <a
+                href="mailto:contacto@tunixlabs.com"
+                className="neu-btn-primary rounded-2xl p-6 flex flex-col items-center justify-center text-center transition-all duration-300 hover:-translate-y-1 group"
+                data-cta="email"
+                onClick={() =>
+                  trackEvent(Events.CTA_EMAIL_CLICK, { location: 'home' })
+                }
+              >
+                <FiMail className="h-10 w-10 mb-3" />
+                <span className="text-lg font-bold">{t('cta.email')}</span>
+              </a>
+            </div>
 
-                  <div>
-                    <label htmlFor="subject" className="block text-sm font-medium mb-2" style={{ color: '#2d3748' }}>{t('contact.form.subject')}</label>
-                    <input
-                      type="text"
-                      id="subject"
-                      className="neu-input"
-                      placeholder={t('contact.form.subjectPlaceholder')}
-                    />
-                  </div>
-
-                  <div>
-                    <label htmlFor="message" className="block text-sm font-medium mb-2" style={{ color: '#2d3748' }}>{t('contact.form.message')}</label>
-                    <textarea
-                      id="message"
-                      rows={4}
-                      className="neu-input resize-none"
-                      placeholder={t('contact.form.messagePlaceholder')}
-                    ></textarea>
-                  </div>
-                </div>
-
-                <div className="mt-6">
-                  <a
-                    href="mailto:contacto@tunixlabs.com?subject=Contacto desde TunixLabs&body=Hola, me gustaría obtener más información sobre sus servicios de IA."
-                    className="neu-btn-primary w-full inline-block text-center"
-                  >
-                    {t('contact.form.submit')}
-                  </a>
-                </div>
-              </div>
-
-              <div className="text-center lg:text-left">
-                <div className="max-w-md mx-auto lg:mr-0 lg:ml-auto">
-                  <h3 className="text-xl font-semibold mb-6" style={{ color: '#2d3748' }}>{t('contact.info.title')}</h3>
-
-                  <div className="space-y-6">
-                    <div className="flex items-start">
-                      <div className="neu-service-icon flex-shrink-0" style={{ width: '48px', height: '48px', margin: 0 }}>
-                        <svg className="h-5 w-5" style={{ color: 'var(--neu-primary)' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                        </svg>
-                      </div>
-                      <div className="ml-4">
-                        <p className="text-lg font-medium" style={{ color: 'var(--text-dark)' }}>{t('contact.info.email')}</p>
-                        <p className="mt-1" style={{ color: 'var(--text-muted)' }}>contacto@tunixlabs.com</p>
-                      </div>
-                    </div>
-
-                    <a
-                      href="https://wa.me/56930367979?text=Hola,%20me%20gustaría%20obtener%20más%20información%20sobre%20sus%20servicios%20de%20IA."
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-start group"
-                    >
-                      <div className="neu-service-icon flex-shrink-0 transition-all duration-300 group-hover:-translate-y-1" style={{ width: '48px', height: '48px', margin: 0, background: 'linear-gradient(145deg, #25D366, #128C7E)' }}>
-                        <BsWhatsapp className="h-5 w-5 text-white" />
-                      </div>
-                      <div className="ml-4">
-                        <p className="text-lg font-medium" style={{ color: 'var(--text-dark)' }}>WhatsApp</p>
-                        <p className="mt-1 group-hover:text-green-600 transition-colors" style={{ color: 'var(--text-muted)' }}>{t('contact.info.whatsappCta')}</p>
-                      </div>
-                    </a>
-                  </div>
-
-                </div>
-              </div>
+            <div className="mt-8 text-center">
+              <Link
+                href="/contacto"
+                className="inline-flex items-center text-sm font-medium neu-gradient-text hover:underline"
+                data-cta="full-form"
+                onClick={() =>
+                  trackEvent(Events.CTA_FULL_FORM_CLICK, { location: 'home' })
+                }
+              >
+                {t('cta.fullForm')}
+                <svg
+                  className="ml-2 h-4 w-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M14 5l7 7m0 0l-7 7m7-7H3"
+                  ></path>
+                </svg>
+              </Link>
             </div>
           </div>
         </section>
 
-        <footer className="py-8 neu-bg text-center" style={{ color: '#718096' }}>
+        <footer
+          className="py-8 neu-bg text-center"
+          style={{ color: '#718096' }}
+        >
+          <p
+            className="max-w-3xl mx-auto text-xs mb-2 px-4"
+            style={{ color: '#a0aec0' }}
+          >
+            {t('footer.disclaimer')}
+          </p>
           <p>&copy; 2026 {t('footer.copyright')}</p>
         </footer>
       </div>

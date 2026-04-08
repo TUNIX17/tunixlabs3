@@ -89,6 +89,20 @@ const nextConfig = {
         destination: '/es/contacto',
         permanent: true,
       },
+      // Dropped services (sprint 2026-04-08) — redirect any cached link
+      // to the homepage services section so visitors don't hit a 404.
+      // The `:locale` segment matches /es or /en (or any other two-letter
+      // locale next-intl routes to).
+      {
+        source: '/:locale/servicios/automatizacion-marketing-ia',
+        destination: '/:locale/inicio#servicios',
+        permanent: true,
+      },
+      {
+        source: '/:locale/servicios/generacion-contenido-ia',
+        destination: '/:locale/inicio#servicios',
+        permanent: true,
+      },
     ];
   },
 };

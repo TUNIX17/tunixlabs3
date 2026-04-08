@@ -1,7 +1,7 @@
 {
   "Metadata": {
-    "title": "TunixLabs - Soluciones Avanzadas de IA",
-    "description": "TunixLabs es una empresa especializada en consultoria y desarrollo de soluciones de Inteligencia Artificial de vanguardia."
+    "title": "TunixLabs - SaaS verticales con IA para industrias reguladas",
+    "description": "Construimos SaaS verticales con IA en produccion para mineria, energia, educacion y compliance tributario. Mas de 5 sistemas operando 24/7."
   },
   "Layout": {
     "nav": {
@@ -12,64 +12,140 @@
   },
   "HomePage": {
     "hero": {
-      "title1": "Soluciones de",
-      "title2": "Inteligencia Artificial",
-      "title3": "para tu negocio",
-      "description": "En TunixLabs, transformamos tu empresa con tecnologia de vanguardia. Nuestras soluciones de IA estan disenadas para impulsar tu crecimiento y optimizar tus procesos.",
+      "title1": "Construimos",
+      "title2": "SaaS verticales con IA",
+      "title3": "para industrias reguladas",
+      "description": "Sistemas en produccion 24/7 para contratistas mineros, empresas de energia, firmas auditoras y compliance tributario chileno. No hacemos demos: entregamos software que opera todos los dias.",
       "cta": {
-        "contact": "Contactar",
-        "services": "Ver Servicios"
+        "contact": "Hablemos de tu proyecto",
+        "services": "Ver casos en produccion"
       },
       "loading3D": "Cargando modelo 3D..."
     },
-    "services": {
-      "badge": "Nuestros Servicios",
-      "title": "Soluciones de IA para cada necesidad",
-      "subtitle": "Impulsando tu negocio con tecnologia de vanguardia",
-      "learnMore": "Saber mas",
-      "items": {
-        "webDev": {
-          "title": "Desarrollos Web",
-          "description": "Creamos experiencias web interactivas y escalables, potenciadas con inteligencia artificial."
+    "trustedBy": {
+      "title": "Equipos que han trabajado con TunixLabs"
+    },
+    "caseStudies": {
+      "badge": "Casos en produccion",
+      "title": "Software que opera 24/7",
+      "subtitle": "5+ sistemas en produccion para clientes en industrias reguladas",
+      "stack": "Stack",
+      "disclaimer": "TunixLabs actua como partner tecnico de firmas seleccionadas. Los nombres de clientes en estos casos refieren al partner directo que encarga el desarrollo, no al usuario final del software.",
+      "cards": {
+        "sime": {
+          "client": "Contratistas en operaciones mineras criticas (Chile)",
+          "problem": "Gestion de pautas de seguridad, mantenciones y ordenes de trabajo sin trazabilidad digital end-to-end en faenas mineras.",
+          "solution": "Plataforma integral de seguridad minera: 1,056 pautas, checklists de actividades, PDFs firmados con QR, dashboard ejecutivo y auditoria completa.",
+          "metric": "115K+ actividades · 19,778 ordenes de trabajo · 24/7 en Railway",
+          "stack": ["Turborepo", "Fastify 5", "React 19", "PostgreSQL", "AWS S3"]
         },
-        "machineLearning": {
-          "title": "Machine Learning",
-          "description": "Implementamos modelos predictivos que aprenden de tus datos para automatizar procesos."
+        "schwager": {
+          "client": "Schwager Energy (via partner tecnico)",
+          "problem": "Firmas legales de faena en ubicaciones remotas con conectividad intermitente y formularios en papel que se extraviaban.",
+          "solution": "App offline-first con Voice AI (Gemini 2.5 Flash), 9 agentes especializados, firma digital auditable y sincronizacion diferida al volver cobertura.",
+          "metric": "210 firmas legales procesadas · Voice AI <2s latencia · 9 agentes en produccion",
+          "stack": ["Express", "React", "Capacitor", "Gemini 2.5", "Prisma"]
         },
-        "aiAssistants": {
-          "title": "Asistentes IA",
-          "description": "Creamos asistentes virtuales inteligentes que mejoran la experiencia de tus clientes."
+        "gasDistribution": {
+          "client": "Distribuidora regional de gas en Chile",
+          "problem": "Validacion manual de codigos de quema y 14 rutas de reparto con errores de transcripcion y re-procesos diarios.",
+          "solution": "Bot de procesamiento automatico de codigos con validacion contra reglas de negocio, dashboard de metricas y reporteria por ruta.",
+          "metric": "4,040 codigos procesados · 88.7% tasa de exito · 14 rutas automatizadas",
+          "stack": ["Express 5", "Prisma", "React 18", "PostgreSQL"]
         },
-        "businessIntelligence": {
-          "title": "Business Intelligence",
-          "description": "Dashboards interactivos y reportes automatizados para monitorear tu negocio."
-        },
-        "computerVision": {
-          "title": "Vision Artificial",
-          "description": "Sistemas de vision por computadora para reconocimiento y analisis de imagenes."
-        },
-        "aiConsulting": {
-          "title": "Consultoria IA",
-          "description": "Te asesoramos en estrategias de IA que maximizan el retorno de inversion."
-        },
-        "rpa": {
-          "title": "RPA con IA",
-          "description": "Automatiza tareas repetitivas con robots de software inteligentes."
-        },
-        "contentGeneration": {
-          "title": "Generacion de Contenido IA",
-          "description": "Crea textos, imagenes y videos personalizados mediante IA."
-        },
-        "marketingAutomation": {
-          "title": "Automatizacion Marketing IA",
-          "description": "Segmenta, personaliza y automatiza campanas de marketing."
+        "apoderapp": {
+          "client": "Apoderapp (producto propio)",
+          "problem": "Colegios y apoderados sin un canal digital para gestionar cuotas, pagos y boletas integrado al SII chileno.",
+          "solution": "Plataforma SaaS con integracion nativa al SII (tipos 33/39/61/56), firma XMLDSig, CAF, Libros IVA, validacion de schemas y asistente WhatsApp con IA.",
+          "metric": "Certificacion SII completa · DTE en produccion · Libros Ventas/Compras LOK",
+          "stack": ["Next.js", "React", "Prisma", "SII XML/CAF", "Claude"]
         }
       }
     },
+    "about": {
+      "badge": "Sobre el founder",
+      "title": "Ingenieria senior, no promesas",
+      "name": "Alejandro Moyano Foncea",
+      "roleLine": "Fundador · 10+ anos construyendo software que opera en produccion",
+      "bioParagraph1": "Formacion en Machine Learning via <mit>MIT Professional Education</mit>: programa \"No Code AI and Machine Learning: Building Data Science Solutions\", 80 horas de trabajo con Dataiku DSS (Feb–May 2024). Ese background ancla la parte de ML clasico; el stack moderno de LLMs y agentes llego despues.",
+      "bioParagraph2": "Hoy TunixLabs es un studio boutique chileno enfocado en industrias reguladas: mineria, energia, compliance tributario, auditoria. Escribimos codigo que tiene que pasar auditoria y operar los 365 dias del ano. No hacemos landings ni demos bonitas: entregamos sistemas que una persona revisa todos los dias a las 7am."
+    },
+    "credentials": {
+      "modalTitle": "Credencial MIT Professional Education",
+      "caption": "Alejandro Moyano Foncea · No Code AI and Machine Learning: Building Data Science Solutions · MIT Professional Education · Feb–May 2024 · 80 horas de trabajo",
+      "close": "Cerrar",
+      "open": "Ver credencial MIT",
+      "altText": "Diploma de MIT Professional Education a nombre de Alejandro Moyano Foncea"
+    },
+    "services": {
+      "badge": "Que hacemos",
+      "title": "Lo que construimos",
+      "subtitle": "7 areas ancladas a proyectos reales en produccion. Sin buzzwords genericos, sin stacks inventados.",
+      "learnMore": "Saber mas",
+      "items": {
+        "aiAssistants": {
+          "title": "Asistentes conversacionales y Voice AI",
+          "shortDescription": "Agentes de voz y chatbots con LLMs reales, no flujos rigidos. Voice AI con <2s de latencia en produccion.",
+          "longDescription": "Construimos asistentes conversacionales para operaciones reales: voice AI para faenas de energia, chatbots WhatsApp con IA para soporte de productos SaaS y agentes Claude integrados al backend del cliente. No usamos Dialogflow ni Rasa: trabajamos con LLMs frontera (Claude, Gemini) y construimos la orquestacion sobre tu stack.",
+          "stack": ["Claude", "Gemini 2.5 Flash", "Next.js", "Fastify", "Voice AI pipelines"],
+          "anchorProject": "En produccion: Voice AI de faena con 9 agentes especializados para una empresa de energia (latencia <2s, Gemini 2.5 Flash, session resumption)."
+        },
+        "businessIntelligence": {
+          "title": "Business Intelligence y dashboards operacionales",
+          "shortDescription": "Dashboards para directores de operaciones que efectivamente los miran. KPIs con data real, no placeholders.",
+          "longDescription": "Construimos dashboards operacionales y pipelines ETL para equipos que necesitan ver la realidad de su operacion antes del cafe. Calendarios 20-20, vistas mensuales, comparativas historicas, backfills. Hechos para equipos que trabajan en faena, no para investors deck.",
+          "stack": ["Next.js", "React 19", "Prisma", "PostgreSQL", "ETL multi-year", "Gantt charts"],
+          "anchorProject": "En produccion: plataformas BI con 115K+ actividades trackeadas, 1,056 pautas y 19,778 ordenes de trabajo para contratistas mineros; dashboards de 103 estandares de auditoria para una firma que reporta a operadores mineros."
+        },
+        "webDev": {
+          "title": "Desarrollo web y SaaS verticales",
+          "shortDescription": "Plataformas SaaS completas: backend, frontend, integraciones, CI/CD y deploy. Especializados en industrias reguladas.",
+          "longDescription": "Construimos SaaS verticales end-to-end. No hacemos landings marketing-only: construimos el producto completo — auth, billing, admin panels, integraciones con sistemas legacy y APIs gubernamentales. Stack moderno con TypeScript estricto, testing real y deploy automatizado.",
+          "stack": ["Next.js 14 App Router", "Fastify 5", "React 19", "Prisma", "PostgreSQL", "Railway", "Turborepo"],
+          "anchorProject": "En produccion: Apoderapp (compliance tributario SII chileno), Speakly (plataforma de aprendizaje de ingles con IA en Turborepo) y este mismo sitio que estas leyendo."
+        },
+        "aiConsulting": {
+          "title": "Consultoria de IA y auditorias tecnicas",
+          "shortDescription": "Evaluamos tu arquitectura de IA actual, encontramos el scope drift y proponemos el approach mas barato que funciona.",
+          "longDescription": "Hacemos auditorias adversariales de sistemas de IA ya desplegados: que tan solido es tu pipeline, donde esta la deuda tecnica escondida, cuando tiene sentido un LLM y cuando un modelo clasico es mejor. Tambien diseniamos arquitecturas multi-agente desde cero para clientes que ya tienen data y saben que problema quieren resolver.",
+          "stack": ["Claude Code", "Sistemas multi-agente", "RAG", "Closing pipelines", "Playwright testing"],
+          "anchorProject": "Experiencia propia: meta-sistema Agente_Tunix que orquesta 7 proyectos en produccion via agentes Claude jerarquicos, cada uno con su propio closing pipeline (type_check → lint → build → test → audit) y PR review automatizado."
+        },
+        "rpa": {
+          "title": "Automatizacion de procesos (RPA con IA)",
+          "shortDescription": "Automatizamos procesos repetitivos con codigo, no con plataformas RPA carisimas. Integracion directa con tus APIs.",
+          "longDescription": "Cuando tu equipo gasta horas procesando archivos Excel, validando codigos manualmente o reenviando mails, construimos un bot que lo hace en segundos. No usamos UiPath ni Power Automate: escribimos un servicio en Node/Python que corre en tu infra y se integra con tus sistemas existentes. Mas barato, mas auditable, y no depende de licencias enterprise.",
+          "stack": ["Node.js", "Python", "Playwright", "Prisma", "Docker", "Claude"],
+          "anchorProject": "En produccion: bot de procesamiento de codigos para una distribuidora regional de gas en Chile. 4,040 codigos procesados, 88.7% de tasa de exito, 14 rutas de reparto automatizadas, dashboard de metricas por ruta y reporteria diaria."
+        },
+        "machineLearning": {
+          "title": "Machine Learning y data science aplicado",
+          "shortDescription": "ML clasico + LLM stack combinados. Formacion en MIT Professional Education y trabajo con Dataiku + Python.",
+          "longDescription": "Diferencia honesta vs consultoras que solo conocen LLMs: tenemos background real en ML clasico (feature engineering, seleccion de modelos, cross-validation) ANTES del boom de GPT. Eso significa que si tu problema es prediccion sobre data estructurada, no vamos a vendarte un LLM que alucina: vamos a construir un modelo que funciona y se audita. La formacion es MIT Professional Education — 80 horas de trabajo sobre Dataiku DSS entre febrero y mayo de 2024.",
+          "stack": ["Python (scikit-learn, pandas)", "Dataiku DSS", "Claude como coding assistant", "PostgreSQL", "Jupyter"],
+          "anchorProject": "Formacion: programa MIT Professional Education \"No Code AI and Machine Learning: Building Data Science Solutions\" (80h, 2024) trabajando con Dataiku DSS, luego replicacion de los modelos en Python con Claude como coding assistant."
+        },
+        "computerVision": {
+          "title": "Vision artificial (capability en construccion)",
+          "shortDescription": "Framing honesto: tenemos los fundamentos tecnicos y el interes, pero aun sin proyectos de CV en produccion propios.",
+          "longDescription": "Seccion honesta: la vision artificial es un area de interes personal del founder desde el inicio del journey IA y tenemos los fundamentos tecnicos del entrenamiento de modelos. Sin embargo, todavia no hay proyectos de CV en produccion en el portafolio. Si tu proyecto necesita CV critica, recomendamos trabajar con un especialista dedicado o conversar con nosotros para colaboraciones experimentales donde el alcance sea claro.",
+          "stack": ["Python", "PyTorch / TensorFlow (fundamentos)", "OpenCV (basico)", "Claude"],
+          "anchorProject": "Honesto: sin proyectos CV en produccion propios. Tomamos este servicio como experimental / colaborativo con especialistas. Si es critico para tu proyecto, te derivamos a quien corresponde."
+        }
+      }
+    },
+    "cta": {
+      "title": "Listo para construir tu proximo SaaS?",
+      "subtitle": "Respondemos en menos de 24h",
+      "whatsapp": "Hablar por WhatsApp",
+      "email": "Enviar email",
+      "fullForm": "Tambien podes usar el formulario completo \u2192"
+    },
+    "whatsappMessage": "Hola, vengo de tunixlabs.com. Me interesa conversar sobre un proyecto de SaaS vertical con IA.",
     "contact": {
       "badge": "Contacto",
-      "title": "Transforma tu negocio con IA",
-      "subtitle": "Contactanos hoy para una consulta gratuita",
+      "title": "Hablemos de tu proximo producto",
+      "subtitle": "Respondemos en menos de 24h. Sin formularios interminables.",
       "form": {
         "title": "Envianos un mensaje",
         "description": "Completa el formulario y nos pondremos en contacto contigo.",
@@ -91,7 +167,8 @@
       }
     },
     "footer": {
-      "copyright": "TunixLabs. Todos los derechos reservados."
+      "copyright": "TunixLabs. Todos los derechos reservados.",
+      "disclaimer": "TunixLabs actua como partner tecnico de firmas seleccionadas. Los nombres de clientes en casos de estudio refieren al partner directo que encarga el desarrollo, no al usuario final del software."
     }
   },
   "ContactPage": {
@@ -118,6 +195,8 @@
     "directContact": {
       "title": "Contacto directo",
       "whatsapp": "Escribenos por WhatsApp",
+      "whatsappInfoMessage": "Hola, vengo de tunixlabs.com y me gustaria mas informacion sobre sus SaaS verticales con IA.",
+      "whatsappScheduleMessage": "Hola, vengo de tunixlabs.com y me gustaria agendar una reunion para discutir mi proyecto.",
       "socialMedia": "Redes sociales",
       "meetingQuestion": "Prefieres una reunion?",
       "scheduleCall": "Agenda una videollamada"
@@ -125,107 +204,111 @@
   },
   "Footer": {
     "companyName": "TunixLabs",
-    "companyDescription": "Consultoria especializada en soluciones de Inteligencia Artificial para empresas.",
+    "companyDescription": "Studio boutique chileno especializado en SaaS verticales con IA para industrias reguladas.",
     "contactTitle": "Contacto",
     "linksTitle": "Enlaces",
     "home": "Inicio",
     "services": "Servicios",
     "contact": "Contacto",
-    "copyright": "TunixLabs. Todos los derechos reservados."
+    "copyright": "TunixLabs. Todos los derechos reservados.",
+    "disclaimer": "TunixLabs actua como partner tecnico de firmas seleccionadas. Los nombres de clientes en casos de estudio refieren al partner directo que encarga el desarrollo, no al usuario final del software."
   },
   "Services": {
     "backToServices": "Volver",
     "ourServicesBadge": "Nuestros Servicios",
+    "sections": {
+      "overview": "Vision general",
+      "stack": "Stack real que usamos",
+      "anchorProject": "Proyecto ancla en produccion",
+      "cta": "Hablemos"
+    },
+    "backHome": "Volver a Inicio",
     "webDev": {
       "meta": {
-        "title": "Desarrollos Web | TunixLabs",
-        "description": "Creamos experiencias web interactivas y escalables potenciadas con inteligencia artificial."
+        "title": "Desarrollo web y SaaS verticales | TunixLabs",
+        "description": "SaaS verticales end-to-end para industrias reguladas. Apoderapp (SII), Speakly (AI learning) y mas en produccion."
       },
       "hero": {
-        "title": "Desarrollos Web",
-        "description": "Creamos experiencias web interactivas y escalables, potenciadas con inteligencia artificial para llevar tu negocio al siguiente nivel."
+        "badge": "Desarrollo web",
+        "title": "Desarrollo web y SaaS verticales",
+        "description": "Construimos plataformas SaaS completas: backend, frontend, integraciones con APIs gubernamentales, CI/CD y deploy. No hacemos landings: construimos productos que sus duenos revisan todos los dias."
       }
     },
     "machineLearning": {
       "meta": {
-        "title": "Machine Learning | TunixLabs",
-        "description": "Implementamos modelos predictivos que aprenden de tus datos para automatizar procesos."
+        "title": "Machine Learning aplicado | TunixLabs",
+        "description": "ML clasico + LLM stack. Formacion en MIT Professional Education, trabajo real con Dataiku DSS y Python."
       },
       "hero": {
-        "title": "Machine Learning",
-        "description": "Implementamos modelos predictivos que aprenden de tus datos para automatizar procesos y tomar mejores decisiones."
+        "badge": "Machine Learning",
+        "title": "Machine Learning y data science aplicado",
+        "description": "ML clasico con raices en MIT Professional Education + stack moderno de LLMs. Si tu problema es prediccion sobre data estructurada, no te vamos a vendar un LLM: vamos a construir el modelo que corresponde."
       }
     },
     "aiAssistants": {
       "meta": {
-        "title": "Asistentes IA | TunixLabs",
-        "description": "Creamos asistentes virtuales inteligentes que mejoran la experiencia de tus clientes."
+        "title": "Asistentes conversacionales y Voice AI | TunixLabs",
+        "description": "Voice AI con <2s de latencia en produccion. Chatbots WhatsApp con LLMs reales. Agentes Claude integrados a tu operacion."
       },
       "hero": {
-        "title": "Asistentes IA",
-        "description": "Creamos asistentes virtuales inteligentes que mejoran la experiencia de tus clientes y automatizan la atencion."
+        "badge": "Asistentes IA",
+        "title": "Asistentes conversacionales y Voice AI",
+        "description": "Voice AI, chatbots y agentes Claude para operaciones reales. Sin flujos rigidos pre-programados: LLMs frontera orquestados sobre tu stack existente."
       }
     },
     "businessIntelligence": {
       "meta": {
-        "title": "Business Intelligence | TunixLabs",
-        "description": "Dashboards interactivos y reportes automatizados para monitorear tu negocio."
+        "title": "Business Intelligence y dashboards operacionales | TunixLabs",
+        "description": "Dashboards que los directores de operaciones efectivamente miran. KPIs con data real, ETL multi-year, Gantt charts."
       },
       "hero": {
-        "title": "Business Intelligence",
-        "description": "Dashboards interactivos y reportes automatizados para monitorear tu negocio en tiempo real."
+        "badge": "Business Intelligence",
+        "title": "Business Intelligence y dashboards operacionales",
+        "description": "Dashboards para equipos que trabajan en faena, no para investor decks. Calendarios 20-20, vistas mensuales, comparativas historicas. Data real, cero placeholders."
       }
     },
     "computerVision": {
       "meta": {
-        "title": "Vision Artificial | TunixLabs",
-        "description": "Sistemas de vision por computadora para reconocimiento y analisis de imagenes."
+        "title": "Vision artificial | TunixLabs",
+        "description": "Seccion honesta: capability en construccion, sin proyectos de CV en produccion propios todavia. Para proyectos CV criticos trabajamos con especialistas dedicados."
       },
       "hero": {
-        "title": "Vision Artificial",
-        "description": "Sistemas de vision por computadora para reconocimiento y analisis de imagenes en tu industria."
+        "badge": "Vision artificial",
+        "title": "Vision artificial",
+        "description": "Seccion honesta: tenemos los fundamentos tecnicos y el interes, pero aun sin proyectos de CV en produccion propios. Si tu proyecto necesita CV critica, te recomendamos un especialista dedicado o una colaboracion experimental con nosotros."
       }
     },
     "aiConsulting": {
       "meta": {
-        "title": "Consultoria IA | TunixLabs",
-        "description": "Te asesoramos en estrategias de IA que maximizan el retorno de inversion."
+        "title": "Consultoria IA y auditorias tecnicas | TunixLabs",
+        "description": "Auditorias adversariales de sistemas de IA. Disenamos arquitecturas multi-agente. Encontramos scope drift y deuda tecnica escondida."
       },
       "hero": {
-        "title": "Consultoria IA",
-        "description": "Te asesoramos en estrategias de IA que maximizan el retorno de inversion y transforman tu negocio."
+        "badge": "Consultoria IA",
+        "title": "Consultoria IA y auditorias tecnicas",
+        "description": "Evaluamos tu arquitectura de IA, encontramos deuda tecnica escondida y proponemos el approach mas barato que funciona. Tambien disenamos sistemas multi-agente desde cero."
       }
     },
     "rpa": {
       "meta": {
-        "title": "RPA con IA | TunixLabs",
-        "description": "Automatiza tareas repetitivas con robots de software inteligentes."
+        "title": "Automatizacion de procesos (RPA con IA) | TunixLabs",
+        "description": "Automatizamos procesos repetitivos con codigo, no con UiPath. Integracion directa con tus APIs y sistemas legacy."
       },
       "hero": {
-        "title": "RPA con IA",
-        "description": "Automatiza tareas repetitivas con robots de software inteligentes que ahorran tiempo y reducen errores."
-      }
-    },
-    "contentGeneration": {
-      "meta": {
-        "title": "Generacion de Contenido IA | TunixLabs",
-        "description": "Crea textos, imagenes y videos personalizados mediante inteligencia artificial."
-      },
-      "hero": {
-        "title": "Generacion de Contenido IA",
-        "description": "Crea textos, imagenes y videos personalizados mediante inteligencia artificial de ultima generacion."
-      }
-    },
-    "marketingAutomation": {
-      "meta": {
-        "title": "Automatizacion Marketing IA | TunixLabs",
-        "description": "Segmenta, personaliza y automatiza campanas de marketing con IA."
-      },
-      "hero": {
-        "title": "Automatizacion Marketing IA",
-        "description": "Segmenta, personaliza y automatiza campanas de marketing para maximizar conversiones."
+        "badge": "RPA",
+        "title": "Automatizacion de procesos con IA",
+        "description": "Cuando tu equipo gasta horas procesando archivos o validando codigos a mano, escribimos un bot que lo hace en segundos. Sin licencias enterprise carisimas: codigo en tu infra que se integra con tus sistemas."
       }
     }
+  },
+  "ServiceLayout": {
+    "backButton": "Volver a Inicio",
+    "overviewTitle": "Que hacemos en esta area",
+    "stackTitle": "Stack real que usamos",
+    "anchorTitle": "Proyecto ancla en produccion",
+    "ctaTitle": "Tenes un proyecto en esta area?",
+    "ctaButton": "Hablemos por WhatsApp",
+    "ctaSecondary": "O envianos un mensaje"
   },
   "VoiceInterface": {
     "startRecording": "Haz clic para comenzar a grabar",
