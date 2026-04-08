@@ -28,9 +28,6 @@
   "dependencies": {
     "@prisma/client": "^5.22.0",
     "@react-email/render": "^2.0.2",
-    "@react-spring/three": "^9.7.5",
-    "@react-three/drei": "^9.80.3",
-    "@react-three/fiber": "^8.13.6",
     "@ricky0123/vad-react": "^0.0.36",
     "@ricky0123/vad-web": "^0.0.30",
     "@swc/helpers": "0.5.18",
@@ -47,7 +44,6 @@
     "react-icons": "^5.5.0",
     "recharts": "^3.6.0",
     "resend": "^6.7.0",
-    "three": "^0.151.3",
     "uuid": "^11.1.0",
     "zod": "^4.3.5"
   },
@@ -56,7 +52,6 @@
     "@types/node": "^18.0.0",
     "@types/react": "^18.0.0",
     "@types/react-dom": "^18.0.0",
-    "@types/three": "^0.175.0",
     "autoprefixer": "^10.4.14",
     "copy-webpack-plugin": "^13.0.1",
     "eslint": "^8.38.0",
