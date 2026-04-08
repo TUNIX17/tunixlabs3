@@ -1,7 +1,13 @@
 'use client';
 
 import { useEffect } from 'react';
-import Link from 'next/link';
+// IMPORTANT: use the next-intl Link, NOT next/link. The plain next/link
+// outputs literal hrefs like `/contacto`, which on EN service pages get
+// caught by the next.config.js redirect `/contacto -> /es/contacto` and
+// silently kick the visitor to the Spanish form. The next-intl Link
+// resolves canonical pathnames against `routing.ts` and emits the correct
+// localized URL (`/en/contact` for EN, `/es/contacto` for ES).
+import { Link } from '@/i18n/navigation';
 import { useTranslations } from 'next-intl';
 import { FiArrowLeft, FiArrowRight, FiCheckCircle } from 'react-icons/fi';
 import { BsWhatsapp } from 'react-icons/bs';
