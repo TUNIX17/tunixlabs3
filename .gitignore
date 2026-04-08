@@ -58,3 +58,8 @@ next-env.d.ts
 # Python Virtual Environment (symlink)
 .venv
 /src/generated/prisma
+
+# Sprint working artifacts (local-only, not shipped)
+/reports/
+/screenshots/
+/public/case-studies/cv-extracted/
