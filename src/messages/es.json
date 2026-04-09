@@ -1,7 +1,7 @@
 {
   "Metadata": {
     "title": "TunixLabs — Software a medida para industrias reguladas",
-    "description": "Un operador chileno que shippea software a medida para industrias reguladas. Minería, metalurgia, retail, compliance tributario. 15 años liderando proyectos + MIT Professional Education ML."
+    "description": "Un operador chileno que construye software a medida para industrias reguladas. Minería, metalurgia, retail, compliance tributario. 15 años liderando proyectos + MIT Professional Education ML."
   },
   "Layout": {
     "nav": {
@@ -15,7 +15,7 @@
       "title1": "Software",
       "title2": "que opera en producción",
       "title3": "para industrias reguladas",
-      "description": "Soy Alejandro. 15 años corriendo proyectos reales — maestranza, retail, minería — y hoy shippeo software de producción con workflows agénticos sobre Claude Code. Trabajo con contratistas mineros, firmas auditoras y mi propio SaaS de gestión escolar.",
+      "description": "Soy Alejandro. 15 años corriendo proyectos reales — maestranza, retail, minería — y hoy entrego sistemas de producción con workflows agénticos sobre Claude Code. Trabajo con contratistas mineros, firmas auditoras y mi propio SaaS de gestión escolar.",
       "cta": {
         "contact": "Hablemos por WhatsApp",
         "services": "Ver lo que construí"
@@ -23,7 +23,7 @@
       "loading3D": "Cargando..."
     },
     "trustedBy": {
-      "title": "Equipos para los que he shippeado"
+      "title": "Equipos con los que he trabajado"
     },
     "caseStudies": {
       "badge": "En producción",
@@ -33,7 +33,7 @@
       "disclaimer": "TunixLabs actúa como partner técnico de firmas seleccionadas. Los nombres de clientes en estos casos refieren al partner directo que encarga el desarrollo, no al usuario final del software.",
       "cards": {
         "sime": {
-          "client": "Contratistas en operaciones mineras criticas en Chile",
+          "client": "Contratistas en operaciones mineras críticas en Chile",
           "problem": "Pautas de seguridad, mantenciones preventivas y órdenes de trabajo corriendo en papel y planillas, sin trazabilidad digital entre la faena y la oficina central.",
           "solution": "Reemplazo completo del sistema legacy: 1,056 pautas, checklists por actividad, PDFs firmados con QR, navegación histórica de KPIs y auditoría completa por turno minero.",
           "metric": "19,778 órdenes de trabajo · 115K+ actividades · 116K+ sub-actividades",
@@ -87,7 +87,7 @@
           "client": "Maestranza Fernández (empresa metalúrgica, 50 años)",
           "problem": "Operación completa corriendo en Excel — RRHH, asistencia, finanzas, control de proyectos, CRM — durante ausencia de los dueños, sin un ERP que reflejara el estado real del negocio.",
           "solution": "ERP custom con IA que reemplazó el Excel en cada área. Pipelines de OCR, QR y LLM Vision para digitalizar documentos en planta. Lideré la transformación digital end-to-end durante el desarrollo.",
-          "metric": "ERP full-stack shippeado solo · OCR + QR + LLM Vision en producción · transformación digital end-to-end",
+          "metric": "ERP full-stack construido solo · OCR + QR + LLM Vision en producción · transformación digital end-to-end",
           "stack": [
             "Next.js",
             "Prisma",
@@ -191,7 +191,7 @@
         "aiConsulting": {
           "title": "Consultoría de IA y auditorías técnicas",
           "shortDescription": "Reviso tu arquitectura de IA, encuentro la deuda escondida y propongo el approach más barato que funciona.",
-          "longDescription": "Auditorías adversariales de sistemas de IA ya desplegados: qué tan sólido es tu pipeline, dónde está la deuda técnica escondida, cuándo tiene sentido un LLM y cuándo un modelo clásico es mejor. También diseño arquitecturas multi-agente desde cero para clientes que ya tienen data y saben qué problema quieren resolver. El diferenciador honesto: 15 años corriendo proyectos reales antes de shippear la primera línea de código — sé distinguir entre un problema de software y un problema de proceso.",
+          "longDescription": "Auditorías adversariales de sistemas de IA ya desplegados: qué tan sólido es tu pipeline, dónde está la deuda técnica escondida, cuándo tiene sentido un LLM y cuándo un modelo clásico es mejor. También diseño arquitecturas multi-agente desde cero para clientes que ya tienen data y saben qué problema quieren resolver. El diferenciador honesto: 15 años corriendo proyectos reales antes de escribir la primera línea de código — sé distinguir entre un problema de software y un problema de proceso.",
           "stack": [
             "Claude Code",
             "Sistemas multi-agente",
@@ -243,7 +243,7 @@
       }
     },
     "cta": {
-      "title": "Tenés un proyecto que necesita shippear?",
+      "title": "¿Tienes un proyecto que necesita salir a producción?",
       "subtitle": "Respondo en menos de 24h. Escríbeme directo por WhatsApp.",
       "whatsapp": "Escríbeme por WhatsApp",
       "email": "Ir al formulario",
@@ -252,26 +252,26 @@
     "whatsappMessage": "Hola Alejandro, vengo de tunixlabs.com. Me gustaría conversar sobre un proyecto.",
     "contact": {
       "badge": "Contacto",
-      "title": "Hablemos de tu proximo producto",
-      "subtitle": "Respondemos en menos de 24h. Sin formularios interminables.",
+      "title": "Hablemos de tu próximo producto",
+      "subtitle": "Respondo en menos de 24h. Sin formularios interminables.",
       "form": {
-        "title": "Envianos un mensaje",
-        "description": "Completa el formulario y nos pondremos en contacto contigo.",
+        "title": "Envíame un mensaje",
+        "description": "Completa el formulario y te responderé pronto.",
         "name": "Nombre",
         "namePlaceholder": "Tu nombre",
         "email": "Email",
         "emailPlaceholder": "tu@email.com",
         "subject": "Asunto",
-        "subjectPlaceholder": "Como podemos ayudarte?",
+        "subjectPlaceholder": "¿Cómo puedo ayudarte?",
         "message": "Mensaje",
-        "messagePlaceholder": "Cuentanos sobre tu proyecto",
+        "messagePlaceholder": "Cuéntame sobre tu proyecto",
         "submit": "Enviar mensaje"
       },
       "info": {
-        "title": "Informacion de contacto",
+        "title": "Información de contacto",
         "email": "Email",
-        "whatsappCta": "Escribenos por WhatsApp",
-        "followUs": "Siguenos"
+        "whatsappCta": "Escríbeme por WhatsApp",
+        "followUs": "Sígueme"
       }
     },
     "footer": {
@@ -285,13 +285,13 @@
       "description": "Completa el formulario o escríbeme directamente. Respondo en menos de 24h."
     },
     "form": {
-      "title": "Envianos un mensaje",
+      "title": "Envíame un mensaje",
       "name": "Nombre",
       "namePlaceholder": "Tu nombre",
       "email": "Email",
       "emailPlaceholder": "tu@email.com",
       "subject": "Asunto",
-      "subjectPlaceholder": "Sobre que quieres hablar?",
+      "subjectPlaceholder": "¿De qué quieres hablar?",
       "message": "Mensaje",
       "messagePlaceholder": "Cuéntame tu idea o consulta...",
       "submit": "Enviar mensaje",
@@ -306,13 +306,13 @@
       "whatsappInfoMessage": "Hola, vengo de tunixlabs.com y me gustaría más información sobre tus servicios.",
       "whatsappScheduleMessage": "Hola, vengo de tunixlabs.com y me gustaría agendar una reunión para discutir mi proyecto.",
       "socialMedia": "Redes sociales",
-      "meetingQuestion": "Prefieres una reunión?",
+      "meetingQuestion": "¿Prefieres una reunión?",
       "scheduleCall": "Agenda una videollamada"
     }
   },
   "Footer": {
     "companyName": "TunixLabs",
-    "companyDescription": "Un operador chileno que shippea software a medida para industrias reguladas. Minería, metalurgia, retail, compliance tributario.",
+    "companyDescription": "Un operador chileno que construye software a medida para industrias reguladas. Minería, metalurgia, retail, compliance tributario.",
     "contactTitle": "Contacto",
     "linksTitle": "Enlaces",
     "home": "Inicio",
@@ -323,10 +323,10 @@
   },
   "Services": {
     "backToServices": "Volver",
-    "ourServicesBadge": "Nuestros Servicios",
+    "ourServicesBadge": "Servicios",
     "sections": {
       "overview": "Visión general",
-      "stack": "Stack real que usamos",
+      "stack": "Stack real que uso",
       "anchorProject": "Proyecto ancla en producción",
       "cta": "Hablemos"
     },
@@ -378,10 +378,10 @@
     "computerVision": {
       "meta": {
         "title": "Visión artificial | TunixLabs",
-        "description": "Sección honesta: capability en construcción, sin proyectos de CV en producción propios todavía. Para proyectos CV críticos trabajamos con especialistas dedicados."
+        "description": "Sección honesta: capability en construcción, sin proyectos de CV en producción propios todavía. Para proyectos CV críticos te derivo a un especialista dedicado."
       },
       "hero": {
-        "badge": "Vision artificial",
+        "badge": "Visión artificial",
         "title": "Visión artificial",
         "description": "Sección honesta: tengo los fundamentos técnicos y el interés, pero aún sin proyectos de CV en producción propios. Si tu proyecto necesita CV crítica, te recomiendo un especialista dedicado o una colaboración experimental con entregables acotados."
       }
@@ -392,7 +392,7 @@
         "description": "Auditorías adversariales de sistemas de IA. Diseño arquitecturas multi-agente. Encuentro scope drift y deuda técnica escondida."
       },
       "hero": {
-        "badge": "Consultoria IA",
+        "badge": "Consultoría IA",
         "title": "Consultoría IA y auditorías técnicas",
         "description": "Evalúo tu arquitectura de IA, encuentro deuda técnica escondida y propongo el approach más barato que funciona. También diseño sistemas multi-agente desde cero."
       }
@@ -414,13 +414,13 @@
     "overviewTitle": "Qué hago en esta área",
     "stackTitle": "Stack real que uso",
     "anchorTitle": "Proyecto ancla en producción",
-    "ctaTitle": "Tenés un proyecto en esta área?",
+    "ctaTitle": "¿Tienes un proyecto en esta área?",
     "ctaButton": "Hablemos por WhatsApp",
     "ctaSecondary": "O envíame un mensaje"
   },
   "VoiceInterface": {
     "startRecording": "Haz clic para comenzar a grabar",
-    "stopRecording": "Haz clic para detener la grabacion",
+    "stopRecording": "Haz clic para detener la grabación",
     "processing": "Procesando...",
     "talkToTunix": "Hablar con Tunix",
     "talkToMe": "Habla conmigo",
@@ -430,23 +430,23 @@
     "tryAgain": "Intenta de nuevo",
     "interrupt": "Interrumpir (habla para detener)",
     "errors": {
-      "microphoneAccess": "No se puede acceder al microfono",
+      "microphoneAccess": "No se puede acceder al micrófono",
       "speechRecognition": "Error en el reconocimiento de voz",
       "network": "Error de red. Intenta nuevamente"
     },
-    "inputPlaceholder": "Escribe tu mensaje aqui...",
+    "inputPlaceholder": "Escribe tu mensaje aquí...",
     "send": "Enviar"
   },
   "Robot": {
-    "greeting": "Hola, soy Tunix. En que puedo ayudarte?",
+    "greeting": "Hola, soy Tunix. ¿En qué puedo ayudarte?",
     "thinking": "Estoy pensando...",
-    "error": "Lo siento, ha ocurrido un error. Por favor, intentalo de nuevo.",
+    "error": "Lo siento, ha ocurrido un error. Por favor, inténtalo de nuevo.",
     "loading": "Cargando modelo 3D..."
   },
   "Common": {
     "loading": "Cargando...",
     "error": "Error",
-    "success": "Exito",
+    "success": "Éxito",
     "cancel": "Cancelar",
     "confirm": "Confirmar",
     "back": "Volver"
