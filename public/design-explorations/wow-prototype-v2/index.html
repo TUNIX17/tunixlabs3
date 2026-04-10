@@ -890,7 +890,7 @@
   </div>
 
   <nav>
-    <div class="mark">TUNIXLABS</div>
+    <div class="mark">TUNIXLABS <canvas id="rive-brand-dot" width="12" height="12" style="display:inline-block; vertical-align:-1px; margin-left:1px;"></canvas></div>
     <div class="nav-hint">scroll to execute</div>
   </nav>
 
@@ -899,7 +899,9 @@
 
   <!-- THE MAIN TERMINAL — fixed size, persistent, executes commands on scroll -->
   <div class="terminal" id="terminal">
-    <div class="tty-topbar">
+    <div class="tty-topbar" style="position:relative;">
+      <!-- Rive scanline — thin acid-lime line sweeping across the top bar (ambient) -->
+      <canvas id="rive-scanline" width="800" height="6" style="position:absolute; left:0; right:0; top:0; width:100%; height:6px; pointer-events:none; opacity:0.9;"></canvas>
       <!-- Sprint 1 v3: Rive traffic lights replaces CSS simulation -->
       <canvas id="rive-traffic-lights" width="120" height="32" style="display:block; flex-shrink:0;"></canvas>
       <!-- Hidden CSS lights kept for prod-light state JS hook (no visual impact) -->
@@ -916,7 +918,9 @@
       <div class="tty-prompt" id="tty-prompt">
         <span class="dollar">$</span>
         <span class="cmd-text" id="cmd-text"></span>
-        <span class="cursor"></span>
+        <!-- Rive inline cursor (replaces visible CSS caret; .cursor span kept hidden for typing-engine JS references) -->
+        <canvas id="rive-inline-cursor" width="12" height="20" style="display:inline-block; vertical-align:-4px; margin-left:2px;"></canvas>
+        <span class="cursor" style="display:none"></span>
       </div>
 
       <div class="tty-content">
@@ -935,7 +939,10 @@
             </div>
             <div class="meta-cell line">
               <div class="meta-label">Years of ops</div>
-              <div class="meta-value"><em>15</em></div>
+              <div class="meta-value" style="position:relative;">
+                <em style="position:relative; z-index:2;">15</em>
+                <canvas id="rive-metric-years" width="280" height="110" style="position:absolute; left:50%; top:50%; transform:translate(-50%, -50%); pointer-events:none; z-index:1; opacity:0.85;"></canvas>
+              </div>
             </div>
             <div class="meta-cell line">
               <div class="meta-label">Credentials</div>
@@ -1026,10 +1033,20 @@
         <div class="state state-contact" data-state="contact">
           <div class="contact-inner">
             <h2 class="line">Have a project that <span class="acid">ships?</span></h2>
+            <!-- Rive voice waveform — ambient equalizer evoking Voice AI dimension -->
+            <div class="line" style="display:flex; justify-content:center; margin: 16px 0;">
+              <canvas id="rive-voice-waveform" width="200" height="40" style="display:block;"></canvas>
+            </div>
             <p class="line">I reply in under 24h · no endless forms</p>
             <div class="cta-row line">
-              <a href="#" class="cta">Book a call</a>
-              <a href="#" class="cta secondary">Send a message</a>
+              <div class="rive-button-wrap" style="position:relative; display:inline-block;">
+                <canvas class="rive-button-bg" width="180" height="48" style="position:absolute; left:50%; top:50%; transform:translate(-50%, -50%); pointer-events:none; z-index:0;"></canvas>
+                <a href="#" class="cta" style="position:relative; z-index:1;">Book a call</a>
+              </div>
+              <div class="rive-button-wrap" style="position:relative; display:inline-block;">
+                <canvas class="rive-button-bg" width="180" height="48" style="position:absolute; left:50%; top:50%; transform:translate(-50%, -50%); pointer-events:none; z-index:0;"></canvas>
+                <a href="#" class="cta secondary" style="position:relative; z-index:1;">Send a message</a>
+              </div>
             </div>
           </div>
         </div>
@@ -1296,35 +1313,99 @@
     console.log('[wow-v2] ready. Scroll to execute commands. window.__wow2 for debug.');
   </script>
 
-  <!-- Sprint 1 v3: Rive runtime + loaders for traffic-lights canvas -->
+  <!-- Rive runtime + loaders · 9 animations total · Sprint 1 v3 + Rive-max iteration -->
   <script src="https://unpkg.com/@rive-app/canvas@2.17.3"></script>
   <script>
   (function() {
-    if (typeof rive === 'undefined' || !rive.Rive) return;
+    if (typeof rive === 'undefined' || !rive.Rive) { console.warn('rive global not found'); return; }
+    var loaded = 0, failed = 0;
+    function load(opts, label) {
+      try {
+        var r = new rive.Rive(opts);
+        loaded++;
+        return r;
+      } catch(e) {
+        failed++;
+        console.error('[rive] ' + label + ' load failed:', e);
+        return null;
+      }
+    }
+
+    // 1. Traffic lights (terminal topbar — 3 buttons, live pulsing)
     var tlc = document.getElementById('rive-traffic-lights');
-    if (tlc) {
-      try {
-        new rive.Rive({
-          src: '/design-explorations/rive-preview/traffic-lights.riv',
-          canvas: tlc,
-          autoplay: true,
-          artboard: 'TrafficLights',
-          animations: ['LivePulse']
-        });
-      } catch(e) { console.error('rive traffic-lights load failed', e); }
+    if (tlc) load({
+      src: '/design-explorations/rive-preview/traffic-lights.riv',
+      canvas: tlc, autoplay: true, artboard: 'TrafficLights', animations: ['LivePulse']
+    }, 'traffic-lights');
+
+    // 2. Inline cursor (inside .tty-prompt — replaces CSS caret)
+    var inline = document.getElementById('rive-inline-cursor');
+    if (inline) load({
+      src: '/design-explorations/rive-preview/inline-cursor.riv',
+      canvas: inline, autoplay: true, artboard: 'InlineCursor', animations: ['Blink']
+    }, 'inline-cursor');
+
+    // 3. Brand dot (pulsing acid lime dot next to TUNIXLABS wordmark)
+    var brandDot = document.getElementById('rive-brand-dot');
+    if (brandDot) load({
+      src: '/design-explorations/rive-preview/brand-dot.riv',
+      canvas: brandDot, autoplay: true, artboard: 'BrandDot', animations: ['Pulse']
+    }, 'brand-dot');
+
+    // 4. Scanline (terminal topbar overlay — ambient)
+    var scan = document.getElementById('rive-scanline');
+    if (scan) load({
+      src: '/design-explorations/rive-preview/scanline.riv',
+      canvas: scan, autoplay: true, artboard: 'Scanline', animations: ['Sweep']
+    }, 'scanline');
+
+    // 5. Voice waveform (contact scene — 7-bar EQ)
+    var wave = document.getElementById('rive-voice-waveform');
+    if (wave) load({
+      src: '/design-explorations/rive-preview/voice-waveform.riv',
+      canvas: wave, autoplay: true, artboard: 'VoiceWaveform', animations: ['Wave']
+    }, 'voice-waveform');
+
+    // 6. Metric reveal (hero YEARS OF OPS 15 — underline sweep + bounce)
+    var metric = document.getElementById('rive-metric-years');
+    if (metric) {
+      var metricRive = load({
+        src: '/design-explorations/rive-preview/metric-reveal.riv',
+        canvas: metric, autoplay: false, artboard: 'MetricReveal',
+        onLoad: function() {
+          try { metricRive.setTextRunValue('value', ''); } catch(e) {}
+          try { metricRive.play('Reveal'); } catch(e) {}
+          // Replay on hero scene re-entry
+          var heroEl = document.querySelector('.state-hero');
+          if (heroEl && window.MutationObserver) {
+            new MutationObserver(function() {
+              if (heroEl.classList.contains('active')) {
+                try { metricRive.stop(); metricRive.play('Reveal'); } catch(e) {}
+              }
+            }).observe(heroEl, { attributes: true, attributeFilter: ['class'] });
+          }
+        }
+      }, 'metric-years');
     }
-    var crc = document.getElementById('rive-cursor');
-    if (crc) {
-      try {
-        new rive.Rive({
-          src: '/design-explorations/rive-preview/typing-cursor.riv',
-          canvas: crc,
-          autoplay: true,
-          artboard: 'TypingCursor',
-          animations: ['Blink']
-        });
-      } catch(e) { console.error('rive cursor load failed', e); }
-    }
+
+    // 7. Button glow (each .rive-button-bg canvas in contact CTAs)
+    document.querySelectorAll('.rive-button-bg').forEach(function(cvs, idx) {
+      var btnRive = load({
+        src: '/design-explorations/rive-preview/button-glow.riv',
+        canvas: cvs, autoplay: false, artboard: 'ButtonGlow'
+      }, 'button-glow#' + idx);
+      if (!btnRive) return;
+      var wrap = cvs.closest('.rive-button-wrap');
+      if (!wrap) return;
+      wrap.addEventListener('mouseenter', function() {
+        try { btnRive.stop('HoverOut'); btnRive.play('HoverIn'); } catch(e) {}
+      });
+      wrap.addEventListener('mouseleave', function() {
+        try { btnRive.stop('HoverIn'); btnRive.play('HoverOut'); } catch(e) {}
+      });
+    });
+
+    console.log('[rive] loaded ' + loaded + ' animations, ' + failed + ' failed');
   })();
   </script>
 </body>
