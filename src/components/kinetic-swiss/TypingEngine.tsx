@@ -5,14 +5,30 @@ import {
   useEffect,
   useImperativeHandle,
   forwardRef,
+  useCallback,
   type ForwardedRef,
 } from 'react';
 import { TIMING } from './timing';
 import { useReducedMotion } from './hooks/useReducedMotion';
 
+export interface StreamLinesOptions {
+  charDelay?: number;
+  lineDelay?: number;
+}
+
 export interface TypingEngineHandle {
   /** Remove characters one-by-one at backspace speed, then resolve. */
   backspace: () => Promise<void>;
+  /**
+   * Type out an array of lines character-by-character with pauses between lines.
+   * Returns an object with a promise and a cancel function.
+   * onLine fires each time a line finishes (index, full line text).
+   */
+  streamLines: (
+    lines: string[],
+    opts?: StreamLinesOptions,
+    onLine?: (index: number, line: string) => void
+  ) => { promise: Promise<void>; cancel: () => void };
 }
 
 interface TypingEngineProps {
@@ -24,7 +40,7 @@ interface TypingEngineProps {
 /**
  * Progressively renders characters into a <span> ref, simulating terminal typing.
  * Respects prefers-reduced-motion by showing the full text instantly.
- * Exposes a `backspace` method via useImperativeHandle.
+ * Exposes `backspace` and `streamLines` methods via useImperativeHandle.
  */
 export const TypingEngine = forwardRef(function TypingEngine(
   { text, onComplete, delayMs = TIMING.CHAR_DELAY_MS }: TypingEngineProps,
@@ -32,13 +48,14 @@ export const TypingEngine = forwardRef(function TypingEngine(
 ) {
   const spanRef = useRef<HTMLSpanElement>(null);
   const timersRef = useRef<ReturnType<typeof setTimeout>[]>([]);
+  const cancelledRef = useRef(false);
   const reducedMotion = useReducedMotion();
 
   // Cleanup all pending timeouts
-  const clearTimers = () => {
+  const clearTimers = useCallback(() => {
     timersRef.current.forEach(clearTimeout);
     timersRef.current = [];
-  };
+  }, []);
 
   useImperativeHandle(
     ref,
@@ -74,8 +91,80 @@ export const TypingEngine = forwardRef(function TypingEngine(
           };
           step();
         }),
+
+      streamLines: (
+        lines: string[],
+        opts?: StreamLinesOptions,
+        onLine?: (index: number, line: string) => void
+      ) => {
+        const charDelay = opts?.charDelay ?? TIMING.CHAR_DELAY_MS;
+        const lineDelay = opts?.lineDelay ?? TIMING.LINE_STAGGER_MS;
+
+        cancelledRef.current = false;
+
+        const cancel = () => {
+          cancelledRef.current = true;
+          clearTimers();
+        };
+
+        const promise = new Promise<void>((resolve) => {
+          if (reducedMotion) {
+            // Instantly reveal all lines
+            for (let i = 0; i < lines.length; i++) {
+              onLine?.(i, lines[i]);
+            }
+            resolve();
+            return;
+          }
+
+          let lineIdx = 0;
+
+          const typeLine = () => {
+            if (cancelledRef.current || lineIdx >= lines.length) {
+              resolve();
+              return;
+            }
+
+            const line = lines[lineIdx];
+            const currentLineIdx = lineIdx;
+            let charIdx = 0;
+
+            const typeChar = () => {
+              if (cancelledRef.current) {
+                resolve();
+                return;
+              }
+
+              if (charIdx < line.length) {
+                charIdx++;
+                // Notify partial progress — the hook tracks char-level streaming
+                // but we only notify on line completion to keep state manageable
+                const timer = setTimeout(typeChar, charDelay);
+                timersRef.current.push(timer);
+              } else {
+                // Line finished
+                onLine?.(currentLineIdx, line);
+                lineIdx++;
+
+                if (lineIdx < lines.length) {
+                  const timer = setTimeout(typeLine, lineDelay);
+                  timersRef.current.push(timer);
+                } else {
+                  resolve();
+                }
+              }
+            };
+
+            typeChar();
+          };
+
+          typeLine();
+        });
+
+        return { promise, cancel };
+      },
     }),
-    [reducedMotion]
+    [reducedMotion, clearTimers]
   );
 
   useEffect(() => {

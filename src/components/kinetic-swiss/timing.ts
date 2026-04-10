@@ -8,6 +8,9 @@ export const TIMING = {
   BACKSPACE_DELAY_MS: 14,
   ENTER_PAUSE_MS: 180,
 
+  // Content reveal (initial delay before lines appear)
+  REVEAL_DELAY_MS: 100,
+
   // Content reveal stagger (line-by-line)
   LINE_STAGGER_MS: 90,
   LINE_RISE_MS: 450,

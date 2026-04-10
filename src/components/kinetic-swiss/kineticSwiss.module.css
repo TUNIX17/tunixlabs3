@@ -1069,3 +1069,29 @@
     font-size: 36px;
   }
 }
+
+/* ============================================================
+   CSS Scroll-Timeline Progressive Enhancement (2026 SOTY pattern)
+   When browser supports animation-timeline: scroll(), the prompt
+   typing animation is driven by CSS instead of JS TypingEngine.
+   Feature detection done via CSS.supports() in KineticSwissPage.
+   ============================================================ */
+
+/* Scroll-timeline: prompt text reveal via clip-path */
+@supports (animation-timeline: scroll()) {
+  .root[data-scroll-timeline="true"] .cmdText {
+    /* Clip the text progressively as scroll advances within each trigger section */
+    animation: scrollPromptReveal linear forwards;
+    animation-timeline: scroll(nearest block);
+    animation-range: entry 0% entry 50%;
+  }
+
+  @keyframes scrollPromptReveal {
+    from {
+      clip-path: inset(0 100% 0 0);
+    }
+    to {
+      clip-path: inset(0 0 0 0);
+    }
+  }
+}

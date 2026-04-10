@@ -1,79 +1,85 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useReducedMotion } from '../hooks/useReducedMotion';
-import { TIMING } from '../timing';
 import styles from '../kineticSwiss.module.css';
 
 interface Metric {
-  value: string;
   label: string;
+  value: string;
 }
 
-interface CaseStudy {
+interface CaseTitle {
+  text: string;
+  copperWords: string;
+}
+
+export interface CaseStudyData {
+  id: string;
   badge: string;
-  title: string;
+  title: CaseTitle;
   metrics: Metric[];
+  imageRef: string;
+  stack: string[];
 }
 
 interface CaseStudyStateProps {
   active: boolean;
-  study: CaseStudy;
+  /** Single case study — parent iterates t.raw('caseStudies.cases') */
+  study: CaseStudyData;
+  /** Lines revealed so far by the content stream engine. */
+  streamedLines?: string[];
 }
 
 /**
- * Case study state: badge + giant title + 3 metrics row.
+ * Returns the content lines for this case study (used by the orchestrator).
+ * Line 0 = badge, line 1 = title, line 2 = metrics summary.
  */
-export function CaseStudyState({ active, study }: CaseStudyStateProps) {
-  const reducedMotion = useReducedMotion();
-  const [revealed, setRevealed] = useState(false);
+export function getCaseStudyLines(study: CaseStudyData): string[] {
+  return [
+    study.badge,
+    study.title.text,
+    study.metrics.map((m) => `${m.label}: ${m.value}`).join(' | '),
+  ];
+}
 
-  useEffect(() => {
-    if (!active) {
-      setRevealed(false);
-      return;
-    }
-
-    if (reducedMotion) {
-      setRevealed(true);
-      return;
-    }
-
-    const timer = setTimeout(() => setRevealed(true), 100);
-    return () => clearTimeout(timer);
-  }, [active, reducedMotion]);
-
+/**
+ * Case study state: badge + giant title + metrics row.
+ * Rendering gated by streamedLines from content stream engine.
+ * Line 0 = badge, line 1 = title, line 2 = metrics.
+ */
+export function CaseStudyState({ active, study, streamedLines }: CaseStudyStateProps) {
   const stateClass = `${styles.state} ${styles.stateCase}${
     active ? ` ${styles.stateActive}` : ''
   }`;
 
-  const lineClass = revealed ? `${styles.line} ${styles.lineIn}` : styles.line;
-
-  const lineStyle = (delay: number): React.CSSProperties | undefined =>
-    !reducedMotion ? { transitionDelay: `${delay}ms` } : undefined;
+  const badgeRevealed = streamedLines != null && streamedLines.length > 0;
+  const titleRevealed = streamedLines != null && streamedLines.length > 1;
+  const metricsRevealed = streamedLines != null && streamedLines.length > 2;
 
   return (
     <div className={stateClass}>
       {/* Badge */}
       <div
-        className={`${styles.caseBadge} ${lineClass}`}
-        style={lineStyle(0)}
+        className={`${styles.caseBadge} ${styles.line}${
+          badgeRevealed ? ` ${styles.lineIn}` : ''
+        }`}
       >
         {study.badge}
       </div>
 
       {/* Title */}
       <h2
-        className={`${styles.caseTitle} ${lineClass}`}
-        style={lineStyle(TIMING.LINE_STAGGER_MS)}
+        className={`${styles.caseTitle} ${styles.line}${
+          titleRevealed ? ` ${styles.lineIn}` : ''
+        }`}
       >
-        {study.title}
+        {study.title.text}
       </h2>
 
       {/* Metrics */}
       <div
-        className={`${styles.caseMetrics} ${lineClass}`}
-        style={lineStyle(TIMING.LINE_STAGGER_MS * 2)}
+        className={`${styles.caseMetrics} ${styles.line}${
+          metricsRevealed ? ` ${styles.lineIn}` : ''
+        }`}
       >
         {study.metrics.map((metric, i) => (
           <div key={i}>

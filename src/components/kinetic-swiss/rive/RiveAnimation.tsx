@@ -1,7 +1,6 @@
 'use client';
 
 import { useRive, Layout, Fit, Alignment } from '@rive-app/react-canvas';
-import { useCallback, useRef } from 'react';
 
 interface RiveAnimationProps {
   /** URL or path to the .riv file */
@@ -29,9 +28,7 @@ export function RiveAnimation({
   onLoadError,
   onLoad,
 }: RiveAnimationProps) {
-  const containerRef = useRef<HTMLDivElement>(null);
-
-  const { RiveComponent, rive } = useRive(
+  const { RiveComponent } = useRive(
     {
       src,
       artboard,
@@ -53,15 +50,8 @@ export function RiveAnimation({
     }
   );
 
-  const setRef = useCallback(
-    (node: HTMLDivElement | null) => {
-      (containerRef as React.MutableRefObject<HTMLDivElement | null>).current = node;
-    },
-    []
-  );
-
   return (
-    <div ref={setRef} className={className} style={{ width: '100%', height: '100%' }}>
+    <div className={className} style={{ width: '100%', height: '100%' }}>
       <RiveComponent />
     </div>
   );
