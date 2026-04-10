@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl';
 import { useCursorParallax } from '../hooks/useCursorParallax';
 import { useUptime } from '../hooks/useUptime';
 import { useReducedMotion } from '../hooks/useReducedMotion';
+import { SplitFlapCounter, parseMetricValue } from '../SplitFlapCounter';
 import styles from '../kineticSwiss.module.css';
 
 interface MetaCell {
@@ -109,14 +110,36 @@ export function HeroState({
             metaRevealed ? ` ${styles.lineIn}` : ''
           }`;
 
+          const isNumeric = /^\d/.test(cell.value.replace(/[,$]/g, ''));
+
           return (
             <div key={i} className={cellClass}>
               <div className={styles.metaLabel}>{cell.label}</div>
-              <div className={styles.metaValue}>{cell.value}</div>
+              <div className={styles.metaValue}>
+                {isNumeric ? (
+                  <HeroMetricCounter value={cell.value} active={active && metaRevealed} />
+                ) : (
+                  cell.value
+                )}
+              </div>
             </div>
           );
         })}
       </div>
     </div>
+  );
+}
+
+/** Renders a numeric hero meta value with split-flap count-up animation. */
+function HeroMetricCounter({ value, active }: { value: string; active: boolean }) {
+  const parsed = parseMetricValue(value);
+
+  return (
+    <SplitFlapCounter
+      target={parsed.target}
+      active={active}
+      prefix={parsed.prefix}
+      suffix={parsed.suffix}
+    />
   );
 }

@@ -23,6 +23,7 @@ import { CaseStudyState, getCaseStudyLines } from './states/CaseStudyState';
 import { AboutState, getAboutLines } from './states/AboutState';
 import { ContactState, getContactLines } from './states/ContactState';
 import type { CaseStudyData } from './states/CaseStudyState';
+import { BrandMarkDot } from './rive/BrandMarkDot';
 import styles from './kineticSwiss.module.css';
 
 type SceneId = 'hero' | 'services' | 'case' | 'about' | 'contact';
@@ -314,7 +315,18 @@ export function KineticSwissPage({ locale: _locale }: KineticSwissPageProps) {
 
         {/* Nav bar */}
         <nav className={styles.nav}>
-          <div className={styles.mark}>{brand}</div>
+          <div className={styles.mark}>
+            {brand}
+            {!reducedMotion ? (
+              <BrandMarkDot
+                scrollProgress={scrollProgress}
+                className={styles.markDotRive}
+                fallbackClassName={styles.markDotFallback}
+              />
+            ) : (
+              <span className={styles.markDotFallback} />
+            )}
+          </div>
           <div className={styles.navHint}>{navHint}</div>
         </nav>
 

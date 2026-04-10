@@ -41,6 +41,11 @@ export const TIMING = {
   PRELOAD_DISMISS_DELAY_MS: 400,
   PRELOAD_FADE_OUT_MS: 500,
 
+  // Split-flap counter (airport-board style digit flip)
+  SPLIT_FLAP_DURATION_MS: 1400,
+  SPLIT_FLAP_DIGIT_STAGGER_MS: 60,
+  SPLIT_FLAP_FLIP_MS: 120,
+
   // Scroll progress throttle
   SCROLL_RAF_THROTTLE: true,
 } as const;

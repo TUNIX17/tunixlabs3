@@ -1,5 +1,6 @@
 'use client';
 
+import { SplitFlapCounter, parseMetricValue } from '../SplitFlapCounter';
 import styles from '../kineticSwiss.module.css';
 
 interface Metric {
@@ -41,10 +42,16 @@ export function getCaseStudyLines(study: CaseStudyData): string[] {
   ];
 }
 
+/** Check if a metric value starts with a number (worth animating). */
+function isNumericMetric(value: string): boolean {
+  return /^\d/.test(value.replace(/[,$]/g, ''));
+}
+
 /**
  * Case study state: badge + giant title + metrics row.
  * Rendering gated by streamedLines from content stream engine.
  * Line 0 = badge, line 1 = title, line 2 = metrics.
+ * Numeric metric values use SplitFlapCounter for airport-board count-up.
  */
 export function CaseStudyState({ active, study, streamedLines }: CaseStudyStateProps) {
   const stateClass = `${styles.state} ${styles.stateCase}${
@@ -81,13 +88,37 @@ export function CaseStudyState({ active, study, streamedLines }: CaseStudyStateP
           metricsRevealed ? ` ${styles.lineIn}` : ''
         }`}
       >
-        {study.metrics.map((metric, i) => (
-          <div key={i}>
-            <div className={styles.caseMetricLabel}>{metric.label}</div>
-            <div className={styles.caseMetricValue}>{metric.value}</div>
-          </div>
-        ))}
+        {study.metrics.map((metric, i) => {
+          const numeric = isNumericMetric(metric.value);
+
+          return (
+            <div key={i}>
+              <div className={styles.caseMetricLabel}>{metric.label}</div>
+              <div className={styles.caseMetricValue}>
+                {numeric ? (
+                  <MetricCounter value={metric.value} active={active && metricsRevealed} />
+                ) : (
+                  metric.value
+                )}
+              </div>
+            </div>
+          );
+        })}
       </div>
     </div>
+  );
+}
+
+/** Renders a numeric metric value with split-flap count-up animation. */
+function MetricCounter({ value, active }: { value: string; active: boolean }) {
+  const parsed = parseMetricValue(value);
+
+  return (
+    <SplitFlapCounter
+      target={parsed.target}
+      active={active}
+      prefix={parsed.prefix}
+      suffix={parsed.suffix}
+    />
   );
 }

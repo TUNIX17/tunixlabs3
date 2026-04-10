@@ -35,6 +35,9 @@ export async function generateMetadata({ params: { locale } }: Props) {
         en: 'https://tunixlabs.com/en',
       },
     },
+    other: {
+      'git-sha': process.env.NEXT_PUBLIC_COMMIT_SHA || 'development',
+    },
   };
 }
 
