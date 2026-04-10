@@ -365,7 +365,14 @@ Los findings sugieren una **Camino B** alternativo al prototype actual (Camino A
 
 **Decisión pendiente:** usuario debe abrir Camino A primero (prototype actual) y reaccionar. Después decidir si el salto a B justifica el rebuild.
 
-**Estado actualizado:** Spec + research findings incorporados. Esperando validación visual del prototype actual antes de decidir A vs B.
+**Estado actualizado:** Spec + research findings incorporados. Camino B elegido, implementado en 5 sprints.
+
+---
+
+## Status: SHIPPED 2026-04-10
+Main SHA: 7aad89c
+Deploy verified: PENDING (Railway build command update needed for SHA meta)
+Sprints: 5/5 complete
 
 ---
 
