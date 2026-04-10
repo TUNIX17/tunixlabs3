@@ -903,7 +903,7 @@
       <!-- Rive scanline — thin acid-lime line sweeping across the top bar (ambient) -->
       <canvas id="rive-scanline" width="800" height="6" style="position:absolute; left:0; right:0; top:0; width:100%; height:6px; pointer-events:none; opacity:0.9;"></canvas>
       <!-- Sprint 1 v3: Rive traffic lights replaces CSS simulation -->
-      <canvas id="rive-traffic-lights" width="120" height="32" style="display:block; flex-shrink:0;"></canvas>
+      <canvas id="rive-traffic-lights" width="140" height="42" style="display:block; flex-shrink:0;"></canvas>
       <!-- Hidden CSS lights kept for prod-light state JS hook (no visual impact) -->
       <div class="lights" style="display:none;">
         <span class="light close" data-label="local"></span>
@@ -1331,12 +1331,12 @@
       }
     }
 
-    // 1. Traffic lights (terminal topbar — 3 buttons, live pulsing)
+    // 1. Traffic lights BIG — spring pop-in + dramatic live pulse (200x60 canvas)
     var tlc = document.getElementById('rive-traffic-lights');
     if (tlc) load({
-      src: '/design-explorations/rive-preview/traffic-lights.riv',
-      canvas: tlc, autoplay: true, artboard: 'TrafficLights', animations: ['LivePulse']
-    }, 'traffic-lights');
+      src: '/design-explorations/rive-preview/traffic-big.riv',
+      canvas: tlc, autoplay: true, artboard: 'TrafficBig', animations: ['SpringIn', 'LivePulse']
+    }, 'traffic-big');
 
     // 2. Inline cursor (inside .tty-prompt — replaces CSS caret)
     var inline = document.getElementById('rive-inline-cursor');
