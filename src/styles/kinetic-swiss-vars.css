@@ -1,0 +1,23 @@
+/*
+ * Kinetic Swiss v2 — Design tokens
+ * Extracted from wow-prototype-v2/index.html
+ * Single source of truth for the kinetic-swiss color palette.
+ */
+
+:root {
+  --paper: #f5f5f2;
+  --paper-warm: #f0eee8;
+  --paper-raise: #fafaf7;
+  --ink: #0a0a0a;
+  --ink-mid: #1a1a1a;
+  --ink-muted: #666664;
+  --ink-light: #9a9a96;
+  --acid: #ccff00;
+  --acid-deep: #a8d600;
+  --copper: #b85c38;
+  --terminal-border: rgba(10, 10, 10, 0.14);
+  --terminal-shadow:
+    0 50px 100px -30px rgba(10, 10, 10, 0.28),
+    0 25px 50px -15px rgba(10, 10, 10, 0.16),
+    0 0 0 1px var(--terminal-border);
+}
