@@ -10,275 +10,6 @@
       "contact": "Contact"
     }
   },
-  "HomePage": {
-    "hero": {
-      "title1": "Not a studio.",
-      "title2": "One operator",
-      "title3": "shipping production systems from Chile.",
-      "description": "I'm Alejandro. 15 years running real operations — metallurgy, retail, mining contractors — and now shipping AI-powered production systems with Claude Code agentic workflows. MSc Finance (UAI) + MIT Professional Education ML training. Based in Chile, fluent English (Ukiah High School, California), US time zones. Engagements typically USD 15k–60k.",
-      "cta": {
-        "contact": "Book a discovery call",
-        "services": "See what I've shipped"
-      },
-      "loading3D": "Loading..."
-    },
-    "trustedBy": {
-      "title": "Teams I've shipped for"
-    },
-    "caseStudies": {
-      "badge": "In production",
-      "title": "Production systems, not prototypes",
-      "subtitle": "Software someone opens every morning at 7am. Real users, real numbers, real audit trails.",
-      "stack": "Stack",
-      "disclaimer": "TunixLabs acts as technical partner for selected firms. Client names in these case studies refer to the direct commissioning partner, not the end-user of the software.",
-      "cards": {
-        "sime": {
-          "client": "Contractors at Chile's largest copper mining operations",
-          "problem": "Safety inspections, preventive maintenance plans and work orders were tracked on paper and spreadsheets across remote mining sites, with no end-to-end digital audit trail between the field and the head office.",
-          "solution": "Full rebuild of an aging legacy system into a modern TypeScript platform. Every legacy feature preserved, plus QR-signed PDFs archived on AWS S3, mobile-friendly batch approvals via shareable links, KPI dashboards with historical navigation, and period comparisons built around mining shift cycles.",
-          "metric": "19,778 work orders · 115K+ activities · 116K+ sub-activities in production",
-          "stack": [
-            "Turborepo",
-            "Fastify",
-            "React",
-            "PostgreSQL",
-            "AWS S3"
-          ]
-        },
-        "schwager": {
-          "client": "Schwager (mining services, via technical partner)",
-          "problem": "Legal maintenance sign-offs collected on paper at remote mining field sites with intermittent connectivity. Forms were lost before reaching audit, supervisors spent hours chasing approvals, and SAP exports of cancelled work orders slipped through.",
-          "solution": "Offline-first mobile app (iOS + Android) with Voice AI powered by Google Gemini — field workers complete safety forms hands-free in gloves, rain, and vibration. Multi-channel digital signatures (email, WhatsApp, web, mobile) with full audit trail, and a smart Excel parser that reads SAP exports and detects cancelled work orders automatically.",
-          "metric": "195+ field workers · 7 maintenance teams · 4,000+ daily route sheets · >90% memory usage reduction · response times under 100ms",
-          "stack": [
-            "React",
-            "TypeScript",
-            "PostgreSQL",
-            "Google Gemini",
-            "Capacitor"
-          ]
-        },
-        "gasDistribution": {
-          "client": "Regional gas distribution operator in Chile",
-          "problem": "Manual validation of burn codes across 14 delivery routes, with daily transcription errors and hours of rework before billing.",
-          "solution": "Automated code processing bot with business-rule validation, per-route metrics dashboard and daily reporting. Commodity stack, no enterprise licensing lock-in.",
-          "metric": "4,040 codes processed · 88.7% success rate · 14 routes automated",
-          "stack": [
-            "Express",
-            "Prisma",
-            "React",
-            "PostgreSQL"
-          ]
-        },
-        "apoderapp": {
-          "client": "Apoderapp (own product)",
-          "problem": "Chilean parent-teacher associations had no digital channel for fees, payments and voting — everything lived in spreadsheets and WhatsApp.",
-          "solution": "PWA built end-to-end using agentic coding pipelines on Claude Code, with a 5-agent multi-agent architecture. Ships with a reusable sii-factura library (Chilean electronic invoicing, 88+ tests) as a compliance feature, but the core value is association management. Designed for LATAM-wide expansion.",
-          "metric": "PWA in production · 5 Claude Code agents · sii-factura library with 88+ tests as a feature",
-          "stack": [
-            "Next.js",
-            "React",
-            "Prisma",
-            "SII XML/CAF",
-            "Claude Code"
-          ]
-        },
-        "fernandezMetallurgic": {
-          "client": "Fernandez Metallurgic (50-year-old industrial company)",
-          "problem": "A 50-year-old metallurgic company running its entire operation on Excel — HR, attendance, finance, document management, project control, CRM — during a period when the owners were absent and operational continuity was at risk.",
-          "solution": "Custom AI-powered ERP that replaced Excel across every critical area. OCR, QR and LLM Vision pipelines for on-floor document digitization, full Chilean SII integration for invoicing and tax compliance, and a project control module built for metallurgy, not for SaaS. Led the end-to-end digital transformation while the owners were away.",
-          "metric": "Full ERP shipped solo · SII integration in production · OCR + QR + LLM Vision pipelines live",
-          "stack": [
-            "Next.js",
-            "Prisma",
-            "PostgreSQL",
-            "Claude Code",
-            "SII XML"
-          ]
-        }
-      }
-    },
-    "productShowcase": {
-      "title": "Production portfolio",
-      "slots": {
-        "sgmSchwager": {
-          "label": "Field maintenance management",
-          "metric": "195+ field workers · 4,000+ daily route sheets · Voice AI on Google Gemini"
-        },
-        "apoderappDark": {
-          "label": "SaaS for Chilean school associations",
-          "metric": "Own PWA · 5 Claude Code agents · sii-factura library with 88+ tests as a feature"
-        },
-        "fernandezErp": {
-          "label": "Custom ERP for metallurgy",
-          "metric": "50-year-old company · Excel replaced area by area · OCR + QR + LLM Vision"
-        },
-        "speakly": {
-          "label": "AI English learning",
-          "metric": "Own product · Turborepo + Voice AI · personalized learning paths"
-        },
-        "gasDistribution": {
-          "label": "Gas distribution automation",
-          "metric": "4,040 codes · 88.7% success · 14 delivery routes automated"
-        }
-      }
-    },
-    "about": {
-      "badge": "About the founder",
-      "title": "The person you'll actually work with",
-      "name": "Alejandro Moyano Foncea",
-      "roleLine": "Chilean solo operator · MSc Finance + MIT Professional Education · 15 years running real ops before writing code",
-      "bioParagraph1": "I fix operational inefficiencies by building custom software. Unlike a traditional developer, I don't spend weeks writing code by hand — I use modern AI workflows on Claude Code to architect and ship production systems in a fraction of the usual time. My background isn't just tech, it's business: MSc in Finance, <mit>MIT Professional Education</mit> in AI/ML, and 15 years leading real operations before writing production code.",
-      "bioParagraph2": "That's how I understand the *why* behind the software, not just the *how*. I've delivered everything from mining maintenance platforms for large-scale Chilean mining and custom ERPs for heavy industry, to engagement apps for education and decade-old legacy system modernization. I turn manual, paper-based work into digital tools that actually move the needle — no demos, no pitch decks, systems running today. US time zone overlap (0–2h from East/Central) and rates 3–5x below comparable SF/NYC shops, without giving up senior ownership.",
-      "linkedinLabel": "View on LinkedIn",
-      "linkedinUrl": "https://www.linkedin.com/in/alejandro-moyano/"
-    },
-    "credentials": {
-      "modalTitle": "MIT Professional Education credential",
-      "caption": "Alejandro Moyano Foncea · No Code AI and Machine Learning: Building Data Science Solutions · MIT Professional Education · Feb–May 2024 · 80 hours of effort",
-      "close": "Close",
-      "open": "View MIT credential",
-      "altText": "MIT Professional Education credential issued to Alejandro Moyano Foncea"
-    },
-    "services": {
-      "badge": "What I do",
-      "title": "What I build",
-      "subtitle": "Seven practice areas, each anchored to a real production project. No buzzwords, no invented stacks.",
-      "learnMore": "Learn more",
-      "items": {
-        "aiAssistants": {
-          "title": "Conversational assistants & Voice AI",
-          "shortDescription": "Voice agents and chatbots powered by frontier LLMs, not rigid flows. Running in the field today, not in a demo.",
-          "longDescription": "I build conversational assistants for real operations: field Voice AI so workers can complete safety forms hands-free — in gloves, rain and vibration — WhatsApp chatbots for SaaS product support, and Claude agents integrated directly into your backend. No Dialogflow, no Rasa: frontier LLMs (Claude, Google Gemini) orchestrated on top of your existing stack.",
-          "stack": [
-            "Claude",
-            "Google Gemini",
-            "Next.js",
-            "Fastify",
-            "Voice AI pipelines"
-          ],
-          "anchorProject": "In production: field Voice AI for a mining services contractor — 195+ field workers across 7 maintenance teams, 4,000+ daily route sheets, response times under 100ms."
-        },
-        "businessIntelligence": {
-          "title": "Operational BI and dashboards",
-          "shortDescription": "Dashboards ops directors actually open. Real data, real numbers, zero placeholders.",
-          "longDescription": "I build operational dashboards and ETL pipelines for teams that need to see their operation's reality before morning coffee. Standard mining KPIs out of the box — OEE, MTBF, MTTR, Availability, CAUE, plan compliance, ABC criticality matrices — plus multi-year planning views with Gantt timelines and historical comparisons. Built for planners who live in SAP, not for pitch decks.",
-          "stack": [
-            "Next.js",
-            "React",
-            "Prisma",
-            "PostgreSQL",
-            "Multi-year ETL",
-            "Gantt charts"
-          ],
-          "anchorProject": "In production: BI platforms tracking 115K+ activities, 1,056 inspection protocols and 19,778 work orders for contractors at Chile's largest copper mining operations; audit dashboards tracking 103+ safety standards for an auditing firm serving major mining operators; multi-year planning views built directly from raw SAP data."
-        },
-        "webDev": {
-          "title": "Web development & vertical SaaS",
-          "shortDescription": "Full SaaS platforms: backend, frontend, integrations, CI/CD and deploy. Specialized in regulated industries.",
-          "longDescription": "I build vertical SaaS end-to-end. Not marketing landings — the actual product: auth, billing, admin panels, integrations with legacy systems and government APIs (Chilean SII). Strict TypeScript, real testing, automated deploy. Code written to pass audits, not to impress investors.",
-          "stack": [
-            "Next.js",
-            "Fastify",
-            "React",
-            "Prisma",
-            "PostgreSQL",
-            "Railway",
-            "Turborepo"
-          ],
-          "anchorProject": "In production: Apoderapp (Chilean SII tax compliance, sii-factura library with 88+ tests), Speakly (own AI English-learning platform on Turborepo), a custom AI-powered ERP for a 50-year-old metallurgic company, and the site you're reading right now."
-        },
-        "aiConsulting": {
-          "title": "AI consulting & adversarial audits",
-          "shortDescription": "I audit your existing AI architecture, find hidden scope drift and propose the cheapest approach that actually works.",
-          "longDescription": "Adversarial audits of deployed AI systems: how solid is your pipeline, where is the hidden tech debt, when does an LLM make sense and when does a classical model win. I also design multi-agent architectures from scratch for clients who already have data and a clearly-scoped problem. The honest differentiator: 15 years of operations leadership before the first line of production code — I can tell the difference between a software problem and a process problem.",
-          "stack": [
-            "Claude Code",
-            "Multi-agent systems",
-            "RAG",
-            "Closing pipelines",
-            "Playwright testing"
-          ],
-          "anchorProject": "Own experience: Agente_Tunix meta-system that orchestrates 7 production projects via hierarchical Claude agents, each with its own closing pipeline (type_check → lint → build → test → audit) and automated PR review."
-        },
-        "rpa": {
-          "title": "Process automation (RPA with AI)",
-          "shortDescription": "I automate repetitive processes with code, not with expensive RPA suites. Direct integration with your APIs.",
-          "longDescription": "When your team burns hours processing Excel files, validating codes by hand or re-sending emails, I write a bot that does it in seconds. No UiPath, no Power Automate: a Node or Python service that runs on your infra and integrates with your existing systems. Cheaper, more auditable, and no enterprise licensing lock-in.",
-          "stack": [
-            "Node.js",
-            "Python",
-            "Playwright",
-            "Prisma",
-            "Docker",
-            "Claude"
-          ],
-          "anchorProject": "In production: code processing bot for a regional gas distribution operator in Chile — 4,040 codes, 88.7% success rate, 14 delivery routes automated. Plus OCR + QR + LLM Vision document digitization pipelines on the shop floor of a 50-year-old metallurgic company."
-        },
-        "machineLearning": {
-          "title": "Machine learning & applied data science",
-          "shortDescription": "Classical ML plus modern LLM stack. Trained through MIT Professional Education on Dataiku DSS, then replicated in Python.",
-          "longDescription": "Honest differentiator vs the AI consultancies that appeared post-ChatGPT: I have classical ML fundamentals (feature engineering, model selection, cross-validation) that predate the GPT boom, plus finance fundamentals from a finance MSc. If your problem is prediction on structured data, I won't push an LLM that hallucinates — I'll build a model that works and can be audited. Training was MIT Professional Education, 80 hours of effort on Dataiku DSS, Feb–May 2024.",
-          "stack": [
-            "Python (scikit-learn, pandas)",
-            "Dataiku DSS",
-            "Claude as coding assistant",
-            "PostgreSQL",
-            "Jupyter"
-          ],
-          "anchorProject": "Training: MIT Professional Education program \"No Code AI and Machine Learning: Building Data Science Solutions\" (80h, 2024) on Dataiku DSS, then replicated models in Python with Claude as coding assistant."
-        },
-        "computerVision": {
-          "title": "Computer vision (capability in progress)",
-          "shortDescription": "Honest framing: I have the fundamentals and the interest, but no production CV projects of my own yet.",
-          "longDescription": "Honest section: computer vision has been a personal interest since the start of my AI journey, and I understand the fundamentals of training vision models. That said, I don't have mission-critical CV projects in production yet. If your project needs production-grade computer vision, I recommend working with a dedicated CV specialist or talking to me about an experimental collaboration with clearly-scoped deliverables.",
-          "stack": [
-            "Python",
-            "PyTorch / TensorFlow (fundamentals)",
-            "OpenCV (basic)",
-            "Claude"
-          ],
-          "anchorProject": "Honest: no production CV projects of my own yet. For mission-critical CV I'll refer you to a dedicated specialist."
-        }
-      }
-    },
-    "cta": {
-      "title": "Have a project that needs to ship?",
-      "subtitle": "I reply in under 24h. Book a 30-minute discovery call.",
-      "whatsapp": "Book a discovery call",
-      "email": "Send an email",
-      "fullForm": "Or use the full contact form →"
-    },
-    "whatsappMessage": "Hi Alejandro, I'm coming from tunixlabs.com. I'd like to talk about a project.",
-    "contact": {
-      "badge": "Contact",
-      "title": "Let's talk about your next product",
-      "subtitle": "I reply in under 24h. No endless forms.",
-      "form": {
-        "title": "Send me a message",
-        "description": "Fill out the form and I'll get back to you soon.",
-        "name": "Name",
-        "namePlaceholder": "Your name",
-        "email": "Email",
-        "emailPlaceholder": "your@email.com",
-        "subject": "Subject",
-        "subjectPlaceholder": "How can I help you?",
-        "message": "Message",
-        "messagePlaceholder": "Tell me about your project",
-        "submit": "Send message"
-      },
-      "info": {
-        "title": "Contact information",
-        "email": "Email",
-        "whatsappCta": "Contact me on WhatsApp",
-        "followUs": "Follow me"
-      }
-    },
-    "footer": {
-      "copyright": "TunixLabs. All rights reserved.",
-      "disclaimer": "TunixLabs acts as technical partner for selected firms. Client names in case studies refer to the direct commissioning partner, not the end-user of the software."
-    }
-  },
   "ContactPage": {
     "hero": {
       "title": "Let's talk about your project",
@@ -455,46 +186,110 @@
     "terminal": {
       "brand": "TUNIXLABS",
       "navHint": "scroll to execute",
-      "lights": { "close": "local", "live": "live", "prod": "prod" }
+      "lights": {
+        "close": "local",
+        "live": "live",
+        "prod": "prod"
+      }
     },
     "states": {
       "hero": {
-        "prompts": ["./production --show-portfolio", "./production --live", "tail -f ./operations.log"],
+        "prompts": [
+          "./production --show-portfolio",
+          "./production --live",
+          "tail -f ./operations.log"
+        ],
         "command": "./production --show-portfolio",
         "meta": "uptime 15y 03m",
         "path": "production",
         "headline": {
-          "lines": ["NOT A", "STUDIO.", "ONE", "OPERATOR."],
+          "lines": [
+            "NOT A",
+            "STUDIO.",
+            "ONE",
+            "OPERATOR."
+          ],
           "accentLine": 3,
           "outlineLine": 1
         },
         "metaGrid": [
-          { "label": "Based", "value": "Santiago, CL\nUS time zones" },
-          { "label": "Years of ops", "value": "15" },
-          { "label": "Credentials", "value": "MSc Finance\nMIT Prof Ed" },
-          { "label": "Engagement", "value": "Nearshore: USD 15–60k\n3–5× below SF/NYC" }
+          {
+            "label": "Based",
+            "value": "Santiago, CL\nUS time zones"
+          },
+          {
+            "label": "Years of ops",
+            "value": "15"
+          },
+          {
+            "label": "Credentials",
+            "value": "MSc Finance\nMIT Prof Ed"
+          },
+          {
+            "label": "Engagement",
+            "value": "Nearshore: USD 15–60k\n3–5× below SF/NYC"
+          }
         ]
       },
       "services": {
-        "prompts": ["cat ./services.json | jq '.items[]'", "ls ./services/", "./services --list --active"],
+        "prompts": [
+          "cat ./services.json | jq '.items[]'",
+          "ls ./services/",
+          "./services --list --active"
+        ],
         "command": "cat ./services.json | jq '.items[]'",
         "meta": "7 practice areas",
         "path": "services",
-        "title": { "text": "What I ship.", "acidWord": "I ship." },
+        "title": {
+          "text": "What I ship.",
+          "acidWord": "I ship."
+        },
         "count": "Total areas",
         "totalNumber": "07",
         "items": [
-          { "num": "01 / 07", "title": "Voice AI &\nconversational", "anchor": "195+ workers in prod" },
-          { "num": "02 / 07", "title": "Operational\nBI & dashboards", "anchor": "19,778 work orders" },
-          { "num": "03 / 07", "title": "Vertical\nSaaS", "anchor": "Apoderapp, Speakly" },
-          { "num": "04 / 07", "title": "AI\nconsulting", "anchor": "Agente_Tunix (7 projects)" },
-          { "num": "05 / 07", "title": "Process\nautomation (RPA)", "anchor": "4,040 codes at 88.7%" },
-          { "num": "06 / 07", "title": "Applied\nML", "anchor": "MIT Prof Ed" },
-          { "num": "07 / 07", "title": "Custom ERP\n& integrations", "anchor": "50-year-old company" }
+          {
+            "num": "01 / 07",
+            "title": "Voice AI &\nconversational",
+            "anchor": "195+ workers in prod"
+          },
+          {
+            "num": "02 / 07",
+            "title": "Operational\nBI & dashboards",
+            "anchor": "19,778 work orders"
+          },
+          {
+            "num": "03 / 07",
+            "title": "Vertical\nSaaS",
+            "anchor": "Apoderapp, Speakly"
+          },
+          {
+            "num": "04 / 07",
+            "title": "AI\nconsulting",
+            "anchor": "Agente_Tunix (7 projects)"
+          },
+          {
+            "num": "05 / 07",
+            "title": "Process\nautomation (RPA)",
+            "anchor": "4,040 codes at 88.7%"
+          },
+          {
+            "num": "06 / 07",
+            "title": "Applied\nML",
+            "anchor": "MIT Prof Ed"
+          },
+          {
+            "num": "07 / 07",
+            "title": "Custom ERP\n& integrations",
+            "anchor": "50-year-old company"
+          }
         ]
       },
       "caseStudies": {
-        "prompts": ["./case-studies/{id}.run --metrics", "cat ./case-studies/{id}.md", "./case-studies --show {id}"],
+        "prompts": [
+          "./case-studies/{id}.run --metrics",
+          "cat ./case-studies/{id}.md",
+          "./case-studies --show {id}"
+        ],
         "command": "./case-studies/{id}.run --metrics",
         "meta": "5 systems in production",
         "path": "case-studies",
@@ -502,73 +297,172 @@
           {
             "id": "schwager",
             "badge": "In production · Mining services, via technical partner",
-            "title": { "text": "Voice AI\nfor field ops at 100ms.", "copperWords": "at 100ms." },
+            "title": {
+              "text": "Voice AI\nfor field ops at 100ms.",
+              "copperWords": "at 100ms."
+            },
             "metrics": [
-              { "label": "Field workers", "value": "195+" },
-              { "label": "Daily routes", "value": "4,000+" },
-              { "label": "Maintenance teams", "value": "7" },
-              { "label": "Response time", "value": "100ms" }
+              {
+                "label": "Field workers",
+                "value": "195+"
+              },
+              {
+                "label": "Daily routes",
+                "value": "4,000+"
+              },
+              {
+                "label": "Maintenance teams",
+                "value": "7"
+              },
+              {
+                "label": "Response time",
+                "value": "100ms"
+              }
             ],
             "imageRef": "/case-studies/sgm-schwager-hero.png",
-            "stack": ["React", "TypeScript", "PostgreSQL", "Google Gemini", "Capacitor"]
+            "stack": [
+              "React",
+              "TypeScript",
+              "PostgreSQL",
+              "Google Gemini",
+              "Capacitor"
+            ]
           },
           {
             "id": "sime",
             "badge": "In production · Contractors at large-scale Chilean mining",
-            "title": { "text": "19,778 work\norders tracked.", "copperWords": "19,778" },
+            "title": {
+              "text": "19,778 work\norders tracked.",
+              "copperWords": "19,778"
+            },
             "metrics": [
-              { "label": "Work orders", "value": "19,778" },
-              { "label": "Activities", "value": "115K+" },
-              { "label": "Safety protocols", "value": "1,056" }
+              {
+                "label": "Work orders",
+                "value": "19,778"
+              },
+              {
+                "label": "Activities",
+                "value": "115K+"
+              },
+              {
+                "label": "Safety protocols",
+                "value": "1,056"
+              }
             ],
             "imageRef": "/case-studies/sime-platform.png",
-            "stack": ["Turborepo", "Fastify", "React", "PostgreSQL", "AWS S3"]
+            "stack": [
+              "Turborepo",
+              "Fastify",
+              "React",
+              "PostgreSQL",
+              "AWS S3"
+            ]
           },
           {
             "id": "apoderapp",
             "badge": "In production · Own product",
-            "title": { "text": "Chilean SII invoicing\nwith 88+ tests.", "copperWords": "88+ tests." },
+            "title": {
+              "text": "Chilean SII invoicing\nwith 88+ tests.",
+              "copperWords": "88+ tests."
+            },
             "metrics": [
-              { "label": "Claude Code agents", "value": "5" },
-              { "label": "sii-factura tests", "value": "88+" },
-              { "label": "Status", "value": "PWA in production" }
+              {
+                "label": "Claude Code agents",
+                "value": "5"
+              },
+              {
+                "label": "sii-factura tests",
+                "value": "88+"
+              },
+              {
+                "label": "Status",
+                "value": "PWA in production"
+              }
             ],
             "imageRef": "/case-studies/apoderapp-presidenta-dark.png",
-            "stack": ["Next.js", "React", "Prisma", "SII XML/CAF", "Claude Code"]
+            "stack": [
+              "Next.js",
+              "React",
+              "Prisma",
+              "SII XML/CAF",
+              "Claude Code"
+            ]
           },
           {
             "id": "fernandez",
             "badge": "In production · 50-year metallurgic company",
-            "title": { "text": "ERP that replaced\nExcel area by area.", "copperWords": "area by area." },
+            "title": {
+              "text": "ERP that replaced\nExcel area by area.",
+              "copperWords": "area by area."
+            },
             "metrics": [
-              { "label": "Type", "value": "Full-stack ERP" },
-              { "label": "Digitization", "value": "OCR + QR + LLM Vision" },
-              { "label": "Chilean SII", "value": "Integrated" }
+              {
+                "label": "Type",
+                "value": "Full-stack ERP"
+              },
+              {
+                "label": "Digitization",
+                "value": "OCR + QR + LLM Vision"
+              },
+              {
+                "label": "Chilean SII",
+                "value": "Integrated"
+              }
             ],
             "imageRef": "/case-studies/fernandez-erp-dashboard.png",
-            "stack": ["Next.js", "Prisma", "PostgreSQL", "Claude Code", "SII XML"]
+            "stack": [
+              "Next.js",
+              "Prisma",
+              "PostgreSQL",
+              "Claude Code",
+              "SII XML"
+            ]
           },
           {
             "id": "gasDistribution",
             "badge": "In production · Regional gas distribution operator",
-            "title": { "text": "4,040 codes\nat 88.7%.", "copperWords": "88.7%." },
+            "title": {
+              "text": "4,040 codes\nat 88.7%.",
+              "copperWords": "88.7%."
+            },
             "metrics": [
-              { "label": "Codes processed", "value": "4,040" },
-              { "label": "Success rate", "value": "88.7%" },
-              { "label": "Routes automated", "value": "14" }
+              {
+                "label": "Codes processed",
+                "value": "4,040"
+              },
+              {
+                "label": "Success rate",
+                "value": "88.7%"
+              },
+              {
+                "label": "Routes automated",
+                "value": "14"
+              }
             ],
             "imageRef": "/case-studies/gas-distribution.png",
-            "stack": ["Express", "Prisma", "React", "PostgreSQL"]
+            "stack": [
+              "Express",
+              "Prisma",
+              "React",
+              "PostgreSQL"
+            ]
           }
         ]
       },
       "about": {
-        "prompts": ["whoami && cat ./bio.md", "./about --full", "cat ./alejandro.md"],
+        "prompts": [
+          "whoami && cat ./bio.md",
+          "./about --full",
+          "cat ./alejandro.md"
+        ],
         "command": "whoami && cat ./bio.md",
         "meta": "MSc Finance · MIT Prof Ed",
         "path": "about",
         "header": "Alejandro Moyano Foncea · MSc Finance + MIT Prof Ed · 15 yrs running real ops",
-        "title": { "text": "The person you'll actually work with.", "acidWord": "actually" },
+        "title": {
+          "text": "The person you'll actually work with.",
+          "acidWord": "actually"
+        },
         "bioParagraph1": "I fix operational inefficiencies by building custom software. Unlike a traditional developer, I don't spend weeks writing code by hand — I use modern AI workflows on Claude Code to architect and ship production systems in a fraction of the usual time. My background isn't just tech, it's business: MSc in Finance, <mit>MIT Professional Education</mit> in AI/ML, and 15 years leading real operations before writing production code.",
         "bioParagraph2": "That's how I understand the *why* behind the software, not just the *how*. I've delivered everything from mining maintenance platforms for large-scale Chilean mining and custom ERPs for heavy industry, to engagement apps for education and decade-old legacy system modernization. I turn manual, paper-based work into digital tools that actually move the needle — no demos, no pitch decks, systems running today. US time zone overlap (0–2h from East/Central) and rates 3–5× below comparable SF/NYC shops, without giving up senior ownership.",
         "italicQuote": "I understand the why behind the software, not just the how.",
@@ -577,11 +471,18 @@
         "asideCaption": "alejandro.portrait.jpg\n2048×2560 · editorial b&w · Feb 2026"
       },
       "contact": {
-        "prompts": ["./contact --method=any", "./contact --reply-in 24h", "echo $EMAIL && ./contact --send"],
+        "prompts": [
+          "./contact --method=any",
+          "./contact --reply-in 24h",
+          "echo $EMAIL && ./contact --send"
+        ],
         "command": "./contact --method=any",
         "meta": "reply < 24h",
         "path": "contact",
-        "title": { "text": "Have a project that ships?", "acidWord": "ships?" },
+        "title": {
+          "text": "Have a project that ships?",
+          "acidWord": "ships?"
+        },
         "subtitle": "I reply in under 24h. No endless forms.",
         "ctaPrimary": "Book a call",
         "ctaSecondary": "Send a message"

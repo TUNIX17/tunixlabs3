@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Tunixlabs · Design Explorations 2026</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Fraunces:opsz,wght@9..144,300;9..144,500&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --ink: #0a0a0a;
+    --paper: #f5f5f2;
+    --muted: #888;
+    --acid: #ccff00;
+    --copper: #b85c38;
+    --brown: #c94a1b;
+  }
+  html, body { -webkit-font-smoothing: antialiased; }
+  body {
+    font-family: 'JetBrains Mono', monospace;
+    background: var(--ink);
+    color: var(--paper);
+    min-height: 100vh;
+    padding: 64px 48px;
+  }
+  header {
+    max-width: 1400px;
+    margin-bottom: 72px;
+  }
+  .kicker {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--muted);
+    margin-bottom: 16px;
+  }
+  .kicker::before { content: '§ '; color: var(--acid); }
+  h1 {
+    font-family: 'Fraunces', serif;
+    font-variation-settings: "opsz" 144;
+    font-weight: 300;
+    font-size: clamp(40px, 6vw, 72px);
+    line-height: 0.95;
+    letter-spacing: -0.03em;
+    margin-bottom: 24px;
+  }
+  h1 em { font-style: italic; color: var(--acid); }
+  .intro {
+    font-size: 14px;
+    line-height: 1.7;
+    max-width: 62ch;
+    color: #bbb;
+  }
+  .intro strong { color: var(--paper); }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+    gap: 24px;
+    max-width: 1400px;
+  }
+  a.card {
+    display: block;
+    padding: 36px 32px 32px;
+    border: 1px solid #222;
+    text-decoration: none;
+    color: inherit;
+    transition: all 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
+    background: #0f0f0f;
+    position: relative;
+    overflow: hidden;
+  }
+  a.card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 3px;
+    background: var(--card-accent);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+  a.card:hover { border-color: #333; background: #141414; transform: translateY(-4px); }
+  a.card:hover::before { transform: scaleX(1); }
+
+  a.card.a { --card-accent: var(--brown); }
+  a.card.b { --card-accent: var(--copper); }
+  a.card.c { --card-accent: var(--acid); }
+
+  .num {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--card-accent);
+    margin-bottom: 20px;
+    font-weight: 500;
+  }
+  .title {
+    font-family: 'Fraunces', serif;
+    font-variation-settings: "opsz" 144;
+    font-weight: 400;
+    font-size: 28px;
+    line-height: 1;
+    letter-spacing: -0.02em;
+    margin-bottom: 6px;
+    color: var(--paper);
+  }
+  .subtitle {
+    font-size: 11px;
+    color: #888;
+    margin-bottom: 28px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+  .desc {
+    font-size: 13px;
+    line-height: 1.65;
+    color: #aaa;
+    margin-bottom: 28px;
+  }
+  .desc strong { color: var(--card-accent); }
+  .principle {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: #666;
+    padding-top: 16px;
+    border-top: 1px dashed #333;
+    line-height: 1.7;
+  }
+  .principle .lbl { color: #555; }
+  .principle .val { color: var(--card-accent); }
+
+  .footer {
+    margin-top: 72px;
+    font-size: 11px;
+    color: #555;
+    border-top: 1px solid #1a1a1a;
+    padding-top: 28px;
+    max-width: 1400px;
+    line-height: 1.8;
+  }
+  .footer strong { color: #888; }
+
+  @media (max-width: 700px) {
+    body { padding: 40px 20px; }
+    .grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+  <header>
+    <div class="kicker">Tunixlabs · Design Explorations · 2026-04</div>
+    <h1>Three distinct aesthetic<br>directions. <em>Pick one.</em></h1>
+    <p class="intro">
+      Each direction pulls a <strong>different principle</strong> from jeskojets.com and lands at a distant point in design space. None is "the answer" — pick the one whose personality matches how you want to be perceived by a mining director, a tax auditor, or a US nearshore buyer. Open each in its own tab and compare side-by-side.
+    </p>
+  </header>
+
+  <div class="grid">
+    <a class="card a" href="./a-editorial-monolith.html">
+      <div class="num">Direction A</div>
+      <div class="title">Editorial Monolith</div>
+      <div class="subtitle">Dark cinematic · serif display</div>
+      <p class="desc">
+        Warm browns and deep black. <strong>Heavy display serif</strong> (Fraunces variable) with italic Instrument Serif dek. Full-bleed atmospheric gradients, editorial single-column rhythm, grain overlay. Feels like a long-read magazine profile.
+      </p>
+      <div class="principle">
+        <span class="lbl">Principle from ref</span><br>
+        <span class="val">→ Invisible luxury, dramatic reveals</span><br>
+        <span class="lbl">Personality</span><br>
+        <span class="val">→ Trustworthy, considered, premium</span>
+      </div>
+    </a>
+
+    <a class="card b" href="./b-industrial-blueprint.html">
+      <div class="num">Direction B</div>
+      <div class="title">Industrial Blueprint</div>
+      <div class="subtitle">Technical drawing · mono + plex sans</div>
+      <p class="desc">
+        Engineering drawing aesthetic applied to software. <strong>Graph paper grid</strong>, dimensional callouts, BOM-style service schedule, oxidized copper accents, constructive line draws. Feels like reading a mech drawing — but for software.
+      </p>
+      <div class="principle">
+        <span class="lbl">Principle from ref</span><br>
+        <span class="val">→ Technical sophistication (the blueprint schematic)</span><br>
+        <span class="lbl">Personality</span><br>
+        <span class="val">→ Engineer-to-engineer, zero bullshit</span>
+      </div>
+    </a>
+
+    <a class="card c" href="./c-kinetic-swiss.html">
+      <div class="num">Direction C</div>
+      <div class="title">Kinetic Swiss</div>
+      <div class="subtitle">Absurd type · acid accent</div>
+      <p class="desc">
+        Massive Archivo Black display at 17vw. <strong>Pure ink/paper palette</strong> with acid lime accent. Text-as-image hero, horizontal marquee, asymmetric 12-col service grid with full-card invert hover. Feels like a modern studio owns the room.
+      </p>
+      <div class="principle">
+        <span class="lbl">Principle from ref</span><br>
+        <span class="val">→ Motion with purpose, asymmetric grid</span><br>
+        <span class="lbl">Personality</span><br>
+        <span class="val">→ Confident, modern, unapologetic</span>
+      </div>
+    </a>
+  </div>
+
+  <div class="footer">
+    <strong>How to compare:</strong> open each in a new tab, scroll the hero, hover the service cards (each has a different hover treatment), and notice the typography contrast. The reference <strong>jeskojets.com</strong> has more principles than three — these are the three I think fit the "solo operator · regulated industries · honest" brief. If none feel right, say which element of which one you want to steal and I can build a hybrid.
+  </div>
+</body>
+</html>
