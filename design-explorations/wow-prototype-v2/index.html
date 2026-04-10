@@ -1,0 +1,1331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Wow v2 · Terminal as Interpreter</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Archivo:wght@400;500;700;900&family=JetBrains+Mono:wght@400;500;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #f5f5f2;
+    --paper-warm: #f0eee8;
+    --paper-raise: #fafaf7;
+    --ink: #0a0a0a;
+    --ink-mid: #1a1a1a;
+    --ink-muted: #666664;
+    --ink-light: #9a9a96;
+    --acid: #ccff00;
+    --acid-deep: #a8d600;
+    --copper: #b85c38;
+    --terminal-border: rgba(10, 10, 10, 0.14);
+    --terminal-shadow:
+      0 50px 100px -30px rgba(10, 10, 10, 0.28),
+      0 25px 50px -15px rgba(10, 10, 10, 0.16),
+      0 0 0 1px var(--terminal-border);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  ::selection { background: var(--acid); color: var(--ink); }
+  html { -webkit-font-smoothing: antialiased; background: var(--paper); color: var(--ink); scroll-behavior: auto; }
+  body {
+    font-family: 'Archivo', sans-serif;
+    min-height: 100vh;
+    line-height: 1.35;
+    overflow-x: hidden;
+    background: var(--paper);
+  }
+
+  /* ============ BACKGROUND LAYER ============ */
+  /* Persistent background that crossfades between atmospheric scenes.
+     In Fase 1, each .bg-scene will have a real photo via background-image.
+     For now, CSS gradients simulate the mood. */
+  .bg-layer {
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    overflow: hidden;
+  }
+  .bg-scene {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    transition: opacity 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+    will-change: opacity, transform;
+  }
+  .bg-scene.active {
+    opacity: 1;
+    animation: ken-burns 24s ease-in-out infinite alternate;
+  }
+  @keyframes ken-burns {
+    0% { transform: scale(1) translate(0, 0); }
+    100% { transform: scale(1.03) translate(-4px, -4px); }
+  }
+
+  /* Hero scene: SGM Schwager hero photo (mining ops) */
+  .bg-hero {
+    background:
+      radial-gradient(ellipse 90% 60% at 75% 25%, rgba(184, 92, 56, 0.45), transparent 55%),
+      radial-gradient(ellipse 60% 70% at 20% 85%, rgba(8, 14, 30, 0.9), transparent 60%),
+      radial-gradient(ellipse 100% 80% at 50% 50%, rgba(26, 37, 64, 0.6), transparent 70%),
+      linear-gradient(180deg, rgba(10, 16, 36, 0.55) 0%, rgba(26, 37, 64, 0.45) 30%, rgba(42, 32, 24, 0.55) 70%, rgba(10, 9, 7, 0.65) 100%),
+      url('/case-studies/sgm-schwager-hero.png');
+    background-size: cover, cover, cover, cover, cover;
+    background-position: center, center, center, center, center;
+  }
+
+  /* Services scene: flat paper with subtle blueprint tick grid */
+  .bg-services {
+    background:
+      linear-gradient(rgba(10, 10, 10, 0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(10, 10, 10, 0.04) 1px, transparent 1px),
+      radial-gradient(ellipse 90% 70% at 50% 40%, rgba(245, 241, 234, 1), var(--paper-warm) 80%);
+    background-size: 24px 24px, 24px 24px, 100% 100%;
+  }
+
+  /* Case scene: Fernandez ERP dashboard screenshot */
+  .bg-case {
+    background:
+      radial-gradient(circle 60% at 65% 45%, rgba(184, 92, 56, 0.3), transparent 55%),
+      radial-gradient(ellipse 70% 50% at 30% 70%, rgba(20, 25, 45, 0.7), transparent 60%),
+      radial-gradient(ellipse at 50% 20%, rgba(204, 255, 0, 0.04), transparent 55%),
+      linear-gradient(160deg, rgba(15, 18, 25, 0.55) 0%, rgba(30, 34, 53, 0.45) 40%, rgba(26, 18, 16, 0.55) 75%, rgba(10, 9, 7, 0.65) 100%),
+      url('/case-studies/fernandez-erp-dashboard.png');
+    background-size: cover, cover, cover, cover, cover;
+    background-position: center, center, center, center, center;
+  }
+
+  /* About scene: Alejandro portrait, editorial b&w treatment */
+  .bg-about {
+    background:
+      radial-gradient(ellipse 80% 60% at 30% 40%, rgba(235, 222, 195, 0.55), transparent 55%),
+      radial-gradient(ellipse 60% 50% at 75% 70%, rgba(180, 140, 105, 0.25), transparent 55%),
+      linear-gradient(135deg, rgba(240, 232, 216, 0.35) 0%, rgba(232, 221, 196, 0.3) 40%, rgba(212, 195, 163, 0.35) 100%),
+      url('/team/alejandro-moyano.png');
+    background-size: cover, cover, cover, cover;
+    background-position: center, center, center, center top;
+    filter: grayscale(1) contrast(1.15) brightness(0.95);
+  }
+
+  /* Contact scene: Apoderapp presidenta photo */
+  .bg-contact {
+    background:
+      radial-gradient(ellipse 100% 50% at 50% 0%, rgba(184, 92, 56, 0.45), transparent 60%),
+      radial-gradient(ellipse 70% 40% at 30% 100%, rgba(26, 37, 64, 0.4), transparent 60%),
+      linear-gradient(180deg, rgba(42, 26, 20, 0.55) 0%, rgba(235, 216, 184, 0.35) 60%, rgba(245, 241, 234, 0.45) 100%),
+      url('/case-studies/apoderapp-presidenta-dark.png');
+    background-size: cover, cover, cover, cover;
+    background-position: center, center, center, center;
+  }
+
+  /* Grain overlay on top of everything */
+  .bg-layer::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
+    opacity: 0.08;
+    mix-blend-mode: overlay;
+    pointer-events: none;
+  }
+
+  /* ============ NAV ============ */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 24px 32px;
+    z-index: 200;
+    pointer-events: none;
+    mix-blend-mode: difference;
+    color: var(--paper);
+  }
+  nav > * { pointer-events: auto; }
+  .mark {
+    font-family: 'Archivo Black', sans-serif;
+    font-size: 16px;
+    letter-spacing: -0.03em;
+    text-transform: uppercase;
+  }
+  .mark::after {
+    content: '●';
+    color: var(--acid);
+    margin-left: 6px;
+    font-size: 12px;
+    animation: pulse 2s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(0.82); }
+  }
+  .nav-hint {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+  }
+
+  /* ============ THE MAIN TERMINAL (fixed size, persistent) ============ */
+  .terminal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(250, 250, 247, 0.94);
+    backdrop-filter: blur(20px) saturate(140%);
+    -webkit-backdrop-filter: blur(20px) saturate(140%);
+    border-radius: 14px;
+    box-shadow: var(--terminal-shadow);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    z-index: 100;
+    width: 82vw;
+    height: 78vh;
+    max-width: 1640px;
+    max-height: 880px;
+    transition:
+      width 0.9s cubic-bezier(0.2, 0.9, 0.25, 1),
+      height 0.9s cubic-bezier(0.2, 0.9, 0.25, 1),
+      transform 0.9s cubic-bezier(0.2, 0.9, 0.25, 1);
+  }
+  /* When the aside terminal is shown in About section, the main shrinks
+     to make real room for the aside (not just shift — actually resize).
+     The aside appears LEFT of the main with a 2vw gap. */
+  .terminal.shifted {
+    width: 54vw;
+    max-width: 1080px;
+    height: 74vh;
+    max-height: 820px;
+  }
+
+  .tty-topbar {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 24px;
+    align-items: center;
+    padding: 0 20px;
+    height: 42px;
+    border-bottom: 1px solid var(--terminal-border);
+    background: rgba(240, 238, 232, 0.8);
+    flex-shrink: 0;
+  }
+  .lights { display: flex; gap: 8px; }
+  .light {
+    display: block;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    position: relative;
+    cursor: help;
+  }
+  .light.close { background: #c8c8c0; }
+  .light.live {
+    background: var(--acid-deep);
+    animation: pulse 2s ease-in-out infinite;
+  }
+  .light.prod { background: var(--copper); opacity: 0.55; transition: opacity 0.4s; }
+  .light.prod.active { opacity: 1; }
+  .light::after {
+    content: attr(data-label);
+    position: absolute;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--ink-muted);
+    background: var(--paper-raise);
+    padding: 4px 8px;
+    border-radius: 4px;
+    opacity: 0;
+    pointer-events: none;
+    white-space: nowrap;
+    transition: opacity 0.2s;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  }
+  .light:hover::after { opacity: 1; }
+
+  .tty-path {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--ink-muted);
+    text-align: center;
+  }
+  .tty-path strong {
+    color: var(--ink);
+    font-weight: 500;
+  }
+  .tty-path .slash { color: var(--acid-deep); margin: 0 4px; }
+
+  .tty-meta {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--ink-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    text-align: right;
+  }
+
+  .tty-body {
+    flex: 1;
+    padding: 28px 48px 48px;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .tty-prompt {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    color: var(--ink-muted);
+    margin-bottom: 28px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+    min-height: 18px;
+  }
+  .tty-prompt .dollar { color: var(--acid-deep); }
+  .tty-prompt .cmd-text {
+    color: var(--ink);
+    font-weight: 500;
+    white-space: pre;
+  }
+  .tty-prompt .cursor {
+    display: inline-block;
+    width: 7px;
+    height: 15px;
+    background: var(--acid-deep);
+    margin-left: 3px;
+    animation: blink 1s steps(2) infinite;
+  }
+  .tty-prompt.typing .cursor { animation: none; opacity: 1; }
+  @keyframes blink {
+    0%, 50% { opacity: 1; }
+    50.01%, 100% { opacity: 0; }
+  }
+
+  .tty-content {
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+  }
+  .state {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    pointer-events: none;
+    display: flex;
+    flex-direction: column;
+  }
+  .state.active {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  /* Line-by-line reveal */
+  .line {
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity 0.45s cubic-bezier(0.2, 0.9, 0.25, 1), transform 0.45s cubic-bezier(0.2, 0.9, 0.25, 1);
+  }
+  .line.in {
+    opacity: 1;
+    transform: none;
+  }
+
+  /* ============ STATE: HERO ============ */
+  .state-hero {
+    justify-content: center;
+  }
+  h1.monster {
+    font-family: 'Archivo Black', sans-serif;
+    font-weight: 900;
+    font-size: clamp(52px, 12vw, 190px);
+    line-height: 0.82;
+    letter-spacing: -0.055em;
+    text-transform: uppercase;
+    color: var(--ink);
+  }
+  h1.monster .hero-line {
+    display: block;
+    overflow: hidden;
+  }
+  h1.monster .hero-line > span {
+    display: inline-block;
+    transform: translateY(110%);
+    transition: transform 1s cubic-bezier(0.2, 0.9, 0.25, 1);
+  }
+  h1.monster .hero-line.rise > span { transform: translateY(0); }
+  h1.monster .accent {
+    color: var(--ink);
+    background: var(--acid);
+    padding: 0.02em 0.12em 0.08em;
+    line-height: 0.88;
+  }
+  h1.monster .outline {
+    color: transparent;
+    -webkit-text-stroke: 2.5px var(--ink);
+  }
+  .hero-meta {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 24px;
+    margin-top: 48px;
+    padding-top: 24px;
+    border-top: 1.5px solid var(--ink);
+  }
+  .meta-cell { display: flex; flex-direction: column; gap: 4px; }
+  .meta-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--ink-muted);
+  }
+  .meta-label::before { content: '['; color: var(--acid-deep); margin-right: 4px; }
+  .meta-label::after { content: ']'; color: var(--acid-deep); margin-left: 4px; }
+  .meta-value {
+    font-size: 15px;
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+  }
+  .meta-value em {
+    font-style: normal;
+    background: var(--acid);
+    padding: 0 6px;
+    display: inline-block;
+  }
+
+  /* ============ STATE: SERVICES ============ */
+  .state-services { justify-content: flex-start; }
+  .services-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    padding-bottom: 16px;
+    border-bottom: 1.5px solid var(--ink);
+    margin-bottom: 20px;
+  }
+  .services-head h2 {
+    font-family: 'Archivo Black', sans-serif;
+    font-size: clamp(32px, 5vw, 72px);
+    line-height: 0.9;
+    letter-spacing: -0.04em;
+    text-transform: uppercase;
+  }
+  .services-head h2 .acid {
+    background: var(--acid);
+    padding: 0 0.1em 0.08em;
+    display: inline-block;
+  }
+  .services-head .count {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--ink-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    text-align: right;
+  }
+  .services-head .count strong {
+    display: block;
+    font-family: 'Archivo Black', sans-serif;
+    font-size: 54px;
+    color: var(--ink);
+    line-height: 0.85;
+    margin-top: 4px;
+    letter-spacing: -0.04em;
+  }
+  .services-grid {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    flex: 1;
+    border-top: 1.5px solid var(--ink);
+  }
+  .svc {
+    padding: 20px 18px;
+    border-right: 1.5px solid var(--ink);
+    border-bottom: 1.5px solid var(--ink);
+    display: flex;
+    flex-direction: column;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    transition: color 0.4s;
+  }
+  .svc::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--ink);
+    transform: translateY(100%);
+    transition: transform 0.45s cubic-bezier(0.2, 0.9, 0.25, 1);
+    z-index: 0;
+  }
+  .svc:hover::before { transform: none; }
+  .svc > * { position: relative; z-index: 1; transition: color 0.3s; }
+  .svc:hover { color: var(--paper); }
+  .svc:hover .svc-num,
+  .svc:hover .svc-meta { color: var(--acid); }
+  .svc.s1 { grid-column: 1 / 6; }
+  .svc.s2 { grid-column: 6 / 10; }
+  .svc.s3 { grid-column: 10 / 13; border-right: none; }
+  .svc.s4 { grid-column: 1 / 4; border-bottom: none; }
+  .svc.s5 { grid-column: 4 / 9; border-bottom: none; }
+  .svc.s6 { grid-column: 9 / 13; border-right: none; border-bottom: none; }
+  .svc-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--ink-muted);
+    letter-spacing: 0.08em;
+  }
+  .svc-title {
+    font-family: 'Archivo Black', sans-serif;
+    font-size: clamp(15px, 1.4vw, 21px);
+    line-height: 0.95;
+    letter-spacing: -0.03em;
+    text-transform: uppercase;
+    margin-top: auto;
+    padding-top: 18px;
+  }
+  .svc-meta {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    color: var(--ink-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-top: 10px;
+    padding-top: 8px;
+    border-top: 1px solid currentColor;
+    opacity: 0.6;
+  }
+
+  /* ============ STATE: CASE ============ */
+  .state-case { justify-content: space-between; }
+  .case-badge {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--copper);
+    display: flex;
+    gap: 16px;
+    align-items: center;
+    margin-bottom: auto;
+  }
+  .case-badge::before { content: '▸'; color: var(--copper); }
+  .case-title {
+    font-family: 'Archivo Black', sans-serif;
+    font-size: clamp(38px, 7.5vw, 130px);
+    line-height: 0.85;
+    letter-spacing: -0.04em;
+    text-transform: uppercase;
+    max-width: 17ch;
+    color: var(--ink);
+    margin: 24px 0;
+  }
+  .case-title .copper { color: var(--copper); }
+  .case-metrics {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    padding-top: 24px;
+    border-top: 1.5px solid var(--ink);
+  }
+  .case-metric-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--ink-muted);
+    margin-bottom: 4px;
+  }
+  .case-metric-value {
+    font-family: 'Archivo Black', sans-serif;
+    font-size: clamp(28px, 3.4vw, 52px);
+    line-height: 0.9;
+    letter-spacing: -0.03em;
+    color: var(--ink);
+  }
+
+  /* ============ STATE: ABOUT ============ */
+  /* About state shows a simpler layout — the second (aside) terminal handles the portrait */
+  .state-about { justify-content: center; }
+  .about-header {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--ink-muted);
+    margin-bottom: 20px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--ink);
+  }
+  .about-header strong { color: var(--ink); }
+  .about-title {
+    font-family: 'Archivo Black', sans-serif;
+    font-size: clamp(32px, 4.5vw, 62px);
+    line-height: 0.9;
+    letter-spacing: -0.04em;
+    text-transform: uppercase;
+    margin-bottom: 28px;
+    color: var(--ink);
+  }
+  .about-title .acid {
+    background: var(--acid);
+    padding: 0 0.08em 0.06em;
+    display: inline-block;
+  }
+  .about-body {
+    font-size: 15px;
+    line-height: 1.65;
+    color: var(--ink-mid);
+    margin-bottom: 16px;
+    max-width: 56ch;
+  }
+  .about-body strong { color: var(--ink); font-weight: 600; }
+  .about-italic {
+    font-family: 'Instrument Serif', serif;
+    font-style: italic;
+    font-size: 19px;
+    color: var(--ink);
+    padding-left: 16px;
+    border-left: 2px solid var(--acid-deep);
+    max-width: 54ch;
+  }
+
+  /* ============ STATE: CONTACT ============ */
+  .state-contact {
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+  }
+  .contact-inner { max-width: 540px; }
+  .contact-inner h2 {
+    font-family: 'Archivo Black', sans-serif;
+    font-size: clamp(32px, 5vw, 68px);
+    line-height: 0.88;
+    letter-spacing: -0.045em;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+  .contact-inner h2 .acid {
+    background: var(--acid);
+    padding: 0 0.1em 0.08em;
+    display: inline-block;
+  }
+  .contact-inner p {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--ink-muted);
+    margin-bottom: 32px;
+  }
+  .cta-row { display: flex; gap: 12px; justify-content: center; }
+  .cta {
+    padding: 16px 28px;
+    background: var(--ink);
+    color: var(--paper);
+    text-decoration: none;
+    font-family: 'Archivo', sans-serif;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    font-weight: 700;
+    border: 2px solid var(--ink);
+    transition: all 0.3s;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .cta::after { content: '→'; transition: transform 0.3s; }
+  .cta:hover { background: var(--acid); color: var(--ink); }
+  .cta:hover::after { transform: translateX(4px); }
+  .cta.secondary { background: transparent; color: var(--ink); }
+  .cta.secondary:hover { background: var(--ink); color: var(--paper); }
+  .cta.secondary:hover::after { color: var(--paper); }
+
+  /* ============ THE ASIDE TERMINAL (only appears in About) ============ */
+  /* Positioned to the LEFT of the main terminal when main is .shifted.
+     With main at width 54vw centered (left edge ≈ 23vw), the aside sits
+     at left 2vw with width 19vw, leaving a ~2vw gap between them.
+     z-index: 101 ensures it's above the main terminal (100) as a safety
+     guarantee even if the math is slightly off on certain viewports. */
+  .terminal-aside {
+    position: fixed;
+    top: 50%;
+    left: 2vw;
+    transform: translate(-32px, -50%) scale(0.96);
+    width: 19vw;
+    height: 74vh;
+    max-width: 380px;
+    max-height: 820px;
+    background: rgba(10, 10, 10, 0.94);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-radius: 12px;
+    box-shadow:
+      0 40px 80px -20px rgba(10, 10, 10, 0.45),
+      0 0 0 1px rgba(204, 255, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    z-index: 101;
+    opacity: 0;
+    pointer-events: none;
+    transition:
+      opacity 0.7s cubic-bezier(0.2, 0.9, 0.25, 1),
+      transform 0.8s cubic-bezier(0.2, 0.9, 0.25, 1);
+  }
+  .terminal-aside.visible {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translate(0, -50%) scale(1);
+  }
+  .tty-topbar-mini {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 16px;
+    align-items: center;
+    padding: 0 14px;
+    height: 34px;
+    border-bottom: 1px solid rgba(204, 255, 0, 0.12);
+    background: rgba(20, 20, 18, 0.6);
+    flex-shrink: 0;
+  }
+  .tty-topbar-mini .lights .light {
+    width: 9px; height: 9px;
+  }
+  .tty-topbar-mini .lights .light.close { background: #4a4a44; }
+  .tty-topbar-mini .lights .light.prod { background: var(--copper); opacity: 0.8; }
+  .tty-path-mini {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: #999;
+    text-align: center;
+  }
+  .tty-path-mini strong { color: var(--acid); font-weight: 500; }
+  .tty-aside-body {
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+  }
+  .aside-portrait {
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(circle 70% at 55% 40%, rgba(245, 241, 234, 0.1), transparent 60%),
+      radial-gradient(circle 60% at 35% 70%, rgba(10, 10, 10, 0.6), transparent 60%),
+      linear-gradient(145deg, #2a2a28 0%, #0a0a0a 100%);
+  }
+  .aside-portrait::before {
+    content: 'PORTRAIT.JPG';
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: rgba(245, 241, 234, 0.3);
+    letter-spacing: 0.22em;
+  }
+  .aside-caption {
+    position: absolute;
+    bottom: 0;
+    left: 0; right: 0;
+    padding: 14px 16px;
+    background: linear-gradient(0deg, rgba(0, 0, 0, 0.85), transparent);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--paper);
+    line-height: 1.6;
+  }
+  .aside-caption strong { color: var(--acid); }
+
+  /* ============ SCROLL DRIVER ============ */
+  main.scroll-driver {
+    position: relative;
+    z-index: 2;
+  }
+  .trigger {
+    height: 100vh;
+    width: 100%;
+    display: block;
+    pointer-events: none;
+  }
+  .trigger.first { height: 80vh; }
+  .trigger.spacer { height: 30vh; }
+
+  /* ============ SCROLL PROGRESS ============ */
+  .scroll-progress {
+    position: fixed;
+    top: 0; left: 0;
+    width: 3px;
+    height: 100vh;
+    background: rgba(10, 10, 10, 0.08);
+    z-index: 300;
+    pointer-events: none;
+  }
+  .scroll-progress::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%;
+    height: var(--progress, 0%);
+    background: var(--acid-deep);
+    transition: height 0.12s linear;
+  }
+
+  .scroll-hint {
+    position: fixed;
+    bottom: 28px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--ink);
+    z-index: 150;
+    pointer-events: none;
+    animation: hint-bounce 2.5s ease-in-out infinite;
+    opacity: 0.75;
+    transition: opacity 0.4s;
+    mix-blend-mode: difference;
+    color: var(--paper);
+  }
+  .scroll-hint.hidden { opacity: 0; }
+  .scroll-hint::after {
+    content: '↓';
+    display: block;
+    text-align: center;
+    font-size: 14px;
+    margin-top: 4px;
+    color: var(--acid);
+  }
+  @keyframes hint-bounce {
+    0%, 100% { transform: translate(-50%, 0); }
+    50% { transform: translate(-50%, 6px); }
+  }
+
+  /* ============ PRELOADER ============ */
+  .preloader {
+    position: fixed;
+    inset: 0;
+    background: var(--paper);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .preloader.done {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.5s 0.3s;
+  }
+  .preloader-dot {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--acid-deep);
+    animation: preload-pulse 0.9s ease-in-out infinite;
+  }
+  @keyframes preload-pulse {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.6); opacity: 0.4; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .bg-scene.active { animation: none; }
+    .terminal, .terminal-aside, .line, .svc::before,
+    .cta, .scroll-hint, .light.live, .preloader-dot,
+    h1.monster .hero-line > span { transition: none !important; animation: none !important; }
+    .line { opacity: 1 !important; transform: none !important; }
+    h1.monster .hero-line > span { transform: none !important; }
+    .tty-prompt .cursor { animation: none !important; }
+  }
+
+  @media (max-width: 768px) {
+    .terminal {
+      width: calc(100vw - 20px) !important;
+      height: calc(100vh - 90px) !important;
+      max-width: none;
+      max-height: none;
+      transform: translate(-50%, -50%) !important;
+    }
+    .terminal.shifted { transform: translate(-50%, -50%) !important; }
+    .terminal-aside { display: none; }
+    .tty-body { padding: 20px 24px; }
+    h1.monster { font-size: 14vw; }
+    .hero-meta { grid-template-columns: repeat(2, 1fr); gap: 16px; margin-top: 28px; }
+    .services-grid { grid-template-columns: 1fr !important; }
+    .svc { grid-column: 1 / -1 !important; border-right: none !important; min-height: 110px; padding: 14px; }
+    .services-head .count strong { font-size: 36px; }
+  }
+</style>
+</head>
+<body>
+  <div class="preloader" id="preloader">
+    <div class="preloader-dot"></div>
+  </div>
+
+  <!-- Background layer with crossfading atmospheric scenes -->
+  <div class="bg-layer">
+    <div class="bg-scene bg-hero active" data-scene="hero"></div>
+    <div class="bg-scene bg-services" data-scene="services"></div>
+    <div class="bg-scene bg-case" data-scene="case"></div>
+    <div class="bg-scene bg-about" data-scene="about"></div>
+    <div class="bg-scene bg-contact" data-scene="contact"></div>
+  </div>
+
+  <nav>
+    <div class="mark">TUNIXLABS</div>
+    <div class="nav-hint">scroll to execute</div>
+  </nav>
+
+  <div class="scroll-progress" id="scroll-progress"></div>
+  <div class="scroll-hint" id="scroll-hint">Scroll</div>
+
+  <!-- THE MAIN TERMINAL — fixed size, persistent, executes commands on scroll -->
+  <div class="terminal" id="terminal">
+    <div class="tty-topbar">
+      <!-- Sprint 1 v3: Rive traffic lights replaces CSS simulation -->
+      <canvas id="rive-traffic-lights" width="120" height="32" style="display:block; flex-shrink:0;"></canvas>
+      <!-- Hidden CSS lights kept for prod-light state JS hook (no visual impact) -->
+      <div class="lights" style="display:none;">
+        <span class="light close" data-label="local"></span>
+        <span class="light live" data-label="live"></span>
+        <span class="light prod" id="prod-light" data-label="prod"></span>
+      </div>
+      <div class="tty-path">tunixlabs <span class="slash">·</span> ~/<strong id="section-path">production</strong></div>
+      <div class="tty-meta" id="section-meta">uptime 15y 03m</div>
+    </div>
+
+    <div class="tty-body">
+      <div class="tty-prompt" id="tty-prompt">
+        <span class="dollar">$</span>
+        <span class="cmd-text" id="cmd-text"></span>
+        <span class="cursor"></span>
+      </div>
+
+      <div class="tty-content">
+        <!-- STATE: HERO -->
+        <div class="state state-hero active" data-state="hero">
+          <h1 class="monster">
+            <span class="hero-line line"><span>NOT A</span></span>
+            <span class="hero-line line"><span class="outline">STUDIO.</span></span>
+            <span class="hero-line line"><span>ONE</span></span>
+            <span class="hero-line line"><span class="accent">OPERATOR.</span></span>
+          </h1>
+          <div class="hero-meta">
+            <div class="meta-cell line">
+              <div class="meta-label">Based</div>
+              <div class="meta-value">Santiago, CL<br>US time zones</div>
+            </div>
+            <div class="meta-cell line">
+              <div class="meta-label">Years of ops</div>
+              <div class="meta-value"><em>15</em></div>
+            </div>
+            <div class="meta-cell line">
+              <div class="meta-label">Credentials</div>
+              <div class="meta-value">MSc Finance<br>MIT Prof Ed</div>
+            </div>
+            <div class="meta-cell line">
+              <div class="meta-label">Engagement</div>
+              <div class="meta-value">USD 15–60k<br>3–5× below SF/NYC</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- STATE: SERVICES -->
+        <div class="state state-services" data-state="services">
+          <div class="services-head line">
+            <h2>What <span class="acid">I ship.</span></h2>
+            <div class="count">Total areas <strong>07</strong></div>
+          </div>
+          <div class="services-grid">
+            <div class="svc s1 line">
+              <div class="svc-num">01 / 07</div>
+              <h3 class="svc-title">Voice AI &<br>conversational</h3>
+              <div class="svc-meta">→ 195+ workers in prod</div>
+            </div>
+            <div class="svc s2 line">
+              <div class="svc-num">02 / 07</div>
+              <h3 class="svc-title">Operational<br>BI & dashboards</h3>
+              <div class="svc-meta">→ 19,778 work orders</div>
+            </div>
+            <div class="svc s3 line">
+              <div class="svc-num">03 / 07</div>
+              <h3 class="svc-title">Vertical<br>SaaS</h3>
+              <div class="svc-meta">→ Apoderapp, Speakly</div>
+            </div>
+            <div class="svc s4 line">
+              <div class="svc-num">04 / 07</div>
+              <h3 class="svc-title">AI<br>consulting</h3>
+              <div class="svc-meta">→ Agente_Tunix</div>
+            </div>
+            <div class="svc s5 line">
+              <div class="svc-num">05 / 07</div>
+              <h3 class="svc-title">Process<br>automation (RPA)</h3>
+              <div class="svc-meta">→ 4,040 codes · 88.7%</div>
+            </div>
+            <div class="svc s6 line">
+              <div class="svc-num">06 / 07</div>
+              <h3 class="svc-title">Applied<br>ML</h3>
+              <div class="svc-meta">→ MIT Prof Ed</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- STATE: CASE -->
+        <div class="state state-case" data-state="case">
+          <div class="case-badge line">In production · Mining services contractor</div>
+          <h2 class="case-title line">Voice AI<br>for field ops <span class="copper">at 100ms.</span></h2>
+          <div class="case-metrics line">
+            <div>
+              <div class="case-metric-label">Field workers</div>
+              <div class="case-metric-value">195+</div>
+            </div>
+            <div>
+              <div class="case-metric-label">Daily routes</div>
+              <div class="case-metric-value">4,000+</div>
+            </div>
+            <div>
+              <div class="case-metric-label">Memory reduction</div>
+              <div class="case-metric-value">90%</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- STATE: ABOUT (the aside terminal opens when this is active) -->
+        <div class="state state-about" data-state="about">
+          <div class="about-header line">
+            <strong>whoami</strong> · Alejandro Moyano Foncea <span style="color:var(--copper)">·</span> MSc Finance + MIT Prof Ed <span style="color:var(--copper)">·</span> 15 yrs running real ops
+          </div>
+          <h2 class="about-title line">The person you'll <span class="acid">actually</span> work with.</h2>
+          <p class="about-body line">
+            I fix operational inefficiencies by building custom software. Unlike a traditional developer, I don't spend weeks writing code by hand — I use modern AI workflows on Claude Code to architect and ship production systems <strong>in a fraction of the usual time</strong>.
+          </p>
+          <p class="about-italic line">
+            "That's how I understand the <em>why</em> behind the software, not just the <em>how</em>."
+          </p>
+        </div>
+
+        <!-- STATE: CONTACT -->
+        <div class="state state-contact" data-state="contact">
+          <div class="contact-inner">
+            <h2 class="line">Have a project that <span class="acid">ships?</span></h2>
+            <p class="line">I reply in under 24h · no endless forms</p>
+            <div class="cta-row line">
+              <a href="#" class="cta">Book a call</a>
+              <a href="#" class="cta secondary">Send a message</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- THE ASIDE TERMINAL — only shown in About section -->
+  <div class="terminal-aside" id="terminal-aside">
+    <div class="tty-topbar-mini">
+      <div class="lights">
+        <span class="light close"></span>
+        <span class="light live"></span>
+        <span class="light prod"></span>
+      </div>
+      <div class="tty-path-mini">~/<strong>portrait.jpg</strong></div>
+    </div>
+    <div class="tty-aside-body">
+      <div class="aside-portrait"></div>
+      <div class="aside-caption">
+        <strong>alejandro.portrait.jpg</strong><br>
+        2048×2560 · editorial b&amp;w · Feb 2026
+      </div>
+    </div>
+  </div>
+
+  <main class="scroll-driver" id="scroll-driver">
+    <div class="trigger first" data-target="hero" data-path="production" data-prompt="./production --show-portfolio" data-meta="uptime 15y 03m"></div>
+    <div class="trigger" data-target="services" data-path="services" data-prompt="cat ./services.json | jq '.items[]'" data-meta="7 practice areas"></div>
+    <div class="trigger" data-target="case" data-path="case-studies/schwager" data-prompt="./case-studies/schwager.run --metrics" data-meta="195+ field workers"></div>
+    <div class="trigger" data-target="about" data-path="about" data-prompt="whoami && cat ./bio.md" data-meta="MSc Finance · MIT Prof Ed"></div>
+    <div class="trigger" data-target="contact" data-path="contact" data-prompt="./contact --method=any" data-meta="reply < 24h"></div>
+    <div class="trigger spacer"></div>
+  </main>
+
+  <script type="module">
+    // === Preloader dismiss ===
+    const preloader = document.getElementById('preloader');
+    const dismissPreloader = () => {
+      if (!preloader || preloader.classList.contains('done')) return;
+      preloader.classList.add('done');
+      setTimeout(() => preloader.remove(), 800);
+    };
+    if (document.readyState === 'complete') {
+      setTimeout(dismissPreloader, 400);
+    } else {
+      window.addEventListener('load', () => setTimeout(dismissPreloader, 400));
+    }
+    setTimeout(dismissPreloader, 2000);
+
+    // === References ===
+    const terminal = document.getElementById('terminal');
+    const asideTerminal = document.getElementById('terminal-aside');
+    const sectionPath = document.getElementById('section-path');
+    const cmdText = document.getElementById('cmd-text');
+    const sectionMeta = document.getElementById('section-meta');
+    const ttyPrompt = document.getElementById('tty-prompt');
+    const prodLight = document.getElementById('prod-light');
+    const scrollProgress = document.getElementById('scroll-progress');
+    const scrollHint = document.getElementById('scroll-hint');
+
+    const states = document.querySelectorAll('.state');
+    const bgScenes = document.querySelectorAll('.bg-scene');
+    const triggers = Array.from(document.querySelectorAll('.trigger[data-target]'));
+
+    const stateMap = {};
+    states.forEach(s => stateMap[s.dataset.state] = s);
+    const bgMap = {};
+    bgScenes.forEach(s => bgMap[s.dataset.scene] = s);
+
+    let currentState = null;
+    let typingTimer = null;
+
+    // === Typing engine ===
+    // Types a string into cmdText character-by-character, then resolves.
+    function typeText(target, delay = 35) {
+      return new Promise(resolve => {
+        clearTimeout(typingTimer);
+        cmdText.textContent = '';
+        ttyPrompt.classList.add('typing');
+        let i = 0;
+        const step = () => {
+          if (i < target.length) {
+            cmdText.textContent += target[i];
+            i++;
+            typingTimer = setTimeout(step, delay);
+          } else {
+            ttyPrompt.classList.remove('typing');
+            resolve();
+          }
+        };
+        step();
+      });
+    }
+
+    // Backspace: remove chars one by one from cmdText
+    function backspace(delay = 18) {
+      return new Promise(resolve => {
+        clearTimeout(typingTimer);
+        ttyPrompt.classList.add('typing');
+        const step = () => {
+          const current = cmdText.textContent;
+          if (current.length > 0) {
+            cmdText.textContent = current.slice(0, -1);
+            typingTimer = setTimeout(step, delay);
+          } else {
+            resolve();
+          }
+        };
+        step();
+      });
+    }
+
+    // === Line-by-line reveal of content ===
+    function revealLines(state) {
+      const lines = state.querySelectorAll('.line');
+      lines.forEach((line, i) => {
+        line.classList.remove('in');
+        setTimeout(() => line.classList.add('in'), i * 90);
+      });
+    }
+
+    function hideLines(state) {
+      state.querySelectorAll('.line').forEach(l => l.classList.remove('in'));
+    }
+
+    // === State transition ===
+    async function setTerminalState(target, trigger) {
+      if (currentState === target) return;
+      const prevState = currentState;
+      currentState = target;
+      console.log('[wow-v2] state →', target);
+
+      const path = trigger.dataset.path;
+      const promptText = trigger.dataset.prompt;
+      const meta = trigger.dataset.meta;
+
+      // 1. Hide current content (fade + hide lines)
+      const currentStateEl = prevState ? stateMap[prevState] : stateMap.hero;
+      if (currentStateEl) hideLines(currentStateEl);
+
+      // 2. Backspace the current prompt
+      await backspace(14);
+
+      // 3. Swap state + metadata
+      states.forEach(s => s.classList.remove('active'));
+      const nextState = stateMap[target];
+      if (nextState) nextState.classList.add('active');
+
+      sectionPath.textContent = path;
+      sectionMeta.textContent = meta;
+
+      // 4. Background scene crossfade
+      bgScenes.forEach(s => s.classList.remove('active'));
+      if (bgMap[target]) bgMap[target].classList.add('active');
+
+      // 5. Prod light activates for case studies
+      prodLight.classList.toggle('active', target === 'case');
+
+      // 6. Aside terminal visibility + main terminal shift (only in about)
+      if (target === 'about') {
+        terminal.classList.add('shifted');
+        asideTerminal.classList.add('visible');
+      } else {
+        terminal.classList.remove('shifted');
+        asideTerminal.classList.remove('visible');
+      }
+
+      // 7. Type the new prompt
+      await typeText(promptText, 32);
+
+      // 8. After a brief Enter pause, reveal content line-by-line
+      setTimeout(() => {
+        if (nextState) revealLines(nextState);
+      }, 180);
+    }
+
+    // === Scroll-driven state detection ===
+    function updateFromScroll() {
+      const viewportCenter = window.scrollY + window.innerHeight / 2;
+      let active = null;
+
+      for (const t of triggers) {
+        const rect = t.getBoundingClientRect();
+        const top = window.scrollY + rect.top;
+        const bottom = top + rect.height;
+        if (viewportCenter >= top && viewportCenter <= bottom) {
+          active = t;
+          break;
+        }
+      }
+      if (!active) active = triggers[0];
+
+      if (active.dataset.target !== currentState) {
+        setTerminalState(active.dataset.target, active);
+      }
+
+      const total = document.documentElement.scrollHeight - window.innerHeight;
+      const pct = total > 0 ? (window.scrollY / total) * 100 : 0;
+      scrollProgress.style.setProperty('--progress', `${pct}%`);
+
+      if (window.scrollY > 50) scrollHint.classList.add('hidden');
+      else scrollHint.classList.remove('hidden');
+    }
+
+    let scrollTicking = false;
+    window.addEventListener('scroll', () => {
+      if (!scrollTicking) {
+        requestAnimationFrame(() => {
+          updateFromScroll();
+          scrollTicking = false;
+        });
+        scrollTicking = true;
+      }
+    }, { passive: true });
+    window.addEventListener('resize', updateFromScroll, { passive: true });
+
+    // === Initial hero entrance: type prompt then reveal lines ===
+    async function playHeroEntrance() {
+      const heroTrigger = triggers[0];
+      currentState = 'hero';
+      sectionPath.textContent = heroTrigger.dataset.path;
+      sectionMeta.textContent = heroTrigger.dataset.meta;
+      // Small pause so the preloader is fully gone
+      await new Promise(r => setTimeout(r, 700));
+      await typeText(heroTrigger.dataset.prompt, 38);
+      setTimeout(() => {
+        // Reveal hero lines + trigger rise animation for the monster title
+        const hero = stateMap.hero;
+        revealLines(hero);
+        const heroLines = hero.querySelectorAll('.hero-line');
+        heroLines.forEach((line, i) => {
+          setTimeout(() => line.classList.add('rise'), i * 100);
+        });
+      }, 260);
+    }
+    playHeroEntrance();
+
+    // === Cursor parallax on hero only ===
+    const heroState = stateMap.hero;
+    let parallaxTicking = false;
+    document.addEventListener('mousemove', (e) => {
+      if (currentState !== 'hero') return;
+      if (parallaxTicking) return;
+      parallaxTicking = true;
+      requestAnimationFrame(() => {
+        const x = (e.clientX / window.innerWidth - 0.5) * 12;
+        const y = (e.clientY / window.innerHeight - 0.5) * 8;
+        heroState.style.transition = 'transform 0.9s cubic-bezier(0.16,1,0.3,1)';
+        heroState.style.transform = `translate(${x}px, ${y}px)`;
+        parallaxTicking = false;
+      });
+    });
+
+    // === Debug handles ===
+    window.__wow2 = {
+      setTerminalState,
+      triggers,
+      currentState: () => currentState,
+      updateFromScroll,
+      typeText,
+      backspace,
+    };
+    console.log('[wow-v2] ready. Scroll to execute commands. window.__wow2 for debug.');
+  </script>
+
+  <!-- Sprint 1 v3: Rive runtime + loaders for traffic-lights canvas -->
+  <script src="https://unpkg.com/@rive-app/canvas@2.17.3"></script>
+  <script>
+  (function() {
+    if (typeof rive === 'undefined' || !rive.Rive) return;
+    var tlc = document.getElementById('rive-traffic-lights');
+    if (tlc) {
+      try {
+        new rive.Rive({
+          src: '/design-explorations/rive-preview/traffic-lights.riv',
+          canvas: tlc,
+          autoplay: true,
+          artboard: 'TrafficLights',
+          animations: ['LivePulse']
+        });
+      } catch(e) { console.error('rive traffic-lights load failed', e); }
+    }
+    var crc = document.getElementById('rive-cursor');
+    if (crc) {
+      try {
+        new rive.Rive({
+          src: '/design-explorations/rive-preview/typing-cursor.riv',
+          canvas: crc,
+          autoplay: true,
+          artboard: 'TypingCursor',
+          animations: ['Blink']
+        });
+      } catch(e) { console.error('rive cursor load failed', e); }
+    }
+  })();
+  </script>
+</body>
+</html>
