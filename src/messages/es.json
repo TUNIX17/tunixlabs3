@@ -450,5 +450,142 @@
     "cancel": "Cancelar",
     "confirm": "Confirmar",
     "back": "Volver"
+  },
+  "KineticSwiss": {
+    "terminal": {
+      "brand": "TUNIXLABS",
+      "navHint": "scroll para ejecutar",
+      "lights": { "close": "local", "live": "live", "prod": "prod" }
+    },
+    "states": {
+      "hero": {
+        "prompts": ["./production --show-portfolio", "./production --live", "tail -f ./operations.log"],
+        "command": "./production --show-portfolio",
+        "meta": "uptime 15y 03m",
+        "path": "production",
+        "headline": {
+          "lines": ["SOFTWARE", "QUE CORRE EN", "PRODUCCIÓN.", "NADA MÁS."],
+          "accentLine": 3,
+          "outlineLine": 1
+        },
+        "metaGrid": [
+          { "label": "Base", "value": "Santiago, CL" },
+          { "label": "Operando hace", "value": "15 años" },
+          { "label": "Credenciales", "value": "MSc Finanzas\nMIT Prof Ed" },
+          { "label": "Industrias", "value": "Minería\nMetalurgia\nTributario" }
+        ]
+      },
+      "services": {
+        "prompts": ["cat ./services.json | jq '.items[]'", "ls ./services/", "./services --list --active"],
+        "command": "cat ./services.json | jq '.items[]'",
+        "meta": "7 áreas en producción",
+        "path": "services",
+        "title": { "text": "Lo que entrego.", "acidWord": "entrego." },
+        "count": "Áreas totales",
+        "totalNumber": "07",
+        "items": [
+          { "num": "01 / 07", "title": "Voice AI y\nasistentes", "anchor": "195+ operarios en prod" },
+          { "num": "02 / 07", "title": "BI operacional\ny dashboards", "anchor": "19,778 órdenes de trabajo" },
+          { "num": "03 / 07", "title": "SaaS\nverticales", "anchor": "Apoderapp, Speakly" },
+          { "num": "04 / 07", "title": "Consultoría\nIA", "anchor": "Agente_Tunix (7 proyectos)" },
+          { "num": "05 / 07", "title": "Automatización\n(RPA)", "anchor": "4,040 códigos · 88.7%" },
+          { "num": "06 / 07", "title": "ML\naplicado", "anchor": "MIT Prof Ed" },
+          { "num": "07 / 07", "title": "ERP custom\ne integraciones", "anchor": "Empresa de 50 años" }
+        ]
+      },
+      "caseStudies": {
+        "prompts": ["./case-studies/{id}.run --metrics", "cat ./case-studies/{id}.md", "./case-studies --show {id}"],
+        "command": "./case-studies/{id}.run --metrics",
+        "meta": "5 sistemas en producción",
+        "path": "case-studies",
+        "cases": [
+          {
+            "id": "schwager",
+            "badge": "En producción · Servicios mineros, vía partner técnico",
+            "title": { "text": "Voice AI\nen faena a 100ms.", "copperWords": "a 100ms." },
+            "metrics": [
+              { "label": "Operarios de faena", "value": "195+" },
+              { "label": "Rutas diarias", "value": "4,000+" },
+              { "label": "Cuadrillas", "value": "7" },
+              { "label": "Tiempo de respuesta", "value": "100ms" }
+            ],
+            "imageRef": "/case-studies/sgm-schwager-hero.png",
+            "stack": ["React", "TypeScript", "PostgreSQL", "Google Gemini", "Capacitor"]
+          },
+          {
+            "id": "sime",
+            "badge": "En producción · Contratistas en operaciones mineras críticas en Chile",
+            "title": { "text": "19,778 órdenes\nde trabajo.", "copperWords": "19,778" },
+            "metrics": [
+              { "label": "Órdenes de trabajo", "value": "19,778" },
+              { "label": "Actividades", "value": "115K+" },
+              { "label": "Pautas de seguridad", "value": "1,056" }
+            ],
+            "imageRef": "/case-studies/sime-platform.png",
+            "stack": ["Turborepo", "Fastify", "React", "PostgreSQL", "AWS S3"]
+          },
+          {
+            "id": "apoderapp",
+            "badge": "En producción · Producto propio",
+            "title": { "text": "Facturación SII\ncon 88+ tests.", "copperWords": "88+ tests." },
+            "metrics": [
+              { "label": "Agentes Claude Code", "value": "5" },
+              { "label": "Tests sii-factura", "value": "88+" },
+              { "label": "Estado", "value": "PWA en producción" }
+            ],
+            "imageRef": "/case-studies/apoderapp-presidenta-dark.png",
+            "stack": ["Next.js", "React", "Prisma", "SII XML/CAF", "Claude Code"]
+          },
+          {
+            "id": "fernandez",
+            "badge": "En producción · Empresa metalúrgica de 50 años",
+            "title": { "text": "ERP que reemplazó\nExcel área por área.", "copperWords": "área por área." },
+            "metrics": [
+              { "label": "Tipo", "value": "ERP full-stack" },
+              { "label": "Digitalización", "value": "OCR + QR + LLM Vision" },
+              { "label": "SII", "value": "Integrado" }
+            ],
+            "imageRef": "/case-studies/fernandez-erp-dashboard.png",
+            "stack": ["Next.js", "Prisma", "PostgreSQL", "Claude Code", "SII XML"]
+          },
+          {
+            "id": "gasDistribution",
+            "badge": "En producción · Distribuidora regional de gas",
+            "title": { "text": "4,040 códigos\nal 88.7%.", "copperWords": "88.7%." },
+            "metrics": [
+              { "label": "Códigos procesados", "value": "4,040" },
+              { "label": "Tasa de éxito", "value": "88.7%" },
+              { "label": "Rutas automatizadas", "value": "14" }
+            ],
+            "imageRef": "/case-studies/gas-distribution.png",
+            "stack": ["Express", "Prisma", "React", "PostgreSQL"]
+          }
+        ]
+      },
+      "about": {
+        "prompts": ["whoami && cat ./bio.md", "./about --full", "cat ./alejandro.md"],
+        "command": "whoami && cat ./bio.md",
+        "meta": "MSc Finanzas · MIT Prof Ed",
+        "path": "about",
+        "header": "Alejandro Moyano Foncea · MSc Finanzas + MIT Prof Ed · 15 años liderando operaciones reales",
+        "title": { "text": "No soy un studio. Soy una persona que construye.", "acidWord": "construye." },
+        "bioParagraph1": "Resuelvo ineficiencias operativas construyendo software a medida. A diferencia de un dev tradicional, no escribo código a mano durante semanas — uso workflows agénticos sobre Claude Code para diseñar y entregar sistemas de producción en una fracción del tiempo. Mi background no es solo tecnología, es negocio: MSc en Finanzas, <mit>MIT Professional Education</mit> en AI/ML y 15 años liderando proyectos reales antes de escribir código en serio.",
+        "bioParagraph2": "Por eso entiendo el *por qué* detrás del software, no solo el *cómo*. He entregado desde plataformas de mantenimiento para gran minería chilena y ERPs custom para industria pesada, hasta apps de gestión para centros educativos y modernización de sistemas legacy de décadas. Convierto el trabajo manual y de papel en herramientas digitales que de verdad mueven el indicador — no demos, no pitch decks, sistemas operando hoy.",
+        "italicQuote": "Entiendo el por qué detrás del software, no solo el cómo.",
+        "portraitRef": "/team/alejandro-moyano.png",
+        "asidePath": "portrait.jpg",
+        "asideCaption": "alejandro.portrait.jpg\n2048×2560 · editorial b&w · Feb 2026"
+      },
+      "contact": {
+        "prompts": ["./contact --method=any", "./contact --reply-in 24h", "echo $WHATSAPP && ./contact --send"],
+        "command": "./contact --method=any",
+        "meta": "respondo < 24h",
+        "path": "contact",
+        "title": { "text": "¿Tienes algo que sacar a producción?", "acidWord": "producción?" },
+        "subtitle": "Respondo en menos de 24h. Sin formularios interminables.",
+        "ctaPrimary": "Escríbeme por WhatsApp",
+        "ctaSecondary": "Ir al formulario"
+      }
+    }
   }
 }
