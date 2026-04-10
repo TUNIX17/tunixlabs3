@@ -1,6 +1,7 @@
 'use client';
 
 import { useTranslations, useLocale } from 'next-intl';
+import { RiveWithFallback } from '../rive/RiveWithFallback';
 import styles from '../kineticSwiss.module.css';
 
 interface ContactStateProps {
@@ -45,6 +46,17 @@ export function ContactState({ active }: ContactStateProps) {
         >
           {subtitle}
         </p>
+        {/* Voice AI waveform — Rive micro-animation */}
+        <div
+          className={lineClass}
+          style={{ transitionDelay: active ? '240ms' : '0ms', width: 200, height: 40, margin: '16px auto' }}
+        >
+          <RiveWithFallback
+            src="/design-explorations/rive/voice-waveform.riv"
+            className={styles.voiceWaveform}
+            fallback={<div style={{ width: 200, height: 40, background: 'transparent' }} />}
+          />
+        </div>
         <div
           className={`${styles.ctaRow} ${lineClass}`}
           style={{ transitionDelay: active ? '280ms' : '0ms' }}

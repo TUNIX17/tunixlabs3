@@ -334,11 +334,13 @@
 .monster {
   font-family: 'Archivo Black', sans-serif;
   font-weight: 900;
-  font-size: clamp(52px, 12vw, 190px);
-  line-height: 0.82;
-  letter-spacing: -0.055em;
+  font-size: clamp(28px, 7.5vw, 140px);
+  line-height: 0.88;
+  letter-spacing: -0.04em;
   text-transform: uppercase;
   color: var(--ink);
+  max-width: 100%;
+  overflow-wrap: break-word;
 }
 
 .heroLine {
@@ -849,18 +851,18 @@
 }
 
 .trigger {
-  height: 100vh;
+  height: 60vh;
   width: 100%;
   display: block;
   pointer-events: none;
 }
 
 .triggerFirst {
-  height: 80vh;
+  height: 50vh;
 }
 
 .triggerSpacer {
-  height: 30vh;
+  height: 20vh;
 }
 
 /* ============ SCROLL PROGRESS BAR ============ */
@@ -926,27 +928,68 @@
 .preloader {
   position: fixed;
   inset: 0;
-  background: var(--paper);
   z-index: 1000;
   display: flex;
   align-items: center;
   justify-content: center;
+  background: var(--paper);
+  transition: opacity 0.5s cubic-bezier(0.2, 0.9, 0.25, 1);
+}
+
+.preloaderBoot {
+  background: #0a0a0a;
 }
 
 .preloaderDone {
   opacity: 0;
   pointer-events: none;
-  /* 500ms = TIMING.PRELOAD_FADE_OUT_MS, 400ms delay = TIMING.PRELOAD_DISMISS_DELAY_MS */
-  transition: opacity 0.5s 0.4s;
 }
 
-.preloaderDot {
-  width: 14px;
-  height: 14px;
-  border-radius: 50%;
-  background: var(--acid-deep);
-  /* 900ms = TIMING.PRELOAD_PULSE_MS */
-  animation: preloadPulse 0.9s ease-in-out infinite;
+.bootTerminal {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 14px;
+  color: var(--acid);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.bootLine {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.bootPrompt {
+  color: rgba(204, 255, 0, 0.5);
+}
+
+.bootCursor {
+  width: 8px;
+  height: 16px;
+  background: var(--acid);
+  animation: bootBlink 0.6s steps(2) infinite;
+}
+
+.bootText {
+  animation: bootType 0.6s steps(22) forwards;
+  overflow: hidden;
+  white-space: nowrap;
+  width: 0;
+}
+
+.bootLineTyping .bootCursor {
+  display: none;
+}
+
+@keyframes bootBlink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+@keyframes bootType {
+  from { width: 0; }
+  to { width: 22ch; }
 }
 
 @keyframes preloadPulse {
@@ -1037,17 +1080,39 @@
   }
 }
 
+/* ============ TABLET ============ */
+@media (max-width: 1200px) {
+  .servicesGrid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+
+  .svc {
+    grid-column: auto !important;
+    border-right: none;
+  }
+
+  .svc:nth-child(odd) {
+    border-right: 1.5px solid var(--ink);
+  }
+
+  .monster {
+    font-size: clamp(28px, 7vw, 100px);
+  }
+}
+
 /* ============ MOBILE ============ */
 @media (max-width: 768px) {
   .terminal {
-    width: calc(100vw - 20px) !important;
-    height: calc(100vh - 90px) !important;
+    width: calc(100vw - 16px) !important;
+    height: calc(100vh - 80px) !important;
     max-width: none;
     max-height: none;
     transform: translate(-50%, -50%) !important;
+    border-radius: 10px;
   }
 
   .terminalShifted {
+    width: calc(100vw - 16px) !important;
     transform: translate(-50%, -50%) !important;
   }
 
@@ -1056,17 +1121,18 @@
   }
 
   .ttyBody {
-    padding: 20px 24px;
+    padding: 16px 20px;
   }
 
   .monster {
-    font-size: 14vw;
+    font-size: clamp(24px, 10vw, 60px);
+    line-height: 0.92;
   }
 
   .heroMeta {
     grid-template-columns: repeat(2, 1fr);
-    gap: 16px;
-    margin-top: 28px;
+    gap: 12px;
+    margin-top: 20px;
   }
 
   .servicesGrid {
@@ -1076,12 +1142,16 @@
   .svc {
     grid-column: 1 / -1 !important;
     border-right: none !important;
-    min-height: 110px;
+    min-height: 80px;
     padding: 14px;
   }
 
   .servicesCountNumber {
     font-size: 36px;
+  }
+
+  .ttyTopbar {
+    padding: 8px 12px;
   }
 }
 

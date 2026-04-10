@@ -84,6 +84,13 @@ export function KineticSwissPage({ locale: _locale }: KineticSwissPageProps) {
     setHasScrollTimeline(supportsScrollTimeline());
   }, []);
 
+  // Hide the layout's default header — KineticSwiss has its own nav
+  useEffect(() => {
+    const header = document.querySelector('header');
+    if (header) header.style.display = 'none';
+    return () => { if (header) header.style.display = ''; };
+  }, []);
+
   // ── Read i18n data ──────────────────────────────────────────────
   const heroState = {
     prompts: t.raw('states.hero.prompts') as string[],
@@ -284,6 +291,8 @@ export function KineticSwissPage({ locale: _locale }: KineticSwissPageProps) {
           topBar={topBar}
           prompt={prompt}
           promptTyping={promptTyping}
+          trafficState={activeScene === 'case' ? 3 : 1}
+          cursorState={promptTyping ? 1 : 0}
         >
           {/* Hero */}
           <HeroState

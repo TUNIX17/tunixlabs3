@@ -2,41 +2,54 @@
 
 import { useState, useEffect } from 'react';
 import { TIMING } from './timing';
-import { RiveWithFallback } from './rive/RiveWithFallback';
 import styles from './kineticSwiss.module.css';
 
 /**
- * Full-screen preloader overlay with a pulsing dot.
- * Auto-dismisses after fonts + a short delay, then fades out.
- * Uses Rive animation (preloader-dot.riv) with CSS fallback.
+ * Terminal boot preloader — dark screen with cursor blink + typing,
+ * then fades to reveal the terminal. Pure CSS, no Rive dependency.
+ * The Rive logo splash (logo-splash.riv) is loaded separately if available.
  */
 export function Preloader() {
-  const [done, setDone] = useState(false);
+  const [phase, setPhase] = useState<'boot' | 'typing' | 'done'>('boot');
 
   useEffect(() => {
-    // Wait for fonts, then dismiss after a brief pause
-    const dismiss = () => {
-      // Small delay so the pulse is visible
-      setTimeout(() => setDone(true), TIMING.PRELOAD_DISMISS_DELAY_MS);
-    };
+    // Phase 1: cursor blinks on dark screen (600ms)
+    const t1 = setTimeout(() => setPhase('typing'), 600);
+    // Phase 2: "initializing..." types out (800ms)
+    const t2 = setTimeout(() => {
+      // Wait for fonts before dismissing
+      const dismiss = () => setPhase('done');
+      if (typeof document !== 'undefined' && document.fonts) {
+        document.fonts.ready.then(dismiss);
+      } else {
+        dismiss();
+      }
+    }, 600 + 800 + TIMING.PRELOAD_DISMISS_DELAY_MS);
 
-    if (typeof document !== 'undefined' && document.fonts) {
-      document.fonts.ready.then(dismiss);
-    } else {
-      dismiss();
-    }
+    return () => {
+      clearTimeout(t1);
+      clearTimeout(t2);
+    };
   }, []);
 
-  const className = `${styles.preloader}${done ? ` ${styles.preloaderDone}` : ''}`;
+  const rootClass = `${styles.preloader} ${styles.preloaderBoot}${
+    phase === 'done' ? ` ${styles.preloaderDone}` : ''
+  }`;
 
   return (
-    <div className={className}>
-      <RiveWithFallback
-        src="/design-explorations/rive/preloader-dot.riv"
-        stateMachine="State Machine 1"
-        className={styles.preloaderDot}
-        fallback={<div className={styles.preloaderDot} />}
-      />
+    <div className={rootClass}>
+      <div className={styles.bootTerminal}>
+        <div className={styles.bootLine}>
+          <span className={styles.bootPrompt}>{'>'}</span>
+          <span className={styles.bootCursor} />
+        </div>
+        {(phase === 'typing' || phase === 'done') && (
+          <div className={`${styles.bootLine} ${styles.bootLineTyping}`}>
+            <span className={styles.bootPrompt}>{'>'}</span>
+            <span className={styles.bootText}>initializing system...</span>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
