@@ -5,6 +5,8 @@ import { routing } from '@/i18n/routing';
 import { Link } from '@/i18n/navigation';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
 import '../../styles/globals.css';
+// Kinetic Swiss v3 design tokens (paper/ink/acid palette).
+import '../../styles/kinetic-swiss-vars.css';
 // Motion layer lives separate from globals so we can iterate on it without
 // touching the rest of the neu design system. Imported AFTER globals so the
 // cascade gives it the last word on animated properties.

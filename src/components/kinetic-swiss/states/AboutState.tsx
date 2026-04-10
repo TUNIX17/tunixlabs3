@@ -3,64 +3,28 @@
 import { useTranslations } from 'next-intl';
 import styles from '../kineticSwiss.module.css';
 
-interface AboutStateProps {
-  active: boolean;
-}
-
-export function AboutState({ active }: AboutStateProps) {
+export function AboutState({ active }: { active: boolean }) {
   const t = useTranslations('KineticSwiss.states.about');
-  const header = t('header');
-  const titleText = t('title.text');
-  const bioParagraph1 = t.rich('bioParagraph1', {
-    mit: (chunks) => <strong>{chunks}</strong>,
-  });
-  const bioParagraph2 = t('bioParagraph2');
-  const italicQuote = t('italicQuote');
-
-  const stateClass = `${styles.state} ${styles.stateAbout}${
-    active ? ` ${styles.stateActive}` : ''
-  }`;
-
-  const lineClass = (active: boolean) =>
-    `${styles.line}${active ? ` ${styles.lineIn}` : ''}`;
+  const lc = `${styles.line}${active ? ` ${styles.lineIn}` : ''}`;
 
   return (
-    <div className={stateClass}>
-      <div
-        className={`${styles.aboutHeader} ${lineClass(active)}`}
-        style={{ transitionDelay: active ? '100ms' : '0ms' }}
-      >
-        {header}
+    <div className={`${styles.state} ${styles.stateAbout}${active ? ` ${styles.stateActive}` : ''}`}>
+      <div className={`${styles.aboutHeader} ${lc}`} style={{ transitionDelay: active ? '100ms' : '0ms' }}>
+        {t('header')}
       </div>
-
-      <h2
-        className={`${styles.aboutTitle} ${lineClass(active)}`}
-        style={{ transitionDelay: active ? '190ms' : '0ms' }}
-      >
-        {titleText}
+      <h2 className={`${styles.aboutTitle} ${lc}`} style={{ transitionDelay: active ? '190ms' : '0ms' }}>
+        {t('title.text')}
       </h2>
-
-      <p
-        className={`${styles.aboutBody} ${lineClass(active)}`}
-        style={{ transitionDelay: active ? '280ms' : '0ms' }}
-      >
-        {bioParagraph1}
+      <p className={`${styles.aboutBody} ${lc}`} style={{ transitionDelay: active ? '280ms' : '0ms' }}>
+        {t.rich('bioParagraph1', { mit: (chunks) => <strong>{chunks}</strong> })}
       </p>
-
-      {bioParagraph2 && (
-        <p
-          className={`${styles.aboutBody} ${lineClass(active)}`}
-          style={{ transitionDelay: active ? '370ms' : '0ms' }}
-        >
-          {bioParagraph2}
+      {t('bioParagraph2') && (
+        <p className={`${styles.aboutBody} ${lc}`} style={{ transitionDelay: active ? '370ms' : '0ms' }}>
+          {t('bioParagraph2')}
         </p>
       )}
-
-      <p
-        className={`${styles.aboutItalic} ${lineClass(active)}`}
-        style={{ transitionDelay: active ? `${bioParagraph2 ? 460 : 370}ms` : '0ms' }}
-      >
-        {italicQuote}
+      <p className={`${styles.aboutItalic} ${lc}`} style={{ transitionDelay: active ? '460ms' : '0ms' }}>
+        {t('italicQuote')}
       </p>
     </div>
   );

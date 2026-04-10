@@ -12,10 +12,10 @@
   },
   "HomePage": {
     "hero": {
-      "title1": "Software",
-      "title2": "que opera en producción",
-      "title3": "para industrias reguladas",
-      "description": "Soy Alejandro. 15 años corriendo proyectos reales — maestranza, retail, minería — y hoy entrego sistemas de producción con workflows agénticos sobre Claude Code. Trabajo con contratistas mineros, firmas auditoras y mi propio SaaS de gestión escolar.",
+      "title1": "Construyo los sistemas",
+      "title2": "que hacen funcionar",
+      "title3": "empresas reales.",
+      "description": "Minería, energía, educación — cuando Excel ya no alcanza, yo llego. 15 años operando negocios reales antes de escribir código. MSc Finanzas + MIT AI/ML. Hoy entrego sistemas de producción con IA agéntica.",
       "cta": {
         "contact": "Hablemos por WhatsApp",
         "services": "Ver lo que construí"
@@ -27,16 +27,16 @@
     },
     "caseStudies": {
       "badge": "En producción",
-      "title": "Sistemas reales, no demos de pitch",
-      "subtitle": "Software que una persona revisa todos los días a las 7 de la mañana.",
+      "title": "Sistemas que alguien usa hoy",
+      "subtitle": "No demos. No pitch decks. Software que alguien revisa a las 7 de la mañana.",
       "stack": "Stack",
       "disclaimer": "TunixLabs actúa como partner técnico de firmas seleccionadas. Los nombres de clientes en estos casos refieren al partner directo que encarga el desarrollo, no al usuario final del software.",
       "cards": {
         "sime": {
-          "client": "Contratistas en operaciones mineras críticas en Chile",
-          "problem": "Pautas de seguridad, mantenciones preventivas y órdenes de trabajo corriendo en papel y planillas, sin trazabilidad digital entre la faena y la oficina central.",
-          "solution": "Reemplazo completo del sistema legacy: 1,056 pautas, checklists por actividad, PDFs firmados con QR, navegación histórica de KPIs y auditoría completa por turno minero.",
-          "metric": "19,778 órdenes de trabajo · 115K+ actividades · 116K+ sub-actividades",
+          "client": "Contratistas en operaciones mineras de cobre en Chile",
+          "problem": "Miles de ordenes de trabajo en papel entre la faena y la oficina. Sin trazabilidad, sin auditoria.",
+          "solution": "Sistema digital completo: los operarios firman con QR en terreno. Supervisores aprueban desde el celular. Auditoria automatica por turno.",
+          "metric": "4,000 hojas de ruta digitales al dia · Cero papel en faena",
           "stack": [
             "Turborepo",
             "Fastify",
@@ -46,10 +46,10 @@
           ]
         },
         "schwager": {
-          "client": "Schwager (servicios mineros, vía partner técnico)",
-          "problem": "Firmas legales de mantención en faenas mineras remotas, con conectividad intermitente y formularios en papel que se extraviaban antes de llegar a auditoría.",
-          "solution": "App mobile offline-first con Voice AI sobre Google Gemini — los operarios completan formularios de seguridad hablando, sin sacarse los guantes. Firma multicanal (email, WhatsApp, web, mobile) con audit trail completo y parser inteligente de exports SAP que detecta órdenes canceladas.",
-          "metric": "195+ operarios de faena · 7 cuadrillas de mantenimiento · 4,000+ rutas y firmas diarias · 90%+ reducción de uso de memoria · respuestas bajo 100ms",
+          "client": "Schwager (servicios mineros, via partner tecnico)",
+          "problem": "Operarios con guantes y lluvia no pueden llenar formularios de seguridad en el celular. Los papeles se pierden antes de llegar a auditoria.",
+          "solution": "Voice AI: los operarios completan formularios hablando. Sin sacarse los guantes, sin depender de señal. Firma legal via email, WhatsApp o web.",
+          "metric": "195+ operarios hablan en vez de escribir · Respuestas bajo 100ms",
           "stack": [
             "React",
             "TypeScript",
@@ -60,9 +60,9 @@
         },
         "gasDistribution": {
           "client": "Distribuidora regional de gas en Chile",
-          "problem": "Validación manual de códigos de quema en 14 rutas de reparto, con errores de transcripción y horas diarias de re-proceso antes de facturar.",
-          "solution": "Bot de procesamiento automático con validación contra reglas de negocio, dashboard de métricas por ruta y reportería diaria. Commodity hardware, sin licencias enterprise.",
-          "metric": "4,040 códigos procesados · 88.7% tasa de éxito · 14 rutas automatizadas",
+          "problem": "14 repartidores pierden 2 horas al dia transcribiendo codigos de descuento a mano. Errores de tipeo = entregas fallidas.",
+          "solution": "Un bot recibe la foto del codigo por WhatsApp, lo lee con IA, y lo quema automaticamente. El repartidor sigue en la ruta.",
+          "metric": "De 5 min por codigo a 30 segundos · 14 repartidores en ruta",
           "stack": [
             "Express",
             "Prisma",
@@ -72,9 +72,9 @@
         },
         "apoderapp": {
           "client": "Apoderapp (producto propio)",
-          "problem": "Centros de padres de colegios chilenos sin canal digital para cuotas, pagos y votaciones, corriendo todo en Excel y WhatsApp.",
-          "solution": "PWA construida con pipelines de agentic coding sobre Claude Code — 5 agentes especializados. Como feature de compliance, incluye una librería sii-factura reusable (facturación electrónica chilena con 88+ tests), pero el core es la gestión del centro de padres. Diseñado para escalar a LATAM.",
-          "metric": "PWA en producción · 5 agentes Claude Code · sii-factura library con 88+ tests como feature",
+          "problem": "Tesoreros de cursos escolares cobran cuotas con Excel y fotos por WhatsApp. Caos, sin comprobantes, sin transparencia.",
+          "solution": "Plataforma WhatsApp-first: padres envian foto del comprobante, IA lo lee y registra automaticamente. Tesorero aprueba con un click. Reportes de transparencia publicos.",
+          "metric": "Cobranza escolar sin Excel · Verificacion automatica de comprobantes",
           "stack": [
             "Next.js",
             "React",
@@ -84,10 +84,10 @@
           ]
         },
         "fernandezMetallurgic": {
-          "client": "Maestranza Fernández (empresa metalúrgica, 50 años)",
-          "problem": "Operación completa corriendo en Excel — RRHH, asistencia, finanzas, control de proyectos, CRM — durante ausencia de los dueños, sin un ERP que reflejara el estado real del negocio.",
-          "solution": "ERP custom con IA que reemplazó el Excel en cada área. Pipelines de OCR, QR y LLM Vision para digitalizar documentos en planta. Lideré la transformación digital end-to-end durante el desarrollo.",
-          "metric": "ERP full-stack construido solo · OCR + QR + LLM Vision en producción · transformación digital end-to-end",
+          "client": "Maestranza Fernandez (empresa metalurgica, 50 anos)",
+          "problem": "50 anos de empresa corriendo en Excel: RRHH, finanzas, proyectos, CRM. Los duenos viajaron y nadie sabia el estado real del negocio.",
+          "solution": "ERP a medida que reemplazo cada Excel. OCR lee facturas, QR identifica herramientas, IA extrae datos de documentos en planta. Un solo sistema para todo.",
+          "metric": "50 anos de Excel reemplazados · Un sistema, toda la empresa",
           "stack": [
             "Next.js",
             "Prisma",
@@ -102,34 +102,34 @@
       "title": "Portafolio en producción",
       "slots": {
         "sgmSchwager": {
-          "label": "Gestión de mantenimiento en faena",
-          "metric": "195+ operarios · 4,000+ rutas diarias · Voice AI con Google Gemini"
+          "label": "Voice AI para faenas mineras",
+          "metric": "Operarios llenan formularios hablando, con guantes y lluvia"
         },
         "apoderappDark": {
-          "label": "SaaS de gestión para centros de padres",
-          "metric": "PWA propia · 5 agentes Claude Code · feature sii-factura con 88+ tests"
+          "label": "Cobranza escolar por WhatsApp",
+          "metric": "Tesoreros cobran cuotas sin Excel. IA verifica comprobantes."
         },
         "fernandezErp": {
           "label": "ERP a medida para maestranza",
-          "metric": "50 años de empresa · Excel reemplazado área por área · OCR + QR + LLM Vision"
+          "metric": "50 anos de Excel reemplazados. Un sistema, toda la empresa."
         },
         "speakly": {
-          "label": "Aprender inglés con IA",
-          "metric": "Producto propio · Turborepo + Voice AI · rutas personalizadas"
+          "label": "Academia de ingles con IA",
+          "metric": "Practica con avatar AI + clases con profesor y copiloto IA"
         },
         "gasDistribution": {
-          "label": "Automatización de distribución de gas",
-          "metric": "4,040 códigos · 88.7% de éxito · 14 rutas automatizadas"
+          "label": "Bot de codigos para repartidores",
+          "metric": "Foto del codigo por WhatsApp → quemado automatico en 30 seg"
         }
       }
     },
     "about": {
       "badge": "Sobre el founder",
-      "title": "No soy un studio. Soy una persona que construye.",
+      "title": "Una persona. Siete sistemas en produccion.",
       "name": "Alejandro Moyano Foncea",
-      "roleLine": "Operador chileno · MSc Finanzas + MIT Professional Education · 15 años corriendo proyectos antes de escribir código",
-      "bioParagraph1": "Resuelvo ineficiencias operativas construyendo software a medida. A diferencia de un dev tradicional, no escribo código a mano durante semanas — uso workflows agénticos sobre Claude Code para diseñar y entregar sistemas de producción en una fracción del tiempo. Mi background no es solo tecnología, es negocio: MSc en Finanzas, <mit>MIT Professional Education</mit> en AI/ML y 15 años liderando proyectos reales antes de escribir código en serio.",
-      "bioParagraph2": "Por eso entiendo el *por qué* detrás del software, no solo el *cómo*. He entregado desde plataformas de mantenimiento para gran minería chilena y ERPs custom para industria pesada, hasta apps de gestión para centros educativos y modernización de sistemas legacy de décadas. Convierto el trabajo manual y de papel en herramientas digitales que de verdad mueven el indicador — no demos, no pitch decks, sistemas operando hoy.",
+      "roleLine": "MSc Finanzas · MIT Professional Education AI/ML · 15 anos operando antes de codear",
+      "bioParagraph1": "No soy un studio ni una agencia. Soy una persona que entiende el negocio porque lo opero hace 15 anos — maestranzas, minas de cobre, distribuidoras de gas — y hoy construyo los sistemas que reemplazan el Excel, el papel y el caos manual. <mit>MIT Professional Education</mit> en AI/ML, MSc en Finanzas, y workflows agenticos sobre Claude Code.",
+      "bioParagraph2": "Entiendo el *por que* detras del software, no solo el *como*. Cada sistema que entrego resuelve un problema que vi con mis propios ojos: operarios que no pueden escribir con guantes, tesoreros ahogados en comprobantes, talleres de 50 anos sin visibilidad de sus numeros. No vendo tecnologia — vendo que tu operacion funcione mejor manana.",
       "linkedinLabel": "Ver en LinkedIn",
       "linkedinUrl": "https://www.linkedin.com/in/alejandro-moyano/"
     },

@@ -1,25 +1,18 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { useRive, Layout, Fit, Alignment } from '@rive-app/react-canvas';
 import styles from './kineticSwiss.module.css';
 
 /**
- * Logo splash preloader — Rive animation of the Tunixlabs dripping-T logo:
- *   1. Logo appears centered on dark background
- *   2. Pulses 2x with spring bounce
- *   3. Shrinks and flies to top-left corner (nav position)
- *   4. Background fades from dark to transparent
- *   5. Preloader dismisses, revealing the terminal
- *
- * Falls back to CSS terminal boot if Rive fails to load.
+ * Logo splash preloader — Rive dripping-T pulses + flies to nav corner.
+ * Falls back to CSS terminal boot if Rive fails.
  */
 export function Preloader() {
   const [done, setDone] = useState(false);
   const [riveFailed, setRiveFailed] = useState(false);
   const [cssPhase, setCssPhase] = useState<'boot' | 'typing' | 'done'>('boot');
 
-  // Rive logo splash animation
   const { RiveComponent } = useRive({
     src: '/design-explorations/rive/logo-splash.riv',
     artboard: 'Splash',
@@ -28,7 +21,6 @@ export function Preloader() {
     layout: new Layout({ fit: Fit.Cover, alignment: Alignment.Center }),
     onLoadError: () => setRiveFailed(true),
     onLoad: () => {
-      // Dismiss after animation duration (1.5s) + small buffer
       setTimeout(() => setDone(true), 1800);
     },
   });
@@ -38,29 +30,19 @@ export function Preloader() {
     if (!riveFailed) return;
     const t1 = setTimeout(() => setCssPhase('typing'), 600);
     const t2 = setTimeout(() => {
-      const dismiss = () => { setCssPhase('done'); setDone(true); };
-      if (typeof document !== 'undefined' && document.fonts) {
-        document.fonts.ready.then(dismiss);
-      } else {
-        dismiss();
-      }
+      setCssPhase('done');
+      setDone(true);
     }, 1800);
     return () => { clearTimeout(t1); clearTimeout(t2); };
   }, [riveFailed]);
 
-  const rootClass = `${styles.preloader}${riveFailed ? ` ${styles.preloaderBoot}` : ''}${
-    done ? ` ${styles.preloaderDone}` : ''
-  }`;
-
   return (
-    <div className={rootClass}>
+    <div className={`${styles.preloader}${done ? ` ${styles.preloaderDone}` : ''}`}>
       {!riveFailed ? (
-        /* Rive logo splash — full viewport */
-        <div style={{ position: 'absolute', inset: 0, background: '#0a0a0a' }}>
+        <div className={styles.preloaderRive}>
           <RiveComponent />
         </div>
       ) : (
-        /* CSS fallback — terminal boot */
         <div className={styles.bootTerminal}>
           <div className={styles.bootLine}>
             <span className={styles.bootPrompt}>{'>'}</span>
