@@ -5,9 +5,6 @@ import { routing } from '@/i18n/routing';
 import { Link } from '@/i18n/navigation';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
 import '../../styles/globals.css';
-// Kinetic Swiss v2 design tokens (paper/ink/acid palette).
-// Imported before animations so animation overrides cascade correctly.
-import '../../styles/kinetic-swiss-vars.css';
 // Motion layer lives separate from globals so we can iterate on it without
 // touching the rest of the neu design system. Imported AFTER globals so the
 // cascade gives it the last word on animated properties.
@@ -34,9 +31,6 @@ export async function generateMetadata({ params: { locale } }: Props) {
         es: 'https://tunixlabs.com/es',
         en: 'https://tunixlabs.com/en',
       },
-    },
-    other: {
-      'git-sha': process.env.NEXT_PUBLIC_COMMIT_SHA || 'development',
     },
   };
 }
