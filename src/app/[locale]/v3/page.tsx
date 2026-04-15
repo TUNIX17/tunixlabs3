@@ -1,8 +1,10 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import Image from 'next/image';
 import { useRive, useStateMachineInput, Layout, Fit, Alignment } from '@rive-app/react-canvas';
 import { useLocale } from 'next-intl';
+import { blurMap } from '@/generated/blurMap';
 import './v3.css';
 
 /* ══════════════════════════════════════════════════════════════
@@ -35,19 +37,23 @@ const HERO_EN = {
 };
 
 const CASES_ES: CaseData[] = [
-  { id: 'schwager', cmd: './cases --show schwager', badge: 'VOICE AI · MINERÍA', title: 'Operarios llenan formularios hablando.', desc: 'Con guantes, bajo la lluvia, sin señal. Voice AI sobre Google Gemini para faenas mineras.', metric: '195+ operarios · <100ms', image: '/case-studies/sgm-schwager-hero.png', color: '#b85c38', path: 'cases/schwager', meta: '195+ OPERARIOS' },
-  { id: 'sime', cmd: './cases --show sime', badge: 'MANTENIMIENTO · MINERÍA', title: '4,000 hojas de ruta digitales al día.', desc: 'Reemplazo completo del sistema legacy. QR en terreno, aprobación móvil, auditoría automática.', metric: 'Cero papel en faena', image: '/case-studies/sgm-schwager-semana.png', color: '#2d5a27', path: 'cases/sime', meta: '4K RUTAS/DÍA' },
-  { id: 'apoderapp', cmd: './cases --show apoderapp', badge: 'SAAS · EDUCACIÓN', title: 'Tesoreros cobran cuotas por WhatsApp.', desc: 'Padres envían foto del comprobante. IA lo lee y registra. Sin Excel, sin caos.', metric: 'Verificación automática', image: '/case-studies/apoderapp-presidenta-dark.png', color: '#5b21b6', path: 'cases/apoderapp', meta: 'PRODUCTO PROPIO' },
+  { id: 'apoderapp', cmd: './cases --show apoderapp', badge: 'SAAS · EDUCACIÓN', title: 'Tesoreros cobran cuotas por WhatsApp.', desc: 'Padres envían foto del comprobante. IA lo lee y registra. Sin Excel, sin caos.', metric: 'Verificación automática', image: '/cases/apoderapp/01.webp', color: '#5b21b6', path: 'cases/apoderapp', meta: 'PRODUCTO PROPIO' },
+  { id: 'fernandez', cmd: './cases --show fernandez', badge: 'ERP · MANUFACTURA', title: 'Transformación digital de una maestranza.', desc: 'OCR lee facturas, QR identifica herramientas, IA extrae datos. Un sistema, toda la empresa.', metric: 'Transformación completa', image: '/cases/fernandez/01.webp', color: '#92400e', path: 'cases/fernandez', meta: '50 AÑOS MIGRADOS' },
+  { id: 'schwager', cmd: './cases --show schwager', badge: 'VOICE AI · MINERÍA', title: 'Operarios llenan formularios hablando.', desc: 'Con guantes, bajo la lluvia, sin señal. Voice AI sobre Google Gemini para faenas mineras.', metric: '195+ operarios · <100ms', image: '/cases/schwager/01.webp', color: '#b85c38', path: 'cases/schwager', meta: '195+ OPERARIOS' },
+  { id: 'sime', cmd: './cases --show sime', badge: 'MANTENIMIENTO · MINERÍA', title: '4,000 hojas de ruta digitales al día.', desc: 'Reemplazo completo del sistema legacy. QR en terreno, aprobación móvil, auditoría automática.', metric: 'Cero papel en faena', image: '/cases/sime/01.webp', color: '#2d5a27', path: 'cases/sime', meta: '4K RUTAS/DÍA' },
   { id: 'gasco', cmd: './cases --show gasco', badge: 'AUTOMATIZACIÓN · ENERGÍA', title: 'De 5 min por código a 30 segundos.', desc: 'Repartidores envían foto por WhatsApp. Bot lee el código y lo quema automáticamente.', metric: '14 repartidores en ruta', image: '/case-studies/bot-gas-distribution.png', color: '#0369a1', path: 'cases/gasco', meta: '14 RUTAS' },
-  { id: 'fernandez', cmd: './cases --show fernandez', badge: 'ERP · MANUFACTURA', title: 'Transformación digital de una maestranza.', desc: 'OCR lee facturas, QR identifica herramientas, IA extrae datos. Un sistema, toda la empresa.', metric: 'Transformación completa', image: '/case-studies/fernandez-erp-dashboard.png', color: '#92400e', path: 'cases/fernandez', meta: '50 AÑOS MIGRADOS' },
+  { id: 'soma', cmd: './cases --show soma', badge: 'BI · MINERIA', title: 'Dashboards KPI que reemplazan 50 Excel', desc: 'Data de SAP sincronizada, KPIs operacionales y ejecutivos, alertas en tiempo real. Los directores de operaciones lo miran antes del café.', metric: 'SAP → decisiones en tiempo real', image: '/cases/soma/01.webp', color: '#0369a1', path: 'cases/soma', meta: 'BI OPERACIONAL' },
+  { id: 'speakly', cmd: './cases --show speakly', badge: 'SAAS · EDUCACION', title: 'Profesor + avatar AI con copiloto', desc: 'Plataforma de inglés con copiloto AI que asiste al profesor en tiempo real. Avatares conversacionales, progresión adaptativa, sin fricción.', metric: 'Profesor × AI en la misma clase', image: '/cases/speakly/01.webp', color: '#7c3aed', path: 'cases/speakly', meta: 'SAAS EDUTECH' },
 ];
 
 const CASES_EN: CaseData[] = [
-  { id: 'schwager', cmd: './cases --show schwager', badge: 'VOICE AI · MINING', title: 'Workers fill safety forms by talking.', desc: 'In gloves, rain, no signal. Voice AI on Google Gemini for mining field ops.', metric: '195+ workers · <100ms', image: '/case-studies/sgm-schwager-hero.png', color: '#b85c38', path: 'cases/schwager', meta: '195+ WORKERS' },
-  { id: 'sime', cmd: './cases --show sime', badge: 'MAINTENANCE · MINING', title: '4,000 digital route sheets per day.', desc: 'Full legacy replacement. QR signing on-site, mobile approvals, automated audit.', metric: 'Zero paper in the field', image: '/case-studies/sgm-schwager-semana.png', color: '#2d5a27', path: 'cases/sime', meta: '4K ROUTES/DAY' },
-  { id: 'apoderapp', cmd: './cases --show apoderapp', badge: 'SAAS · EDUCATION', title: 'School fee collection via WhatsApp.', desc: 'Parents send receipt photo. AI reads and verifies it. No spreadsheets, no chaos.', metric: 'Automated verification', image: '/case-studies/apoderapp-presidenta-dark.png', color: '#5b21b6', path: 'cases/apoderapp', meta: 'OWN PRODUCT' },
+  { id: 'apoderapp', cmd: './cases --show apoderapp', badge: 'SAAS · EDUCATION', title: 'School fee collection via WhatsApp.', desc: 'Parents send receipt photo. AI reads and verifies it. No spreadsheets, no chaos.', metric: 'Automated verification', image: '/cases/apoderapp/01.webp', color: '#5b21b6', path: 'cases/apoderapp', meta: 'OWN PRODUCT' },
+  { id: 'fernandez', cmd: './cases --show fernandez', badge: 'ERP · MANUFACTURING', title: 'Digital transformation of an industrial workshop.', desc: 'OCR reads invoices, QR tracks tools, AI extracts data. One system, entire company.', metric: 'Complete transformation', image: '/cases/fernandez/01.webp', color: '#92400e', path: 'cases/fernandez', meta: '50 YRS MIGRATED' },
+  { id: 'schwager', cmd: './cases --show schwager', badge: 'VOICE AI · MINING', title: 'Workers fill safety forms by talking.', desc: 'In gloves, rain, no signal. Voice AI on Google Gemini for mining field ops.', metric: '195+ workers · <100ms', image: '/cases/schwager/01.webp', color: '#b85c38', path: 'cases/schwager', meta: '195+ WORKERS' },
+  { id: 'sime', cmd: './cases --show sime', badge: 'MAINTENANCE · MINING', title: '4,000 digital route sheets per day.', desc: 'Full legacy replacement. QR signing on-site, mobile approvals, automated audit.', metric: 'Zero paper in the field', image: '/cases/sime/01.webp', color: '#2d5a27', path: 'cases/sime', meta: '4K ROUTES/DAY' },
   { id: 'gasco', cmd: './cases --show gasco', badge: 'AUTOMATION · ENERGY', title: 'From 5 min per code to 30 seconds.', desc: 'Drivers send photo via WhatsApp. Bot reads the code and burns it automatically.', metric: '14 drivers on route', image: '/case-studies/bot-gas-distribution.png', color: '#0369a1', path: 'cases/gasco', meta: '14 ROUTES' },
-  { id: 'fernandez', cmd: './cases --show fernandez', badge: 'ERP · MANUFACTURING', title: 'Digital transformation of an industrial workshop.', desc: 'OCR reads invoices, QR tracks tools, AI extracts data. One system, entire company.', metric: 'Complete transformation', image: '/case-studies/fernandez-erp-dashboard.png', color: '#92400e', path: 'cases/fernandez', meta: '50 YRS MIGRATED' },
+  { id: 'soma', cmd: './cases --show soma', badge: 'BI · MINING', title: 'BI dashboards replacing 50 spreadsheets', desc: 'SAP-synced data, operational and executive KPIs, real-time alerts. Ops directors check it before coffee.', metric: 'SAP → real-time decisions', image: '/cases/soma/01.webp', color: '#0369a1', path: 'cases/soma', meta: 'OPERATIONAL BI' },
+  { id: 'speakly', cmd: './cases --show speakly', badge: 'SAAS · EDUCATION', title: 'Teacher + AI avatar with copilot', desc: 'English learning platform with an AI copilot assisting the teacher in real time. Conversational avatars, adaptive progression, zero friction.', metric: 'Teacher × AI in the same class', image: '/cases/speakly/01.webp', color: '#7c3aed', path: 'cases/speakly', meta: 'SAAS EDTECH' },
 ];
 
 interface ServiceData {
@@ -168,8 +174,8 @@ function Waveform() {
 
 // ── SCROLL HOOK ──────────────────────────────────────────────
 
-type Section = 'hero' | 'case0' | 'case1' | 'case2' | 'case3' | 'case4' | 'services' | 'about' | 'contact';
-const SECTIONS: Section[] = ['hero', 'case0', 'case1', 'case2', 'case3', 'case4', 'services', 'about', 'contact'];
+type Section = 'hero' | 'case0' | 'case1' | 'case2' | 'case3' | 'case4' | 'case5' | 'case6' | 'services' | 'about' | 'contact';
+const SECTIONS: Section[] = ['hero', 'case0', 'case1', 'case2', 'case3', 'case4', 'case5', 'case6', 'services', 'about', 'contact'];
 
 function useActiveSection(): Section {
   const [active, setActive] = useState<Section>('hero');
@@ -431,9 +437,9 @@ export default function V3Page() {
           {cases.map((cs, i) => {
             const isActive = active === `case${i}`;
             return (
-              <div key={cs.id} style={{
+              <div key={cs.id} className="v3-grid-2col" style={{
                 position: 'absolute', inset: 0, padding: '24px 32px 32px',
-                display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 32, alignItems: 'center', className: 'v3-grid-2col',
+                display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 32, alignItems: 'center',
                 opacity: isActive ? 1 : 0,
                 transition: 'opacity 0.5s ease',
                 pointerEvents: isActive ? 'auto' : 'none',
@@ -455,7 +461,17 @@ export default function V3Page() {
                   transitionDelay: '200ms',
                   position: 'relative',
                 }}>
-                  <img src={cs.image} alt={cs.title} style={{ width: '100%', height: '100%', objectFit: 'cover', filter: 'saturate(0.8) brightness(0.85)' }} loading="lazy" />
+                  <Image
+                    src={cs.image}
+                    alt={cs.title}
+                    width={800}
+                    height={450}
+                    placeholder={blurMap[cs.cmd] ? 'blur' : 'empty'}
+                    blurDataURL={blurMap[cs.cmd]}
+                    loading="lazy"
+                    sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw"
+                    style={{ width: '100%', height: '100%', objectFit: 'cover', filter: 'saturate(0.8) brightness(0.85)' }}
+                  />
                   {/* Rive screen frame — brackets + scanline + border draw */}
                   {isActive && (
                     <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }}>
