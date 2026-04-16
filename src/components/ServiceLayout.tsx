@@ -11,7 +11,6 @@ import { openChatwoot } from '@/components/ChatwootWidget';
 export type ServiceContent = {
   serviceKey: string;
   ctaHref: string;
-  whatsappHref: string;
 };
 
 type Props = {

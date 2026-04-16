@@ -3,8 +3,9 @@
 import React, { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { FiMail, FiSend, FiCheck, FiAlertCircle } from 'react-icons/fi';
-import { BsWhatsapp } from 'react-icons/bs';
+import { BsChatDots } from 'react-icons/bs';
 import { trackEvent, Events } from '@/lib/analytics/track';
+import { openChatwoot } from '@/components/ChatwootWidget';
 
 type FormStatus = 'idle' | 'loading' | 'success' | 'error';
 
@@ -215,19 +216,21 @@ export default function ContactoPage() {
                 </div>
                 <span className="text-white/60">contacto@tunixlabs.com</span>
               </div>
-              <a
-                href={`https://wa.me/56930367979?text=${encodeURIComponent(t('directContact.whatsappInfoMessage'))}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="group flex items-center gap-3"
+              <button
+                type="button"
+                onClick={() => {
+                  trackEvent(Events.CTA_WHATSAPP_CLICK, { location: 'contact:info' });
+                  openChatwoot();
+                }}
+                className="group flex items-center gap-3 text-left"
               >
-                <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-green-600 transition-transform group-hover:-translate-y-0.5">
-                  <BsWhatsapp className="h-5 w-5 text-white" />
+                <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-[#ccff00] transition-transform group-hover:-translate-y-0.5">
+                  <BsChatDots className="h-5 w-5 text-[#0a0a0a]" />
                 </div>
-                <span className="text-white/60 transition-colors group-hover:text-green-400">
+                <span className="text-white/60 transition-colors group-hover:text-[#ccff00]">
                   {t('directContact.whatsapp')}
                 </span>
-              </a>
+              </button>
             </div>
           </div>
 
@@ -235,15 +238,17 @@ export default function ContactoPage() {
             <p className="mb-3 text-lg font-semibold text-white">
               {t('directContact.meetingQuestion')}
             </p>
-            <a
-              href={`https://wa.me/56930367979?text=${encodeURIComponent(t('directContact.whatsappScheduleMessage'))}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 rounded-lg bg-green-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-green-500"
+            <button
+              type="button"
+              onClick={() => {
+                trackEvent(Events.CTA_WHATSAPP_CLICK, { location: 'contact:schedule' });
+                openChatwoot();
+              }}
+              className="inline-flex items-center gap-2 rounded-lg bg-[#ccff00] px-5 py-2.5 text-sm font-semibold text-[#0a0a0a] transition hover:bg-[#b8e600]"
             >
-              <BsWhatsapp className="h-5 w-5" />
+              <BsChatDots className="h-5 w-5" />
               {t('directContact.scheduleCall')}
-            </a>
+            </button>
           </div>
         </div>
       </section>
