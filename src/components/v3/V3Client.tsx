@@ -27,7 +27,7 @@ const HERO_ES = {
   lines: ['Construyo los sistemas', 'que hacen funcionar'],
   accent: 'empresas reales.',
   sub: 'Minería, energía, educación — cuando Excel ya no alcanza, yo llego. 15 años operando antes de codear. MSc Finanzas + MIT AI/ML.',
-  cta1: 'Hablemos por WhatsApp', cta2: 'Ver lo que construí',
+  cta1: 'Hablemos de tu proyecto', cta2: 'Ver lo que construí',
 };
 const HERO_EN = {
   cmd: './production --status',
@@ -35,7 +35,7 @@ const HERO_EN = {
   lines: ['One operator.', 'MIT-trained.'],
   accent: 'Production AI from Santiago.',
   sub: '15 years running real operations before writing code. MSc Finance + MIT AI/ML. Nearshore at 3-5x below SF/NYC rates.',
-  cta1: 'Book a discovery call', cta2: 'See what I shipped',
+  cta1: 'Let\'s talk about your project', cta2: 'See what I shipped',
 };
 
 const CASES_ES: CaseData[] = [
@@ -599,10 +599,10 @@ export default function V3Client() {
             </h1>
             <p style={{ fontSize: 'clamp(14px, 1.4vw, 18px)', color: 'rgba(245,245,242,0.5)', maxWidth: 560, marginTop: 20, lineHeight: 1.6, opacity: isHero && booted ? 1 : 0, transform: isHero && booted ? 'none' : 'translateY(15px)', transition: 'all 0.7s ease 0.8s' }}>{hero.sub}</p>
             <div style={{ display: 'flex', gap: 14, marginTop: 28, opacity: isHero && booted ? 1 : 0, transition: 'opacity 0.6s ease 1s' }}>
-              <a href={isES ? 'https://wa.me/56930367979' : 'https://calendly.com/amoyano17/30min'} target="_blank" rel="noopener noreferrer" data-cursor="grow" style={{ background: '#ccff00', color: '#0a0a0a', padding: '14px 32px', borderRadius: 10, fontSize: 14, fontWeight: 700, textDecoration: 'none', transition: 'transform 0.3s cubic-bezier(0.2,0.9,0.25,1), box-shadow 0.3s ease', boxShadow: '0 0 0 rgba(204,255,0,0)', }}
+              <button onClick={() => openChatwoot()} data-cursor="grow" style={{ background: '#ccff00', color: '#0a0a0a', padding: '14px 32px', borderRadius: 10, fontSize: 14, fontWeight: 700, border: 'none', cursor: 'pointer', transition: 'transform 0.3s cubic-bezier(0.2,0.9,0.25,1), box-shadow 0.3s ease', boxShadow: '0 0 0 rgba(204,255,0,0)', }}
                 onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 8px 30px rgba(204,255,0,0.3)'; }}
                 onMouseLeave={e => { e.currentTarget.style.transform = ''; e.currentTarget.style.boxShadow = '0 0 0 rgba(204,255,0,0)'; }}
-              >{hero.cta1}</a>
+              >{hero.cta1}</button>
               <a href="#sec-case0" data-cursor="grow" style={{ border: '1px solid rgba(255,255,255,0.15)', color: '#f5f5f2', padding: '14px 32px', borderRadius: 10, fontSize: 14, textDecoration: 'none', transition: 'all 0.3s cubic-bezier(0.2,0.9,0.25,1)', }}
                 onMouseEnter={e => { e.currentTarget.style.borderColor = '#ccff00'; e.currentTarget.style.color = '#ccff00'; e.currentTarget.style.transform = 'translateY(-2px)'; }}
                 onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.15)'; e.currentTarget.style.color = '#f5f5f2'; e.currentTarget.style.transform = ''; }}
