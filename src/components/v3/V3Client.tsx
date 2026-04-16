@@ -400,6 +400,40 @@ export default function V3Client() {
           </div>
         </div>
 
+        {/* ── ACCENT BAR — colored line under topbar that changes per section ── */}
+        <div style={{
+          height: 2, flexShrink: 0,
+          background: currentCase
+            ? `linear-gradient(90deg, transparent, ${currentCase.color}, transparent)`
+            : isServices ? 'linear-gradient(90deg, transparent, #ccff00, transparent)'
+            : isAbout ? 'linear-gradient(90deg, transparent, #00e5cc, transparent)'
+            : isContact ? 'linear-gradient(90deg, transparent, #25d366, transparent)'
+            : 'linear-gradient(90deg, transparent, #ccff00, transparent)',
+          opacity: 0.6,
+          transition: 'all 0.8s ease',
+        }} />
+
+        {/* ── GLITCH FLASH — fires on section transition ── */}
+        {transitioning && (
+          <div style={{
+            position: 'absolute', inset: 0, zIndex: 200, pointerEvents: 'none',
+            background: 'linear-gradient(0deg, transparent 40%, rgba(204,255,0,0.03) 50%, transparent 60%)',
+            animation: 'v3glitch 0.4s ease-out forwards',
+          }} />
+        )}
+
+        {/* ── SCANLINE — subtle CRT sweep ── */}
+        <div style={{
+          position: 'absolute', inset: 0, zIndex: 199, pointerEvents: 'none',
+          overflow: 'hidden', opacity: 0.03,
+        }}>
+          <div style={{
+            width: '100%', height: 2,
+            background: 'rgba(204,255,0,0.8)',
+            animation: 'v3scanlineSweep 4s linear infinite',
+          }} />
+        </div>
+
         {/* ── PROMPT LINE (live typing engine) ── */}
         <div style={{
           padding: '16px 32px 0',
@@ -470,21 +504,25 @@ export default function V3Client() {
                 transition: 'opacity 0.5s ease',
                 pointerEvents: isActive ? 'auto' : 'none',
               }}>
-                {/* Left: text */}
+                {/* Left: text — varied entrance animations */}
                 <div>
-                  <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 10, color: cs.color, letterSpacing: '.12em', opacity: isActive ? 1 : 0, transform: isActive ? 'none' : 'translateY(12px)', transition: 'all 0.5s ease', ...stg(0) }}>{cs.badge}</span>
-                  <h2 style={{ fontSize: 'clamp(22px, 3vw, 36px)', fontWeight: 700, margin: '14px 0 10px', lineHeight: 1.15, opacity: isActive ? 1 : 0, transform: isActive ? 'none' : 'translateY(12px)', transition: 'all 0.5s ease', ...stg(1) }}>{cs.title}</h2>
-                  <p style={{ color: 'rgba(245,245,242,0.5)', lineHeight: 1.6, fontSize: 'clamp(13px, 1.2vw, 16px)', opacity: isActive ? 1 : 0, transform: isActive ? 'none' : 'translateY(12px)', transition: 'all 0.5s ease', ...stg(2) }}>{cs.desc}</p>
-                  <div style={{ marginTop: 16, fontFamily: 'JetBrains Mono, monospace', fontSize: 12, color: '#ccff00', opacity: isActive ? 1 : 0, transition: 'opacity 0.5s ease', ...stg(3) }}>{cs.metric}</div>
+                  <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 10, color: cs.color, letterSpacing: '.12em', opacity: isActive ? 1 : 0, transform: isActive ? 'none' : 'translateX(-20px)', transition: 'all 0.5s cubic-bezier(0.2,0.9,0.25,1)', ...stg(0) }}>{cs.badge}</span>
+                  <h2 style={{ fontSize: 'clamp(22px, 3vw, 36px)', fontWeight: 700, margin: '14px 0 10px', lineHeight: 1.15, opacity: isActive ? 1 : 0, transform: isActive ? 'none' : 'translateY(30px) rotateX(10deg)', transition: 'all 0.6s cubic-bezier(0.2,0.9,0.25,1)', transformOrigin: 'left bottom', ...stg(1) }}>{cs.title}</h2>
+                  <p style={{ color: 'rgba(245,245,242,0.5)', lineHeight: 1.6, fontSize: 'clamp(13px, 1.2vw, 16px)', opacity: isActive ? 1 : 0, transform: isActive ? 'none' : 'translateY(15px)', transition: 'all 0.5s ease', ...stg(2) }}>{cs.desc}</p>
+                  <div style={{ marginTop: 16, fontFamily: 'JetBrains Mono, monospace', fontSize: 12, color: '#ccff00', opacity: isActive ? 1 : 0, transform: isActive ? 'none' : 'translateX(-10px)', transition: 'all 0.4s ease', ...stg(3) }}>
+                    <span style={{ display: 'inline-block', width: 16, height: 1, background: '#ccff00', marginRight: 8, verticalAlign: 'middle' }} />
+                    {cs.metric}
+                  </div>
                 </div>
-                {/* Right: screenshot with Rive screen frame overlay */}
+                {/* Right: screenshot — clip-path reveal + parallax */}
                 <div style={{
                   borderRadius: 12, overflow: 'hidden', height: '100%',
                   background: `linear-gradient(160deg, ${cs.color}15, ${cs.color}30)`,
                   opacity: isActive ? 1 : 0,
-                  transform: isActive ? 'none' : 'scale(0.95)',
-                  transition: 'all 0.6s cubic-bezier(0.2,0.9,0.25,1)',
-                  transitionDelay: '200ms',
+                  clipPath: isActive ? 'inset(0 0 0 0)' : 'inset(0 100% 0 0)',
+                  transform: isActive ? 'none' : 'scale(1.05)',
+                  transition: 'all 0.7s cubic-bezier(0.2,0.9,0.25,1)',
+                  transitionDelay: '150ms',
                   position: 'relative',
                 }}>
                   <Image
