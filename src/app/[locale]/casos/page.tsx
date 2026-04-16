@@ -86,13 +86,13 @@ export default async function CasosIndexPage({ params: { locale } }: Props) {
                 style={{ borderTop: `4px solid ${color}` }}
               >
                 {/* Case image */}
-                <div className="relative h-48 w-full overflow-hidden bg-black/40">
+                <div className="relative w-full overflow-hidden bg-black/40" style={{ aspectRatio: '1600/870' }}>
                   <Image
                     src={c.images[0]}
                     alt={title}
-                    width={600}
-                    height={340}
-                    className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    width={1600}
+                    height={870}
+                    className="h-full w-full object-contain transition-transform duration-500 group-hover:scale-105"
                     style={{ filter: 'brightness(0.9) contrast(1.05)' }}
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />

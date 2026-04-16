@@ -656,7 +656,7 @@ export default function V3Client() {
                       loading="lazy"
                       sizes="(max-width: 768px) 90vw, 50vw"
                       style={{
-                        width: '100%', height: '100%', objectFit: 'cover',
+                        width: '100%', height: '100%', objectFit: 'contain',
                         filter: 'brightness(0.95) contrast(1.02)', transition: 'filter 0.6s ease, transform 0.2s ease-out',
                         transform: isActive ? `translate(${(mousePos.x - 0.5) * -5}px, ${(mousePos.y - 0.5) * -4}px)` : 'none',
                       }}
