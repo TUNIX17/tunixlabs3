@@ -629,30 +629,35 @@ export default function V3Client() {
                 </div>
                 {/* Right: screenshot — clip-path reveal + parallax */}
                 <div style={{
-                  borderRadius: 12, overflow: 'hidden', height: '100%',
-                  background: `linear-gradient(160deg, ${cs.color}15, ${cs.color}30)`,
+                  borderRadius: 14, overflow: 'hidden', height: '100%',
+                  background: `linear-gradient(160deg, ${cs.color}10, ${cs.color}20)`,
+                  border: `1px solid ${cs.color}30`,
                   opacity: isActive ? 1 : 0,
                   clipPath: isActive ? 'inset(0 0 0 0)' : 'inset(0 100% 0 0)',
                   transform: isActive ? 'none' : 'scale(1.05)',
                   transition: 'all 0.7s cubic-bezier(0.2,0.9,0.25,1)',
                   transitionDelay: '150ms',
                   position: 'relative',
+                  padding: 8,
                 }}>
-                  <Image
-                    src={cs.image}
-                    alt={cs.title}
-                    width={800}
-                    height={450}
-                    placeholder={blurMap[cs.cmd] ? 'blur' : 'empty'}
-                    blurDataURL={blurMap[cs.cmd]}
-                    loading="lazy"
-                    sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw"
-                    style={{
-                      width: '100%', height: '100%', objectFit: 'cover',
-                      filter: 'brightness(0.92) contrast(1.05)', transition: 'filter 0.6s ease, transform 0.15s ease-out',
-                      transform: isActive ? `translate(${(mousePos.x - 0.5) * -8}px, ${(mousePos.y - 0.5) * -6}px) scale(1.06)` : 'scale(1)',
-                    }}
-                  />
+                  <div style={{ borderRadius: 8, overflow: 'hidden', width: '100%', height: '100%', position: 'relative' }}>
+                    <Image
+                      src={cs.image}
+                      alt={cs.title}
+                      width={1600}
+                      height={870}
+                      quality={90}
+                      placeholder={blurMap[cs.cmd] ? 'blur' : 'empty'}
+                      blurDataURL={blurMap[cs.cmd]}
+                      loading="lazy"
+                      sizes="(max-width: 768px) 90vw, 50vw"
+                      style={{
+                        width: '100%', height: '100%', objectFit: 'cover',
+                        filter: 'brightness(0.95) contrast(1.02)', transition: 'filter 0.6s ease, transform 0.2s ease-out',
+                        transform: isActive ? `translate(${(mousePos.x - 0.5) * -5}px, ${(mousePos.y - 0.5) * -4}px)` : 'none',
+                      }}
+                    />
+                  </div>
                   {/* Rive case frame — animated corner brackets + scanline reveal */}
                   <CaseRevealFrame active={isActive} />
                   {/* Voice scene for schwager */}
