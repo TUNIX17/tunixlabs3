@@ -67,14 +67,14 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
 
 export function createContact(): Promise<ChatwootContactResponse> {
   return request<ChatwootContactResponse>(
-    `/public/api/v1/inboxes/${CHATWOOT.websiteToken}/contacts`,
+    `/public/api/v1/inboxes/${CHATWOOT.inboxIdentifier}/contacts`,
     { method: 'POST', body: '{}' }
   );
 }
 
 export function createConversation(sourceId: string): Promise<ConversationResponse> {
   return request<ConversationResponse>(
-    `/public/api/v1/inboxes/${CHATWOOT.websiteToken}/contacts/${sourceId}/conversations`,
+    `/public/api/v1/inboxes/${CHATWOOT.inboxIdentifier}/contacts/${sourceId}/conversations`,
     { method: 'POST', body: '{}' }
   );
 }
@@ -85,7 +85,7 @@ export function sendMessage(
   content: string
 ): Promise<ChatwootMessage> {
   return request<ChatwootMessage>(
-    `/public/api/v1/inboxes/${CHATWOOT.websiteToken}/contacts/${sourceId}/conversations/${conversationId}/messages`,
+    `/public/api/v1/inboxes/${CHATWOOT.inboxIdentifier}/contacts/${sourceId}/conversations/${conversationId}/messages`,
     { method: 'POST', body: JSON.stringify({ content }) }
   );
 }
@@ -95,6 +95,6 @@ export function listMessages(
   conversationId: number
 ): Promise<ChatwootMessage[]> {
   return request<ChatwootMessage[]>(
-    `/public/api/v1/inboxes/${CHATWOOT.websiteToken}/contacts/${sourceId}/conversations/${conversationId}/messages`
+    `/public/api/v1/inboxes/${CHATWOOT.inboxIdentifier}/contacts/${sourceId}/conversations/${conversationId}/messages`
   );
 }
