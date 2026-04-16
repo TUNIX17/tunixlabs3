@@ -59,12 +59,12 @@ export default function Nav() {
             aria-label="Tunix Labs — Home"
           >
             <Image
-              src="/logo_blanco.webp"
+              src="/logo_nav.webp"
               alt=""
               width={28}
               height={28}
               className="transition-transform duration-300 hover:rotate-12"
-              style={{ filter: 'drop-shadow(0 0 6px rgba(204,255,0,0.3))' }}
+              style={{ filter: 'drop-shadow(0 0 8px rgba(0,229,204,0.4))' }}
             />
             <span className="font-mono uppercase tracking-[0.2em] text-acid text-sm md:text-base">
               TUNIX LABS
