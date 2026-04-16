@@ -308,6 +308,9 @@ export default function V3Client() {
   const [showWhatsAppChat, setShowWhatsAppChat] = useState(false);
   const [formStatus, setFormStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle');
   const [chatMsg, setChatMsg] = useState('');
+  const [chatSent, setChatSent] = useState<string | null>(null);
+  const [chatTyping, setChatTyping] = useState(false);
+  const [chatReady, setChatReady] = useState(false);
   const [mousePos, setMousePos] = useState({ x: 0.5, y: 0.5 });
 
   // Mouse tracking for parallax effects
@@ -919,7 +922,7 @@ export default function V3Client() {
       {/* ── WHATSAPP CHAT TERMINAL (inline, no external redirect) ── */}
       {showWhatsAppChat && (
         <>
-          <div onClick={() => setShowWhatsAppChat(false)} style={{
+          <div onClick={() => { setShowWhatsAppChat(false); setChatSent(null); setChatTyping(false); setChatReady(false); setChatMsg(''); }} style={{
             position: 'fixed', inset: 0, zIndex: 300,
             background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(8px)',
             animation: 'v3fadeIn 0.3s ease', cursor: 'pointer',
@@ -940,7 +943,7 @@ export default function V3Client() {
               borderBottom: '1px solid rgba(255,255,255,0.06)',
               background: 'rgba(37,211,102,0.05)', flexShrink: 0,
             }}>
-              <button onClick={() => setShowWhatsAppChat(false)} style={{ width: 12, height: 12, borderRadius: '50%', background: '#ff5f57', border: 'none', cursor: 'pointer', padding: 0 }} />
+              <button onClick={() => { setShowWhatsAppChat(false); setChatSent(null); setChatTyping(false); setChatReady(false); setChatMsg(''); }} style={{ width: 12, height: 12, borderRadius: '50%', background: '#ff5f57', border: 'none', cursor: 'pointer', padding: 0 }} />
               <span style={{ width: 12, height: 12, borderRadius: '50%', background: '#ffbd2e' }} />
               <span style={{ width: 12, height: 12, borderRadius: '50%', background: '#28c840' }} />
               <span style={{ flex: 1, textAlign: 'center', fontFamily: 'JetBrains Mono, monospace', fontSize: 10, color: 'rgba(37,211,102,0.6)' }}>
@@ -958,14 +961,45 @@ export default function V3Client() {
                   {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                 </div>
               </div>
+              {/* User message */}
+              {chatSent && (
+                <div style={{ background: 'rgba(37,211,102,0.15)', borderRadius: '12px 12px 2px 12px', padding: '10px 14px', maxWidth: '80%', alignSelf: 'flex-end', fontSize: 13, color: '#f5f5f2', lineHeight: 1.5, animation: 'v3fadeIn 0.3s ease' }}>
+                  {chatSent}
+                </div>
+              )}
+              {/* Typing indicator */}
+              {chatTyping && (
+                <div style={{ display: 'flex', gap: 4, padding: '8px 14px', animation: 'v3fadeIn 0.3s ease' }}>
+                  {[0, 1, 2].map(i => (
+                    <span key={i} style={{ width: 6, height: 6, borderRadius: '50%', background: 'rgba(37,211,102,0.5)', animation: `v3blink 1s ease-in-out ${i * 0.2}s infinite` }} />
+                  ))}
+                </div>
+              )}
+              {/* Ready confirmation */}
+              {chatReady && (
+                <div style={{ background: 'rgba(37,211,102,0.08)', borderRadius: '12px 12px 12px 2px', padding: '10px 14px', maxWidth: '85%', fontSize: 13, color: 'rgba(245,245,242,0.8)', lineHeight: 1.5, animation: 'v3fadeIn 0.3s ease' }}>
+                  {isES ? '¡Perfecto! Tu mensaje está listo.' : 'Your message is ready.'}
+                  <a
+                    href={`https://wa.me/56930367979?text=${encodeURIComponent(chatSent || '')}`}
+                    target="_blank" rel="noopener noreferrer"
+                    style={{ display: 'block', marginTop: 8, background: '#25D366', color: '#fff', padding: '8px 16px', borderRadius: 8, textDecoration: 'none', fontSize: 12, fontWeight: 700, textAlign: 'center' }}
+                  >
+                    {isES ? '→ Abrir en WhatsApp' : '→ Open in WhatsApp'}
+                  </a>
+                  <div style={{ fontSize: 10, color: 'rgba(245,245,242,0.3)', marginTop: 6 }}>
+                    {isES ? 'Se abre en una nueva pestaña' : 'Opens in a new tab'}
+                  </div>
+                </div>
+              )}
             </div>
             {/* Input */}
             <form onSubmit={(e) => {
               e.preventDefault();
-              if (!chatMsg.trim()) return;
-              const encoded = encodeURIComponent(chatMsg);
-              window.open(`https://wa.me/56930367979?text=${encoded}`, '_blank');
-              setShowWhatsAppChat(false);
+              if (!chatMsg.trim() || chatReady) return;
+              setChatSent(chatMsg);
+              setChatMsg('');
+              setChatTyping(true);
+              setTimeout(() => { setChatTyping(false); setChatReady(true); }, 1200);
             }} style={{
               padding: '12px 16px', borderTop: '1px solid rgba(255,255,255,0.06)',
               display: 'flex', gap: 10, flexShrink: 0,
