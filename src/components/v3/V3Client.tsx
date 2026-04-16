@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { useRive, useStateMachineInput, Layout, Fit, Alignment } from '@rive-app/react-canvas';
 import { useLocale } from 'next-intl';
 import { blurMap } from '@/generated/blurMap';
+import { CustomCursor } from './CustomCursor';
 import '@/app/[locale]/v3/v3.css';
 
 /* ══════════════════════════════════════════════════════════════
@@ -324,8 +325,9 @@ export default function V3Client() {
         opacity: booted ? 0 : 1, pointerEvents: booted ? 'none' : 'auto',
         transition: 'opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1)',
       }}>
-        <img
-          src="/logo_turquesa.png" alt="TunixLabs"
+        <Image
+          src="/logo_turquesa.webp" alt="TunixLabs"
+          width={280} height={140} priority
           style={{
             height: 140, width: 'auto',
             animation: 'v3logoPulse 1.5s ease-in-out',
@@ -339,19 +341,32 @@ export default function V3Client() {
         </div>
       </div>
 
+      <CustomCursor />
+
+      {/* ── HERO BACKGROUND — floating particle field ── */}
+      {booted && (
+        <div style={{
+          position: 'fixed', inset: 0, zIndex: 50, pointerEvents: 'none',
+          opacity: 0.6,
+          transition: 'opacity 1.5s ease',
+        }}>
+          <RiveScene src="/rive/hero-particles.riv" />
+        </div>
+      )}
+
       {/* ════════════════════════════════════════════════════════
           THE TERMINAL — fixed center, persistent, content swaps
           ════════════════════════════════════════════════════════ */}
       <div style={{
         position: 'fixed', top: '50%', left: '50%',
-        transform: `translate(-50%,-50%) scale(${1 - scrollVelocity * 0.008})`,
+        transform: `translate(-50%, calc(-50% + ${scrollVelocity * -6}px)) scale(${1 - scrollVelocity * 0.025})`,
         width: isAbout ? '56vw' : '86vw', maxWidth: isAbout ? 900 : 1400,
         height: '76vh', maxHeight: 860,
         background: 'rgba(20,20,20,0.85)',
         backdropFilter: 'blur(24px) saturate(1.4)',
         WebkitBackdropFilter: 'blur(24px) saturate(1.4)',
         borderRadius: 16,
-        boxShadow: `0 0 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.06), 0 0 ${currentCase ? '40px' : '20px'} ${currentCase ? currentCase.color + '15' : 'rgba(204,255,0,0.05)'}`,
+        boxShadow: `0 0 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.08), 0 0 ${currentCase ? '60px' : '30px'} ${currentCase ? currentCase.color + '25' : 'rgba(204,255,0,0.08)'}, inset 0 1px 0 rgba(255,255,255,0.06)`,
         display: 'flex', flexDirection: 'column',
         overflow: 'hidden', zIndex: 100,
         opacity: booted ? 1 : 0,
@@ -452,7 +467,7 @@ export default function V3Client() {
                     blurDataURL={blurMap[cs.cmd]}
                     loading="lazy"
                     sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw"
-                    style={{ width: '100%', height: '100%', objectFit: 'cover', filter: 'saturate(0.8) brightness(0.85)' }}
+                    style={{ width: '100%', height: '100%', objectFit: 'cover', filter: 'brightness(0.92) contrast(1.05)', transition: 'filter 0.6s ease' }}
                   />
                   {/* Rive screen frame — brackets + scanline + border draw */}
                   {isActive && (
@@ -534,7 +549,7 @@ export default function V3Client() {
               transition: 'all 0.6s cubic-bezier(0.2,0.9,0.25,1)',
               transitionDelay: '100ms',
             }}>
-              <img src="/team/alejandro-moyano.png" alt="Alejandro Moyano" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              <Image src="/team/alejandro-moyano.webp" alt="Alejandro Moyano" width={160} height={160} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
             </div>
             <div>
               <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 10, color: '#ccff00', letterSpacing: '.12em', opacity: isAbout ? 1 : 0, transition: 'opacity 0.4s ease', transitionDelay: '150ms' }}>
@@ -967,19 +982,24 @@ export default function V3Client() {
         </div>
       )}
 
-      {/* ── CASE NAV DOTS ── */}
+      {/* ── SCROLL NAV DOTS ── */}
       <div style={{
         position: 'fixed', right: 24, top: '50%', transform: 'translateY(-50%)',
-        zIndex: 150, display: 'flex', flexDirection: 'column', gap: 8,
+        zIndex: 150, display: 'flex', flexDirection: 'column', gap: 6,
       }}>
-        {SECTIONS.map(s => (
-          <a key={s} href={`#sec-${s}`} style={{
-            width: 8, height: 8, borderRadius: '50%',
-            background: active === s ? '#ccff00' : 'rgba(245,245,242,0.15)',
-            transition: 'background 0.3s',
-            display: 'block',
-          }} />
-        ))}
+        {SECTIONS.map(s => {
+          const isActive = active === s;
+          return (
+            <a key={s} href={`#sec-${s}`} aria-label={s} style={{
+              width: isActive ? 10 : 6, height: isActive ? 10 : 6,
+              borderRadius: '50%',
+              background: isActive ? '#ccff00' : 'rgba(245,245,242,0.2)',
+              boxShadow: isActive ? '0 0 8px rgba(204,255,0,0.5)' : 'none',
+              transition: 'all 0.4s cubic-bezier(0.2, 0.9, 0.25, 1)',
+              display: 'block',
+            }} />
+          );
+        })}
       </div>
 
       {/* ══════════════════════════════════════════════════════

@@ -3,6 +3,7 @@ import { getMessages, getTranslations, setRequestLocale } from 'next-intl/server
 import { notFound } from 'next/navigation';
 import { routing } from '@/i18n/routing';
 import Nav from '@/components/Nav';
+import { LenisProvider } from '@/components/kinetic-swiss/LenisProvider';
 import JsonLd from '@/components/seo/JsonLd';
 import {
   organizationSchema,
@@ -12,9 +13,8 @@ import {
 import '../../styles/globals.css';
 // Kinetic Swiss v3 design tokens (paper/ink/acid palette).
 import '../../styles/kinetic-swiss-vars.css';
-// Motion layer lives separate from globals so we can iterate on it without
-// touching the rest of the neu design system. Imported AFTER globals so the
-// cascade gives it the last word on animated properties.
+// Motion layer — reserved for scroll-reveal and transition overrides.
+// Imported AFTER globals so the cascade gives it the last word.
 import '../../styles/animations.css';
 
 type Props = {
@@ -143,8 +143,10 @@ export default async function LocaleLayout({ children, params: { locale } }: Pro
       </head>
       <body>
         <NextIntlClientProvider messages={messages}>
-          <Nav />
-          <main className="min-h-screen">{children}</main>
+          <LenisProvider>
+            <Nav />
+            <main className="min-h-screen">{children}</main>
+          </LenisProvider>
         </NextIntlClientProvider>
       </body>
     </html>
