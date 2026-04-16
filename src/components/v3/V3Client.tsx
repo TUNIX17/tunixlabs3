@@ -609,8 +609,8 @@ export default function V3Client() {
                   transition: 'all 0.4s ease',
                   transitionDelay: `${(i + 1) * 50 + 80}ms`,
                 }}
-                  onMouseEnter={e => { e.currentTarget.style.borderColor = '#ccff00'; e.currentTarget.style.background = 'rgba(204,255,0,0.04)'; e.currentTarget.style.transform = 'translateY(-2px)'; }}
-                  onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(245,245,242,0.06)'; e.currentTarget.style.background = 'rgba(245,245,242,0.02)'; e.currentTarget.style.transform = 'none'; }}
+                  onMouseEnter={e => { e.currentTarget.style.borderColor = '#ccff00'; e.currentTarget.style.background = 'rgba(204,255,0,0.04)'; e.currentTarget.style.transform = 'translateY(-3px)'; e.currentTarget.style.boxShadow = '0 8px 24px rgba(204,255,0,0.08), inset 3px 0 0 #ccff00'; }}
+                  onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(245,245,242,0.06)'; e.currentTarget.style.background = 'rgba(245,245,242,0.02)'; e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = 'none'; }}
                 >
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
                     <span style={{ fontSize: 14, fontWeight: 700 }}>{isES ? svc.es : svc.en}</span>
@@ -682,18 +682,40 @@ export default function V3Client() {
             textAlign: 'center',
           }}>
             <Waveform />
-            <h2 style={{ fontSize: 'clamp(28px, 4vw, 52px)', fontWeight: 800, margin: '16px 0', opacity: isContact ? 1 : 0, transform: isContact ? 'none' : 'translateY(20px)', transition: 'all 0.6s ease', ...stg(0) }}>
-              {isES ? '¿Tienes un proyecto?' : 'Have a project?'}
+            {/* Split text heading for contact */}
+            <h2 style={{ fontSize: 'clamp(28px, 4vw, 52px)', fontWeight: 800, margin: '16px 0' }}>
+              {(isES ? '¿Tienes un proyecto?' : 'Have a project?').split(' ').map((word, wi) => (
+                <span key={wi} style={{
+                  display: 'inline-block', marginRight: '0.3em',
+                  opacity: isContact ? 1 : 0,
+                  transform: isContact ? 'none' : 'translateY(30px) rotateX(15deg)',
+                  transition: 'all 0.6s cubic-bezier(0.2,0.9,0.25,1)',
+                  transitionDelay: `${wi * 80 + 100}ms`,
+                  transformOrigin: 'left bottom',
+                }}>{word}</span>
+              ))}
             </h2>
-            <p style={{ color: 'rgba(245,245,242,0.4)', fontSize: 16, marginBottom: 32, opacity: isContact ? 1 : 0, transition: 'opacity 0.5s ease', ...stg(1) }}>
+            <p style={{ color: 'rgba(245,245,242,0.4)', fontSize: 16, marginBottom: 32, opacity: isContact ? 1 : 0, transition: 'all 0.5s ease 0.5s' }}>
               {isES ? 'Respondo en menos de 24 horas.' : 'I reply within 24 hours.'}
             </p>
-            <div style={{ display: 'flex', gap: 14, opacity: isContact ? 1 : 0, transition: 'opacity 0.5s ease', ...stg(2) }}>
-              <button onClick={() => setShowContactForm(true)} style={{ background: '#ccff00', color: '#0a0a0a', padding: '14px 36px', borderRadius: 8, fontSize: 15, fontWeight: 700, border: 'none', cursor: 'pointer' }}>
+            <div style={{ display: 'flex', gap: 14, opacity: isContact ? 1 : 0, transition: 'opacity 0.6s ease 0.7s' }}>
+              <button onClick={() => setShowContactForm(true)} data-cursor="grow" style={{
+                background: '#ccff00', color: '#0a0a0a', padding: '16px 40px', borderRadius: 10, fontSize: 15, fontWeight: 700, border: 'none', cursor: 'pointer',
+                transition: 'all 0.3s cubic-bezier(0.2,0.9,0.25,1)', boxShadow: '0 0 0 rgba(204,255,0,0)',
+              }}
+                onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-3px)'; e.currentTarget.style.boxShadow = '0 12px 40px rgba(204,255,0,0.3)'; }}
+                onMouseLeave={e => { e.currentTarget.style.transform = ''; e.currentTarget.style.boxShadow = '0 0 0 rgba(204,255,0,0)'; }}
+              >
                 {isES ? 'Enviar mensaje' : 'Send message'}
               </button>
-              <button onClick={() => setShowWhatsAppChat(true)} style={{ border: '1px solid rgba(255,255,255,0.15)', color: '#f5f5f2', padding: '14px 36px', borderRadius: 8, fontSize: 15, background: 'transparent', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8 }}>
-                {isES ? 'WhatsApp' : 'Book a call'}
+              <button onClick={() => setShowWhatsAppChat(true)} data-cursor="grow" style={{
+                border: '1px solid rgba(255,255,255,0.15)', color: '#f5f5f2', padding: '16px 40px', borderRadius: 10, fontSize: 15, background: 'transparent', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8,
+                transition: 'all 0.3s cubic-bezier(0.2,0.9,0.25,1)',
+              }}
+                onMouseEnter={e => { e.currentTarget.style.borderColor = '#25d366'; e.currentTarget.style.color = '#25d366'; e.currentTarget.style.transform = 'translateY(-3px)'; }}
+                onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.15)'; e.currentTarget.style.color = '#f5f5f2'; e.currentTarget.style.transform = ''; }}
+              >
+                <span style={{ fontSize: 18 }}>💬</span> {isES ? 'WhatsApp' : 'Book a call'}
               </button>
             </div>
           </div>
