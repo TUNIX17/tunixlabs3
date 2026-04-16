@@ -220,13 +220,13 @@ export default async function ServiciosIndexPage({ params: { locale } }: Props) 
       <JsonLd schema={faqSchema} />
       <main className="mx-auto max-w-6xl px-6 py-20 md:py-28">
         <header className="mb-16 max-w-3xl">
-          <span className="inline-block rounded-full border border-black/10 px-3 py-1 text-xs uppercase tracking-[0.2em] text-black/60">
+          <span className="inline-block rounded-full border border-white/20 px-3 py-1 text-xs uppercase tracking-[0.2em] text-white/50 font-mono">
             {copy.heroBadge}
           </span>
-          <h1 className="mt-6 text-4xl font-bold leading-tight text-black md:text-6xl">
+          <h1 className="mt-6 text-4xl font-bold leading-tight text-white md:text-6xl">
             {copy.heroTitle}
           </h1>
-          <p className="mt-5 text-lg text-black/70 md:text-xl">{copy.heroSubtitle}</p>
+          <p className="mt-5 text-lg text-white/60 md:text-xl">{copy.heroSubtitle}</p>
         </header>
 
         <ul className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
@@ -238,19 +238,19 @@ export default async function ServiciosIndexPage({ params: { locale } }: Props) 
               <li key={s.slug}>
                 <Link
                   href={`/servicios/${s.slug}` as '/servicios'}
-                  className="group relative block h-full rounded-2xl border border-black/10 bg-white p-6 transition hover:-translate-y-0.5 hover:shadow-lg"
+                  className="group relative block h-full rounded-2xl border border-white/10 bg-white/5 p-6 transition hover:-translate-y-0.5 hover:bg-white/10 hover:shadow-lg hover:shadow-white/5"
                   style={{ borderTop: `4px solid ${s.color}` }}
                 >
                   <div className="mb-4 text-3xl" aria-hidden>
                     {s.icon}
                   </div>
-                  <h2 className="text-xl font-semibold text-black">{title}</h2>
-                  <p className="mt-2 text-sm text-black/70">{tagline}</p>
-                  <p className="mt-4 text-xs font-medium uppercase tracking-wider text-black/50">
+                  <h2 className="text-xl font-semibold text-white">{title}</h2>
+                  <p className="mt-2 text-sm text-white/60">{tagline}</p>
+                  <p className="mt-4 text-xs font-medium uppercase tracking-wider text-white/40">
                     {metrics}
                   </p>
                   <span
-                    className="mt-5 inline-flex items-center gap-1 text-sm font-semibold text-black group-hover:underline"
+                    className="mt-5 inline-flex items-center gap-1 text-sm font-semibold group-hover:underline"
                     style={{ color: s.color }}
                   >
                     {copy.cta} →

@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { useTranslations } from 'next-intl';
-import { FiMail, FiMessageCircle, FiSend, FiCheck, FiAlertCircle } from 'react-icons/fi';
+import { FiMail, FiSend, FiCheck, FiAlertCircle } from 'react-icons/fi';
 import { BsWhatsapp } from 'react-icons/bs';
 import { trackEvent, Events } from '@/lib/analytics/track';
 
@@ -17,7 +17,6 @@ interface FormData {
 
 export default function ContactoPage() {
   const t = useTranslations('ContactPage');
-  const tFooter = useTranslations('HomePage.footer');
 
   const [formData, setFormData] = useState<FormData>({
     nombre: '',
@@ -63,75 +62,74 @@ export default function ContactoPage() {
     }
   };
 
-  return (
-    <div className="min-h-screen neu-bg" style={{ backgroundColor: 'var(--neu-bg)' }}>
-      {/* Aurora Blobs */}
-      <div className="aurora-blob aurora-blob-1"></div>
-      <div className="aurora-blob aurora-blob-2"></div>
-      <div className="aurora-blob aurora-blob-3"></div>
-      <div className="aurora-blob aurora-blob-4"></div>
-      {/* HERO - Neumorphic */}
-      <section className="w-full py-16 sm:py-20 px-4 neu-bg relative overflow-hidden">
+  const inputClass =
+    'w-full rounded-lg border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder-white/30 outline-none transition focus:border-[#ccff00]/50 focus:ring-1 focus:ring-[#ccff00]/30 disabled:opacity-40';
 
-        <div className="max-w-4xl mx-auto text-center relative z-10 pt-16">
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold neu-gradient-text mb-6">
-            {t('hero.title')}
-          </h1>
-          <p className="text-lg sm:text-xl max-w-2xl mx-auto" style={{ color: '#718096', lineHeight: '1.7' }}>
-            {t('hero.description')}
-          </p>
-        </div>
+  return (
+    <div className="min-h-screen pt-24 pb-16">
+      <section className="mx-auto max-w-4xl px-6 text-center">
+        <span className="inline-block font-mono text-xs uppercase tracking-[0.2em] text-white/40">
+          // {t('hero.title').split(' ')[0]}
+        </span>
+        <h1 className="mt-4 text-4xl font-bold text-white sm:text-5xl lg:text-6xl">
+          {t('hero.title')}
+        </h1>
+        <p className="mx-auto mt-5 max-w-2xl text-lg text-white/50">
+          {t('hero.description')}
+        </p>
       </section>
 
-      {/* FORMULARIO Y DATOS - Neumorphic */}
-      <section className="w-full max-w-5xl mx-auto px-4 py-16 grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* Formulario */}
-        <div className="neu-raised p-6 sm:p-8 rounded-2xl">
-          <h2 className="text-xl font-bold mb-6 flex items-center gap-2" style={{ color: '#2d3748' }}>
-            <FiMessageCircle className="h-6 w-6" style={{ color: 'var(--neu-primary)' }} />
+      <section className="mx-auto mt-16 grid max-w-5xl grid-cols-1 gap-8 px-6 lg:grid-cols-2">
+        <div className="rounded-2xl border border-white/10 bg-white/5 p-6 sm:p-8">
+          <h2 className="mb-6 flex items-center gap-2 text-xl font-bold text-white">
+            <FiMail className="h-5 w-5 text-[#ccff00]" />
             {t('form.title')}
           </h2>
 
           {status === 'success' ? (
             <div className="flex flex-col items-center justify-center py-12 text-center">
-              <div className="w-16 h-16 rounded-full flex items-center justify-center mb-4" style={{ background: 'linear-gradient(145deg, #22c55e, #16a34a)' }}>
-                <FiCheck className="h-8 w-8 text-white" />
+              <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-green-500/20">
+                <FiCheck className="h-8 w-8 text-green-400" />
               </div>
-              <h3 className="text-xl font-bold mb-2" style={{ color: '#2d3748' }}>{t('form.successTitle')}</h3>
-              <p style={{ color: '#718096' }}>{t('form.successMessage')}</p>
+              <h3 className="mb-2 text-xl font-bold text-white">{t('form.successTitle')}</h3>
+              <p className="text-white/50">{t('form.successMessage')}</p>
               <button
                 onClick={() => setStatus('idle')}
-                className="neu-btn-primary mt-6"
+                className="mt-6 rounded-lg bg-[#ccff00] px-6 py-2.5 text-sm font-semibold text-[#0a0a0a] transition hover:bg-[#b8e600]"
               >
                 {t('form.sendAnother')}
               </button>
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="flex flex-col gap-5">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div>
-                  <label htmlFor="nombre" className="block text-sm font-medium mb-2" style={{ color: '#2d3748' }}>{t('form.name')}</label>
+                  <label htmlFor="nombre" className="mb-2 block text-sm font-medium text-white/70">
+                    {t('form.name')}
+                  </label>
                   <input
                     id="nombre"
                     name="nombre"
                     type="text"
                     required
                     placeholder={t('form.namePlaceholder')}
-                    className="neu-input"
+                    className={inputClass}
                     value={formData.nombre}
                     onChange={handleChange}
                     disabled={status === 'loading'}
                   />
                 </div>
                 <div>
-                  <label htmlFor="email" className="block text-sm font-medium mb-2" style={{ color: '#2d3748' }}>{t('form.email')}</label>
+                  <label htmlFor="email" className="mb-2 block text-sm font-medium text-white/70">
+                    {t('form.email')}
+                  </label>
                   <input
                     id="email"
                     name="email"
                     type="email"
                     required
                     placeholder={t('form.emailPlaceholder')}
-                    className="neu-input"
+                    className={inputClass}
                     value={formData.email}
                     onChange={handleChange}
                     disabled={status === 'loading'}
@@ -140,14 +138,16 @@ export default function ContactoPage() {
               </div>
 
               <div>
-                <label htmlFor="asunto" className="block text-sm font-medium mb-2" style={{ color: '#2d3748' }}>{t('form.subject')}</label>
+                <label htmlFor="asunto" className="mb-2 block text-sm font-medium text-white/70">
+                  {t('form.subject')}
+                </label>
                 <input
                   id="asunto"
                   name="asunto"
                   type="text"
                   required
                   placeholder={t('form.subjectPlaceholder')}
-                  className="neu-input"
+                  className={inputClass}
                   value={formData.asunto}
                   onChange={handleChange}
                   disabled={status === 'loading'}
@@ -155,14 +155,16 @@ export default function ContactoPage() {
               </div>
 
               <div>
-                <label htmlFor="mensaje" className="block text-sm font-medium mb-2" style={{ color: '#2d3748' }}>{t('form.message')}</label>
+                <label htmlFor="mensaje" className="mb-2 block text-sm font-medium text-white/70">
+                  {t('form.message')}
+                </label>
                 <textarea
                   id="mensaje"
                   name="mensaje"
                   required
                   rows={5}
                   placeholder={t('form.messagePlaceholder')}
-                  className="neu-input resize-none"
+                  className={`${inputClass} resize-none`}
                   value={formData.mensaje}
                   onChange={handleChange}
                   disabled={status === 'loading'}
@@ -170,22 +172,22 @@ export default function ContactoPage() {
               </div>
 
               {status === 'error' && (
-                <div className="flex items-center gap-2 p-3 rounded-lg" style={{ background: '#fef2f2', border: '1px solid #fecaca' }}>
-                  <FiAlertCircle className="h-5 w-5 flex-shrink-0" style={{ color: '#dc2626' }} />
-                  <span style={{ color: '#dc2626' }}>{errorMessage}</span>
+                <div className="flex items-center gap-2 rounded-lg border border-red-500/30 bg-red-500/10 p-3">
+                  <FiAlertCircle className="h-5 w-5 flex-shrink-0 text-red-400" />
+                  <span className="text-sm text-red-300">{errorMessage}</span>
                 </div>
               )}
 
               <button
                 type="submit"
                 disabled={status === 'loading'}
-                className="neu-btn-primary w-full flex items-center justify-center gap-2 mt-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="mt-2 flex w-full items-center justify-center gap-2 rounded-lg bg-[#ccff00] px-6 py-3 text-sm font-semibold text-[#0a0a0a] transition hover:bg-[#b8e600] disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {status === 'loading' ? (
                   <>
-                    <svg className="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    <svg className="h-5 w-5 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                     </svg>
                     {t('form.sending')}
                   </>
@@ -199,44 +201,45 @@ export default function ContactoPage() {
           )}
         </div>
 
-        {/* Datos de contacto */}
-        <div className="neu-raised p-6 sm:p-8 rounded-2xl flex flex-col justify-between">
+        <div className="flex flex-col justify-between rounded-2xl border border-white/10 bg-white/5 p-6 sm:p-8">
           <div>
-            <h2 className="text-xl font-bold mb-6 flex items-center gap-2" style={{ color: '#2d3748' }}>
-              <FiMail className="h-6 w-6" style={{ color: 'var(--neu-primary)' }} />
+            <h2 className="mb-6 flex items-center gap-2 text-xl font-bold text-white">
+              <FiMail className="h-5 w-5 text-[#ccff00]" />
               {t('directContact.title')}
             </h2>
 
-            <div className="space-y-4 mb-8">
+            <div className="mb-8 space-y-4">
               <div className="flex items-center gap-3">
-                <div className="neu-service-icon flex-shrink-0" style={{ width: '48px', height: '48px', margin: 0 }}>
-                  <FiMail className="h-5 w-5" style={{ color: 'var(--neu-primary)' }} />
+                <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full border border-white/10 bg-white/5">
+                  <FiMail className="h-5 w-5 text-[#ccff00]" />
                 </div>
-                <span style={{ color: 'var(--text-muted)' }}>contacto@tunixlabs.com</span>
+                <span className="text-white/60">contacto@tunixlabs.com</span>
               </div>
               <a
                 href={`https://wa.me/56930367979?text=${encodeURIComponent(t('directContact.whatsappInfoMessage'))}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-3 group"
+                className="group flex items-center gap-3"
               >
-                <div className="neu-service-icon flex-shrink-0 transition-all duration-300 group-hover:-translate-y-1" style={{ width: '48px', height: '48px', margin: 0, background: 'linear-gradient(145deg, #25D366, #128C7E)' }}>
+                <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-green-600 transition-transform group-hover:-translate-y-0.5">
                   <BsWhatsapp className="h-5 w-5 text-white" />
                 </div>
-                <span style={{ color: 'var(--text-muted)' }} className="group-hover:text-green-600 transition-colors">{t('directContact.whatsapp')}</span>
+                <span className="text-white/60 transition-colors group-hover:text-green-400">
+                  {t('directContact.whatsapp')}
+                </span>
               </a>
             </div>
-
           </div>
 
-          <div className="neu-pressed p-6 rounded-xl text-center">
-            <p className="text-lg font-semibold mb-3 neu-gradient-text">{t('directContact.meetingQuestion')}</p>
+          <div className="rounded-xl border border-white/10 bg-white/[0.03] p-6 text-center">
+            <p className="mb-3 text-lg font-semibold text-white">
+              {t('directContact.meetingQuestion')}
+            </p>
             <a
               href={`https://wa.me/56930367979?text=${encodeURIComponent(t('directContact.whatsappScheduleMessage'))}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="neu-btn-primary inline-flex items-center gap-2"
-              style={{ background: 'linear-gradient(145deg, #25D366, #128C7E)' }}
+              className="inline-flex items-center gap-2 rounded-lg bg-green-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-green-500"
             >
               <BsWhatsapp className="h-5 w-5" />
               {t('directContact.scheduleCall')}
@@ -244,11 +247,6 @@ export default function ContactoPage() {
           </div>
         </div>
       </section>
-
-      {/* Footer */}
-      <footer className="py-8 neu-bg text-center" style={{ color: '#718096' }}>
-        <p>&copy; 2026 {tFooter('copyright')}</p>
-      </footer>
     </div>
   );
 }

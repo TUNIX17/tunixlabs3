@@ -288,14 +288,11 @@ export default function V3Client() {
     return () => { cancelled = true; };
   }, [active]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Layout takeover
   useEffect(() => {
-    document.querySelector('header')?.setAttribute('style', 'display:none!important');
     document.body.style.cssText = 'background:#0a0a0a!important;color:#f5f5f2!important;overflow-x:hidden';
     const m = document.querySelector('main') as HTMLElement;
     if (m) m.style.background = 'transparent';
     return () => {
-      document.querySelector('header')?.removeAttribute('style');
       document.body.style.cssText = '';
       if (m) m.style.background = '';
     };
@@ -341,21 +338,6 @@ export default function V3Client() {
           <span style={{ display: 'inline-block', width: 7, height: 14, background: '#00e5cc', marginLeft: 2, animation: 'v3blink .5s steps(2) infinite' }} />
         </div>
       </div>
-
-      {/* ── NAV (outside terminal) ── */}
-      <nav style={{
-        position: 'fixed', top: 0, left: 0, right: 0, zIndex: 200,
-        padding: '16px 32px', display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <img src="/logo_purpura.png" alt="TunixLabs" style={{ height: 32, filter: 'drop-shadow(0 0 8px rgba(124,58,237,0.3))' }} />
-          <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 9, color: '#ccff00', letterSpacing: '.2em' }}>AI SYSTEMS</span>
-        </div>
-        <div style={{ display: 'flex', gap: 20, alignItems: 'center' }}>
-          <a href={isES ? '/es/contacto' : '/en/contact'} style={{ color: '#f5f5f2', textDecoration: 'none', fontSize: 13 }}>{isES ? 'Contacto' : 'Contact'}</a>
-          <a href={isES ? '/en/v3' : '/es/v3'} style={{ background: '#ccff00', color: '#0a0a0a', padding: '4px 14px', borderRadius: 4, fontSize: 11, fontWeight: 700, textDecoration: 'none', fontFamily: 'JetBrains Mono, monospace' }}>{isES ? 'EN' : 'ES'}</a>
-        </div>
-      </nav>
 
       {/* ════════════════════════════════════════════════════════
           THE TERMINAL — fixed center, persistent, content swaps
