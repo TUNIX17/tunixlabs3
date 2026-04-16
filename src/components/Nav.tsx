@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Image from 'next/image';
 import { useLocale } from 'next-intl';
 import { Link, usePathname, useRouter } from '@/i18n/navigation';
 import { routing } from '@/i18n/routing';
@@ -54,10 +55,20 @@ export default function Nav() {
         <div className="max-w-7xl mx-auto flex justify-between items-center px-6 py-4">
           <Link
             href="/"
-            className="font-mono uppercase tracking-[0.2em] text-acid text-sm md:text-base"
+            className="flex items-center gap-2.5"
             aria-label="Tunix Labs — Home"
           >
-            TUNIX LABS
+            <Image
+              src="/logo_blanco.webp"
+              alt=""
+              width={28}
+              height={28}
+              className="transition-transform duration-300 hover:rotate-12"
+              style={{ filter: 'drop-shadow(0 0 6px rgba(204,255,0,0.3))' }}
+            />
+            <span className="font-mono uppercase tracking-[0.2em] text-acid text-sm md:text-base">
+              TUNIX LABS
+            </span>
           </Link>
 
           {/* Desktop links */}

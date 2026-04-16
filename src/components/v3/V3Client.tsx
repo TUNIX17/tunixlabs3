@@ -217,6 +217,16 @@ export default function V3Client() {
   const [showWhatsAppChat, setShowWhatsAppChat] = useState(false);
   const [formStatus, setFormStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle');
   const [chatMsg, setChatMsg] = useState('');
+  const [mousePos, setMousePos] = useState({ x: 0.5, y: 0.5 });
+
+  // Mouse tracking for parallax effects
+  useEffect(() => {
+    const onMove = (e: MouseEvent) => {
+      setMousePos({ x: e.clientX / window.innerWidth, y: e.clientY / window.innerHeight });
+    };
+    window.addEventListener('mousemove', onMove, { passive: true });
+    return () => window.removeEventListener('mousemove', onMove);
+  }, []);
 
   // #4: Per-visit generative seed — every session is unique
   const [seed] = useState(() => Math.random());
@@ -419,14 +429,33 @@ export default function V3Client() {
           }}>
             <h1 style={{ fontSize: 'clamp(32px, 5.5vw, 80px)', fontWeight: 800, lineHeight: 1.08, letterSpacing: '-0.03em', margin: 0 }}>
               {hero.lines.map((l, i) => (
-                <span key={i} style={{ display: 'block', opacity: isHero && booted ? 1 : 0, transform: isHero && booted ? 'none' : 'translateY(30px)', transition: 'all 0.7s cubic-bezier(0.2,0.9,0.25,1)', ...stg(i) }}>{l}</span>
+                <span key={i} style={{ display: 'block', opacity: isHero && booted ? 1 : 0, transform: isHero && booted ? 'none' : 'translateY(40px) rotateX(15deg)', transition: 'all 0.8s cubic-bezier(0.2,0.9,0.25,1)', transformOrigin: 'left bottom', ...stg(i) }}>{l}</span>
               ))}
-              <span style={{ display: 'block', color: '#ccff00', opacity: isHero && booted ? 1 : 0, transform: isHero && booted ? 'none' : 'translateY(30px)', transition: 'all 0.7s cubic-bezier(0.2,0.9,0.25,1)', ...stg(hero.lines.length) }}>{hero.accent}</span>
+              {/* Accent line — character-by-character stagger reveal */}
+              <span style={{ display: 'block', color: '#ccff00' }}>
+                {hero.accent.split('').map((char, ci) => (
+                  <span key={ci} style={{
+                    display: 'inline-block',
+                    opacity: isHero && booted ? 1 : 0,
+                    transform: isHero && booted ? 'none' : 'translateY(50px) rotateX(20deg)',
+                    transition: 'all 0.6s cubic-bezier(0.2,0.9,0.25,1)',
+                    transitionDelay: `${hero.lines.length * 80 + 200 + ci * 25}ms`,
+                    transformOrigin: 'left bottom',
+                    ...(char === ' ' ? { width: '0.3em' } : {}),
+                  }}>{char}</span>
+                ))}
+              </span>
             </h1>
-            <p style={{ fontSize: 'clamp(14px, 1.4vw, 18px)', color: 'rgba(245,245,242,0.5)', maxWidth: 560, marginTop: 20, lineHeight: 1.6, opacity: isHero && booted ? 1 : 0, transition: 'opacity 0.6s ease 0.6s' }}>{hero.sub}</p>
-            <div style={{ display: 'flex', gap: 14, marginTop: 28, opacity: isHero && booted ? 1 : 0, transition: 'opacity 0.6s ease 0.8s' }}>
-              <a href={isES ? 'https://wa.me/56930367979' : 'https://calendly.com/amoyano17/30min'} target="_blank" rel="noopener noreferrer" style={{ background: '#ccff00', color: '#0a0a0a', padding: '12px 28px', borderRadius: 8, fontSize: 14, fontWeight: 700, textDecoration: 'none' }}>{hero.cta1}</a>
-              <a href="#sec-case0" style={{ border: '1px solid rgba(255,255,255,0.15)', color: '#f5f5f2', padding: '12px 28px', borderRadius: 8, fontSize: 14, textDecoration: 'none' }}>{hero.cta2}</a>
+            <p style={{ fontSize: 'clamp(14px, 1.4vw, 18px)', color: 'rgba(245,245,242,0.5)', maxWidth: 560, marginTop: 20, lineHeight: 1.6, opacity: isHero && booted ? 1 : 0, transform: isHero && booted ? 'none' : 'translateY(15px)', transition: 'all 0.7s ease 0.8s' }}>{hero.sub}</p>
+            <div style={{ display: 'flex', gap: 14, marginTop: 28, opacity: isHero && booted ? 1 : 0, transition: 'opacity 0.6s ease 1s' }}>
+              <a href={isES ? 'https://wa.me/56930367979' : 'https://calendly.com/amoyano17/30min'} target="_blank" rel="noopener noreferrer" data-cursor="grow" style={{ background: '#ccff00', color: '#0a0a0a', padding: '14px 32px', borderRadius: 10, fontSize: 14, fontWeight: 700, textDecoration: 'none', transition: 'transform 0.3s cubic-bezier(0.2,0.9,0.25,1), box-shadow 0.3s ease', boxShadow: '0 0 0 rgba(204,255,0,0)', }}
+                onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 8px 30px rgba(204,255,0,0.3)'; }}
+                onMouseLeave={e => { e.currentTarget.style.transform = ''; e.currentTarget.style.boxShadow = '0 0 0 rgba(204,255,0,0)'; }}
+              >{hero.cta1}</a>
+              <a href="#sec-case0" data-cursor="grow" style={{ border: '1px solid rgba(255,255,255,0.15)', color: '#f5f5f2', padding: '14px 32px', borderRadius: 10, fontSize: 14, textDecoration: 'none', transition: 'all 0.3s cubic-bezier(0.2,0.9,0.25,1)', }}
+                onMouseEnter={e => { e.currentTarget.style.borderColor = '#ccff00'; e.currentTarget.style.color = '#ccff00'; e.currentTarget.style.transform = 'translateY(-2px)'; }}
+                onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.15)'; e.currentTarget.style.color = '#f5f5f2'; e.currentTarget.style.transform = ''; }}
+              >{hero.cta2}</a>
             </div>
           </div>
 
@@ -467,7 +496,11 @@ export default function V3Client() {
                     blurDataURL={blurMap[cs.cmd]}
                     loading="lazy"
                     sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw"
-                    style={{ width: '100%', height: '100%', objectFit: 'cover', filter: 'brightness(0.92) contrast(1.05)', transition: 'filter 0.6s ease' }}
+                    style={{
+                      width: '100%', height: '100%', objectFit: 'cover',
+                      filter: 'brightness(0.92) contrast(1.05)', transition: 'filter 0.6s ease, transform 0.15s ease-out',
+                      transform: isActive ? `translate(${(mousePos.x - 0.5) * -8}px, ${(mousePos.y - 0.5) * -6}px) scale(1.06)` : 'scale(1)',
+                    }}
                   />
                   {/* Rive screen frame — brackets + scanline + border draw */}
                   {isActive && (
