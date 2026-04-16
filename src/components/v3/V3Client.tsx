@@ -231,6 +231,38 @@ function BootSequenceRive() {
   return <div style={{ width: 300, height: 220 }}><RiveComponent /></div>;
 }
 
+function CaseRevealFrame({ active: isActive }: { active: boolean }) {
+  const [ok, setOk] = useState(true);
+  const { rive, RiveComponent } = useRive({
+    src: '/rive/case-frame.riv',
+    artboard: 'Frame', stateMachines: ['frame'], autoplay: true,
+    layout: new Layout({ fit: Fit.Fill, alignment: Alignment.Center }),
+    onLoadError: () => setOk(false),
+  });
+  const showTrigger = useStateMachineInput(rive, 'frame', 'show');
+  const prevActive = useRef(false);
+  useEffect(() => {
+    if (isActive && !prevActive.current && showTrigger) showTrigger.fire();
+    prevActive.current = isActive;
+  }, [isActive, showTrigger]);
+  if (!ok) return null;
+  return <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 2 }}><RiveComponent /></div>;
+}
+
+function ReactiveWaveform({ intensity }: { intensity: number }) {
+  const [ok, setOk] = useState(true);
+  const { rive, RiveComponent } = useRive({
+    src: '/rive/contact-wave.riv',
+    artboard: 'Wave', stateMachines: ['wave'], autoplay: true,
+    layout: new Layout({ fit: Fit.Contain, alignment: Alignment.Center }),
+    onLoadError: () => setOk(false),
+  });
+  const input = useStateMachineInput(rive, 'wave', 'intensity');
+  useEffect(() => { if (input) input.value = intensity * 100; }, [input, intensity]);
+  if (!ok) return null;
+  return <div style={{ width: 240, height: 50, margin: '16px auto' }}><RiveComponent /></div>;
+}
+
 // ── SCROLL HOOK ──────────────────────────────────────────────
 
 type Section = 'hero' | 'case0' | 'case1' | 'case2' | 'case3' | 'case4' | 'case5' | 'case6' | 'services' | 'about' | 'contact';
@@ -623,12 +655,8 @@ export default function V3Client() {
                       transform: isActive ? `translate(${(mousePos.x - 0.5) * -8}px, ${(mousePos.y - 0.5) * -6}px) scale(1.06)` : 'scale(1)',
                     }}
                   />
-                  {/* Rive screen frame — brackets + scanline + border draw */}
-                  {isActive && (
-                    <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }}>
-                      <RiveScene src="/design-explorations/rive/screen-frame.riv" />
-                    </div>
-                  )}
+                  {/* Rive case frame — animated corner brackets + scanline reveal */}
+                  <CaseRevealFrame active={isActive} />
                   {/* Voice scene for schwager */}
                   {cs.id === 'schwager' && isActive && (
                     <div style={{ position: 'absolute', bottom: 12, left: 12, right: 12, height: 60, opacity: 0.85 }}>
@@ -739,7 +767,7 @@ export default function V3Client() {
             pointerEvents: isContact ? 'auto' : 'none',
             textAlign: 'center',
           }}>
-            <Waveform />
+            <ReactiveWaveform intensity={isContact ? (1 - Math.abs(mousePos.y - 0.5) * 2) : 0} />
             {/* Split text heading for contact */}
             <h2 style={{ fontSize: 'clamp(28px, 4vw, 52px)', fontWeight: 800, margin: '16px 0' }}>
               {(isES ? '¿Tienes un proyecto?' : 'Have a project?').split(' ').map((word, wi) => (
