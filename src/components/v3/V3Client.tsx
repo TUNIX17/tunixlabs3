@@ -658,8 +658,8 @@ export default function V3Client() {
                       }}
                     />
                   </div>
-                  {/* Rive case frame — animated corner brackets + scanline reveal */}
-                  <CaseRevealFrame active={isActive} />
+                  {/* Gradient overlay for text readability */}
+                  <div style={{ position: 'absolute', inset: 0, borderRadius: 8, background: 'linear-gradient(180deg, transparent 50%, rgba(0,0,0,0.3) 100%)', pointerEvents: 'none' }} />
                   {/* Voice scene for schwager */}
                   {cs.id === 'schwager' && isActive && (
                     <div style={{ position: 'absolute', bottom: 12, left: 12, right: 12, height: 60, opacity: 0.85 }}>
