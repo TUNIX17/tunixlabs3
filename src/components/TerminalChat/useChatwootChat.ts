@@ -140,7 +140,28 @@ export function useChatwootChat(enabled: boolean): UseChatwootChat {
       cable.on('typing_off', () => setIsAgentTyping(false));
       cable.on('message', ({ message }) => {
         setMessages((prev) => {
+          // Dedupe by id (happens when our own send echoes back through WS
+          // after the HTTP response already populated the bubble).
           if (prev.some((m) => m.id === message.id)) return prev;
+          // Race: ActionCable delivered before our HTTP POST resolved. The
+          // message is ours (outgoing from visitor = message_type 0), so we
+          // may have a temp bubble with the same content and sending status.
+          // Replace it instead of appending to avoid a duplicate when the
+          // HTTP response eventually lands.
+          if (message.message_type === 0) {
+            const tempIdx = prev.findIndex(
+              (m) =>
+                typeof m.id === 'string' &&
+                m.id.startsWith('temp-') &&
+                m.direction === 'outgoing' &&
+                m.content === message.content
+            );
+            if (tempIdx >= 0) {
+              const copy = prev.slice();
+              copy[tempIdx] = { ...toUIMessage(message), status: 'sent' };
+              return copy;
+            }
+          }
           return [...prev, toUIMessage(message)];
         });
         // Any inbound message means the agent stopped typing.
@@ -189,11 +210,18 @@ export function useChatwootChat(enabled: boolean): UseChatwootChat {
     ]);
     try {
       const saved = await apiSendMessage(state.source_id, state.conversation_id, text);
-      setMessages((prev) =>
-        prev.map((m) =>
+      setMessages((prev) => {
+        // If ActionCable already added the real message during the HTTP
+        // round-trip, drop the temp and keep only the real one — otherwise
+        // we'd end up with two bubbles carrying the same real id.
+        const alreadyHasReal = prev.some((m) => m.id === saved.id);
+        if (alreadyHasReal) {
+          return prev.filter((m) => m.id !== tempId);
+        }
+        return prev.map((m) =>
           m.id === tempId ? { ...toUIMessage(saved), status: 'sent' } : m
-        )
-      );
+        );
+      });
     } catch {
       setMessages((prev) =>
         prev.map((m) => (m.id === tempId ? { ...m, status: 'error' } : m))
