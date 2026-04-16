@@ -2,9 +2,29 @@
 
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
+import { useRive, Layout, Fit, Alignment } from '@rive-app/react-canvas';
 import { useLocale } from 'next-intl';
 import { Link, usePathname, useRouter } from '@/i18n/navigation';
 import { routing } from '@/i18n/routing';
+
+function NavBrandMark() {
+  const [ok, setOk] = useState(true);
+  const { RiveComponent } = useRive({
+    src: '/design-explorations/rive/brand-mark.riv',
+    autoplay: true,
+    layout: new Layout({ fit: Fit.Contain, alignment: Alignment.Center }),
+    onLoadError: () => setOk(false),
+  });
+  if (!ok) return (
+    <Image src="/logo_nav.webp" alt="" width={28} height={28}
+      style={{ filter: 'drop-shadow(0 0 8px rgba(0,229,204,0.4))' }} />
+  );
+  return (
+    <div style={{ width: 28, height: 28, filter: 'drop-shadow(0 0 8px rgba(0,229,204,0.4))' }}>
+      <RiveComponent />
+    </div>
+  );
+}
 
 export default function Nav() {
   const locale = useLocale();
@@ -58,14 +78,7 @@ export default function Nav() {
             className="flex items-center gap-2.5"
             aria-label="Tunix Labs — Home"
           >
-            <Image
-              src="/logo_nav.webp"
-              alt=""
-              width={28}
-              height={28}
-              className="transition-transform duration-300 hover:rotate-12"
-              style={{ filter: 'drop-shadow(0 0 8px rgba(0,229,204,0.4))' }}
-            />
+            <NavBrandMark />
             <span className="font-mono uppercase tracking-[0.2em] text-acid text-sm md:text-base">
               TUNIX LABS
             </span>

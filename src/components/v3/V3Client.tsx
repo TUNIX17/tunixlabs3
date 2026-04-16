@@ -698,9 +698,14 @@ export default function V3Client() {
                   onMouseEnter={e => { e.currentTarget.style.borderColor = '#ccff00'; e.currentTarget.style.background = 'rgba(204,255,0,0.04)'; e.currentTarget.style.transform = 'translateY(-3px)'; e.currentTarget.style.boxShadow = '0 8px 24px rgba(204,255,0,0.08), inset 3px 0 0 #ccff00'; }}
                   onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(245,245,242,0.06)'; e.currentTarget.style.background = 'rgba(245,245,242,0.02)'; e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = 'none'; }}
                 >
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
-                    <span style={{ fontSize: 14, fontWeight: 700 }}>{isES ? svc.es : svc.en}</span>
-                    <span style={{ fontSize: 10, color: '#ccff00', fontFamily: 'JetBrains Mono, monospace' }}>open →</span>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%', gap: 8 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 10, flex: 1, minWidth: 0 }}>
+                      <div style={{ width: 24, height: 24, flexShrink: 0, opacity: 0.7 }}>
+                        <RiveScene src={`/rive/services/${svc.key}.riv`} />
+                      </div>
+                      <span style={{ fontSize: 14, fontWeight: 700, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{isES ? svc.es : svc.en}</span>
+                    </div>
+                    <span style={{ fontSize: 10, color: '#ccff00', fontFamily: 'JetBrains Mono, monospace', flexShrink: 0 }}>open →</span>
                   </div>
                   <span style={{ fontSize: 12, color: 'rgba(245,245,242,0.4)', lineHeight: 1.4 }}>
                     {isES ? svc.descEs.substring(0, 80) + '...' : svc.descEn.substring(0, 80) + '...'}
