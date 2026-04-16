@@ -173,6 +173,64 @@ function Waveform() {
   return <div style={{ width: 200, height: 40, margin: '20px auto' }}><RiveComponent /></div>;
 }
 
+// ── SCROLL-DRIVEN RIVE COMPONENTS ────────────────────────────
+
+function ScrollGridBg({ scrollPct }: { scrollPct: number }) {
+  const [ok, setOk] = useState(true);
+  const { rive, RiveComponent } = useRive({
+    src: '/rive/scroll-grid.riv',
+    artboard: 'ScrollGrid', stateMachines: ['scroll'], autoplay: true,
+    layout: new Layout({ fit: Fit.Cover, alignment: Alignment.Center }),
+    onLoadError: () => setOk(false),
+  });
+  const input = useStateMachineInput(rive, 'scroll', 'scrollProgress');
+  useEffect(() => { if (input) input.value = scrollPct * 100; }, [input, scrollPct]);
+  if (!ok) return null;
+  return <div style={{ width: '100%', height: '100%' }}><RiveComponent /></div>;
+}
+
+function TerminalCursor({ isTyping: typing, isGlitching }: { isTyping: boolean; isGlitching: boolean }) {
+  const [ok, setOk] = useState(true);
+  const { rive, RiveComponent } = useRive({
+    src: '/rive/terminal-cursor.riv',
+    artboard: 'Cursor', stateMachines: ['cursor'], autoplay: true,
+    layout: new Layout({ fit: Fit.Contain, alignment: Alignment.Center }),
+    onLoadError: () => setOk(false),
+  });
+  const typingInput = useStateMachineInput(rive, 'cursor', 'isTyping');
+  const glitchInput = useStateMachineInput(rive, 'cursor', 'isGlitch');
+  useEffect(() => { if (typingInput) typingInput.value = typing; }, [typingInput, typing]);
+  useEffect(() => { if (glitchInput) glitchInput.value = isGlitching; }, [glitchInput, isGlitching]);
+  if (!ok) return <span style={{ display: 'inline-block', width: 7, height: 14, background: '#ccff00', animation: 'v3blink .8s steps(2) infinite' }} />;
+  return <div style={{ display: 'inline-block', width: 14, height: 16, verticalAlign: 'middle', marginLeft: 2 }}><RiveComponent /></div>;
+}
+
+function ScrollProgressBar({ scrollPct }: { scrollPct: number }) {
+  const [ok, setOk] = useState(true);
+  const { rive, RiveComponent } = useRive({
+    src: '/rive/scroll-progress.riv',
+    artboard: 'Progress', stateMachines: ['progress'], autoplay: true,
+    layout: new Layout({ fit: Fit.Contain, alignment: Alignment.Center }),
+    onLoadError: () => setOk(false),
+  });
+  const input = useStateMachineInput(rive, 'progress', 'scrollProgress');
+  useEffect(() => { if (input) input.value = scrollPct * 100; }, [input, scrollPct]);
+  if (!ok) return null;
+  return <div style={{ width: 24, height: 300 }}><RiveComponent /></div>;
+}
+
+function BootSequenceRive() {
+  const [ok, setOk] = useState(true);
+  const { RiveComponent } = useRive({
+    src: '/rive/boot-sequence.riv',
+    artboard: 'Boot', stateMachines: ['boot'], autoplay: true,
+    layout: new Layout({ fit: Fit.Contain, alignment: Alignment.Center }),
+    onLoadError: () => setOk(false),
+  });
+  if (!ok) return null;
+  return <div style={{ width: 300, height: 220 }}><RiveComponent /></div>;
+}
+
 // ── SCROLL HOOK ──────────────────────────────────────────────
 
 type Section = 'hero' | 'case0' | 'case1' | 'case2' | 'case3' | 'case4' | 'case5' | 'case6' | 'services' | 'about' | 'contact';
@@ -212,6 +270,7 @@ export default function V3Client() {
   const [typedCmd, setTypedCmd] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const [scrollVelocity, setScrollVelocity] = useState(0);
+  const [scrollPct, setScrollPct] = useState(0);
   const [selectedService, setSelectedService] = useState<ServiceData | null>(null);
   const [showContactForm, setShowContactForm] = useState(false);
   const [showWhatsAppChat, setShowWhatsAppChat] = useState(false);
@@ -242,6 +301,8 @@ export default function V3Client() {
     const track = () => {
       const v = Math.abs(window.scrollY - lastY);
       setScrollVelocity(Math.min(v / 10, 1)); // normalized 0-1
+      const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+      setScrollPct(maxScroll > 0 ? Math.min(window.scrollY / maxScroll, 1) : 0);
       lastY = window.scrollY;
       raf = requestAnimationFrame(track);
     };
@@ -344,6 +405,8 @@ export default function V3Client() {
             filter: 'drop-shadow(0 0 40px rgba(0, 229, 204, 0.5)) drop-shadow(0 0 80px rgba(0, 229, 204, 0.2))',
           }}
         />
+        {/* Boot Rive animation — T assembles from particles */}
+        <BootSequenceRive />
         {/* Boot terminal output */}
         <div style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 12, color: 'rgba(245,245,242,0.3)', textAlign: 'left', maxWidth: 300 }}>
           <div style={{ animation: 'v3fadeIn 0.3s ease 0.3s both' }}>
@@ -369,14 +432,14 @@ export default function V3Client() {
 
       <CustomCursor />
 
-      {/* ── HERO BACKGROUND — floating particle field ── */}
+      {/* ── SCROLL-DRIVEN BACKGROUND — grid that converges with scroll ── */}
       {booted && (
         <div style={{
           position: 'fixed', inset: 0, zIndex: 50, pointerEvents: 'none',
-          opacity: 0.6,
+          opacity: 0.7,
           transition: 'opacity 1.5s ease',
         }}>
-          <RiveScene src="/rive/hero-particles.riv" />
+          <ScrollGridBg scrollPct={scrollPct} />
         </div>
       )}
 
@@ -467,12 +530,7 @@ export default function V3Client() {
         }}>
           <span style={{ color: '#ccff00' }}>$</span>{' '}
           <span style={{ color: isTyping ? 'rgba(245,245,242,0.7)' : 'rgba(245,245,242,0.5)' }}>{typedCmd}</span>
-          <span style={{
-            display: 'inline-block', width: 7, height: 14, marginLeft: 2,
-            background: isTyping ? '#ccff00' : '#ccff00',
-            animation: isTyping ? 'none' : 'v3blink .8s steps(2) infinite',
-            opacity: isTyping ? 1 : undefined,
-          }} />
+          <TerminalCursor isTyping={isTyping} isGlitching={transitioning} />
         </div>
 
         {/* ── CONTENT AREA ── */}
@@ -1100,24 +1158,12 @@ export default function V3Client() {
         </div>
       )}
 
-      {/* ── SCROLL NAV DOTS ── */}
+      {/* ── SCROLL PROGRESS — Rive vertical indicator ── */}
       <div style={{
-        position: 'fixed', right: 24, top: '50%', transform: 'translateY(-50%)',
-        zIndex: 150, display: 'flex', flexDirection: 'column', gap: 6,
+        position: 'fixed', right: 20, top: '50%', transform: 'translateY(-50%)',
+        zIndex: 150, pointerEvents: 'none',
       }}>
-        {SECTIONS.map(s => {
-          const isActive = active === s;
-          return (
-            <a key={s} href={`#sec-${s}`} aria-label={s} style={{
-              width: isActive ? 10 : 6, height: isActive ? 10 : 6,
-              borderRadius: '50%',
-              background: isActive ? '#ccff00' : 'rgba(245,245,242,0.2)',
-              boxShadow: isActive ? '0 0 8px rgba(204,255,0,0.5)' : 'none',
-              transition: 'all 0.4s cubic-bezier(0.2, 0.9, 0.25, 1)',
-              display: 'block',
-            }} />
-          );
-        })}
+        <ScrollProgressBar scrollPct={scrollPct} />
       </div>
 
       {/* ══════════════════════════════════════════════════════
