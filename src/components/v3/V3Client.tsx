@@ -902,11 +902,10 @@ export default function V3Client() {
               </div>
               {/* CTA */}
               <div style={{ marginTop: 24, display: 'flex', gap: 12 }}>
-                <a href={isES ? 'https://wa.me/56930367979' : 'https://calendly.com/amoyano17/30min'}
-                  target="_blank" rel="noopener noreferrer"
-                  style={{ background: '#ccff00', color: '#0a0a0a', padding: '10px 24px', borderRadius: 8, fontSize: 13, fontWeight: 700, textDecoration: 'none' }}>
+                <button onClick={() => { openChatwoot(); setSelectedService(null); }}
+                  style={{ background: '#ccff00', color: '#0a0a0a', padding: '10px 24px', borderRadius: 8, fontSize: 13, fontWeight: 700, border: 'none', cursor: 'pointer' }}>
                   {isES ? 'Hablemos de este servicio' : 'Discuss this service'}
-                </a>
+                </button>
                 <button onClick={() => setSelectedService(null)} style={{
                   border: '1px solid rgba(255,255,255,0.15)', color: '#f5f5f2', background: 'transparent',
                   padding: '10px 24px', borderRadius: 8, fontSize: 13, cursor: 'pointer',
@@ -981,15 +980,14 @@ export default function V3Client() {
               {chatReady && (
                 <div style={{ background: 'rgba(37,211,102,0.08)', borderRadius: '12px 12px 12px 2px', padding: '10px 14px', maxWidth: '85%', fontSize: 13, color: 'rgba(245,245,242,0.8)', lineHeight: 1.5, animation: 'v3fadeIn 0.3s ease' }}>
                   {isES ? '¡Perfecto! Tu mensaje está listo.' : 'Your message is ready.'}
-                  <a
-                    href={`https://wa.me/56930367979?text=${encodeURIComponent(chatSent || '')}`}
-                    target="_blank" rel="noopener noreferrer"
-                    style={{ display: 'block', marginTop: 8, background: '#25D366', color: '#fff', padding: '8px 16px', borderRadius: 8, textDecoration: 'none', fontSize: 12, fontWeight: 700, textAlign: 'center' }}
+                  <button
+                    onClick={() => openChatwoot()}
+                    style={{ display: 'block', width: '100%', marginTop: 8, background: '#ccff00', color: '#0a0a0a', padding: '8px 16px', borderRadius: 8, border: 'none', fontSize: 12, fontWeight: 700, textAlign: 'center', cursor: 'pointer' }}
                   >
-                    {isES ? '→ Abrir en WhatsApp' : '→ Open in WhatsApp'}
-                  </a>
+                    {isES ? '→ Iniciar chat' : '→ Start chat'}
+                  </button>
                   <div style={{ fontSize: 10, color: 'rgba(245,245,242,0.3)', marginTop: 6 }}>
-                    {isES ? 'Se abre en una nueva pestaña' : 'Opens in a new tab'}
+                    {isES ? 'Chat en vivo directo en esta página' : 'Live chat right here on this page'}
                   </div>
                 </div>
               )}

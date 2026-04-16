@@ -4,8 +4,9 @@ import { useEffect } from 'react';
 import { Link } from '@/i18n/navigation';
 import { useTranslations } from 'next-intl';
 import { FiArrowLeft, FiArrowRight, FiCheckCircle } from 'react-icons/fi';
-import { BsWhatsapp } from 'react-icons/bs';
+import { BsChatDots } from 'react-icons/bs';
 import { trackEvent, Events } from '@/lib/analytics/track';
+import { openChatwoot } from '@/components/ChatwootWidget';
 
 export type ServiceContent = {
   serviceKey: string;
@@ -107,20 +108,18 @@ export default function ServiceLayout({ service }: Props) {
             {layoutT('ctaTitle')}
           </h2>
           <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
-            <a
-              href={service.whatsappHref}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-3 rounded-xl bg-green-600 px-6 py-4 font-semibold text-white transition hover:-translate-y-0.5 hover:bg-green-500"
-              onClick={() =>
+            <button
+              className="inline-flex items-center gap-3 rounded-xl bg-[#ccff00] px-6 py-4 font-semibold text-[#0a0a0a] transition hover:-translate-y-0.5 hover:bg-[#b8e600] cursor-pointer"
+              onClick={() => {
                 trackEvent(Events.CTA_WHATSAPP_CLICK, {
                   location: `service:${service.serviceKey}`,
-                })
-              }
+                });
+                openChatwoot();
+              }}
             >
-              <BsWhatsapp className="h-6 w-6" />
+              <BsChatDots className="h-6 w-6" />
               {layoutT('ctaButton')}
-            </a>
+            </button>
             <Link
               href="/contacto"
               className="inline-flex items-center gap-2 rounded-xl bg-[#ccff00] px-6 py-4 font-semibold text-[#0a0a0a] transition hover:bg-[#b8e600]"
