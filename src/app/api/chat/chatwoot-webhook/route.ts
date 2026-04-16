@@ -17,11 +17,37 @@
  * Telegram hiccup shouldn't cause a retry storm.
  */
 import type { NextRequest } from 'next/server';
+import { createHmac, timingSafeEqual } from 'node:crypto';
 import { CHATWOOT } from '@/lib/chatwoot/config';
 import { sendMessage, getOwnerChatId, TelegramError } from '@/lib/telegram/bot';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
+
+/**
+ * Verify the Chatwoot webhook signature. Chatwoot signs the raw JSON body
+ * with HMAC-SHA256(secret) and sends the hex digest in the
+ * `X-Chatwoot-Signature` header. Returns true if the signature matches or
+ * if no secret is configured (dev mode). Uses timingSafeEqual to avoid
+ * timing attacks.
+ */
+function verifyChatwootSignature(
+  rawBody: string,
+  signatureHeader: string | null
+): boolean {
+  const secret = process.env.CHATWOOT_WEBHOOK_SECRET;
+  if (!secret) return true; // not enforced when unset
+  if (!signatureHeader) return false;
+  const expected = createHmac('sha256', secret).update(rawBody).digest('hex');
+  try {
+    return timingSafeEqual(
+      Buffer.from(expected, 'hex'),
+      Buffer.from(signatureHeader, 'hex')
+    );
+  } catch {
+    return false;
+  }
+}
 
 type ChatwootWebhookPayload = {
   event?: string;
@@ -41,9 +67,19 @@ type ChatwootWebhookPayload = {
 };
 
 export async function POST(req: NextRequest) {
+  // Read raw body once so we can verify HMAC and then parse it.
+  const rawBody = await req.text();
+
+  const signature =
+    req.headers.get('x-chatwoot-signature') ??
+    req.headers.get('X-Chatwoot-Signature');
+  if (!verifyChatwootSignature(rawBody, signature)) {
+    return Response.json({ ok: false, error: 'invalid_signature' }, { status: 401 });
+  }
+
   let payload: ChatwootWebhookPayload;
   try {
-    payload = await req.json();
+    payload = JSON.parse(rawBody);
   } catch {
     return Response.json({ ok: true, skipped: 'invalid_json' });
   }
