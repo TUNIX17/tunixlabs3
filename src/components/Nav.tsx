@@ -78,7 +78,13 @@ export default function Nav() {
             className="flex items-center gap-2.5"
             aria-label="Tunix Labs — Home"
           >
-            <NavBrandMark />
+            <Image
+              src="/logo_nav.webp"
+              alt=""
+              width={36}
+              height={36}
+              style={{ filter: 'drop-shadow(0 0 10px rgba(0,229,204,0.5))' }}
+            />
             <span className="font-mono uppercase tracking-[0.2em] text-acid text-sm md:text-base">
               TUNIX LABS
             </span>

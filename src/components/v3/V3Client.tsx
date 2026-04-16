@@ -430,15 +430,13 @@ export default function V3Client() {
       }}>
         <Image
           src="/logo_turquesa.webp" alt="TunixLabs"
-          width={280} height={140} priority
+          width={400} height={200} priority
           style={{
-            height: 120, width: 'auto',
+            height: 200, width: 'auto',
             animation: 'v3logoPulse 1.5s ease-in-out',
-            filter: 'drop-shadow(0 0 40px rgba(0, 229, 204, 0.5)) drop-shadow(0 0 80px rgba(0, 229, 204, 0.2))',
+            filter: 'drop-shadow(0 0 50px rgba(0, 229, 204, 0.5)) drop-shadow(0 0 100px rgba(0, 229, 204, 0.25))',
           }}
         />
-        {/* Boot Rive animation — T assembles from particles */}
-        <BootSequenceRive />
         {/* Boot terminal output */}
         <div style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 12, color: 'rgba(245,245,242,0.3)', textAlign: 'left', maxWidth: 300 }}>
           <div style={{ animation: 'v3fadeIn 0.3s ease 0.3s both' }}>
