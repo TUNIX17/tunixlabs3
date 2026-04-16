@@ -1,9 +1,8 @@
 import { NextIntlClientProvider } from 'next-intl';
-import { getMessages, getTranslations } from 'next-intl/server';
+import { getMessages, getTranslations, setRequestLocale } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 import { routing } from '@/i18n/routing';
-import { Link } from '@/i18n/navigation';
-import LanguageSwitcher from '@/components/LanguageSwitcher';
+import Nav from '@/components/Nav';
 import JsonLd from '@/components/seo/JsonLd';
 import {
   organizationSchema,
@@ -105,8 +104,12 @@ export default async function LocaleLayout({ children, params: { locale } }: Pro
     notFound();
   }
 
+  // next-intl: enable static rendering by telling next-intl which locale
+  // the current segment is using. Must be called BEFORE any awaited
+  // server-side translation / i18n call in this layout or its descendants.
+  setRequestLocale(locale);
+
   const messages = await getMessages();
-  const t = await getTranslations('Layout');
 
   return (
     <html lang={locale}>
@@ -140,24 +143,7 @@ export default async function LocaleLayout({ children, params: { locale } }: Pro
       </head>
       <body>
         <NextIntlClientProvider messages={messages}>
-          <header className="absolute top-0 left-0 w-full flex justify-between items-center px-8 pt-4 z-30 bg-transparent">
-            <Link href="/inicio" className="flex items-center">
-              <img
-                src="/logo_tunixlabs_negro.png"
-                alt="Logo TunixLabs"
-                className="h-24 w-auto"
-              />
-            </Link>
-            <nav className="flex items-center gap-4">
-              <Link
-                href="/inicio"
-                className="text-lg font-semibold text-white hover:text-blue-300 transition-all duration-300"
-              >
-                {t('nav.home')}
-              </Link>
-              <LanguageSwitcher locale={locale} />
-            </nav>
-          </header>
+          <Nav />
           <main className="min-h-screen">{children}</main>
         </NextIntlClientProvider>
       </body>
