@@ -29,6 +29,11 @@ export type TelegramUpdate = {
     chat: { id: number };
     text?: string;
     date: number;
+    reply_to_message?: {
+      message_id: number;
+      text?: string;
+      from?: { id: number; is_bot?: boolean };
+    };
   };
 };
 
@@ -67,18 +72,56 @@ export async function sendMessage(
 }
 
 /**
- * Parse an owner reply of the form "@<conversationId> <content...>".
- * Returns null if the message doesn't match (treat as noise — e.g. /start,
- * /help, a general note). Content can include newlines.
+ * Extract a conversation id from the text of a forwarded notification.
+ * Our outbound notifications always start with "💬 Web #<id> · ...", so a
+ * Telegram "reply to message" gives us the conv id for free — the owner
+ * just replies naturally without typing any prefix.
  */
-export function parseConversationReply(
+export function extractConversationIdFromNotificationText(
   text: string | undefined | null
-): { conversationId: number; content: string } | null {
+): number | null {
   if (!text) return null;
-  const match = text.match(/^@(\d+)\s+([\s\S]+)$/);
+  const match = text.match(/Web #(\d+)/);
   if (!match) return null;
-  const conversationId = parseInt(match[1], 10);
-  const content = match[2].trim();
-  if (!Number.isFinite(conversationId) || !content) return null;
-  return { conversationId, content };
+  const n = parseInt(match[1], 10);
+  return Number.isFinite(n) ? n : null;
+}
+
+/**
+ * Resolve the target conversation id for an owner message.
+ *
+ * Priority (most natural first):
+ *   1. Telegram "reply to message" → parse the quoted bot notification for `Web #<id>`
+ *   2. Explicit `@<id> <content>` prefix in the message text (fallback for old flow)
+ *
+ * Returns `{ conversationId, content }` or null if we couldn't tell.
+ */
+export function resolveOwnerReply(message: {
+  text?: string;
+  reply_to_message?: { text?: string };
+}): { conversationId: number; content: string } | null {
+  const raw = (message.text ?? '').trim();
+  if (!raw) return null;
+
+  // 1. Reply to a bot notification — the quoted text contains `Web #<id>`.
+  if (message.reply_to_message?.text) {
+    const convId = extractConversationIdFromNotificationText(
+      message.reply_to_message.text
+    );
+    if (convId) {
+      return { conversationId: convId, content: raw };
+    }
+  }
+
+  // 2. Explicit `@<id> <content>` prefix (legacy/override).
+  const match = raw.match(/^@(\d+)\s+([\s\S]+)$/);
+  if (match) {
+    const conversationId = parseInt(match[1], 10);
+    const content = match[2].trim();
+    if (Number.isFinite(conversationId) && content) {
+      return { conversationId, content };
+    }
+  }
+
+  return null;
 }

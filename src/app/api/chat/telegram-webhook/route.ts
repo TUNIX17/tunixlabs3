@@ -14,7 +14,7 @@
 import type { NextRequest } from 'next/server';
 import {
   sendMessage,
-  parseConversationReply,
+  resolveOwnerReply,
   getOwnerChatId,
   type TelegramUpdate,
 } from '@/lib/telegram/bot';
@@ -24,9 +24,8 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 const USAGE_HINT =
-  'Uso: responde un mensaje del web con `@<id> tu respuesta`.\n\n' +
-  'Ej: `@847 hola, cuéntame más del proyecto`\n\n' +
-  'El `<id>` es el número que aparece en `💬 Web #<id>`.';
+  'Para responder: haz reply al mensaje del bot (mantén presionado → Responder) y escribe tu respuesta. Eso basta — yo me encargo del ruteo.\n\n' +
+  'Si prefieres: también puedes escribir `@<id> tu respuesta`.';
 
 export async function POST(req: NextRequest) {
   let update: TelegramUpdate;
@@ -65,13 +64,13 @@ export async function POST(req: NextRequest) {
   if (text === '/start' || text === '/help') {
     await sendMessage(
       ownerId,
-      `Bot listo.\n\n${USAGE_HINT}\n\nLos mensajes nuevos del web chat aparecerán acá con formato:\n\n💬 Web #<id> · <visitor>\n<mensaje>\n\nResponde: @<id> tu respuesta`
+      `Bot listo.\n\nLos mensajes nuevos del web chat aparecen acá como:\n\n💬 Web #<id> · <visitor>\n<mensaje>\n\n${USAGE_HINT}`
     );
     return Response.json({ ok: true, handled: 'start' });
   }
 
-  // Parse "@<id> <content>"
-  const reply = parseConversationReply(text);
+  // Resolve target conversation: reply-to-message (preferred) or @<id> prefix.
+  const reply = resolveOwnerReply(message);
   if (!reply) {
     await sendMessage(ownerId, USAGE_HINT);
     return Response.json({ ok: true, skipped: 'no_conv_match' });

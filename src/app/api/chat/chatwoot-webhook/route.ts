@@ -119,7 +119,11 @@ export async function POST(req: NextRequest) {
   const text =
     `💬 Web #${conversationId} · ${senderName}\n\n` +
     `${content}\n\n` +
-    `Responde: @${conversationId} tu respuesta`;
+    `↳ Responde a este mensaje para contestar`;
+
+  console.log(
+    `[chatwoot-webhook] forwarding conv #${conversationId} sender=${senderName}`
+  );
 
   try {
     await sendMessage(getOwnerChatId(), text);

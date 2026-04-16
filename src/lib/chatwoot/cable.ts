@@ -98,20 +98,25 @@ export class ChatwootCable {
   };
 
   private handleMessage = (ev: MessageEvent): void => {
-    let raw: { type?: string; message?: { event?: string } & ChatwootMessage } | null = null;
+    // Chatwoot's ActionCable frame shape (RoomChannel):
+    //   { identifier, message: { event: "message.created" | "conversation.typing_on" | ..., data: ChatwootMessage | {...} } }
+    // Control frames arrive as { type: "welcome" | "ping" | "confirm_subscription" | ... } without a `message`.
+    type RawFrame = {
+      type?: string;
+      message?: { event?: string; data?: unknown };
+    };
+    let raw: RawFrame | null = null;
     try { raw = JSON.parse(ev.data); } catch { return; }
     if (!raw) return;
 
-    // ActionCable framing messages we can ignore
     if (raw.type === 'welcome' || raw.type === 'ping' || raw.type === 'confirm_subscription' || raw.type === 'reject_subscription') {
       return;
     }
 
-    const payload = raw.message;
-    if (!payload) return;
+    const env = raw.message;
+    if (!env) return;
 
-    // Chatwoot sends multiple event shapes — inspect both `payload.event` and payload itself
-    const eventName = payload.event;
+    const eventName = env.event;
     if (eventName === 'conversation.typing_on') {
       this.emit('typing_on', undefined);
       return;
@@ -120,8 +125,13 @@ export class ChatwootCable {
       this.emit('typing_off', undefined);
       return;
     }
-    if (eventName === 'message.created' || typeof payload.message_type === 'number') {
-      this.emit('message', { message: payload as ChatwootMessage });
+    if (eventName === 'message.created' || eventName === 'message.updated') {
+      // Prefer `data` envelope; fall back to the legacy shape where the message
+      // object itself was attached directly to `message` (older Chatwoot builds).
+      const data = (env.data ?? env) as Partial<ChatwootMessage>;
+      if (typeof data.id === 'number' && typeof data.message_type === 'number') {
+        this.emit('message', { message: data as ChatwootMessage });
+      }
     }
   };
 
