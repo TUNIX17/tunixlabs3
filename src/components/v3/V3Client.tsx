@@ -6,6 +6,7 @@ import { useRive, useStateMachineInput, Layout, Fit, Alignment } from '@rive-app
 import { useLocale } from 'next-intl';
 import { blurMap } from '@/generated/blurMap';
 import { CustomCursor } from './CustomCursor';
+import { openChatwoot } from '@/components/ChatwootWidget';
 import '@/app/[locale]/v3/v3.css';
 
 /* ══════════════════════════════════════════════════════════════
@@ -799,14 +800,14 @@ export default function V3Client() {
               >
                 {isES ? 'Enviar mensaje' : 'Send message'}
               </button>
-              <button onClick={() => setShowWhatsAppChat(true)} data-cursor="grow" style={{
+              <button onClick={() => openChatwoot()} data-cursor="grow" style={{
                 border: '1px solid rgba(255,255,255,0.15)', color: '#f5f5f2', padding: '16px 40px', borderRadius: 10, fontSize: 15, background: 'transparent', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8,
                 transition: 'all 0.3s cubic-bezier(0.2,0.9,0.25,1)',
               }}
-                onMouseEnter={e => { e.currentTarget.style.borderColor = '#25d366'; e.currentTarget.style.color = '#25d366'; e.currentTarget.style.transform = 'translateY(-3px)'; }}
+                onMouseEnter={e => { e.currentTarget.style.borderColor = '#00e5cc'; e.currentTarget.style.color = '#00e5cc'; e.currentTarget.style.transform = 'translateY(-3px)'; }}
                 onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.15)'; e.currentTarget.style.color = '#f5f5f2'; e.currentTarget.style.transform = ''; }}
               >
-                <span style={{ fontSize: 18 }}>💬</span> {isES ? 'WhatsApp' : 'Book a call'}
+                <span style={{ fontSize: 18 }}>💬</span> {isES ? 'Chat en vivo' : 'Live chat'}
               </button>
             </div>
           </div>

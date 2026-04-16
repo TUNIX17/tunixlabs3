@@ -3,6 +3,7 @@ import { getMessages, getTranslations, setRequestLocale } from 'next-intl/server
 import { notFound } from 'next/navigation';
 import { routing } from '@/i18n/routing';
 import Nav from '@/components/Nav';
+import { ChatwootWidget } from '@/components/ChatwootWidget';
 import { LenisProvider } from '@/components/kinetic-swiss/LenisProvider';
 import JsonLd from '@/components/seo/JsonLd';
 import {
@@ -146,6 +147,7 @@ export default async function LocaleLayout({ children, params: { locale } }: Pro
           <LenisProvider>
             <Nav />
             <main className="min-h-screen">{children}</main>
+            <ChatwootWidget />
           </LenisProvider>
         </NextIntlClientProvider>
       </body>
