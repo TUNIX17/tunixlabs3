@@ -932,8 +932,12 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  background: var(--paper);
+  transition: opacity 0.5s cubic-bezier(0.2, 0.9, 0.25, 1);
+}
+
+.preloaderBoot {
   background: #0a0a0a;
-  transition: opacity 0.6s cubic-bezier(0.2, 0.9, 0.25, 1);
 }
 
 .preloaderDone {
@@ -941,13 +945,6 @@
   pointer-events: none;
 }
 
-/* Rive logo splash container */
-.preloaderRive {
-  position: absolute;
-  inset: 0;
-}
-
-/* CSS fallback boot terminal */
 .bootTerminal {
   font-family: 'JetBrains Mono', monospace;
   font-size: 14px;
@@ -993,6 +990,11 @@
 @keyframes bootType {
   from { width: 0; }
   to { width: 22ch; }
+}
+
+@keyframes preloadPulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.6); opacity: 0.4; }
 }
 
 /* ============ NAV ============ */
@@ -1086,6 +1088,11 @@
 
   .svc {
     grid-column: auto !important;
+    border-right: none;
+  }
+
+  .svc:nth-child(odd) {
+    border-right: 1.5px solid var(--ink);
   }
 
   .monster {
@@ -1096,14 +1103,16 @@
 /* ============ MOBILE ============ */
 @media (max-width: 768px) {
   .terminal {
-    width: calc(100vw - 20px) !important;
-    height: calc(100vh - 90px) !important;
+    width: calc(100vw - 16px) !important;
+    height: calc(100vh - 80px) !important;
     max-width: none;
     max-height: none;
     transform: translate(-50%, -50%) !important;
+    border-radius: 10px;
   }
 
   .terminalShifted {
+    width: calc(100vw - 16px) !important;
     transform: translate(-50%, -50%) !important;
   }
 
@@ -1112,17 +1121,18 @@
   }
 
   .ttyBody {
-    padding: 20px 24px;
+    padding: 16px 20px;
   }
 
   .monster {
-    font-size: 14vw;
+    font-size: clamp(24px, 10vw, 60px);
+    line-height: 0.92;
   }
 
   .heroMeta {
     grid-template-columns: repeat(2, 1fr);
-    gap: 16px;
-    margin-top: 28px;
+    gap: 12px;
+    margin-top: 20px;
   }
 
   .servicesGrid {
@@ -1132,12 +1142,16 @@
   .svc {
     grid-column: 1 / -1 !important;
     border-right: none !important;
-    min-height: 110px;
+    min-height: 80px;
     padding: 14px;
   }
 
   .servicesCountNumber {
     font-size: 36px;
+  }
+
+  .ttyTopbar {
+    padding: 8px 12px;
   }
 }
 

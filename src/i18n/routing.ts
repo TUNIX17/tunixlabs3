@@ -50,14 +50,6 @@ export const routing = defineRouting({
       es: '/servicios/automatizacion-marketing-ia',
       en: '/services/ai-marketing-automation'
     },
-    '/casos': {
-      es: '/casos',
-      en: '/cases'
-    },
-    '/sobre': {
-      es: '/sobre',
-      en: '/about'
-    },
     '/contacto': {
       es: '/contacto',
       en: '/contact'

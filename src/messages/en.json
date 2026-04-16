@@ -12,10 +12,10 @@
   },
   "HomePage": {
     "hero": {
-      "title1": "One operator.",
-      "title2": "MIT-trained.",
-      "title3": "Production AI from Santiago.",
-      "description": "I build the systems that replace spreadsheets, paper, and manual chaos in regulated industries. 15 years running real operations before writing code. MSc Finance + MIT AI/ML. Based in Chile, US time zones, fluent English. Nearshore engagements at 3-5x below SF/NYC rates.",
+      "title1": "Not a studio.",
+      "title2": "One operator",
+      "title3": "shipping production systems from Chile.",
+      "description": "I'm Alejandro. 15 years running real operations — metallurgy, retail, mining contractors — and now shipping AI-powered production systems with Claude Code agentic workflows. MSc Finance (UAI) + MIT Professional Education ML training. Based in Chile, fluent English (Ukiah High School, California), US time zones. Engagements typically USD 15k–60k.",
       "cta": {
         "contact": "Book a discovery call",
         "services": "See what I've shipped"
@@ -34,9 +34,9 @@
       "cards": {
         "sime": {
           "client": "Contractors at Chile's largest copper mining operations",
-          "problem": "Thousands of maintenance work orders on paper between field and office. No audit trail, no digital traceability.",
-          "solution": "Complete digital replacement: field workers sign with QR on-site. Supervisors approve from mobile. Automatic audit by shift cycle.",
-          "metric": "4,000 digital route sheets per day · Zero paper in the field",
+          "problem": "Safety inspections, preventive maintenance plans and work orders were tracked on paper and spreadsheets across remote mining sites, with no end-to-end digital audit trail between the field and the head office.",
+          "solution": "Full rebuild of an aging legacy system into a modern TypeScript platform. Every legacy feature preserved, plus QR-signed PDFs archived on AWS S3, mobile-friendly batch approvals via shareable links, KPI dashboards with historical navigation, and period comparisons built around mining shift cycles.",
+          "metric": "19,778 work orders · 115K+ activities · 116K+ sub-activities in production",
           "stack": [
             "Turborepo",
             "Fastify",
@@ -47,9 +47,9 @@
         },
         "schwager": {
           "client": "Schwager (mining services, via technical partner)",
-          "problem": "Field workers in gloves and rain can't fill safety forms on a phone. Paper forms get lost before reaching audit.",
-          "solution": "Voice AI: workers complete safety forms by talking. No typing, no signal dependency. Legal signatures via email, WhatsApp, or web.",
-          "metric": "195+ workers speak instead of type · Sub-100ms responses",
+          "problem": "Legal maintenance sign-offs collected on paper at remote mining field sites with intermittent connectivity. Forms were lost before reaching audit, supervisors spent hours chasing approvals, and SAP exports of cancelled work orders slipped through.",
+          "solution": "Offline-first mobile app (iOS + Android) with Voice AI powered by Google Gemini — field workers complete safety forms hands-free in gloves, rain, and vibration. Multi-channel digital signatures (email, WhatsApp, web, mobile) with full audit trail, and a smart Excel parser that reads SAP exports and detects cancelled work orders automatically.",
+          "metric": "195+ field workers · 7 maintenance teams · 4,000+ daily route sheets · >90% memory usage reduction · response times under 100ms",
           "stack": [
             "React",
             "TypeScript",
@@ -60,9 +60,9 @@
         },
         "gasDistribution": {
           "client": "Regional gas distribution operator in Chile",
-          "problem": "14 delivery drivers losing 2 hours daily hand-typing discount codes. Typos mean failed deliveries and angry customers.",
-          "solution": "WhatsApp bot: driver sends photo of the code, AI reads it, burns it automatically. Driver stays on the road.",
-          "metric": "From 5 min per code to 30 seconds · 14 drivers back on route",
+          "problem": "Manual validation of burn codes across 14 delivery routes, with daily transcription errors and hours of rework before billing.",
+          "solution": "Automated code processing bot with business-rule validation, per-route metrics dashboard and daily reporting. Commodity stack, no enterprise licensing lock-in.",
+          "metric": "4,040 codes processed · 88.7% success rate · 14 routes automated",
           "stack": [
             "Express",
             "Prisma",
@@ -72,9 +72,9 @@
         },
         "apoderapp": {
           "client": "Apoderapp (own product)",
-          "problem": "School treasurers collecting fees via spreadsheets and WhatsApp photos. No receipts, no transparency, no audit trail.",
-          "solution": "WhatsApp-first platform: parents send payment photo, AI reads and verifies it automatically. Treasurer approves with one tap. Public transparency reports.",
-          "metric": "School fee collection without spreadsheets · AI-verified receipts",
+          "problem": "Chilean parent-teacher associations had no digital channel for fees, payments and voting — everything lived in spreadsheets and WhatsApp.",
+          "solution": "PWA built end-to-end using agentic coding pipelines on Claude Code, with a 5-agent multi-agent architecture. Ships with a reusable sii-factura library (Chilean electronic invoicing, 88+ tests) as a compliance feature, but the core value is association management. Designed for LATAM-wide expansion.",
+          "metric": "PWA in production · 5 Claude Code agents · sii-factura library with 88+ tests as a feature",
           "stack": [
             "Next.js",
             "React",
@@ -85,9 +85,9 @@
         },
         "fernandezMetallurgic": {
           "client": "Fernandez Metallurgic (50-year-old industrial company)",
-          "problem": "A 50-year-old workshop running everything on Excel: HR, finance, projects, CRM. Owners traveled and nobody knew the real state of the business.",
-          "solution": "Custom ERP replacing every spreadsheet. OCR reads invoices, QR tracks tools, AI extracts data from floor documents. One system for the entire company.",
-          "metric": "50 years of Excel replaced · One system, one source of truth",
+          "problem": "A 50-year-old metallurgic company running its entire operation on Excel — HR, attendance, finance, document management, project control, CRM — during a period when the owners were absent and operational continuity was at risk.",
+          "solution": "Custom AI-powered ERP that replaced Excel across every critical area. OCR, QR and LLM Vision pipelines for on-floor document digitization, full Chilean SII integration for invoicing and tax compliance, and a project control module built for metallurgy, not for SaaS. Led the end-to-end digital transformation while the owners were away.",
+          "metric": "Full ERP shipped solo · SII integration in production · OCR + QR + LLM Vision pipelines live",
           "stack": [
             "Next.js",
             "Prisma",
@@ -102,34 +102,34 @@
       "title": "Production portfolio",
       "slots": {
         "sgmSchwager": {
-          "label": "Voice AI for mining field ops",
-          "metric": "Workers fill safety forms by talking. In gloves and rain."
+          "label": "Field maintenance management",
+          "metric": "195+ field workers · 4,000+ daily route sheets · Voice AI on Google Gemini"
         },
         "apoderappDark": {
-          "label": "WhatsApp-first school fee collection",
-          "metric": "Treasurers collect fees without spreadsheets. AI verifies receipts."
+          "label": "SaaS for Chilean school associations",
+          "metric": "Own PWA · 5 Claude Code agents · sii-factura library with 88+ tests as a feature"
         },
         "fernandezErp": {
-          "label": "Custom ERP for industrial workshop",
-          "metric": "50 years of Excel replaced. One system, entire company."
+          "label": "Custom ERP for metallurgy",
+          "metric": "50-year-old company · Excel replaced area by area · OCR + QR + LLM Vision"
         },
         "speakly": {
-          "label": "AI English learning academy",
-          "metric": "Practice with AI avatar + human teacher with AI copilot"
+          "label": "AI English learning",
+          "metric": "Own product · Turborepo + Voice AI · personalized learning paths"
         },
         "gasDistribution": {
-          "label": "Delivery driver automation bot",
-          "metric": "Photo of code via WhatsApp → auto-burned in 30 seconds"
+          "label": "Gas distribution automation",
+          "metric": "4,040 codes · 88.7% success · 14 delivery routes automated"
         }
       }
     },
     "about": {
       "badge": "About the founder",
-      "title": "One person. Seven production systems.",
+      "title": "The person you'll actually work with",
       "name": "Alejandro Moyano Foncea",
-      "roleLine": "MSc Finance · MIT Professional Education AI/ML · 15 years ops before code",
-      "bioParagraph1": "Not a studio. Not an agency. I'm one person who understands the business because I've been running them for 15 years — copper mines, gas distributors, industrial workshops — and now I build the systems that replace Excel, paper, and manual chaos. <mit>MIT Professional Education</mit> in AI/ML, MSc Finance, and agentic workflows on Claude Code.",
-      "bioParagraph2": "I understand the *why* behind software, not just the *how*. Every system I ship solves a problem I've seen firsthand: workers who can't type with gloves, treasurers drowning in receipts, 50-year-old shops with no visibility into their own numbers. US time zone overlap, fluent English (California high school), rates 3-5x below SF/NYC — without giving up senior ownership.",
+      "roleLine": "Chilean solo operator · MSc Finance + MIT Professional Education · 15 years running real ops before writing code",
+      "bioParagraph1": "I fix operational inefficiencies by building custom software. Unlike a traditional developer, I don't spend weeks writing code by hand — I use modern AI workflows on Claude Code to architect and ship production systems in a fraction of the usual time. My background isn't just tech, it's business: MSc in Finance, <mit>MIT Professional Education</mit> in AI/ML, and 15 years leading real operations before writing production code.",
+      "bioParagraph2": "That's how I understand the *why* behind the software, not just the *how*. I've delivered everything from mining maintenance platforms for large-scale Chilean mining and custom ERPs for heavy industry, to engagement apps for education and decade-old legacy system modernization. I turn manual, paper-based work into digital tools that actually move the needle — no demos, no pitch decks, systems running today. US time zone overlap (0–2h from East/Central) and rates 3–5x below comparable SF/NYC shops, without giving up senior ownership.",
       "linkedinLabel": "View on LinkedIn",
       "linkedinUrl": "https://www.linkedin.com/in/alejandro-moyano/"
     },

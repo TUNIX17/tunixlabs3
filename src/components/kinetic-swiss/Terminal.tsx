@@ -82,7 +82,7 @@ function TrafficLights({ state, prodActive }: { state: number; prodActive: boole
   }
 
   return (
-    <div className={styles.lights} style={{ width: 52, height: 16 }}>
+    <div className={styles.lights} style={{ width: 80, height: 20 }}>
       <RiveComponent />
     </div>
   );

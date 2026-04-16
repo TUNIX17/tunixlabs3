@@ -1,0 +1,879 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TunixLabs - Coral | Soluciones IA</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* Coral Theme - Warm Neumorphism */
+            --neu-bg: #f5ebe0;
+            --neu-bg-warm: #faf5ef;
+            --neu-shadow-light: #ffffff;
+            --neu-shadow-dark: #d4c8bb;
+            --neu-primary: #e07a5f;
+            --neu-primary-dark: #c9624b;
+            --neu-accent: #f2a285;
+            --neu-accent-light: #f9cbb8;
+            --neu-secondary: #3d5a80;
+            --neu-glow: rgba(224, 122, 95, 0.2);
+            --text-dark: #3d3830;
+            --text-muted: #7a7165;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--neu-bg);
+            color: var(--text-dark);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Neumorphic Warm Classes */
+        .neu-raised {
+            background: var(--neu-bg);
+            border-radius: 28px;
+            box-shadow:
+                12px 12px 24px var(--neu-shadow-dark),
+                -12px -12px 24px var(--neu-shadow-light);
+        }
+
+        .neu-raised-soft {
+            background: linear-gradient(145deg, var(--neu-bg-warm), var(--neu-bg));
+            border-radius: 24px;
+            box-shadow:
+                8px 8px 18px var(--neu-shadow-dark),
+                -8px -8px 18px var(--neu-shadow-light);
+        }
+
+        .neu-pressed {
+            background: var(--neu-bg);
+            border-radius: 16px;
+            box-shadow:
+                inset 5px 5px 12px var(--neu-shadow-dark),
+                inset -5px -5px 12px var(--neu-shadow-light);
+        }
+
+        /* Gradient Text */
+        .gradient-text {
+            background: linear-gradient(135deg, var(--neu-primary), var(--neu-accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .gradient-text-alt {
+            background: linear-gradient(135deg, var(--neu-secondary), var(--neu-primary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Buttons */
+        .neu-btn-primary {
+            padding: 1.1rem 2.8rem;
+            background: linear-gradient(145deg, var(--neu-primary), var(--neu-primary-dark));
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow:
+                6px 6px 14px var(--neu-shadow-dark),
+                -6px -6px 14px var(--neu-shadow-light),
+                0 4px 20px var(--neu-glow);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .neu-btn-primary:hover {
+            transform: translateY(-4px) scale(1.02);
+            box-shadow:
+                8px 8px 20px var(--neu-shadow-dark),
+                -8px -8px 20px var(--neu-shadow-light),
+                0 8px 30px var(--neu-glow);
+        }
+
+        .neu-btn-secondary {
+            padding: 1.1rem 2.8rem;
+            background: var(--neu-bg);
+            color: var(--neu-primary);
+            border: 2px solid transparent;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow:
+                6px 6px 14px var(--neu-shadow-dark),
+                -6px -6px 14px var(--neu-shadow-light);
+            transition: all 0.3s ease;
+        }
+
+        .neu-btn-secondary:hover {
+            border-color: var(--neu-primary);
+            box-shadow:
+                inset 4px 4px 10px var(--neu-shadow-dark),
+                inset -4px -4px 10px var(--neu-shadow-light);
+        }
+
+        /* Navigation */
+        .navbar {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 100;
+            padding: 1rem 2rem;
+            background: rgba(245, 235, 224, 0.9);
+            backdrop-filter: blur(20px);
+            border-radius: 50px;
+            box-shadow:
+                8px 8px 20px var(--neu-shadow-dark),
+                -8px -8px 20px var(--neu-shadow-light);
+            max-width: 800px;
+            width: 90%;
+        }
+
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.6rem;
+            font-weight: 800;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--text-muted);
+            font-weight: 500;
+            transition: color 0.3s;
+            font-size: 0.95rem;
+        }
+
+        .nav-links a:hover {
+            color: var(--neu-primary);
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            padding: 10rem 2rem 6rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Decorative Shapes */
+        .shape {
+            position: absolute;
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        .shape.s1 {
+            width: 400px;
+            height: 400px;
+            background: linear-gradient(135deg, var(--neu-accent-light), transparent);
+            top: -10%;
+            right: -5%;
+            animation: morph 15s ease-in-out infinite;
+        }
+
+        .shape.s2 {
+            width: 300px;
+            height: 300px;
+            background: linear-gradient(135deg, rgba(61, 90, 128, 0.1), transparent);
+            bottom: 10%;
+            left: -5%;
+            animation: morph 12s ease-in-out infinite reverse;
+        }
+
+        .shape.s3 {
+            width: 150px;
+            height: 150px;
+            background: var(--neu-bg);
+            box-shadow:
+                10px 10px 20px var(--neu-shadow-dark),
+                -10px -10px 20px var(--neu-shadow-light);
+            top: 30%;
+            left: 10%;
+            animation: float 8s ease-in-out infinite;
+        }
+
+        @keyframes morph {
+            0%, 100% { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; }
+            50% { border-radius: 30% 60% 70% 40% / 50% 60% 30% 60%; }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(10deg); }
+        }
+
+        .hero-container {
+            max-width: 1280px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 5rem;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-content {
+            padding-right: 2rem;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.6rem 1.2rem;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--neu-primary);
+            margin-bottom: 1.5rem;
+            animation: pulse-soft 3s ease-in-out infinite;
+        }
+
+        @keyframes pulse-soft {
+            0%, 100% { box-shadow: inset 4px 4px 10px var(--neu-shadow-dark), inset -4px -4px 10px var(--neu-shadow-light); }
+            50% { box-shadow: inset 6px 6px 15px var(--neu-shadow-dark), inset -6px -6px 15px var(--neu-shadow-light), 0 0 20px var(--neu-glow); }
+        }
+
+        .hero-content h1 {
+            font-size: 3.5rem;
+            font-weight: 800;
+            line-height: 1.15;
+            margin-bottom: 1.5rem;
+        }
+
+        .hero-content p {
+            font-size: 1.2rem;
+            color: var(--text-muted);
+            margin-bottom: 2.5rem;
+            line-height: 1.8;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        /* Illustration Card */
+        .hero-visual {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .visual-card {
+            width: 100%;
+            max-width: 450px;
+            padding: 3rem;
+            text-align: center;
+            position: relative;
+        }
+
+        .visual-avatar {
+            width: 200px;
+            height: 200px;
+            margin: 0 auto 2rem;
+            border-radius: 50%;
+            background: linear-gradient(145deg, var(--neu-accent), var(--neu-primary));
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 5rem;
+            color: white;
+            box-shadow:
+                15px 15px 30px var(--neu-shadow-dark),
+                -15px -15px 30px var(--neu-shadow-light),
+                inset 5px 5px 15px rgba(255,255,255,0.2);
+            animation: bounce-soft 4s ease-in-out infinite;
+        }
+
+        @keyframes bounce-soft {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+
+        .visual-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+        }
+
+        .visual-text {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        .visual-features {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .feature-chip {
+            padding: 0.6rem 1.2rem;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--neu-secondary);
+        }
+
+        /* Services Section */
+        .services {
+            padding: 8rem 2rem;
+        }
+
+        .section-container {
+            max-width: 1280px;
+            margin: 0 auto;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 5rem;
+        }
+
+        .section-tag {
+            display: inline-block;
+            padding: 0.75rem 2rem;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--neu-primary);
+            margin-bottom: 1.5rem;
+            border-radius: 50px;
+        }
+
+        .section-header h2 {
+            font-size: 2.75rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+        }
+
+        .section-header p {
+            font-size: 1.15rem;
+            color: var(--text-muted);
+            max-width: 550px;
+            margin: 0 auto;
+        }
+
+        /* Bento Grid */
+        .bento-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: auto auto;
+            gap: 2rem;
+        }
+
+        .bento-item {
+            padding: 2.5rem;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .bento-item:hover {
+            transform: translateY(-8px) scale(1.02);
+        }
+
+        .bento-item.large {
+            grid-column: span 2;
+        }
+
+        .bento-icon {
+            width: 70px;
+            height: 70px;
+            margin-bottom: 1.5rem;
+            border-radius: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.75rem;
+            background: linear-gradient(145deg, var(--neu-bg-warm), var(--neu-bg));
+            box-shadow:
+                6px 6px 14px var(--neu-shadow-dark),
+                -6px -6px 14px var(--neu-shadow-light);
+        }
+
+        .bento-item:hover .bento-icon {
+            background: linear-gradient(145deg, var(--neu-accent), var(--neu-primary));
+            color: white;
+            box-shadow:
+                0 8px 25px var(--neu-glow);
+        }
+
+        .bento-item h3 {
+            font-size: 1.35rem;
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+        }
+
+        .bento-item p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            line-height: 1.7;
+        }
+
+        .bento-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 1.25rem;
+            font-weight: 600;
+            color: var(--neu-primary);
+            text-decoration: none;
+            transition: gap 0.3s, color 0.3s;
+        }
+
+        .bento-link:hover {
+            gap: 1rem;
+            color: var(--neu-primary-dark);
+        }
+
+        /* Testimonials */
+        .testimonials {
+            padding: 6rem 2rem;
+        }
+
+        .testimonials-container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 4rem;
+            text-align: center;
+        }
+
+        .quote {
+            font-size: 1.75rem;
+            font-weight: 500;
+            line-height: 1.6;
+            margin-bottom: 2rem;
+            font-style: italic;
+        }
+
+        .author {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+        }
+
+        .author-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(145deg, var(--neu-accent), var(--neu-primary));
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.5rem;
+            color: white;
+        }
+
+        .author-info strong {
+            display: block;
+            font-size: 1rem;
+        }
+
+        .author-info span {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        /* Contact Section */
+        .contact {
+            padding: 8rem 2rem;
+        }
+
+        .contact-wrapper {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 4rem;
+        }
+
+        .contact-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+        }
+
+        .contact-info h3 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .contact-info > p {
+            color: var(--text-muted);
+            margin-bottom: 2rem;
+            font-size: 1.05rem;
+        }
+
+        .info-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .info-row {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .info-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 14px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.25rem;
+            flex-shrink: 0;
+            background: linear-gradient(145deg, var(--neu-accent-light), var(--neu-accent));
+            color: white;
+        }
+
+        .info-row span {
+            font-size: 1rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .neu-input {
+            width: 100%;
+            padding: 1.1rem 1.5rem;
+            border: none;
+            border-radius: 16px;
+            background: var(--neu-bg);
+            color: var(--text-dark);
+            font-size: 1rem;
+            font-family: inherit;
+            box-shadow:
+                inset 5px 5px 12px var(--neu-shadow-dark),
+                inset -5px -5px 12px var(--neu-shadow-light);
+            transition: all 0.3s ease;
+        }
+
+        .neu-input:focus {
+            outline: none;
+            box-shadow:
+                inset 6px 6px 15px var(--neu-shadow-dark),
+                inset -6px -6px 15px var(--neu-shadow-light),
+                0 0 0 3px var(--neu-glow);
+        }
+
+        .neu-input::placeholder {
+            color: var(--text-muted);
+        }
+
+        textarea.neu-input {
+            resize: none;
+            min-height: 130px;
+        }
+
+        /* Social Row */
+        .social-row {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .social-btn {
+            width: 48px;
+            height: 48px;
+            border-radius: 14px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .social-btn:hover {
+            transform: translateY(-5px);
+            box-shadow:
+                8px 8px 18px var(--neu-shadow-dark),
+                -8px -8px 18px var(--neu-shadow-light),
+                0 8px 25px var(--neu-glow);
+        }
+
+        /* Footer */
+        .footer {
+            padding: 3rem 2rem;
+            text-align: center;
+            color: var(--text-muted);
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .hero-container {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+
+            .hero-content {
+                padding-right: 0;
+            }
+
+            .hero-buttons {
+                justify-content: center;
+            }
+
+            .bento-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .bento-item.large {
+                grid-column: span 2;
+            }
+
+            .contact-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                top: 10px;
+                padding: 0.75rem 1.5rem;
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            .hero-content h1 {
+                font-size: 2.5rem;
+            }
+
+            .hero-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .neu-btn-primary,
+            .neu-btn-secondary {
+                width: 100%;
+                max-width: 280px;
+                text-align: center;
+            }
+
+            .bento-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .bento-item.large {
+                grid-column: span 1;
+            }
+
+            .quote {
+                font-size: 1.25rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo gradient-text">TunixLabs</div>
+            <ul class="nav-links">
+                <li><a href="#inicio">Inicio</a></li>
+                <li><a href="#servicios">Servicios</a></li>
+                <li><a href="#contacto">Contacto</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero" id="inicio">
+        <div class="shape s1"></div>
+        <div class="shape s2"></div>
+        <div class="shape s3"></div>
+
+        <div class="hero-container">
+            <div class="hero-content">
+                <div class="hero-badge neu-pressed">&#10024; Consultoria IA Premium</div>
+                <h1>
+                    <span>Transformamos</span><br>
+                    <span class="gradient-text">ideas en realidad</span><br>
+                    <span>con IA</span>
+                </h1>
+                <p>Somos expertos en crear soluciones de inteligencia artificial que impulsan el crecimiento de tu empresa. Desde chatbots hasta analisis predictivo.</p>
+                <div class="hero-buttons">
+                    <button class="neu-btn-primary">Agendar llamada</button>
+                    <button class="neu-btn-secondary">Ver portafolio</button>
+                </div>
+            </div>
+
+            <div class="hero-visual">
+                <div class="visual-card neu-raised">
+                    <div class="visual-avatar">&#129302;</div>
+                    <h3 class="visual-title gradient-text">Asistente IA</h3>
+                    <p class="visual-text">Nuestros agentes virtuales atienden a tus clientes 24/7 con respuestas precisas y naturales.</p>
+                    <div class="visual-features">
+                        <span class="feature-chip neu-pressed">NLP</span>
+                        <span class="feature-chip neu-pressed">Multilingue</span>
+                        <span class="feature-chip neu-pressed">24/7</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Services Section -->
+    <section class="services" id="servicios">
+        <div class="section-container">
+            <div class="section-header">
+                <span class="section-tag neu-pressed">Servicios</span>
+                <h2 class="gradient-text">Lo que hacemos mejor</h2>
+                <p>Soluciones disenadas para el exito de tu negocio</p>
+            </div>
+
+            <div class="bento-grid">
+                <div class="bento-item large neu-raised-soft">
+                    <div class="bento-icon">&#128187;</div>
+                    <h3>Desarrollo Web con IA</h3>
+                    <p>Creamos aplicaciones web modernas potenciadas con inteligencia artificial. Interfaces adaptativas, recomendaciones personalizadas y experiencias que convierten visitantes en clientes.</p>
+                    <a href="#" class="bento-link">Conocer mas &#8594;</a>
+                </div>
+
+                <div class="bento-item neu-raised-soft">
+                    <div class="bento-icon">&#129302;</div>
+                    <h3>Machine Learning</h3>
+                    <p>Modelos predictivos entrenados con tus datos para automatizar decisiones clave.</p>
+                    <a href="#" class="bento-link">Conocer mas &#8594;</a>
+                </div>
+
+                <div class="bento-item neu-raised-soft">
+                    <div class="bento-icon">&#128172;</div>
+                    <h3>Chatbots IA</h3>
+                    <p>Asistentes virtuales que entienden, responden y resuelven con precision.</p>
+                    <a href="#" class="bento-link">Conocer mas &#8594;</a>
+                </div>
+
+                <div class="bento-item neu-raised-soft">
+                    <div class="bento-icon">&#128200;</div>
+                    <h3>Business Intelligence</h3>
+                    <p>Dashboards interactivos con insights automaticos y alertas en tiempo real.</p>
+                    <a href="#" class="bento-link">Conocer mas &#8594;</a>
+                </div>
+
+                <div class="bento-item large neu-raised-soft">
+                    <div class="bento-icon">&#128065;</div>
+                    <h3>Vision por Computadora</h3>
+                    <p>Sistemas de reconocimiento visual para control de calidad, seguridad, analisis de documentos y automatizacion industrial. Detectamos patrones que el ojo humano no puede ver.</p>
+                    <a href="#" class="bento-link">Conocer mas &#8594;</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonial -->
+    <section class="testimonials">
+        <div class="testimonials-container neu-raised">
+            <p class="quote">"TunixLabs transformo nuestra atencion al cliente. Su chatbot IA redujo nuestros tiempos de respuesta en un 80% y aumento la satisfaccion del cliente."</p>
+            <div class="author">
+                <div class="author-avatar">&#128100;</div>
+                <div class="author-info">
+                    <strong>Maria Rodriguez</strong>
+                    <span>CEO, TechStartup Chile</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section class="contact" id="contacto">
+        <div class="section-header">
+            <span class="section-tag neu-pressed">Contacto</span>
+            <h2 class="gradient-text">Hablemos de tu proyecto</h2>
+            <p>Estamos listos para ayudarte a innovar</p>
+        </div>
+
+        <div class="contact-wrapper neu-raised">
+            <div class="contact-grid">
+                <div class="contact-info">
+                    <h3>Conecta con nosotros</h3>
+                    <p>Cuéntanos tu idea y te ayudamos a hacerla realidad con inteligencia artificial.</p>
+
+                    <div class="info-list">
+                        <div class="info-row">
+                            <div class="info-icon">&#9993;</div>
+                            <span>info@tunixlabs.com</span>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-icon">&#128222;</div>
+                            <span>+34 123 456 789</span>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-icon">&#128205;</div>
+                            <span>Madrid, Espana</span>
+                        </div>
+                    </div>
+
+                    <div class="social-row">
+                        <div class="social-btn neu-raised-soft">&#120143;</div>
+                        <div class="social-btn neu-raised-soft">&#128101;</div>
+                        <div class="social-btn neu-raised-soft">&#128247;</div>
+                    </div>
+                </div>
+
+                <div class="contact-form">
+                    <div class="form-group">
+                        <label>Nombre</label>
+                        <input type="text" class="neu-input" placeholder="Tu nombre">
+                    </div>
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" class="neu-input" placeholder="tu@email.com">
+                    </div>
+                    <div class="form-group">
+                        <label>Mensaje</label>
+                        <textarea class="neu-input" placeholder="Cuéntanos sobre tu proyecto..."></textarea>
+                    </div>
+                    <button class="neu-btn-primary" style="width: 100%;">Enviar mensaje</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>&copy; 2026 TunixLabs. Todos los derechos reservados. | Version Coral</p>
+    </footer>
+</body>
+</html>

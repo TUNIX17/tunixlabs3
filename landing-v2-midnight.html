@@ -1,0 +1,946 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TunixLabs - Midnight | Soluciones IA</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* Midnight Theme - Dark Neumorphism */
+            --neu-bg: #1a1a2e;
+            --neu-bg-lighter: #1f1f35;
+            --neu-shadow-light: #252545;
+            --neu-shadow-dark: #0f0f1a;
+            --neu-primary: #00d4ff;
+            --neu-primary-dark: #00a8cc;
+            --neu-accent: #4fc3f7;
+            --neu-accent-purple: #b388ff;
+            --neu-glow: rgba(0, 212, 255, 0.2);
+            --text-light: #ffffff;
+            --text-muted: #8892b0;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--neu-bg);
+            color: var(--text-light);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Neumorphic Dark Classes */
+        .neu-raised {
+            background: linear-gradient(145deg, var(--neu-bg-lighter), var(--neu-bg));
+            border-radius: 24px;
+            box-shadow:
+                8px 8px 20px var(--neu-shadow-dark),
+                -8px -8px 20px var(--neu-shadow-light);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .neu-pressed {
+            background: var(--neu-bg);
+            border-radius: 16px;
+            box-shadow:
+                inset 5px 5px 12px var(--neu-shadow-dark),
+                inset -5px -5px 12px var(--neu-shadow-light);
+        }
+
+        /* Gradient Text */
+        .gradient-text {
+            background: linear-gradient(135deg, var(--neu-primary), var(--neu-accent-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .glow-text {
+            text-shadow: 0 0 20px var(--neu-glow), 0 0 40px var(--neu-glow);
+        }
+
+        /* Buttons */
+        .neu-btn-primary {
+            padding: 1rem 2.5rem;
+            background: linear-gradient(145deg, var(--neu-primary), var(--neu-primary-dark));
+            color: var(--neu-bg);
+            border: none;
+            border-radius: 16px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow:
+                6px 6px 15px var(--neu-shadow-dark),
+                -4px -4px 12px var(--neu-shadow-light),
+                0 0 20px var(--neu-glow);
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .neu-btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow:
+                8px 8px 20px var(--neu-shadow-dark),
+                -6px -6px 15px var(--neu-shadow-light),
+                0 0 40px var(--neu-glow);
+        }
+
+        .neu-btn-secondary {
+            padding: 1rem 2.5rem;
+            background: transparent;
+            color: var(--neu-primary);
+            border: 2px solid var(--neu-primary);
+            border-radius: 16px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .neu-btn-secondary:hover {
+            background: var(--neu-primary);
+            color: var(--neu-bg);
+            box-shadow: 0 0 30px var(--neu-glow);
+        }
+
+        /* Navigation */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            padding: 1.5rem 2rem;
+            background: rgba(26, 26, 46, 0.85);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .nav-container {
+            max-width: 1280px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2.5rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--text-muted);
+            font-weight: 500;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--neu-primary);
+            transition: width 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: var(--neu-primary);
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            padding: 8rem 2rem 4rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Grid Background */
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image:
+                linear-gradient(rgba(0, 212, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 212, 255, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+            pointer-events: none;
+        }
+
+        /* Glowing orbs */
+        .glow-orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            pointer-events: none;
+        }
+
+        .glow-orb.orb1 {
+            width: 500px;
+            height: 500px;
+            background: var(--neu-primary);
+            opacity: 0.1;
+            top: -20%;
+            right: -10%;
+            animation: pulse 8s ease-in-out infinite;
+        }
+
+        .glow-orb.orb2 {
+            width: 400px;
+            height: 400px;
+            background: var(--neu-accent-purple);
+            opacity: 0.08;
+            bottom: -15%;
+            left: -5%;
+            animation: pulse 10s ease-in-out infinite reverse;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.1; }
+            50% { transform: scale(1.2); opacity: 0.15; }
+        }
+
+        .hero-container {
+            max-width: 1280px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            gap: 4rem;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-content h1 {
+            font-size: 4rem;
+            font-weight: 800;
+            line-height: 1.1;
+            margin-bottom: 1.5rem;
+            letter-spacing: -0.02em;
+        }
+
+        .hero-content p {
+            font-size: 1.25rem;
+            color: var(--text-muted);
+            margin-bottom: 2.5rem;
+            max-width: 520px;
+            line-height: 1.8;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 1.5rem;
+        }
+
+        /* Terminal Style Avatar */
+        .hero-avatar {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .terminal-container {
+            width: 100%;
+            max-width: 450px;
+            padding: 2rem;
+        }
+
+        .terminal {
+            background: var(--neu-bg);
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow:
+                15px 15px 30px var(--neu-shadow-dark),
+                -15px -15px 30px var(--neu-shadow-light),
+                0 0 50px var(--neu-glow);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .terminal-header {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 1rem 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .terminal-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .terminal-dot.red { background: #ff5f56; }
+        .terminal-dot.yellow { background: #ffbd2e; }
+        .terminal-dot.green { background: #27ca40; }
+
+        .terminal-body {
+            padding: 1.5rem;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.9rem;
+            min-height: 200px;
+        }
+
+        .terminal-line {
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+        }
+
+        .terminal-prompt {
+            color: var(--neu-primary);
+        }
+
+        .terminal-command {
+            color: var(--text-light);
+        }
+
+        .terminal-output {
+            color: var(--text-muted);
+            padding-left: 1.5rem;
+        }
+
+        .typing-cursor {
+            display: inline-block;
+            width: 10px;
+            height: 18px;
+            background: var(--neu-primary);
+            animation: blink 1s infinite;
+            margin-left: 2px;
+        }
+
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+
+        /* Services Section */
+        .services {
+            padding: 8rem 2rem;
+            position: relative;
+        }
+
+        .section-container {
+            max-width: 1280px;
+            margin: 0 auto;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 5rem;
+        }
+
+        .section-badge {
+            display: inline-block;
+            padding: 0.75rem 2rem;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            color: var(--neu-primary);
+            margin-bottom: 1.5rem;
+        }
+
+        .section-header h2 {
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+        }
+
+        .section-header p {
+            font-size: 1.125rem;
+            color: var(--text-muted);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+        }
+
+        .service-card {
+            padding: 2.5rem;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.4s ease;
+        }
+
+        .service-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--neu-primary), var(--neu-accent-purple));
+            transform: scaleX(0);
+            transition: transform 0.4s ease;
+        }
+
+        .service-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .service-card:hover {
+            transform: translateY(-10px);
+            box-shadow:
+                12px 12px 25px var(--neu-shadow-dark),
+                -12px -12px 25px var(--neu-shadow-light),
+                0 0 40px var(--neu-glow);
+        }
+
+        .service-icon {
+            width: 70px;
+            height: 70px;
+            margin-bottom: 1.5rem;
+            border-radius: 16px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.75rem;
+            background: linear-gradient(145deg, var(--neu-bg-lighter), var(--neu-bg));
+            box-shadow:
+                inset 4px 4px 10px var(--neu-shadow-dark),
+                inset -4px -4px 10px var(--neu-shadow-light);
+            color: var(--neu-primary);
+        }
+
+        .service-card h3 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .service-card p {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            margin-bottom: 1.5rem;
+            line-height: 1.7;
+        }
+
+        .service-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 600;
+            color: var(--neu-primary);
+            text-decoration: none;
+            transition: gap 0.3s;
+        }
+
+        .service-link:hover {
+            gap: 1rem;
+        }
+
+        /* Stats Section */
+        .stats {
+            padding: 5rem 2rem;
+        }
+
+        .stats-container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 3rem;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 2rem;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 1.5rem;
+        }
+
+        .stat-number {
+            font-size: 3.5rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+            text-shadow: 0 0 30px var(--neu-glow);
+        }
+
+        .stat-label {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        /* Contact Section */
+        .contact {
+            padding: 8rem 2rem;
+        }
+
+        .contact-container {
+            max-width: 1280px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+        }
+
+        .contact-form {
+            padding: 3rem;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .neu-input {
+            width: 100%;
+            padding: 1.25rem 1.5rem;
+            border: none;
+            border-radius: 12px;
+            background: var(--neu-bg);
+            color: var(--text-light);
+            font-size: 1rem;
+            font-family: inherit;
+            box-shadow:
+                inset 5px 5px 12px var(--neu-shadow-dark),
+                inset -5px -5px 12px var(--neu-shadow-light);
+            transition: all 0.3s ease;
+            border: 1px solid transparent;
+        }
+
+        .neu-input:focus {
+            outline: none;
+            border-color: var(--neu-primary);
+            box-shadow:
+                inset 5px 5px 12px var(--neu-shadow-dark),
+                inset -5px -5px 12px var(--neu-shadow-light),
+                0 0 15px var(--neu-glow);
+        }
+
+        .neu-input::placeholder {
+            color: rgba(136, 146, 176, 0.5);
+        }
+
+        textarea.neu-input {
+            resize: none;
+            min-height: 150px;
+        }
+
+        .contact-info {
+            padding: 2rem;
+        }
+
+        .contact-info h3 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-bottom: 2rem;
+        }
+
+        .info-item {
+            display: flex;
+            align-items: center;
+            gap: 1.25rem;
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .info-item:hover {
+            transform: translateX(10px);
+        }
+
+        .info-icon {
+            width: 55px;
+            height: 55px;
+            border-radius: 14px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.5rem;
+            flex-shrink: 0;
+            box-shadow:
+                inset 4px 4px 10px var(--neu-shadow-dark),
+                inset -4px -4px 10px var(--neu-shadow-light);
+            color: var(--neu-primary);
+        }
+
+        .info-text strong {
+            display: block;
+            margin-bottom: 0.25rem;
+            font-size: 1rem;
+        }
+
+        .info-text span {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        /* Social Icons */
+        .social-icons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 3rem;
+        }
+
+        .social-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.25rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: var(--text-muted);
+        }
+
+        .social-icon:hover {
+            color: var(--neu-primary);
+            transform: translateY(-5px);
+            box-shadow:
+                10px 10px 20px var(--neu-shadow-dark),
+                -10px -10px 20px var(--neu-shadow-light),
+                0 0 20px var(--neu-glow);
+        }
+
+        /* Footer */
+        .footer {
+            padding: 3rem 2rem;
+            text-align: center;
+            color: var(--text-muted);
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .hero-container {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+
+            .hero-content p {
+                margin: 0 auto 2.5rem;
+            }
+
+            .hero-buttons {
+                justify-content: center;
+            }
+
+            .services-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .contact-container {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-container {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+
+            .hero-content h1 {
+                font-size: 2.5rem;
+            }
+
+            .hero-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .neu-btn-primary,
+            .neu-btn-secondary {
+                width: 100%;
+                max-width: 280px;
+                text-align: center;
+            }
+
+            .services-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-container {
+                grid-template-columns: 1fr;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo gradient-text glow-text">TunixLabs</div>
+            <ul class="nav-links">
+                <li><a href="#inicio">Inicio</a></li>
+                <li><a href="#servicios">Servicios</a></li>
+                <li><a href="#contacto">Contacto</a></li>
+            </ul>
+            <button class="neu-btn-primary" style="padding: 0.75rem 1.5rem; font-size: 0.8rem;">Contactar</button>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero" id="inicio">
+        <div class="glow-orb orb1"></div>
+        <div class="glow-orb orb2"></div>
+
+        <div class="hero-container">
+            <div class="hero-content">
+                <h1>
+                    <span>El futuro de tu</span><br>
+                    <span class="gradient-text glow-text">negocio comienza</span><br>
+                    <span>con IA</span>
+                </h1>
+                <p>En TunixLabs desarrollamos soluciones de inteligencia artificial que transforman datos en decisiones estrategicas. Automatiza, predice y escala con tecnologia de vanguardia.</p>
+                <div class="hero-buttons">
+                    <button class="neu-btn-primary">Iniciar proyecto</button>
+                    <button class="neu-btn-secondary">Ver demos</button>
+                </div>
+            </div>
+
+            <div class="hero-avatar">
+                <div class="terminal-container">
+                    <div class="terminal">
+                        <div class="terminal-header">
+                            <div class="terminal-dot red"></div>
+                            <div class="terminal-dot yellow"></div>
+                            <div class="terminal-dot green"></div>
+                        </div>
+                        <div class="terminal-body">
+                            <div class="terminal-line">
+                                <span class="terminal-prompt">$</span>
+                                <span class="terminal-command">tunix --init-ai</span>
+                            </div>
+                            <div class="terminal-line">
+                                <span class="terminal-output">Inicializando modelos...</span>
+                            </div>
+                            <div class="terminal-line">
+                                <span class="terminal-output" style="color: #27ca40;">&#10003; Modelo cargado exitosamente</span>
+                            </div>
+                            <div class="terminal-line">
+                                <span class="terminal-prompt">$</span>
+                                <span class="terminal-command">tunix analyze --data</span>
+                            </div>
+                            <div class="terminal-line">
+                                <span class="terminal-output">Procesando 1.2M registros...</span>
+                            </div>
+                            <div class="terminal-line">
+                                <span class="terminal-output" style="color: var(--neu-primary);">&#9889; Insights generados</span>
+                            </div>
+                            <div class="terminal-line">
+                                <span class="terminal-prompt">$</span>
+                                <span class="typing-cursor"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stats Section -->
+    <section class="stats">
+        <div class="stats-container neu-raised">
+            <div class="stat-item">
+                <div class="stat-number gradient-text">50+</div>
+                <div class="stat-label">Proyectos IA</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number gradient-text">2M+</div>
+                <div class="stat-label">Predicciones/dia</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number gradient-text">99.5%</div>
+                <div class="stat-label">Precision</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number gradient-text">24/7</div>
+                <div class="stat-label">Monitoreo</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Services Section -->
+    <section class="services" id="servicios">
+        <div class="section-container">
+            <div class="section-header">
+                <span class="section-badge neu-pressed">Servicios</span>
+                <h2 class="gradient-text glow-text">Soluciones IA empresariales</h2>
+                <p>Tecnologia que transforma negocios</p>
+            </div>
+
+            <div class="services-grid">
+                <div class="service-card neu-raised">
+                    <div class="service-icon">&#128187;</div>
+                    <h3>Desarrollos Web IA</h3>
+                    <p>Aplicaciones web inteligentes con interfaces adaptativas y experiencias personalizadas en tiempo real.</p>
+                    <a href="#" class="service-link">Explorar <span>&#8594;</span></a>
+                </div>
+
+                <div class="service-card neu-raised">
+                    <div class="service-icon">&#129302;</div>
+                    <h3>Machine Learning</h3>
+                    <p>Modelos predictivos entrenados con tus datos para automatizar decisiones y optimizar procesos.</p>
+                    <a href="#" class="service-link">Explorar <span>&#8594;</span></a>
+                </div>
+
+                <div class="service-card neu-raised">
+                    <div class="service-icon">&#128172;</div>
+                    <h3>Chatbots & Agentes</h3>
+                    <p>Asistentes conversacionales con NLP avanzado que entienden contexto y resuelven consultas complejas.</p>
+                    <a href="#" class="service-link">Explorar <span>&#8594;</span></a>
+                </div>
+
+                <div class="service-card neu-raised">
+                    <div class="service-icon">&#128200;</div>
+                    <h3>Analytics IA</h3>
+                    <p>Dashboards con insights automaticos, deteccion de anomalias y forecasting en tiempo real.</p>
+                    <a href="#" class="service-link">Explorar <span>&#8594;</span></a>
+                </div>
+
+                <div class="service-card neu-raised">
+                    <div class="service-icon">&#128065;</div>
+                    <h3>Computer Vision</h3>
+                    <p>Deteccion de objetos, OCR inteligente y analisis de imagenes para automatizacion visual.</p>
+                    <a href="#" class="service-link">Explorar <span>&#8594;</span></a>
+                </div>
+
+                <div class="service-card neu-raised">
+                    <div class="service-icon">&#9881;</div>
+                    <h3>Automatizacion RPA</h3>
+                    <p>Robots de software con IA que ejecutan tareas repetitivas con toma de decisiones inteligente.</p>
+                    <a href="#" class="service-link">Explorar <span>&#8594;</span></a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section class="contact" id="contacto">
+        <div class="section-container">
+            <div class="section-header">
+                <span class="section-badge neu-pressed">Contacto</span>
+                <h2 class="gradient-text glow-text">Iniciemos tu proyecto</h2>
+                <p>Cuéntanos tu idea y la hacemos realidad</p>
+            </div>
+
+            <div class="contact-container">
+                <div class="contact-form neu-raised">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Nombre</label>
+                            <input type="text" class="neu-input" placeholder="Tu nombre">
+                        </div>
+                        <div class="form-group">
+                            <label>Email</label>
+                            <input type="email" class="neu-input" placeholder="tu@email.com">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Empresa</label>
+                        <input type="text" class="neu-input" placeholder="Nombre de tu empresa">
+                    </div>
+                    <div class="form-group">
+                        <label>Mensaje</label>
+                        <textarea class="neu-input" placeholder="Describe tu proyecto o necesidad..."></textarea>
+                    </div>
+                    <button class="neu-btn-primary" style="width: 100%;">Enviar propuesta</button>
+                </div>
+
+                <div class="contact-info">
+                    <h3>Conecta con nosotros</h3>
+
+                    <div class="info-item neu-raised">
+                        <div class="info-icon">&#9993;</div>
+                        <div class="info-text">
+                            <strong>Email</strong>
+                            <span>info@tunixlabs.com</span>
+                        </div>
+                    </div>
+
+                    <div class="info-item neu-raised">
+                        <div class="info-icon">&#128222;</div>
+                        <div class="info-text">
+                            <strong>Telefono</strong>
+                            <span>+34 123 456 789</span>
+                        </div>
+                    </div>
+
+                    <div class="info-item neu-raised">
+                        <div class="info-icon">&#128205;</div>
+                        <div class="info-text">
+                            <strong>Oficina</strong>
+                            <span>Madrid, Espana</span>
+                        </div>
+                    </div>
+
+                    <div class="social-icons">
+                        <div class="social-icon neu-raised">&#120143;</div>
+                        <div class="social-icon neu-raised">&#128101;</div>
+                        <div class="social-icon neu-raised">&#128421;</div>
+                        <div class="social-icon neu-raised">&#128247;</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>&copy; 2026 TunixLabs. Innovacion con proposito. | Version Midnight</p>
+    </footer>
+</body>
+</html>
