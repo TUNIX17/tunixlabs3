@@ -95,7 +95,7 @@ export default function Nav() {
             {links.map(({ href, label }) => (
               <Link
                 key={href}
-                href={href}
+                href={href as any}
                 className={`text-sm transition-colors duration-200 ${
                   pathname === href
                     ? 'text-acid'
@@ -168,7 +168,7 @@ export default function Nav() {
           {links.map(({ href, label }, i) => (
             <Link
               key={href}
-              href={href}
+              href={href as any}
               onClick={() => setMobileOpen(false)}
               className={`text-2xl font-mono tracking-wider transition-colors duration-200 ${
                 pathname === href ? 'text-acid' : 'text-white/80 hover:text-acid'

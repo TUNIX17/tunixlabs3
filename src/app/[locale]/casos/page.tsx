@@ -81,7 +81,7 @@ export default async function CasosIndexPage({ params: { locale } }: Props) {
           return (
             <li key={c.slug}>
               <Link
-                href={`/casos/${c.slug}` as '/casos'}
+                href={`/casos/${c.slug}` as any}
                 className="group relative block h-full overflow-hidden rounded-2xl border border-white/10 bg-white/5 transition hover:-translate-y-1 hover:bg-white/8 hover:shadow-xl hover:shadow-white/5"
                 style={{ borderTop: `4px solid ${color}` }}
               >
