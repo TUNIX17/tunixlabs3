@@ -4,8 +4,11 @@
 // server HTML (h1, copy, CTAs visible in view-source), then mounts client
 // islands with ssr:false for interactivity.
 //
-// Sprint 3 will fill the islands with Rive/scroll/terminal logic while
-// keeping the RSC contract.
+// Sprint-3: hero is now a 2-column split. HeroSection (RSC, content-only)
+// renders the h1+CTAs in the left column; HeroClientIsland mounts the Rive
+// Production Monitor (HeroMonitor → SvgMonitor or RiveWithFallback gated by
+// NEXT_PUBLIC_RIVE_HERO) in the right column. The page wrapper owns the
+// section + grid so the SSR'd hero copy is the LCP candidate.
 
 import dynamic from 'next/dynamic';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
@@ -51,8 +54,19 @@ export default async function InicioPage({
 
   return (
     <>
-      <HeroSection copy={copy} />
-      <HeroClientIsland />
+      <section
+        className="relative bg-ink text-paper pt-32 md:pt-40 pb-20 min-h-screen flex items-center"
+        data-section="hero-split"
+      >
+        <div className="mx-auto w-full max-w-6xl px-6 md:px-10">
+          <div className="grid items-center gap-10 md:gap-12 md:grid-cols-2">
+            <HeroSection copy={copy} />
+            <div className="w-full">
+              <HeroClientIsland />
+            </div>
+          </div>
+        </div>
+      </section>
       <TerminalClient />
       <ScrollDriverClient />
     </>

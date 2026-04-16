@@ -1,12 +1,12 @@
 'use client';
 
-/**
- * HeroClientIsland — placeholder island for the Hero.
- *
- * Sprint 2 (ssr-split): returns null. Sprint 3 will mount the real Rive
- * stage using `useRive` + RiveWithFallback here, kept behind a dynamic
- * `ssr:false` import from the RSC page so the server HTML remains static.
- */
+// HeroClientIsland — Rive Production Monitor island (sprint-3).
+// Sprint-2 left this returning null. Sprint-3 mounts HeroMonitor, which
+// picks SvgMonitor (default) or RiveWithFallback (when NEXT_PUBLIC_RIVE_HERO=1)
+// and never SSRs the Rive WASM bundle.
+
+import HeroMonitor from '@/components/HeroMonitor';
+
 export default function HeroClientIsland() {
-  return null;
+  return <HeroMonitor />;
 }
