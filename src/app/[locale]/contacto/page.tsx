@@ -5,7 +5,7 @@ import { useTranslations } from 'next-intl';
 import { FiMail, FiSend, FiCheck, FiAlertCircle } from 'react-icons/fi';
 import { BsChatDots } from 'react-icons/bs';
 import { trackEvent, Events } from '@/lib/analytics/track';
-import { openChatwoot } from '@/components/ChatwootWidget';
+import { useTerminalChat } from '@/components/TerminalChat';
 
 type FormStatus = 'idle' | 'loading' | 'success' | 'error';
 
@@ -18,6 +18,7 @@ interface FormData {
 
 export default function ContactoPage() {
   const t = useTranslations('ContactPage');
+  const { open: openTerminal } = useTerminalChat();
 
   const [formData, setFormData] = useState<FormData>({
     nombre: '',
@@ -220,7 +221,7 @@ export default function ContactoPage() {
                 type="button"
                 onClick={() => {
                   trackEvent(Events.CTA_WHATSAPP_CLICK, { location: 'contact:info' });
-                  openChatwoot();
+                  openTerminal();
                 }}
                 className="group flex items-center gap-3 text-left"
               >
@@ -242,7 +243,7 @@ export default function ContactoPage() {
               type="button"
               onClick={() => {
                 trackEvent(Events.CTA_WHATSAPP_CLICK, { location: 'contact:schedule' });
-                openChatwoot();
+                openTerminal();
               }}
               className="inline-flex items-center gap-2 rounded-lg bg-[#ccff00] px-5 py-2.5 text-sm font-semibold text-[#0a0a0a] transition hover:bg-[#b8e600]"
             >

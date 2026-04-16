@@ -2,7 +2,7 @@
 
 import { useTranslations, useLocale } from 'next-intl';
 import { RiveWithFallback } from '../rive/RiveWithFallback';
-import { openChatwoot } from '@/components/ChatwootWidget';
+import { useTerminalChat } from '@/components/TerminalChat';
 import styles from '../kineticSwiss.module.css';
 
 interface ContactStateProps {
@@ -15,6 +15,7 @@ const CALENDLY_HREF = 'https://calendly.com/amoyano17/30min';
 export function ContactState({ active }: ContactStateProps) {
   const t = useTranslations('KineticSwiss.states.contact');
   const locale = useLocale();
+  const { open: openTerminal } = useTerminalChat();
   const titleText = t('title.text');
   const subtitle = t('subtitle');
   const ctaPrimary = t('ctaPrimary');
@@ -62,7 +63,7 @@ export function ContactState({ active }: ContactStateProps) {
           {isES ? (
             <button
               type="button"
-              onClick={() => openChatwoot()}
+              onClick={() => openTerminal()}
               className={styles.cta}
             >
               {ctaPrimary}

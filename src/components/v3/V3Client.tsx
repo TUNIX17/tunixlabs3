@@ -6,7 +6,7 @@ import { useRive, useStateMachineInput, Layout, Fit, Alignment } from '@rive-app
 import { useLocale } from 'next-intl';
 import { blurMap } from '@/generated/blurMap';
 import { CustomCursor } from './CustomCursor';
-import { openChatwoot } from '@/components/ChatwootWidget';
+import { useTerminalChat } from '@/components/TerminalChat';
 import '@/app/[locale]/v3/v3.css';
 
 /* ══════════════════════════════════════════════════════════════
@@ -306,13 +306,9 @@ export default function V3Client() {
   const [scrollPct, setScrollPct] = useState(0);
   const [selectedService, setSelectedService] = useState<ServiceData | null>(null);
   const [showContactForm, setShowContactForm] = useState(false);
-  const [showWhatsAppChat, setShowWhatsAppChat] = useState(false);
   const [formStatus, setFormStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle');
-  const [chatMsg, setChatMsg] = useState('');
-  const [chatSent, setChatSent] = useState<string | null>(null);
-  const [chatTyping, setChatTyping] = useState(false);
-  const [chatReady, setChatReady] = useState(false);
   const [mousePos, setMousePos] = useState({ x: 0.5, y: 0.5 });
+  const { open: openTerminal } = useTerminalChat();
 
   // Mouse tracking for parallax effects
   useEffect(() => {
@@ -599,7 +595,7 @@ export default function V3Client() {
             </h1>
             <p style={{ fontSize: 'clamp(14px, 1.4vw, 18px)', color: 'rgba(245,245,242,0.5)', maxWidth: 560, marginTop: 20, lineHeight: 1.6, opacity: isHero && booted ? 1 : 0, transform: isHero && booted ? 'none' : 'translateY(15px)', transition: 'all 0.7s ease 0.8s' }}>{hero.sub}</p>
             <div style={{ display: 'flex', gap: 14, marginTop: 28, opacity: isHero && booted ? 1 : 0, transition: 'opacity 0.6s ease 1s' }}>
-              <button onClick={() => openChatwoot()} data-cursor="grow" style={{ background: '#ccff00', color: '#0a0a0a', padding: '14px 32px', borderRadius: 10, fontSize: 14, fontWeight: 700, border: 'none', cursor: 'pointer', transition: 'transform 0.3s cubic-bezier(0.2,0.9,0.25,1), box-shadow 0.3s ease', boxShadow: '0 0 0 rgba(204,255,0,0)', }}
+              <button onClick={() => openTerminal()} data-cursor="grow" style={{ background: '#ccff00', color: '#0a0a0a', padding: '14px 32px', borderRadius: 10, fontSize: 14, fontWeight: 700, border: 'none', cursor: 'pointer', transition: 'transform 0.3s cubic-bezier(0.2,0.9,0.25,1), box-shadow 0.3s ease', boxShadow: '0 0 0 rgba(204,255,0,0)', }}
                 onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 8px 30px rgba(204,255,0,0.3)'; }}
                 onMouseLeave={e => { e.currentTarget.style.transform = ''; e.currentTarget.style.boxShadow = '0 0 0 rgba(204,255,0,0)'; }}
               >{hero.cta1}</button>
@@ -801,7 +797,7 @@ export default function V3Client() {
               >
                 {isES ? 'Enviar mensaje' : 'Send message'}
               </button>
-              <button onClick={() => openChatwoot()} data-cursor="grow" style={{
+              <button onClick={() => openTerminal()} data-cursor="grow" style={{
                 border: '1px solid rgba(255,255,255,0.15)', color: '#f5f5f2', padding: '16px 40px', borderRadius: 10, fontSize: 15, background: 'transparent', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8,
                 transition: 'all 0.3s cubic-bezier(0.2,0.9,0.25,1)',
               }}
@@ -902,7 +898,7 @@ export default function V3Client() {
               </div>
               {/* CTA */}
               <div style={{ marginTop: 24, display: 'flex', gap: 12 }}>
-                <button onClick={() => { openChatwoot(); setSelectedService(null); }}
+                <button onClick={() => { openTerminal(); setSelectedService(null); }}
                   style={{ background: '#ccff00', color: '#0a0a0a', padding: '10px 24px', borderRadius: 8, fontSize: 13, fontWeight: 700, border: 'none', cursor: 'pointer' }}>
                   {isES ? 'Hablemos de este servicio' : 'Discuss this service'}
                 </button>
@@ -919,112 +915,6 @@ export default function V3Client() {
       )}
 
 
-
-      {/* ── WHATSAPP CHAT TERMINAL (inline, no external redirect) ── */}
-      {showWhatsAppChat && (
-        <>
-          <div onClick={() => { setShowWhatsAppChat(false); setChatSent(null); setChatTyping(false); setChatReady(false); setChatMsg(''); }} style={{
-            position: 'fixed', inset: 0, zIndex: 300,
-            background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(8px)',
-            animation: 'v3fadeIn 0.3s ease', cursor: 'pointer',
-          }} />
-          <div style={{
-            position: 'fixed', top: '50%', left: '50%',
-            transform: 'translate(-50%,-50%)',
-            width: '45vw', maxWidth: 520, height: '60vh', maxHeight: 500,
-            background: 'rgba(15,15,15,0.95)', backdropFilter: 'blur(24px)',
-            borderRadius: 14,
-            boxShadow: '0 0 100px rgba(37,211,102,0.1), 0 0 0 1px rgba(37,211,102,0.2)',
-            zIndex: 301, display: 'flex', flexDirection: 'column',
-            overflow: 'hidden', animation: 'v3slideUp 0.4s cubic-bezier(0.2, 0.9, 0.25, 1)',
-          }}>
-            <div style={{
-              height: 40, padding: '0 16px',
-              display: 'flex', alignItems: 'center', gap: 10,
-              borderBottom: '1px solid rgba(255,255,255,0.06)',
-              background: 'rgba(37,211,102,0.05)', flexShrink: 0,
-            }}>
-              <button onClick={() => { setShowWhatsAppChat(false); setChatSent(null); setChatTyping(false); setChatReady(false); setChatMsg(''); }} style={{ width: 12, height: 12, borderRadius: '50%', background: '#ff5f57', border: 'none', cursor: 'pointer', padding: 0 }} />
-              <span style={{ width: 12, height: 12, borderRadius: '50%', background: '#ffbd2e' }} />
-              <span style={{ width: 12, height: 12, borderRadius: '50%', background: '#28c840' }} />
-              <span style={{ flex: 1, textAlign: 'center', fontFamily: 'JetBrains Mono, monospace', fontSize: 10, color: 'rgba(37,211,102,0.6)' }}>
-                whatsapp · <strong style={{ color: 'rgba(37,211,102,0.9)' }}>+56 9 3036 7979</strong>
-              </span>
-            </div>
-            {/* Chat area */}
-            <div style={{ flex: 1, padding: '16px 20px', overflow: 'auto', display: 'flex', flexDirection: 'column', gap: 12 }}>
-              {/* Bot greeting */}
-              <div style={{ background: 'rgba(37,211,102,0.08)', borderRadius: '12px 12px 12px 2px', padding: '10px 14px', maxWidth: '80%', fontSize: 13, color: 'rgba(245,245,242,0.8)', lineHeight: 1.5 }}>
-                {isES
-                  ? '¡Hola! Soy Alejandro. Cuéntame sobre tu proyecto y te respondo en menos de 24 horas.'
-                  : "Hi! I'm Alejandro. Tell me about your project and I'll get back to you within 24 hours."}
-                <div style={{ fontSize: 10, color: 'rgba(245,245,242,0.3)', marginTop: 4, textAlign: 'right' }}>
-                  {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                </div>
-              </div>
-              {/* User message */}
-              {chatSent && (
-                <div style={{ background: 'rgba(37,211,102,0.15)', borderRadius: '12px 12px 2px 12px', padding: '10px 14px', maxWidth: '80%', alignSelf: 'flex-end', fontSize: 13, color: '#f5f5f2', lineHeight: 1.5, animation: 'v3fadeIn 0.3s ease' }}>
-                  {chatSent}
-                </div>
-              )}
-              {/* Typing indicator */}
-              {chatTyping && (
-                <div style={{ display: 'flex', gap: 4, padding: '8px 14px', animation: 'v3fadeIn 0.3s ease' }}>
-                  {[0, 1, 2].map(i => (
-                    <span key={i} style={{ width: 6, height: 6, borderRadius: '50%', background: 'rgba(37,211,102,0.5)', animation: `v3blink 1s ease-in-out ${i * 0.2}s infinite` }} />
-                  ))}
-                </div>
-              )}
-              {/* Ready confirmation */}
-              {chatReady && (
-                <div style={{ background: 'rgba(37,211,102,0.08)', borderRadius: '12px 12px 12px 2px', padding: '10px 14px', maxWidth: '85%', fontSize: 13, color: 'rgba(245,245,242,0.8)', lineHeight: 1.5, animation: 'v3fadeIn 0.3s ease' }}>
-                  {isES ? '¡Perfecto! Tu mensaje está listo.' : 'Your message is ready.'}
-                  <button
-                    onClick={() => openChatwoot()}
-                    style={{ display: 'block', width: '100%', marginTop: 8, background: '#ccff00', color: '#0a0a0a', padding: '8px 16px', borderRadius: 8, border: 'none', fontSize: 12, fontWeight: 700, textAlign: 'center', cursor: 'pointer' }}
-                  >
-                    {isES ? '→ Iniciar chat' : '→ Start chat'}
-                  </button>
-                  <div style={{ fontSize: 10, color: 'rgba(245,245,242,0.3)', marginTop: 6 }}>
-                    {isES ? 'Chat en vivo directo en esta página' : 'Live chat right here on this page'}
-                  </div>
-                </div>
-              )}
-            </div>
-            {/* Input */}
-            <form onSubmit={(e) => {
-              e.preventDefault();
-              if (!chatMsg.trim() || chatReady) return;
-              setChatSent(chatMsg);
-              setChatMsg('');
-              setChatTyping(true);
-              setTimeout(() => { setChatTyping(false); setChatReady(true); }, 1200);
-            }} style={{
-              padding: '12px 16px', borderTop: '1px solid rgba(255,255,255,0.06)',
-              display: 'flex', gap: 10, flexShrink: 0,
-            }}>
-              <input
-                type="text" value={chatMsg} onChange={e => setChatMsg(e.target.value)}
-                placeholder={isES ? 'Escribe tu mensaje...' : 'Type your message...'}
-                autoFocus
-                style={{
-                  flex: 1, padding: '10px 14px', borderRadius: 8,
-                  background: 'rgba(245,245,242,0.04)', border: '1px solid rgba(245,245,242,0.08)',
-                  color: '#f5f5f2', fontSize: 14, outline: 'none', fontFamily: 'inherit',
-                }}
-              />
-              <button type="submit" style={{
-                background: '#25D366', color: '#fff', border: 'none',
-                padding: '10px 20px', borderRadius: 8, fontSize: 13,
-                fontWeight: 700, cursor: 'pointer',
-              }}>
-                {isES ? 'Enviar' : 'Send'}
-              </button>
-            </form>
-          </div>
-        </>
-      )}
 
       {/* ── CONTACT FORM TERMINAL (opens as popup) ── */}
       {showContactForm && (

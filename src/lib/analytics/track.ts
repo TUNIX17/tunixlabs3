@@ -54,6 +54,12 @@ export const Events = {
   CONTACT_FORM_ERROR: 'Contact Form Error',
   FORM_FIELD_BLUR: 'Form Field Blur',
   FORM_ABANDON: 'Form Abandon',
+
+  // Terminal Chat (headless Chatwoot)
+  CHAT_TERMINAL_OPEN: 'Chat Terminal: Open',
+  CHAT_TERMINAL_MESSAGE_SENT: 'Chat Terminal: Message Sent',
+  CHAT_TERMINAL_AGENT_REPLY: 'Chat Terminal: Agent Reply',
+  CHAT_INIT_ERROR: 'Chat Terminal: Init Error',
 } as const;
 
 export type EventName = (typeof Events)[keyof typeof Events];

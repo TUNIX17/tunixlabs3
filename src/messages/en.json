@@ -587,5 +587,17 @@
         "ctaSecondary": "Send a message"
       }
     }
+  },
+  "TerminalChat": {
+    "header": "tunixlabs · chat",
+    "liveBadge": "live",
+    "connecting": "connecting…",
+    "offline": "offline",
+    "greeting": "Hi! I'm Alejandro. Tell me about your project — we'll chat live.",
+    "placeholder": "Type your message…",
+    "send": "Send",
+    "sendError": "not sent — click to retry",
+    "agentTyping": "Alejandro is typing",
+    "initError": "Can't reach chat right now. Email contacto@tunixlabs.com."
   }
 }

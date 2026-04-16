@@ -587,5 +587,17 @@
         "ctaSecondary": "Ir al formulario"
       }
     }
+  },
+  "TerminalChat": {
+    "header": "tunixlabs · chat",
+    "liveBadge": "live",
+    "connecting": "conectando…",
+    "offline": "sin conexión",
+    "greeting": "¡Hola! Soy Alejandro. Cuéntame tu proyecto y conversamos en vivo.",
+    "placeholder": "Escribe tu mensaje…",
+    "send": "Enviar",
+    "sendError": "no enviado — click para reintentar",
+    "agentTyping": "Alejandro está escribiendo",
+    "initError": "No puedo conectar el chat ahora. Escríbeme a contacto@tunixlabs.com."
   }
 }

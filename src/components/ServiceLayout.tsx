@@ -6,7 +6,7 @@ import { useTranslations } from 'next-intl';
 import { FiArrowLeft, FiArrowRight, FiCheckCircle } from 'react-icons/fi';
 import { BsChatDots } from 'react-icons/bs';
 import { trackEvent, Events } from '@/lib/analytics/track';
-import { openChatwoot } from '@/components/ChatwootWidget';
+import { useTerminalChat } from '@/components/TerminalChat';
 
 export type ServiceContent = {
   serviceKey: string;
@@ -24,6 +24,7 @@ export default function ServiceLayout({ service }: Props) {
   );
   const layoutT = useTranslations('ServiceLayout');
   const footerT = useTranslations('Footer');
+  const { open: openTerminal } = useTerminalChat();
 
   useEffect(() => {
     trackEvent(Events.PAGE_VIEW_SERVICE, { service: service.serviceKey });
@@ -113,7 +114,7 @@ export default function ServiceLayout({ service }: Props) {
                 trackEvent(Events.CTA_WHATSAPP_CLICK, {
                   location: `service:${service.serviceKey}`,
                 });
-                openChatwoot();
+                openTerminal();
               }}
             >
               <BsChatDots className="h-6 w-6" />

@@ -6,7 +6,7 @@
 
 import React, { useMemo } from 'react';
 import { getCalendlyLink } from '@/lib/agent/AgentConfig';
-import { openChatwoot } from '@/components/ChatwootWidget';
+import { useTerminalChat } from '@/components/TerminalChat';
 
 interface ConversationSummary {
   name?: string;
@@ -74,6 +74,7 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
   robotResponse,
   className = '',
 }) => {
+  const { open: openTerminal } = useTerminalChat();
   // Determinar que botones mostrar basado en la respuesta
   const { showCalendly, showWhatsApp } = useMemo(() => {
     if (!robotResponse) {
@@ -118,7 +119,7 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
       {showWhatsApp && (
         <button
           type="button"
-          onClick={() => openChatwoot()}
+          onClick={() => openTerminal()}
           className="inline-flex items-center gap-2 px-4 py-2.5 bg-[#ccff00]
                      text-[#0a0a0a] rounded-lg text-sm font-semibold shadow-md hover:shadow-lg
                      hover:bg-[#b8e600] transition-all duration-200
