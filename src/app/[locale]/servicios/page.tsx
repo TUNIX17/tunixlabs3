@@ -1,37 +1,6 @@
 import { setRequestLocale } from 'next-intl/server';
-import dynamic from 'next/dynamic';
-import JsonLd from '@/components/seo/JsonLd';
-import ServiceIconSvg from '@/components/ServiceIconSvg';
 import { Link } from '@/i18n/navigation';
-
-// ServiceCard is a client island (Rive WASM + IntersectionObserver). Dynamic
-// import with ssr:false keeps the /servicios page RSC on first paint — the
-// SVG fallback inside ServiceCard renders identically while the client bundle
-// streams in, so CLS stays at 0 across the swap.
-const ServiceCard = dynamic(() => import('@/components/ServiceCard'), {
-  ssr: false,
-  // Loading placeholder mirrors the card shell exactly so React does not
-  // rerender the border-top color band or the copy block when the client
-  // component mounts (observed jank otherwise with Next 13.4 hydration).
-  loading: () => (
-    <div
-      className="relative block h-full rounded-2xl border border-black/10 bg-white p-6"
-      aria-hidden
-    >
-      <div
-        className="relative w-full overflow-hidden rounded-xl bg-[#f5f5f2]"
-        style={{ aspectRatio: '3 / 2' }}
-      >
-        <div className="absolute inset-0">
-          <ServiceIconSvg slug="asistentes-ia" />
-        </div>
-      </div>
-      <div className="mt-5 h-6 w-3/4 rounded bg-black/5" />
-      <div className="mt-3 h-4 w-full rounded bg-black/5" />
-      <div className="mt-4 h-3 w-1/2 rounded bg-black/5" />
-    </div>
-  ),
-});
+import JsonLd from '@/components/seo/JsonLd';
 
 /**
  * Services index page (/es/servicios, /en/services).
@@ -261,23 +230,35 @@ export default async function ServiciosIndexPage({ params: { locale } }: Props) 
         </header>
 
         <ul className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
-          {SERVICES.map((s) => (
-            <li key={s.slug}>
-              <ServiceCard
-                slug={s.slug}
-                titleEs={s.titleEs}
-                titleEn={s.titleEn}
-                taglineEs={s.taglineEs}
-                taglineEn={s.taglineEn}
-                metricsEs={s.metricsEs}
-                metricsEn={s.metricsEn}
-                color={s.color}
-                href={`/servicios/${s.slug}`}
-                locale={locale}
-                ctaLabel={copy.cta}
-              />
-            </li>
-          ))}
+          {SERVICES.map((s) => {
+            const title = locale === 'en' ? s.titleEn : s.titleEs;
+            const tagline = locale === 'en' ? s.taglineEn : s.taglineEs;
+            const metrics = locale === 'en' ? s.metricsEn : s.metricsEs;
+            return (
+              <li key={s.slug}>
+                <Link
+                  href={`/servicios/${s.slug}` as '/servicios'}
+                  className="group relative block h-full rounded-2xl border border-black/10 bg-white p-6 transition hover:-translate-y-0.5 hover:shadow-lg"
+                  style={{ borderTop: `4px solid ${s.color}` }}
+                >
+                  <div className="mb-4 text-3xl" aria-hidden>
+                    {s.icon}
+                  </div>
+                  <h2 className="text-xl font-semibold text-black">{title}</h2>
+                  <p className="mt-2 text-sm text-black/70">{tagline}</p>
+                  <p className="mt-4 text-xs font-medium uppercase tracking-wider text-black/50">
+                    {metrics}
+                  </p>
+                  <span
+                    className="mt-5 inline-flex items-center gap-1 text-sm font-semibold text-black group-hover:underline"
+                    style={{ color: s.color }}
+                  >
+                    {copy.cta} →
+                  </span>
+                </Link>
+              </li>
+            );
+          })}
         </ul>
       </main>
     </>

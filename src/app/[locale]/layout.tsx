@@ -1,18 +1,9 @@
 import { NextIntlClientProvider } from 'next-intl';
 import { getMessages, getTranslations, setRequestLocale } from 'next-intl/server';
 import { notFound } from 'next/navigation';
-import dynamic from 'next/dynamic';
 import { routing } from '@/i18n/routing';
 import Nav from '@/components/Nav';
 import JsonLd from '@/components/seo/JsonLd';
-
-// Sprint-4 sticky CTA — Rive visual + vanilla WebAudio tick. Loaded client-only
-// because (a) the Rive pill needs canvas, (b) the audio gate lives in
-// `window.AudioContext`, and (c) visibility is scroll-driven (requires a
-// hydrated listener). ssr:false keeps the SSR stream lean.
-const OpenShellCta = dynamic(() => import('@/components/OpenShellCta'), {
-  ssr: false,
-});
 import {
   organizationSchema,
   personSchema,
@@ -154,14 +145,6 @@ export default async function LocaleLayout({ children, params: { locale } }: Pro
         <NextIntlClientProvider messages={messages}>
           <Nav />
           <main className="min-h-screen">{children}</main>
-          <OpenShellCta
-            label={locale === 'en' ? 'open a shell' : 'abre una shell'}
-            ariaLabel={
-              locale === 'en'
-                ? 'Open a shell — start a terminal conversation with us'
-                : 'Abre una shell — inicia una conversación tipo terminal con nosotros'
-            }
-          />
         </NextIntlClientProvider>
       </body>
     </html>
