@@ -20,6 +20,11 @@ html,body,main{background:#0a0a0a!important;color:#f5f5f2!important}
 @keyframes v3fadeIn{
   from{opacity:0}to{opacity:1}
 }
+@keyframes v3bootProgress{
+  0%{transform:scaleX(0)}
+  60%{transform:scaleX(0.7)}
+  100%{transform:scaleX(1)}
+}
 @keyframes v3slideUp{
   from{opacity:0;transform:translate(-50%,-45%) scale(0.95)}
   to{opacity:1;transform:translate(-50%,-50%) scale(1)}

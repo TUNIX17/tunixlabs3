@@ -339,16 +339,32 @@ export default function V3Client() {
           src="/logo_turquesa.webp" alt="TunixLabs"
           width={280} height={140} priority
           style={{
-            height: 140, width: 'auto',
+            height: 120, width: 'auto',
             animation: 'v3logoPulse 1.5s ease-in-out',
-            filter: 'drop-shadow(0 0 30px rgba(0, 200, 200, 0.5))',
+            filter: 'drop-shadow(0 0 40px rgba(0, 229, 204, 0.5)) drop-shadow(0 0 80px rgba(0, 229, 204, 0.2))',
           }}
         />
-        <div style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 14, color: 'rgba(245,245,242,0.5)', overflow: 'hidden', textAlign: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 0 }}>
-          <span style={{ color: '#00e5cc' }}>$&nbsp;</span>
-          <span style={{ display: 'inline-block', animation: 'v3bootType 0.8s steps(12) 0.8s forwards', width: 0, overflow: 'hidden', whiteSpace: 'nowrap', color: '#00e5cc' }}>tunix start</span>
-          <span style={{ display: 'inline-block', width: 7, height: 14, background: '#00e5cc', marginLeft: 2, animation: 'v3blink .5s steps(2) infinite' }} />
+        {/* Boot terminal output */}
+        <div style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 12, color: 'rgba(245,245,242,0.3)', textAlign: 'left', maxWidth: 300 }}>
+          <div style={{ animation: 'v3fadeIn 0.3s ease 0.3s both' }}>
+            <span style={{ color: '#00e5cc' }}>$</span> tunix start
+          </div>
+          <div style={{ animation: 'v3fadeIn 0.3s ease 0.6s both', color: 'rgba(245,245,242,0.2)' }}>
+            ✓ loading modules...
+          </div>
+          <div style={{ animation: 'v3fadeIn 0.3s ease 0.9s both', color: 'rgba(245,245,242,0.2)' }}>
+            ✓ connecting services...
+          </div>
+          <div style={{ animation: 'v3fadeIn 0.3s ease 1.2s both', color: '#00e5cc' }}>
+            ✓ production ready
+          </div>
+          {/* Progress bar */}
+          <div style={{ marginTop: 8, height: 2, background: 'rgba(255,255,255,0.06)', borderRadius: 1, overflow: 'hidden' }}>
+            <div style={{ height: '100%', background: '#00e5cc', animation: 'v3bootProgress 1.8s ease-out forwards', transformOrigin: 'left' }} />
+          </div>
         </div>
+        {/* Boot scanlines */}
+        <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', opacity: 0.04, backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,229,204,0.3) 2px, rgba(0,229,204,0.3) 4px)', backgroundSize: '100% 4px' }} />
       </div>
 
       <CustomCursor />
@@ -411,6 +427,15 @@ export default function V3Client() {
             : 'linear-gradient(90deg, transparent, #ccff00, transparent)',
           opacity: 0.6,
           transition: 'all 0.8s ease',
+        }} />
+
+        {/* ── NOISE GRAIN — cinematic film texture ── */}
+        <div style={{
+          position: 'absolute', inset: '-50%', zIndex: 198, pointerEvents: 'none',
+          opacity: 0.015,
+          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`,
+          backgroundSize: '128px 128px',
+          animation: 'v3grain 0.5s steps(4) infinite',
         }} />
 
         {/* ── GLITCH FLASH — fires on section transition ── */}
