@@ -19,7 +19,7 @@
 import type { NextRequest } from 'next/server';
 import { createHmac, timingSafeEqual } from 'node:crypto';
 import { CHATWOOT } from '@/lib/chatwoot/config';
-import { sendMessage, getOwnerChatId, TelegramError } from '@/lib/telegram/bot';
+import { forwardVisitorMessage } from '@/lib/chatwoot/forwarder';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -51,6 +51,7 @@ function verifyChatwootSignature(
 
 type ChatwootWebhookPayload = {
   event?: string;
+  id?: number; // message id (top-level in message_created events)
   message_type?: 'incoming' | 'outgoing' | 'activity' | 'template';
   content?: string;
   conversation?: {
@@ -110,31 +111,21 @@ export async function POST(req: NextRequest) {
   }
 
   const conversationId = payload.conversation?.id;
+  const messageId = payload.id;
   const content = (payload.content ?? '').trim();
-  if (!conversationId || !content) {
+  if (!conversationId || !content || !messageId) {
     return Response.json({ ok: true, skipped: 'missing_fields' });
   }
 
-  const senderName = payload.sender?.name || 'Visitor';
-  const text =
-    `💬 Web #${conversationId} · ${senderName}\n\n` +
-    `${content}\n\n` +
-    `↳ Responde a este mensaje para contestar`;
+  const result = await forwardVisitorMessage({
+    messageId,
+    conversationId,
+    content,
+    senderName: payload.sender?.name || 'Visitor',
+    source: 'webhook',
+  });
 
-  console.log(
-    `[chatwoot-webhook] forwarding conv #${conversationId} sender=${senderName}`
-  );
-
-  try {
-    await sendMessage(getOwnerChatId(), text);
-  } catch (e) {
-    // Log but don't fail Chatwoot — it would retry and spam us
-    const msg = e instanceof TelegramError ? e.message : String(e);
-    console.error('[chatwoot-webhook] telegram send failed:', msg);
-    return Response.json({ ok: true, forwarded: false, error: msg });
-  }
-
-  return Response.json({ ok: true, forwarded: true, conversationId });
+  return Response.json({ ok: true, ...result, conversationId });
 }
 
 // Chatwoot occasionally does a HEAD/GET probe when saving the webhook URL

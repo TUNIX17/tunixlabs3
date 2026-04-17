@@ -7,6 +7,12 @@ const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
   poweredByHeader: false,
+  experimental: {
+    // Enables src/instrumentation.ts — spawns the Chatwoot polling loop
+    // at server startup (failsafe against hosted webhook non-delivery).
+    // Next.js 13.5+ flag; GA in Next.js 14.
+    instrumentationHook: true,
+  },
   images: {
     domains: ['tunixlabs.com'],
   },
