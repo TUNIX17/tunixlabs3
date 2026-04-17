@@ -77,9 +77,12 @@ export async function generateMetadata({ params: { locale } }: Props) {
       description: t('description'),
       images: [
         {
-          url: '/og/tunixlabs-og.png',
+          url: `/og/tunixlabs-og-${locale}.png`,
           width: 1200,
           height: 630,
+          alt: locale === 'es'
+            ? 'Tunix Labs — Una persona, siete sistemas en producción'
+            : 'Tunix Labs — One operator, seven production systems',
         },
       ],
     },
@@ -87,7 +90,7 @@ export async function generateMetadata({ params: { locale } }: Props) {
       card: 'summary_large_image',
       title: t('title'),
       description: t('description'),
-      images: ['/og/tunixlabs-og.png'],
+      images: [`/og/tunixlabs-og-${locale}.png`],
     },
     robots: {
       index: true,
