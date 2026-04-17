@@ -117,18 +117,30 @@ export function TerminalChat() {
           <button
             onClick={close}
             aria-label="close"
+            title="Close (Esc)"
             style={{
-              width: 12,
-              height: 12,
+              width: 16,
+              height: 16,
               borderRadius: '50%',
               background: '#ff5f57',
               border: 'none',
               cursor: 'pointer',
               padding: 0,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: 'rgba(0,0,0,0.6)',
+              fontSize: 14,
+              lineHeight: 1,
+              fontWeight: 700,
+              fontFamily: 'system-ui, sans-serif',
+              flexShrink: 0,
             }}
-          />
-          <span style={{ width: 12, height: 12, borderRadius: '50%', background: '#ffbd2e' }} />
-          <span style={{ width: 12, height: 12, borderRadius: '50%', background: '#28c840' }} />
+          >
+            ×
+          </button>
+          <span style={{ width: 12, height: 12, borderRadius: '50%', background: '#ffbd2e', flexShrink: 0 }} />
+          <span style={{ width: 12, height: 12, borderRadius: '50%', background: '#28c840', flexShrink: 0 }} />
           <span
             style={{
               flex: 1,
@@ -137,6 +149,10 @@ export function TerminalChat() {
               fontSize: 10,
               color: 'rgba(204,255,0,0.6)',
               letterSpacing: '0.02em',
+              minWidth: 0,
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
             }}
           >
             {t('header')} ·{' '}
@@ -149,6 +165,35 @@ export function TerminalChat() {
               {statusLabel}
             </strong>
           </span>
+          <button
+            onClick={close}
+            aria-label="close"
+            title="Close (Esc)"
+            style={{
+              background: 'transparent',
+              border: '1px solid rgba(245,245,242,0.15)',
+              color: 'rgba(245,245,242,0.7)',
+              fontFamily: 'JetBrains Mono, monospace',
+              fontSize: 10,
+              letterSpacing: '0.08em',
+              padding: '4px 8px',
+              borderRadius: 4,
+              cursor: 'pointer',
+              flexShrink: 0,
+              lineHeight: 1,
+              textTransform: 'uppercase',
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.borderColor = '#ff5f57';
+              e.currentTarget.style.color = '#ff5f57';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.borderColor = 'rgba(245,245,242,0.15)';
+              e.currentTarget.style.color = 'rgba(245,245,242,0.7)';
+            }}
+          >
+            × esc
+          </button>
         </div>
 
         {/* Messages */}
