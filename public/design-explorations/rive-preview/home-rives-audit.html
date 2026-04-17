@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>home .riv audit</title>
+<style>
+  :root { --ink: #0a0a0a; --acid: #ccff00; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: var(--ink);
+    color: #fff;
+    font-family: 'Inter', system-ui, sans-serif;
+    min-height: 100vh;
+    padding: 48px 32px;
+  }
+  h1 {
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.3em;
+    color: rgba(255,255,255,0.5);
+    border-left: 2px solid var(--acid);
+    padding-left: 16px;
+    margin-bottom: 48px;
+  }
+  .note {
+    max-width: 900px;
+    color: rgba(255,255,255,0.55);
+    font-size: 14px;
+    line-height: 1.6;
+    margin-bottom: 48px;
+  }
+  .note strong { color: var(--acid); }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 32px;
+    max-width: 1600px;
+    margin: 0 auto;
+  }
+  .cell {
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 16px;
+    padding: 24px;
+    background: rgba(255,255,255,0.02);
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .cell-header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  .cell-label {
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.25em;
+    color: rgba(255,255,255,0.4);
+  }
+  .cell-size {
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 9px;
+    color: rgba(255,255,255,0.3);
+  }
+  .cell-name {
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 13px;
+    color: #fff;
+    word-break: break-all;
+  }
+  .rive-wrap {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 4/3;
+    background: #000;
+    border-radius: 8px;
+    border: 1px solid rgba(255,255,255,0.08);
+    overflow: hidden;
+  }
+  canvas { display: block; width: 100%; height: 100%; }
+  .verdict {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 12px;
+    color: rgba(255,255,255,0.6);
+  }
+  .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #333;
+    flex-shrink: 0;
+  }
+  .dot.failed { background: #ef4444; }
+  .legend {
+    max-width: 1200px;
+    margin: 48px auto 0;
+    padding: 24px;
+    border: 1px dashed rgba(255,255,255,0.12);
+    border-radius: 12px;
+    color: rgba(255,255,255,0.55);
+    font-size: 13px;
+    line-height: 1.7;
+  }
+  .legend .item { display: flex; gap: 10px; align-items: baseline; }
+  .legend code { color: var(--acid); }
+</style>
+</head>
+<body>
+<h1>home V3Client · 9 .riv audit</h1>
+<p class="note">
+  Cada tile carga un <strong>.riv</strong> que actualmente se monta en el home
+  (<code style="color:var(--acid);font-family:monospace">V3Client.tsx</code>).
+  Si ves <strong>cuadrados coloridos con diamantes</strong> → es wireframe de
+  compose_scene (como el <code>hero-monitor.riv</code> que ya reemplazamos).
+  Esos hay que reemplazar. Si ves animación coherente (rings, waves, cursores,
+  progress) → está OK.
+</p>
+
+<div class="grid">
+  <div class="cell"><div class="cell-header"><span class="cell-label">01 · terminal</span><span class="cell-size">static</span></div><div class="cell-name">/design-explorations/rive/traffic-lights.riv</div><div class="rive-wrap"><canvas id="c1"></canvas></div><div class="verdict"><span class="dot" id="v1"></span><span id="s1">tu veredicto</span></div></div>
+  <div class="cell"><div class="cell-header"><span class="cell-label">02 · transition</span><span class="cell-size">motion</span></div><div class="cell-name">/design-explorations/rive/burst-transition.riv</div><div class="rive-wrap"><canvas id="c2"></canvas></div><div class="verdict"><span class="dot" id="v2"></span><span id="s2">tu veredicto</span></div></div>
+  <div class="cell"><div class="cell-header"><span class="cell-label">03 · voice</span><span class="cell-size">interactive</span></div><div class="cell-name">/design-explorations/rive/voice-waveform.riv</div><div class="rive-wrap"><canvas id="c3"></canvas></div><div class="verdict"><span class="dot" id="v3"></span><span id="s3">tu veredicto</span></div></div>
+  <div class="cell"><div class="cell-header"><span class="cell-label">04 · background</span><span class="cell-size">ambient</span></div><div class="cell-name">/rive/scroll-grid.riv</div><div class="rive-wrap"><canvas id="c4"></canvas></div><div class="verdict"><span class="dot" id="v4"></span><span id="s4">tu veredicto</span></div></div>
+  <div class="cell"><div class="cell-header"><span class="cell-label">05 · cursor</span><span class="cell-size">ui</span></div><div class="cell-name">/rive/terminal-cursor.riv</div><div class="rive-wrap"><canvas id="c5"></canvas></div><div class="verdict"><span class="dot" id="v5"></span><span id="s5">tu veredicto</span></div></div>
+  <div class="cell"><div class="cell-header"><span class="cell-label">06 · progress</span><span class="cell-size">scroll-linked</span></div><div class="cell-name">/rive/scroll-progress.riv</div><div class="rive-wrap"><canvas id="c6"></canvas></div><div class="verdict"><span class="dot" id="v6"></span><span id="s6">tu veredicto</span></div></div>
+  <div class="cell"><div class="cell-header"><span class="cell-label">07 · boot</span><span class="cell-size">intro</span></div><div class="cell-name">/rive/boot-sequence.riv</div><div class="rive-wrap"><canvas id="c7"></canvas></div><div class="verdict"><span class="dot" id="v7"></span><span id="s7">tu veredicto</span></div></div>
+  <div class="cell"><div class="cell-header"><span class="cell-label">08 · case frame</span><span class="cell-size">trigger</span></div><div class="cell-name">/rive/case-frame.riv</div><div class="rive-wrap"><canvas id="c8"></canvas></div><div class="verdict"><span class="dot" id="v8"></span><span id="s8">tu veredicto</span></div></div>
+  <div class="cell"><div class="cell-header"><span class="cell-label">09 · contact</span><span class="cell-size">reactive</span></div><div class="cell-name">/rive/contact-wave.riv</div><div class="rive-wrap"><canvas id="c9"></canvas></div><div class="verdict"><span class="dot" id="v9"></span><span id="s9">tu veredicto</span></div></div>
+</div>
+
+<div class="legend">
+  <div class="item"><strong style="color:var(--acid)">OK</strong><span>si ves el efecto esperado del label (cursor latiendo, waveform reactivo, grid sutil, progress bar lineal).</span></div>
+  <div class="item"><strong style="color:#fb923c">WIREFRAME</strong><span>si ves cuadrados coloridos con diamantes. Reemplazar con CSS o con un nuevo <code>.riv</code> diseñado.</span></div>
+  <div class="item"><strong style="color:rgba(255,255,255,0.5)">EMPTY</strong><span>canvas en blanco → el .riv depende de state-machine input (show, wave, etc) que solo se dispara en contexto. OK.</span></div>
+</div>
+
+<script src="https://unpkg.com/@rive-app/canvas@2.21.3"></script>
+<script>
+  const files = [
+    ['c1','/design-explorations/rive/traffic-lights.riv'],
+    ['c2','/design-explorations/rive/burst-transition.riv'],
+    ['c3','/design-explorations/rive/voice-waveform.riv'],
+    ['c4','/rive/scroll-grid.riv'],
+    ['c5','/rive/terminal-cursor.riv'],
+    ['c6','/rive/scroll-progress.riv'],
+    ['c7','/rive/boot-sequence.riv'],
+    ['c8','/rive/case-frame.riv'],
+    ['c9','/rive/contact-wave.riv'],
+  ];
+  files.forEach(([id, src], i) => {
+    const n = i + 1;
+    const cv = document.getElementById(id);
+    new rive.Rive({
+      src, canvas: cv, autoplay: true,
+      onLoad: () => { cv.width = cv.clientWidth * 2; cv.height = cv.clientHeight * 2; },
+      onLoadError: (e) => {
+        console.error('Rive load error', id, e);
+        document.getElementById('v' + n).classList.add('failed');
+        document.getElementById('s' + n).textContent = 'failed to load';
+      },
+    });
+  });
+</script>
+</body>
+</html>

@@ -10,6 +10,10 @@ export const routing = defineRouting({
       es: '/inicio',
       en: '/home'
     },
+    '/sobre': {
+      es: '/sobre',
+      en: '/about'
+    },
     '/servicios': {
       es: '/servicios',
       en: '/services'
@@ -42,13 +46,13 @@ export const routing = defineRouting({
       es: '/servicios/rpa',
       en: '/services/rpa'
     },
-    '/servicios/generacion-contenido-ia': {
-      es: '/servicios/generacion-contenido-ia',
-      en: '/services/ai-content-generation'
+    '/casos': {
+      es: '/casos',
+      en: '/cases'
     },
-    '/servicios/automatizacion-marketing-ia': {
-      es: '/servicios/automatizacion-marketing-ia',
-      en: '/services/ai-marketing-automation'
+    '/casos/[slug]': {
+      es: '/casos/[slug]',
+      en: '/cases/[slug]'
     },
     '/contacto': {
       es: '/contacto',

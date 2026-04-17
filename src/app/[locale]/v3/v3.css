@@ -68,10 +68,29 @@ html,body,main{background:#0a0a0a!important;color:#f5f5f2!important}
   90%{transform:translate(-2%,1%)}
 }
 
+/* Hero monitor panel — scan line sweeping top-to-bottom */
+@keyframes v3HeroMonitorScan{
+  0%{top:0;opacity:0.55}
+  50%{opacity:0.35}
+  100%{top:calc(100% - 2px);opacity:0.55}
+}
+/* Hero monitor panel — LIVE dot blink */
+@keyframes v3HeroMonitorBlink{
+  0%,100%{opacity:1}
+  50%{opacity:0.35}
+}
+.v3-hero-monitor-scan{
+  animation: v3HeroMonitorScan 3.2s linear infinite;
+}
+.v3-hero-monitor-blink{
+  animation: v3HeroMonitorBlink 1.4s ease-in-out infinite;
+}
+
 *{scrollbar-width:none}
 ::-webkit-scrollbar{display:none}
 @media(max-width:900px){
   .v3-grid-2col{grid-template-columns:1fr!important}
+  .v3-hero-monitor{display:none!important}
 }
 @media(max-width:600px){
   .v3-grid-3col{grid-template-columns:1fr!important}

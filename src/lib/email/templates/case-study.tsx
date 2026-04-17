@@ -1,6 +1,8 @@
 /**
- * Email Template: Caso de Exito
- * Se envia 24h despues si no hay interaccion
+ * Email Template: Caso de éxito
+ * Se envía 24h después si no hay interacción.
+ * Los casos mostrados son reales y coinciden con src/messages/*.json y
+ * src/lib/cases-data.ts — jamás usar casos genéricos inventados aquí.
  */
 
 interface CaseStudyEmailProps {
@@ -9,11 +11,10 @@ interface CaseStudyEmailProps {
 }
 
 export function getCaseStudyEmailSubject(): string {
-  return `Como ayudamos a una empresa a reducir costos 40% con IA`;
+  return `Cómo Voice AI en faena procesa 4,000+ rutas diarias`;
 }
 
 export function getCaseStudyEmailHtml({ leadName, interests }: CaseStudyEmailProps): string {
-  // Seleccionar caso de exito relevante segun intereses
   const caseStudy = selectRelevantCaseStudy(interests);
 
   return `
@@ -27,9 +28,9 @@ export function getCaseStudyEmailHtml({ leadName, interests }: CaseStudyEmailPro
   <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff;">
 
     <!-- Header -->
-    <div style="background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); padding: 40px 30px; text-align: center;">
-      <p style="color: #e0e7ff; margin: 0 0 5px 0; font-size: 12px; text-transform: uppercase; letter-spacing: 1px;">
-        Caso de Exito
+    <div style="background: linear-gradient(135deg, #0a0a0a 0%, #1f1f1f 100%); padding: 40px 30px; text-align: center;">
+      <p style="color: #ccff00; margin: 0 0 5px 0; font-size: 12px; text-transform: uppercase; letter-spacing: 1px;">
+        Caso en producción
       </p>
       <h1 style="color: #ffffff; margin: 0; font-size: 24px; font-weight: 600;">
         ${caseStudy.title}
@@ -43,29 +44,29 @@ export function getCaseStudyEmailHtml({ leadName, interests }: CaseStudyEmailPro
       </p>
 
       <p style="color: #4b5563; line-height: 1.6; margin: 0 0 25px 0;">
-        Queria compartir contigo un caso que creo te puede interesar, dado tu interes
-        en ${interests[0] || 'soluciones de IA'}:
+        Quería compartir contigo un sistema que corre hoy en producción,
+        dado tu interés en ${interests[0] || 'soluciones de IA'}:
       </p>
 
       <!-- Case Study Card -->
-      <div style="background-color: #f8fafc; border-radius: 12px; padding: 25px; margin: 0 0 25px 0; border-left: 4px solid #6366f1;">
+      <div style="background-color: #f8fafc; border-radius: 12px; padding: 25px; margin: 0 0 25px 0; border-left: 4px solid #ccff00;">
         <h3 style="color: #1f2937; margin: 0 0 15px 0; font-size: 18px;">
           ${caseStudy.client}
         </h3>
 
         <p style="color: #4b5563; line-height: 1.6; margin: 0 0 15px 0;">
-          <strong>Desafio:</strong> ${caseStudy.challenge}
+          <strong>Desafío:</strong> ${caseStudy.challenge}
         </p>
 
         <p style="color: #4b5563; line-height: 1.6; margin: 0 0 15px 0;">
-          <strong>Solucion:</strong> ${caseStudy.solution}
+          <strong>Solución:</strong> ${caseStudy.solution}
         </p>
 
         <!-- Results -->
         <div style="display: flex; justify-content: space-around; margin-top: 20px; text-align: center;">
           ${caseStudy.results.map(r => `
             <div style="flex: 1;">
-              <div style="color: #6366f1; font-size: 28px; font-weight: 700;">${r.value}</div>
+              <div style="color: #0a0a0a; font-size: 28px; font-weight: 700;">${r.value}</div>
               <div style="color: #6b7280; font-size: 12px; margin-top: 5px;">${r.label}</div>
             </div>
           `).join('')}
@@ -73,17 +74,17 @@ export function getCaseStudyEmailHtml({ leadName, interests }: CaseStudyEmailPro
       </div>
 
       <p style="color: #4b5563; line-height: 1.6; margin: 0 0 25px 0;">
-        Cada empresa es unica, pero los principios son similares. Me encantaria
-        explorar como podemos lograr resultados similares en tu caso.
+        Cada empresa es única, pero los principios se repiten. Me encantaría
+        explorar cómo podemos llegar a algo similar en tu caso.
       </p>
 
       <!-- CTA -->
       <div style="text-align: center; margin: 30px 0;">
-        <a href="mailto:contacto@tunixlabs.com?subject=Quiero%20saber%20mas%20sobre%20casos%20de%20exito"
-           style="display: inline-block; background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
-                  color: #ffffff; text-decoration: none; padding: 14px 35px; border-radius: 8px;
+        <a href="mailto:contacto@tunixlabs.com?subject=Quiero%20conocer%20mas%20sobre%20casos%20en%20produccion"
+           style="display: inline-block; background: #ccff00;
+                  color: #0a0a0a; text-decoration: none; padding: 14px 35px; border-radius: 8px;
                   font-weight: 600; font-size: 16px;">
-          Quiero Resultados Similares
+          Agendar una llamada
         </a>
       </div>
 
@@ -96,8 +97,8 @@ export function getCaseStudyEmailHtml({ leadName, interests }: CaseStudyEmailPro
     <!-- Footer -->
     <div style="background-color: #f9fafb; padding: 25px 30px; border-top: 1px solid #e5e7eb;">
       <p style="color: #9ca3af; font-size: 12px; margin: 0; text-align: center;">
-        TunixLabs - Consultoria en Inteligencia Artificial<br>
-        Santiago, Chile | contacto@tunixlabs.com
+        Tunix Labs · Sistemas de producción para industrias reguladas<br>
+        Santiago, Chile · contacto@tunixlabs.com
       </p>
       <p style="color: #9ca3af; font-size: 11px; margin: 15px 0 0 0; text-align: center;">
         <a href="#unsubscribe" style="color: #9ca3af;">Dejar de recibir emails</a>
@@ -118,64 +119,69 @@ interface CaseStudy {
   results: { value: string; label: string }[];
 }
 
+/**
+ * Selector de caso por interés. Todos los casos son REALES y coinciden con
+ * src/messages/*.json y src/lib/cases-data.ts. No se permiten casos sintéticos
+ * acá — si agregas un interés nuevo, usa uno de los casos existentes.
+ */
 function selectRelevantCaseStudy(interests: string[]): CaseStudy {
   const interestLower = interests.map(i => i.toLowerCase()).join(' ');
 
-  // Caso para automatizacion/RPA
+  // RPA / automatización → gasco (bot de procesamiento de códigos)
   if (interestLower.includes('automat') || interestLower.includes('rpa') || interestLower.includes('proceso')) {
     return {
-      title: 'Automatizacion que ahorra 200 horas/mes',
-      client: 'Empresa de Servicios Financieros',
-      challenge: 'Procesamiento manual de 500+ documentos diarios con errores frecuentes.',
-      solution: 'Implementamos RPA con IA para extraccion y validacion automatica de datos.',
+      title: '4,040 códigos procesados al 88.7% de éxito',
+      client: 'Distribuidora regional de gas en Chile',
+      challenge: 'Validación manual de códigos de quema en 14 rutas de reparto, con errores de transcripción y horas diarias de re-proceso antes de facturar.',
+      solution: 'Bot de procesamiento automático con validación contra reglas de negocio, dashboard de métricas por ruta y reportería diaria. Stack commodity (Express + Prisma + React + PostgreSQL), cero licenciamiento enterprise.',
       results: [
-        { value: '40%', label: 'Reduccion costos' },
-        { value: '200h', label: 'Ahorro mensual' },
-        { value: '99%', label: 'Precision' }
-      ]
+        { value: '4,040', label: 'Códigos procesados' },
+        { value: '88.7%', label: 'Tasa de éxito' },
+        { value: '14', label: 'Rutas automatizadas' },
+      ],
     };
   }
 
-  // Caso para chatbots/asistentes
-  if (interestLower.includes('chatbot') || interestLower.includes('asistente') || interestLower.includes('atencion')) {
+  // Voice AI / chatbots / asistentes → schwager
+  if (interestLower.includes('chatbot') || interestLower.includes('asistente') || interestLower.includes('atencion') || interestLower.includes('voz') || interestLower.includes('voice')) {
     return {
-      title: 'Chatbot que atiende 24/7 sin descanso',
-      client: 'E-commerce de Retail',
-      challenge: 'Saturacion del equipo de soporte con consultas repetitivas.',
-      solution: 'Chatbot con IA que resuelve el 70% de consultas automaticamente.',
+      title: 'Voice AI en faena a menos de 100 ms',
+      client: 'Schwager (servicios mineros, vía partner técnico)',
+      challenge: 'Operarios mineros con guantes, bajo lluvia y con conectividad intermitente debían firmar formularios de mantención en papel; se extraviaban antes de llegar a auditoría.',
+      solution: 'App móvil offline-first con Voice AI sobre Google Gemini: los operarios completan formularios hablando, sin sacarse los guantes. Firma multicanal con audit trail y parser SAP que detecta órdenes canceladas.',
       results: [
-        { value: '70%', label: 'Consultas auto' },
-        { value: '24/7', label: 'Disponibilidad' },
-        { value: '4.8', label: 'Satisfaccion' }
-      ]
+        { value: '195+', label: 'Operarios en faena' },
+        { value: '4,000+', label: 'Rutas diarias' },
+        { value: '<100 ms', label: 'Latencia de voz' },
+      ],
     };
   }
 
-  // Caso para analytics/BI
-  if (interestLower.includes('dashboard') || interestLower.includes('analy') || interestLower.includes('datos') || interestLower.includes('bi')) {
+  // BI / dashboards / analytics → sime
+  if (interestLower.includes('dashboard') || interestLower.includes('analy') || interestLower.includes('datos') || interestLower.includes('bi') || interestLower.includes('kpi')) {
     return {
-      title: 'Dashboards que predicen el futuro',
-      client: 'Empresa de Logistica',
-      challenge: 'Decisiones basadas en intuicion, no en datos.',
-      solution: 'BI con ML para prediccion de demanda y optimizacion de rutas.',
+      title: '19,778 órdenes de trabajo digitalizadas',
+      client: 'Contratistas en operaciones mineras críticas en Chile',
+      challenge: 'Pautas de seguridad, mantenciones preventivas y órdenes de trabajo corrían en papel y planillas, sin trazabilidad digital entre la faena y la oficina central.',
+      solution: 'Reemplazo completo del sistema legacy: 1,056 pautas, checklists por actividad, PDFs firmados con QR archivados en AWS S3, navegación histórica de KPIs y auditoría completa por turno minero.',
       results: [
-        { value: '25%', label: 'Menos costos' },
-        { value: '15%', label: 'Mas eficiencia' },
-        { value: '95%', label: 'Prediccion' }
-      ]
+        { value: '19,778', label: 'Órdenes de trabajo' },
+        { value: '115K+', label: 'Actividades' },
+        { value: '1,056', label: 'Pautas de seguridad' },
+      ],
     };
   }
 
-  // Caso generico
+  // Fallback / genérico → fernandez (ERP custom)
   return {
-    title: 'IA que transforma operaciones',
-    client: 'Empresa de Manufactura',
-    challenge: 'Procesos lentos y costosos sin visibilidad de datos.',
-    solution: 'Suite de IA para automatizacion y analisis predictivo.',
+    title: 'ERP que reemplazó Excel área por área',
+    client: 'Empresa metalúrgica de 50 años',
+    challenge: 'Toda la operación corría en Excel — RRHH, asistencia, finanzas, control de proyectos, CRM — durante la ausencia de los dueños, sin un ERP que reflejara el estado real del negocio.',
+    solution: 'ERP custom con IA que reemplazó Excel en cada área crítica. Pipelines de OCR, QR y LLM Vision para digitalizar documentos en planta, integración completa con el SII y módulo de control de proyectos pensado para metalurgia, no para SaaS.',
     results: [
-      { value: '35%', label: 'Reduccion costos' },
-      { value: '50%', label: 'Mas rapido' },
-      { value: '3x', label: 'ROI en 6 meses' }
-    ]
+      { value: 'ERP', label: 'Full-stack' },
+      { value: 'OCR + QR', label: 'Digitalización' },
+      { value: 'SII', label: 'Integrado' },
+    ],
   };
 }

@@ -26,7 +26,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
       })
       .catch((err) => {
         console.error('[AdminLayout] Auth check failed:', err);
-        setError('No se pudo verificar la sesion. Intenta recargar la pagina.');
+        setError('No se pudo verificar la sesión. Intenta recargar la página.');
       });
   }, []);
 
@@ -43,10 +43,10 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
         setIsAuthenticated(true);
       } else {
         const data = await res.json();
-        setError(data.error || 'Credenciales invalidas');
+        setError(data.error || 'Credenciales inválidas');
       }
     } catch {
-      setError('Error de conexion');
+      setError('Error de conexión');
     }
   };
 
@@ -103,7 +103,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
           </form>
 
           <p className="text-center text-gray-400 text-xs mt-6">
-            Sistema de gestion de leads
+            Sistema de gestión de leads
           </p>
         </div>
       </div>

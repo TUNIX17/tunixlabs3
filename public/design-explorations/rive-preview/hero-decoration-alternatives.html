@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<title>hero · alternativas de decoration derecha</title>
+<style>
+  :root { --ink: #0a0a0a; --paper: #f5f5f2; --acid: #ccff00; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #1a1a1a;
+    color: var(--paper);
+    font-family: 'Inter', system-ui, sans-serif;
+    min-height: 100vh;
+    padding: 32px;
+  }
+  h1 {
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.3em;
+    color: rgba(255,255,255,0.5);
+    border-left: 2px solid var(--acid);
+    padding-left: 16px;
+    margin-bottom: 40px;
+  }
+  .note {
+    max-width: 900px;
+    color: rgba(255,255,255,0.55);
+    font-size: 14px;
+    line-height: 1.6;
+    margin-bottom: 32px;
+  }
+  .note strong { color: var(--acid); }
+
+  .tile {
+    background: var(--ink);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 32px;
+    position: relative;
+  }
+  .tile-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 16px;
+  }
+  .tile-name {
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.25em;
+    color: var(--acid);
+  }
+  .tile-desc {
+    font-size: 11px;
+    color: rgba(255,255,255,0.4);
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .hero-mock {
+    position: relative;
+    aspect-ratio: 16/8;
+    overflow: hidden;
+    border-radius: 8px;
+    background: var(--ink);
+    border: 1px solid rgba(255,255,255,0.05);
+  }
+  .text-col {
+    position: relative;
+    z-index: 2;
+    padding: 32px 40px;
+    max-width: 58%;
+  }
+  .eyebrow-mock {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.3em;
+    color: rgba(255,255,255,0.5);
+    text-transform: uppercase;
+    display: inline-flex;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 14px;
+  }
+  .eyebrow-mock::before {
+    content: '';
+    display: inline-block;
+    height: 1px; width: 32px;
+    background: var(--acid);
+    box-shadow: 0 0 8px var(--acid);
+  }
+  h2.mock {
+    font-size: clamp(24px, 3.5vw, 52px);
+    font-weight: 800;
+    line-height: 1.05;
+    letter-spacing: -0.03em;
+    margin-bottom: 8px;
+  }
+  h2.mock .acid { color: var(--acid); display: block; }
+  .sub-mock {
+    margin-top: 12px;
+    font-size: 13px;
+    color: rgba(255,255,255,0.5);
+    max-width: 420px;
+    line-height: 1.5;
+  }
+
+  /* Decoration wrappers - each positioned right, centered vertically */
+  .deco {
+    position: absolute;
+    top: 50%;
+    right: 24px;
+    transform: translateY(-50%);
+    width: min(32%, 280px);
+    aspect-ratio: 1;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  /* ═══ A: Concentric rings + scan line ═══ */
+  .deco-a {
+    overflow: hidden;
+  }
+  .deco-a .ring {
+    position: absolute;
+    inset: 10%;
+    border: 1px solid rgba(204,255,0,0.4);
+    border-radius: 50%;
+    animation: ringPulse 4s ease-in-out infinite;
+  }
+  .deco-a .ring.r2 {
+    inset: 22%;
+    border-color: rgba(204,255,0,0.25);
+    animation-delay: -1.3s;
+  }
+  .deco-a .ring.r3 {
+    inset: 34%;
+    border-color: rgba(204,255,0,0.15);
+    animation-delay: -2.6s;
+  }
+  .deco-a .core {
+    position: absolute;
+    top: 50%; left: 50%;
+    width: 8px; height: 8px;
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+    background: var(--acid);
+    box-shadow: 0 0 14px var(--acid);
+  }
+  .deco-a .scan {
+    position: absolute;
+    top: 50%; left: 0;
+    width: 100%; height: 1px;
+    background: linear-gradient(90deg, transparent, var(--acid), transparent);
+    opacity: 0.8;
+    animation: scanV 3s ease-in-out infinite;
+  }
+  @keyframes ringPulse {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.06); opacity: 0.7; }
+  }
+  @keyframes scanV {
+    0%, 100% { top: 50%; }
+    50% { top: 90%; }
+  }
+
+  /* ═══ B: Monitor panel ═══ */
+  .deco-b {
+    border: 1px solid rgba(204,255,0,0.2);
+    background: rgba(204,255,0,0.02);
+    border-radius: 6px;
+    padding: 16px 20px;
+    aspect-ratio: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    min-height: 220px;
+  }
+  .deco-b .bracket {
+    position: absolute;
+    width: 10px; height: 10px;
+  }
+  .deco-b .bracket.tl { top: -1px; left: -1px; border-top: 1.5px solid var(--acid); border-left: 1.5px solid var(--acid); }
+  .deco-b .bracket.tr { top: -1px; right: -1px; border-top: 1.5px solid var(--acid); border-right: 1.5px solid var(--acid); }
+  .deco-b .bracket.bl { bottom: -1px; left: -1px; border-bottom: 1.5px solid var(--acid); border-left: 1.5px solid var(--acid); }
+  .deco-b .bracket.br { bottom: -1px; right: -1px; border-bottom: 1.5px solid var(--acid); border-right: 1.5px solid var(--acid); }
+
+  .deco-b .head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: rgba(245,245,242,0.5);
+  }
+  .deco-b .live-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    color: var(--acid);
+  }
+  .deco-b .live-tag .dot {
+    width: 5px; height: 5px;
+    border-radius: 50%;
+    background: var(--acid);
+    box-shadow: 0 0 6px var(--acid);
+    animation: blink 1.4s ease-in-out infinite;
+  }
+  @keyframes blink { 50% { opacity: 0.35; } }
+
+  .deco-b .row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px dashed rgba(245,245,242,0.08);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+  }
+  .deco-b .row:last-child { border-bottom: 0; }
+  .deco-b .row .k { color: rgba(245,245,242,0.5); }
+  .deco-b .row .v { color: var(--paper); font-weight: 700; }
+  .deco-b .row .v.a { color: var(--acid); }
+
+  .deco-b .scan-line {
+    position: absolute;
+    left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--acid), transparent);
+    opacity: 0.4;
+    animation: scanMonitor 3s linear infinite;
+  }
+  @keyframes scanMonitor {
+    0% { top: 0; }
+    100% { top: 100%; }
+  }
+
+  /* ═══ C: Data waveform ═══ */
+  .deco-c {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .deco-c .wave-container {
+    position: relative;
+    width: 100%;
+    height: 60%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+  }
+  .deco-c .bar {
+    width: 3px;
+    background: var(--acid);
+    box-shadow: 0 0 6px var(--acid);
+    border-radius: 1px;
+    animation: wave 1.4s ease-in-out infinite;
+    transform-origin: center;
+  }
+  @keyframes wave {
+    0%, 100% { height: 15%; opacity: 0.5; }
+    50% { height: 90%; opacity: 1; }
+  }
+  .deco-c .center-line {
+    position: absolute;
+    top: 50%;
+    left: 0; right: 0;
+    height: 1px;
+    background: rgba(204,255,0,0.25);
+    z-index: 0;
+  }
+  .deco-c .label {
+    position: absolute;
+    bottom: 15%;
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    color: rgba(245,245,242,0.5);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .deco-c .label .dot {
+    width: 5px; height: 5px;
+    border-radius: 50%;
+    background: var(--acid);
+    animation: blink 1.4s ease-in-out infinite;
+  }
+
+  /* ═══ D: Terminal grid matrix ═══ */
+  .deco-d {
+    display: grid;
+    grid-template-columns: repeat(10, 1fr);
+    grid-template-rows: repeat(10, 1fr);
+    gap: 6px;
+    padding: 20px;
+  }
+  .deco-d .cell {
+    background: rgba(204,255,0,0.06);
+    border-radius: 1px;
+    animation: cellPulse 3s ease-in-out infinite;
+  }
+  @keyframes cellPulse {
+    0%, 100% { background: rgba(204,255,0,0.06); }
+    50% { background: rgba(204,255,0,0.4); box-shadow: 0 0 4px rgba(204,255,0,0.6); }
+  }
+
+  .footer-note {
+    max-width: 900px;
+    margin: 32px auto 0;
+    padding: 24px;
+    border: 1px dashed rgba(204,255,0,0.25);
+    border-radius: 10px;
+    color: rgba(255,255,255,0.6);
+    font-size: 13px;
+    line-height: 1.7;
+  }
+  .footer-note h2 {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.3em;
+    color: var(--acid);
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+  .footer-note strong { color: var(--acid); }
+</style>
+</head>
+<body>
+<h1>hero · decoration lateral · 4 opciones</h1>
+<p class="note">
+  Mismo hero de prod, distintas decoraciones a la derecha.
+  Cada tile usa el copy real del hero <strong>("Construyo los sistemas / que hacen funcionar / empresas reales.")</strong>.
+  Elige la letra (A / B / C / D) o pide una variante.
+</p>
+
+<!-- ═══ A: CONCENTRIC RINGS + SCAN ═══ -->
+<div class="tile">
+  <div class="tile-head">
+    <span class="tile-name">A · concentric rings + scan</span>
+    <span class="tile-desc">~200 líneas CSS · sin .riv · radar-like</span>
+  </div>
+  <div class="hero-mock">
+    <div class="text-col">
+      <div class="eyebrow-mock">hero · 01 / 11</div>
+      <h2 class="mock">Construyo los sistemas que hacen funcionar <span class="acid">empresas reales.</span></h2>
+      <div class="sub-mock">Minería, energía, educación. 15 años operando antes de codear.</div>
+    </div>
+    <div class="deco deco-a">
+      <span class="ring"></span>
+      <span class="ring r2"></span>
+      <span class="ring r3"></span>
+      <span class="scan"></span>
+      <span class="core"></span>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ B: MONITOR PANEL ═══ -->
+<div class="tile">
+  <div class="tile-head">
+    <span class="tile-name">B · monitor panel</span>
+    <span class="tile-desc">~250 líneas CSS · sin .riv · dice "sistema vivo"</span>
+  </div>
+  <div class="hero-mock">
+    <div class="text-col">
+      <div class="eyebrow-mock">hero · 01 / 11</div>
+      <h2 class="mock">Construyo los sistemas que hacen funcionar <span class="acid">empresas reales.</span></h2>
+      <div class="sub-mock">Minería, energía, educación. 15 años operando antes de codear.</div>
+    </div>
+    <div class="deco deco-b">
+      <span class="bracket tl"></span>
+      <span class="bracket tr"></span>
+      <span class="bracket bl"></span>
+      <span class="bracket br"></span>
+      <span class="scan-line"></span>
+      <div class="head">
+        <span>prod · tunixlabs</span>
+        <span class="live-tag"><span class="dot"></span>LIVE</span>
+      </div>
+      <div class="row"><span class="k">systems</span><span class="v a">07</span></div>
+      <div class="row"><span class="k">uptime</span><span class="v">15y 03m</span></div>
+      <div class="row"><span class="k">latency</span><span class="v">&lt;100ms</span></div>
+      <div class="row"><span class="k">ops done</span><span class="v a">19,778</span></div>
+      <div class="row"><span class="k">status</span><span class="v a">green</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ C: DATA WAVEFORM ═══ -->
+<div class="tile">
+  <div class="tile-head">
+    <span class="tile-name">C · waveform / oscilloscope</span>
+    <span class="tile-desc">~100 líneas CSS · 24 bars animadas · dice "señal viva"</span>
+  </div>
+  <div class="hero-mock">
+    <div class="text-col">
+      <div class="eyebrow-mock">hero · 01 / 11</div>
+      <h2 class="mock">Construyo los sistemas que hacen funcionar <span class="acid">empresas reales.</span></h2>
+      <div class="sub-mock">Minería, energía, educación. 15 años operando antes de codear.</div>
+    </div>
+    <div class="deco deco-c">
+      <div class="wave-container" id="waveC">
+        <div class="center-line"></div>
+      </div>
+      <div class="label"><span class="dot"></span>signal · 24/7</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ D: TERMINAL GRID MATRIX ═══ -->
+<div class="tile">
+  <div class="tile-head">
+    <span class="tile-name">D · terminal grid matrix</span>
+    <span class="tile-desc">10×10 celdas = 100 dots pulsantes · dice "infrastructure"</span>
+  </div>
+  <div class="hero-mock">
+    <div class="text-col">
+      <div class="eyebrow-mock">hero · 01 / 11</div>
+      <h2 class="mock">Construyo los sistemas que hacen funcionar <span class="acid">empresas reales.</span></h2>
+      <div class="sub-mock">Minería, energía, educación. 15 años operando antes de codear.</div>
+    </div>
+    <div class="deco deco-d" id="gridD"></div>
+  </div>
+</div>
+
+<section class="footer-note">
+  <h2>cómo elegir</h2>
+  <p><strong>A · rings + scan</strong>: evolución del orbit-marker.riv actual. Mismo lenguaje "radar/scope" pero más visualmente rico. Seguro + reconocible.</p>
+  <p><strong>B · monitor panel</strong>: semánticamente más fuerte — dice "sistema monitoreado en vivo". Se lee como dashboard real con datos (19,778 ops, 15y 03m, etc). Acerca el mensaje del sitio al visual.</p>
+  <p><strong>C · waveform</strong>: minimalista y cinético. Nunca interrumpe el texto. Dice "señal, pulso, ritmo".</p>
+  <p><strong>D · grid matrix</strong>: awward-tier. 100 celdas pulsando asincrónicamente = "infrastructure layer". Más visualmente impactante pero puede ser ruidoso.</p>
+  <p style="margin-top:18px; padding-top:16px; border-top:1px solid rgba(255,255,255,0.1)">
+    <strong>Mi recomendación</strong>: <strong>B (monitor panel)</strong> porque es el único que habla el idioma del sitio: muestra los KPIs reales del portfolio (07 sistemas, 15y 03m, &lt;100ms, 19,778 ops). No es decoration genérica — es tu portfolio siendo monitoreado en vivo.
+  </p>
+</section>
+
+<script>
+  // Generate waveform bars with staggered delays
+  const wave = document.getElementById('waveC');
+  if (wave) {
+    for (let i = 0; i < 28; i++) {
+      const b = document.createElement('div');
+      b.className = 'bar';
+      b.style.animationDelay = `${(i * 0.06).toFixed(2)}s`;
+      b.style.animationDuration = `${1.2 + (i % 4) * 0.2}s`;
+      wave.appendChild(b);
+    }
+  }
+  // Generate grid matrix with random delays
+  const grid = document.getElementById('gridD');
+  if (grid) {
+    for (let i = 0; i < 100; i++) {
+      const c = document.createElement('div');
+      c.className = 'cell';
+      c.style.animationDelay = `${(Math.random() * 3).toFixed(2)}s`;
+      c.style.animationDuration = `${(2.5 + Math.random() * 1.5).toFixed(2)}s`;
+      grid.appendChild(c);
+    }
+  }
+</script>
+</body>
+</html>

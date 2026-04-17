@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>metric-pulse preview</title>
+<style>
+  :root {
+    --ink: #0a0a0a;
+    --acid: #ccff00;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: var(--ink);
+    color: #fff;
+    font-family: 'Inter', system-ui, sans-serif;
+    min-height: 100vh;
+    display: grid;
+    place-items: center;
+    padding: 40px;
+  }
+  .frame {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 40px;
+    max-width: 1100px;
+    width: 100%;
+  }
+  .cell {
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 16px;
+    padding: 32px;
+    background: rgba(255,255,255,0.02);
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 20px;
+  }
+  .label {
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: rgba(255,255,255,0.4);
+  }
+  .metric {
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 56px;
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: -0.02em;
+    color: var(--acid);
+  }
+  .row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  canvas {
+    display: block;
+  }
+  .mini { width: 40px; height: 40px; }
+  .medium { width: 80px; height: 80px; }
+  .large { width: 160px; height: 160px; }
+  h1 {
+    grid-column: 1 / -1;
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.3em;
+    color: rgba(255,255,255,0.5);
+    border-left: 2px solid var(--acid);
+    padding-left: 16px;
+    margin-bottom: 20px;
+  }
+</style>
+</head>
+<body>
+<div class="frame">
+  <h1>metric-pulse.riv · awward preview</h1>
+
+  <div class="cell">
+    <span class="label">01 · inline tick</span>
+    <div class="row">
+      <canvas id="c1" class="mini"></canvas>
+      <span style="font-family:'JetBrains Mono',monospace; font-size:11px; color:rgba(255,255,255,0.55); text-transform:uppercase; letter-spacing:0.2em;">live system</span>
+    </div>
+  </div>
+
+  <div class="cell">
+    <span class="label">02 · metric counter</span>
+    <div class="row">
+      <canvas id="c2" class="medium"></canvas>
+      <div>
+        <div class="metric">195+</div>
+        <span class="label">operarios activos</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="cell">
+    <span class="label">03 · hero badge</span>
+    <div class="row">
+      <canvas id="c3" class="large"></canvas>
+    </div>
+  </div>
+</div>
+
+<script src="https://unpkg.com/@rive-app/canvas@2.21.3"></script>
+<script>
+  ['c1','c2','c3'].forEach(id => {
+    const cv = document.getElementById(id);
+    new rive.Rive({
+      src: '/rive/cases/metric-pulse.riv',
+      canvas: cv,
+      autoplay: true,
+      stateMachines: undefined,
+      animations: ['pulse'],
+      onLoad: () => {
+        cv.width = cv.clientWidth * 2;
+        cv.height = cv.clientHeight * 2;
+      },
+      onLoadError: (e) => console.error('Rive load error', id, e),
+    });
+  });
+</script>
+</body>
+</html>

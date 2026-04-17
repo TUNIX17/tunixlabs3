@@ -66,8 +66,8 @@ const SLOTS: ShowcaseSlot[] = [
     key: 'sgmSchwager',
     src: '/case-studies/sgm-schwager-hero.png',
     alt: 'SGM Schwager — welcome dashboard with 8 operational modules',
-    fallbackLabel: 'SGM · Gestion operacional minera',
-    fallbackMetric: '8 modulos en produccion',
+    fallbackLabel: 'SGM · Gestión operacional minera',
+    fallbackMetric: '8 módulos en producción',
   },
   {
     key: 'apoderappDark',

@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<title>hero kinetic swiss v3 · compact, one-screen</title>
+<style>
+  :root {
+    --ink: #0a0a0a;
+    --paper: #f5f5f2;
+    --acid: #ccff00;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body {
+    background: #050505;
+    color: var(--paper);
+    font-family: 'Inter', system-ui, sans-serif;
+    min-height: 100vh;
+    padding: 24px;
+  }
+
+  /* ─── TERMINAL FRAME ─────────────────────────────────── */
+  .terminal {
+    position: relative;
+    max-width: 1440px;
+    margin: 0 auto;
+    background: var(--ink);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow:
+      0 30px 90px rgba(0,0,0,0.5),
+      0 0 0 1px rgba(204,255,0,0.04);
+  }
+
+  /* TOP BAR */
+  .terminal-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 11px 18px;
+    background: rgba(255,255,255,0.02);
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 11px;
+    position: relative;
+  }
+  .traffic-lights { display: flex; gap: 7px; }
+  .traffic-lights .light {
+    width: 10px; height: 10px; border-radius: 50%;
+    border: 1px solid rgba(0,0,0,0.3);
+  }
+  .traffic-lights .red { background: #ff5f57; }
+  .traffic-lights .amber { background: #febc2e; }
+  .traffic-lights .green { background: #28c840; }
+  .brand {
+    position: absolute;
+    left: 50%; top: 50%;
+    transform: translate(-50%, -50%);
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    color: rgba(255,255,255,0.7);
+    text-transform: uppercase;
+    letter-spacing: 0.25em;
+    font-size: 10px;
+  }
+  .brand .mono {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--acid);
+    box-shadow: 0 0 8px var(--acid);
+  }
+  .brand .slash { color: rgba(255,255,255,0.25); }
+  .brand .mode { color: var(--acid); }
+  .status-lights { display: inline-flex; gap: 14px; }
+  .sl {
+    display: inline-flex; align-items: center; gap: 6px;
+    color: rgba(255,255,255,0.4);
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    font-size: 9px;
+  }
+  .sl .dot { width: 5px; height: 5px; border-radius: 50%; }
+  .sl.close .dot { background: rgba(255,255,255,0.3); }
+  .sl.live .dot { background: var(--acid); box-shadow: 0 0 6px var(--acid); animation: blink 1.4s ease-in-out infinite; }
+  .sl.prod .dot { background: #4ade80; box-shadow: 0 0 6px #4ade80; }
+  @keyframes blink { 50% { opacity: 0.3; } }
+
+  /* PROMPT ROW */
+  .prompt-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 20px;
+    background: rgba(0,0,0,0.4);
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 11px;
+  }
+  .prompt {
+    display: inline-flex; align-items: center; gap: 8px;
+    color: rgba(255,255,255,0.65);
+  }
+  .prompt .dollar { color: var(--acid); font-weight: 700; }
+  .prompt .cursor {
+    display: inline-block;
+    width: 7px; height: 13px;
+    background: var(--acid);
+    animation: cursorBlink 1s steps(2) infinite;
+    margin-left: 2px;
+  }
+  @keyframes cursorBlink { 50% { opacity: 0; } }
+  .uptime {
+    display: inline-flex; align-items: center; gap: 8px;
+    color: rgba(255,255,255,0.5);
+    text-transform: uppercase;
+    letter-spacing: 0.25em;
+    font-size: 10px;
+  }
+  .uptime .live-dot { position: relative; width: 7px; height: 7px; }
+  .uptime .ping {
+    position: absolute; inset: 0;
+    border-radius: 50%;
+    background: var(--acid);
+    opacity: 0.5;
+    animation: ping 1.6s cubic-bezier(0, 0, 0.2, 1) infinite;
+  }
+  .uptime .core {
+    position: absolute; inset: 0;
+    border-radius: 50%;
+    background: var(--acid);
+    box-shadow: 0 0 8px var(--acid);
+  }
+  @keyframes ping {
+    0% { transform: scale(1); opacity: 0.5; }
+    100% { transform: scale(2.5); opacity: 0; }
+  }
+
+  /* ─── STAGE (compact) ──────────────────────────────── */
+  .stage {
+    position: relative;
+    padding: 44px 48px 28px;
+    overflow: hidden;
+  }
+  .stage::before {
+    content: '';
+    position: absolute; inset: 0;
+    background-image:
+      linear-gradient(rgba(204,255,0,0.08) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(204,255,0,0.08) 1px, transparent 1px);
+    background-size: 60px 60px;
+    mask-image: radial-gradient(ellipse 80% 70% at 50% 50%, black 30%, transparent 80%);
+    -webkit-mask-image: radial-gradient(ellipse 80% 70% at 50% 50%, black 30%, transparent 80%);
+    pointer-events: none;
+    z-index: 0;
+  }
+  .stage::after {
+    content: '';
+    position: absolute;
+    top: -10%; left: 50%;
+    width: 1200px; height: 540px;
+    transform: translateX(-50%);
+    background: radial-gradient(ellipse, rgba(204,255,0,0.15) 0%, transparent 60%);
+    filter: blur(120px);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .bracket {
+    position: absolute;
+    width: 18px; height: 18px;
+    z-index: 3;
+    pointer-events: none;
+  }
+  .bracket.tl { top: 18px; left: 18px; border-top: 1.5px solid var(--acid); border-left: 1.5px solid var(--acid); }
+  .bracket.tr { top: 18px; right: 18px; border-top: 1.5px solid var(--acid); border-right: 1.5px solid var(--acid); }
+  .bracket.bl { bottom: 18px; left: 18px; border-bottom: 1.5px solid var(--acid); border-left: 1.5px solid var(--acid); }
+  .bracket.br { bottom: 18px; right: 18px; border-bottom: 1.5px solid var(--acid); border-right: 1.5px solid var(--acid); }
+
+  .orbit-bg {
+    position: absolute;
+    top: 50%; left: 4%;
+    width: min(40vw, 420px);
+    aspect-ratio: 1;
+    transform: translateY(-55%);
+    opacity: 0.38;
+    pointer-events: none;
+    z-index: 1;
+  }
+  .orbit-bg canvas { display: block; width: 100%; height: 100%; }
+
+  .content {
+    position: relative;
+    z-index: 2;
+    max-width: 1100px;
+    margin: 0 auto;
+    width: 100%;
+  }
+  .eyebrow {
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.3em;
+    color: rgba(255,255,255,0.45);
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+  .eyebrow .line {
+    display: inline-block;
+    height: 1px; width: 36px;
+    background: var(--acid);
+    box-shadow: 0 0 8px var(--acid);
+  }
+
+  h1.monster {
+    font-family: 'Manrope', 'Inter', system-ui, sans-serif;
+    font-weight: 800;
+    font-size: clamp(40px, 6vw, 96px);
+    line-height: 0.94;
+    letter-spacing: -0.035em;
+    color: var(--paper);
+  }
+  h1 .line { display: block; }
+  h1 .line.outline {
+    color: transparent;
+    -webkit-text-stroke: 1.4px rgba(245,245,242,0.35);
+  }
+  h1 .line.accent { color: var(--acid); }
+
+  .sub {
+    margin-top: 20px;
+    max-width: 600px;
+    font-size: clamp(14px, 1.15vw, 17px);
+    line-height: 1.55;
+    color: rgba(245,245,242,0.6);
+  }
+
+  .meta-grid {
+    position: relative;
+    z-index: 3;
+    margin-top: 32px;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    border-top: 1px solid rgba(255,255,255,0.08);
+  }
+  @media (max-width: 900px) {
+    .meta-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+  .meta-cell {
+    padding: 14px 18px;
+    border-right: 1px solid rgba(255,255,255,0.08);
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .meta-cell:last-child { border-right: 0; }
+  .meta-label {
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 0.25em;
+    color: rgba(255,255,255,0.4);
+  }
+  .meta-value {
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 12px;
+    color: var(--paper);
+    line-height: 1.35;
+    white-space: pre-line;
+  }
+  .meta-value.acid { color: var(--acid); font-weight: 700; font-size: 14px; }
+
+  /* BOTTOM BAR */
+  .terminal-bottom {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 20px;
+    background: rgba(255,255,255,0.02);
+    border-top: 1px solid rgba(255,255,255,0.06);
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.25em;
+    color: rgba(255,255,255,0.4);
+  }
+  .state-indicator { display: inline-flex; align-items: center; gap: 8px; }
+  .state-indicator .current { color: var(--acid); }
+  .state-indicator .slash { color: rgba(255,255,255,0.2); }
+
+  .progress-bar {
+    position: absolute;
+    left: 0; right: 0; top: 0;
+    height: 1px;
+    background: rgba(255,255,255,0.06);
+  }
+  .progress-bar .fill {
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 12%;
+    background: var(--acid);
+    box-shadow: 0 0 10px var(--acid);
+  }
+  .scroll-hint {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    color: rgba(255,255,255,0.5);
+  }
+  .scroll-hint .dot {
+    width: 5px; height: 5px;
+    border-radius: 50%;
+    background: var(--acid);
+    box-shadow: 0 0 6px var(--acid);
+    animation: scrollPulse 1.8s ease-in-out infinite;
+  }
+  @keyframes scrollPulse {
+    0%, 100% { transform: translateY(0); opacity: 0.7; }
+    50% { transform: translateY(3px); opacity: 1; }
+  }
+
+  /* EXPLANATION */
+  .explanation {
+    max-width: 1440px;
+    margin: 28px auto 0;
+    padding: 24px;
+    border: 1px dashed rgba(204,255,0,0.25);
+    border-radius: 10px;
+    color: rgba(255,255,255,0.6);
+    font-size: 13px;
+    line-height: 1.7;
+  }
+  .explanation h2 {
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.3em;
+    color: var(--acid);
+    margin-bottom: 14px;
+  }
+  .explanation strong { color: var(--acid); }
+  .explanation ul { margin-top: 8px; padding-left: 22px; }
+  .explanation li { margin: 4px 0; }
+</style>
+</head>
+<body>
+  <div class="terminal">
+    <div class="terminal-top">
+      <div class="traffic-lights">
+        <span class="light red"></span>
+        <span class="light amber"></span>
+        <span class="light green"></span>
+      </div>
+      <div class="brand">
+        <span class="mono"></span>
+        TUNIXLABS
+        <span class="slash">//</span>
+        <span class="mode">production</span>
+      </div>
+      <div class="status-lights">
+        <span class="sl close"><span class="dot"></span>local</span>
+        <span class="sl live"><span class="dot"></span>live</span>
+        <span class="sl prod"><span class="dot"></span>prod</span>
+      </div>
+    </div>
+
+    <div class="prompt-row">
+      <span class="prompt">
+        <span class="dollar">$</span>
+        <span>./production --show-portfolio</span>
+        <span class="cursor"></span>
+      </span>
+      <span class="uptime">
+        <span class="live-dot"><span class="ping"></span><span class="core"></span></span>
+        uptime 15y 03m
+      </span>
+    </div>
+
+    <div class="stage">
+      <span class="bracket tl"></span>
+      <span class="bracket tr"></span>
+      <span class="bracket bl"></span>
+      <span class="bracket br"></span>
+
+      <div class="orbit-bg"><canvas id="orbit"></canvas></div>
+
+      <div class="content">
+        <div class="eyebrow">
+          <span class="line"></span>
+          hero · 01 / 05
+        </div>
+        <h1 class="monster">
+          <span class="line">SOFTWARE</span>
+          <span class="line outline">QUE CORRE EN</span>
+          <span class="line">PRODUCCIÓN.</span>
+          <span class="line accent">NADA MÁS.</span>
+        </h1>
+        <p class="sub">
+          Minería, metalurgia, retail, compliance tributario.
+          15 años operando antes de codear. MSc Finanzas + MIT Prof Ed.
+        </p>
+      </div>
+
+      <div class="meta-grid">
+        <div class="meta-cell">
+          <div class="meta-label">Base</div>
+          <div class="meta-value">Santiago, CL</div>
+        </div>
+        <div class="meta-cell">
+          <div class="meta-label">Operando hace</div>
+          <div class="meta-value acid">15 años</div>
+        </div>
+        <div class="meta-cell">
+          <div class="meta-label">Credenciales</div>
+          <div class="meta-value">MSc Finanzas
+MIT Prof Ed</div>
+        </div>
+        <div class="meta-cell">
+          <div class="meta-label">Industrias</div>
+          <div class="meta-value">Minería
+Metalurgia
+Tributario</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="terminal-bottom">
+      <div class="progress-bar"><div class="fill"></div></div>
+      <span class="state-indicator">
+        <span class="current">01</span>
+        <span class="slash">/</span>
+        <span>hero</span>
+      </span>
+      <span class="scroll-hint">
+        <span class="dot"></span>
+        scroll ↓ para services
+      </span>
+    </div>
+  </div>
+
+  <section class="explanation">
+    <h2>v3 · compact · one-screen</h2>
+    <p><strong>Cambio vs v2</strong>: paddings reducidos (stage 44/48/28 vs 80/64/48), headline bajó de 130→96px, meta-grid margin-top 56→32, orbit 640→420, brackets 22→18. Terminal completo cabe en ≤720px alto.</p>
+    <ul>
+      <li>Terminal frame <strong>INTACTO</strong> (traffic lights + brand + status lights + prompt + uptime + bottom bar + progress bar)</li>
+      <li>Cambio visible sólo dentro del stage: orbit acid sutil detrás + corner brackets + headline jerarquía + "15 años" en acid</li>
+    </ul>
+    <p style="margin-top:14px; padding-top:14px; border-top:1px solid rgba(255,255,255,0.1);">
+      <strong>Tu decisión</strong>: ¿este tamaño es el que querías? Si está OK, lo aplico a <code>HeroState.tsx</code> + <code>kineticSwiss.module.css</code>. Si aún es grande, sigo reduciendo.
+    </p>
+  </section>
+
+  <script src="https://unpkg.com/@rive-app/canvas@2.21.3"></script>
+  <script>
+    const cv = document.getElementById('orbit');
+    new rive.Rive({
+      src: '/rive/cases/orbit-marker.riv',
+      canvas: cv,
+      autoplay: true,
+      animations: ['orbit'],
+      onLoad: () => { cv.width = cv.clientWidth * 2; cv.height = cv.clientHeight * 2; },
+      onLoadError: (e) => console.error('Rive failed', e),
+    });
+  </script>
+</body>
+</html>

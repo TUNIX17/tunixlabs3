@@ -52,7 +52,7 @@ export default function Nav() {
   const switchLocale = (newLocale: string) => {
     if (newLocale === locale) return;
     document.cookie = `NEXT_LOCALE=${newLocale}; path=/; max-age=31536000`;
-    router.replace(pathname, { locale: newLocale });
+    router.replace(pathname as any, { locale: newLocale });
   };
 
   const links: { href: '/inicio' | '/servicios' | '/casos' | '/sobre' | '/contacto'; label: string }[] = [

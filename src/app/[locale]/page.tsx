@@ -1,5 +1,4 @@
 import { redirect } from '@/i18n/navigation';
-import type { Pathnames } from '@/i18n/routing';
 import { routing } from '@/i18n/routing';
 
 /**
@@ -25,5 +24,5 @@ export default function LocaleRootPage({ params: { locale } }: Props) {
   )
     ? (locale as typeof routing.locales[number])
     : routing.defaultLocale;
-  redirect({ href: '/inicio' as Pathnames, locale: safeLocale });
+  redirect({ href: '/inicio', locale: safeLocale });
 }

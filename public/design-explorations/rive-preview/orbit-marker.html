@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>orbit-marker preview · awward</title>
+<style>
+  :root {
+    --ink: #0a0a0a;
+    --acid: #ccff00;
+    --apoderapp: #a78bfa;
+    --fernandez: #f59e0b;
+    --schwager: #fb923c;
+    --sime: #84cc16;
+    --gasco: #38bdf8;
+    --soma: #22d3ee;
+    --speakly: #c084fc;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: var(--ink);
+    color: #fff;
+    font-family: 'Inter', system-ui, sans-serif;
+    min-height: 100vh;
+    padding: 64px 32px;
+  }
+  h1 {
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.3em;
+    color: rgba(255,255,255,0.5);
+    border-left: 2px solid var(--acid);
+    padding-left: 16px;
+    margin-bottom: 48px;
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+    gap: 48px;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+  .cell {
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 16px;
+    padding: 40px;
+    background: rgba(255,255,255,0.02);
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+  .cell-label {
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.3em;
+    color: rgba(255,255,255,0.4);
+  }
+  .marker {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1;
+    max-width: 240px;
+  }
+  canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+  .number {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 128px;
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: -0.04em;
+    color: transparent;
+    -webkit-text-stroke: 1.5px rgba(132, 204, 22, 0.7);
+    pointer-events: none;
+  }
+  .c-apoderapp .number { -webkit-text-stroke-color: rgba(167, 139, 250, 0.7); }
+  .c-schwager .number { -webkit-text-stroke-color: rgba(251, 146, 60, 0.7); }
+  .c-sime .number { -webkit-text-stroke-color: rgba(132, 204, 22, 0.7); }
+  .c-gasco .number { -webkit-text-stroke-color: rgba(56, 189, 248, 0.7); }
+  .eyebrow {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.3em;
+  }
+  .eyebrow .line {
+    display: inline-block;
+    height: 1px;
+    width: 40px;
+    background: var(--acid);
+    box-shadow: 0 0 12px var(--acid);
+  }
+  .eyebrow .text { color: var(--acid); }
+  .c-apoderapp .eyebrow .line { background: var(--apoderapp); box-shadow: 0 0 12px var(--apoderapp); }
+  .c-apoderapp .eyebrow .text { color: var(--apoderapp); }
+  .c-schwager .eyebrow .line { background: var(--schwager); box-shadow: 0 0 12px var(--schwager); }
+  .c-schwager .eyebrow .text { color: var(--schwager); }
+  .c-sime .eyebrow .line { background: var(--sime); box-shadow: 0 0 12px var(--sime); }
+  .c-sime .eyebrow .text { color: var(--sime); }
+  .c-gasco .eyebrow .line { background: var(--gasco); box-shadow: 0 0 12px var(--gasco); }
+  .c-gasco .eyebrow .text { color: var(--gasco); }
+  .sample-text {
+    font-size: 22px;
+    line-height: 1.4;
+    color: rgba(255,255,255,0.85);
+  }
+</style>
+</head>
+<body>
+<h1>orbit-marker.riv · section anchor preview</h1>
+
+<div class="grid">
+  <!-- SIME (acid) -->
+  <div class="cell c-sime">
+    <span class="cell-label">01 · case SIME (acid/lime)</span>
+    <div class="marker">
+      <canvas id="c1"></canvas>
+      <div class="number">01</div>
+    </div>
+    <div class="eyebrow"><span class="line"></span><span class="text">El problema</span></div>
+    <p class="sample-text">Pautas de seguridad, mantenciones preventivas y órdenes de trabajo corrían en papel y planillas.</p>
+  </div>
+
+  <!-- SCHWAGER (orange) -->
+  <div class="cell c-schwager">
+    <span class="cell-label">02 · case SCHWAGER (orange)</span>
+    <div class="marker">
+      <canvas id="c2"></canvas>
+      <div class="number">02</div>
+    </div>
+    <div class="eyebrow"><span class="line"></span><span class="text">Lo que construimos</span></div>
+    <p class="sample-text">Voice AI sobre Google Gemini — operarios en faena completan formularios hablando.</p>
+  </div>
+
+  <!-- APODERAPP (purple) -->
+  <div class="cell c-apoderapp">
+    <span class="cell-label">03 · case APODERAPP (purple)</span>
+    <div class="marker">
+      <canvas id="c3"></canvas>
+      <div class="number">03</div>
+    </div>
+    <div class="eyebrow"><span class="line"></span><span class="text">En números</span></div>
+    <p class="sample-text">PWA con 5 agentes Claude Code y 88+ tests sii-factura como feature de compliance.</p>
+  </div>
+
+  <!-- GASCO (cyan) -->
+  <div class="cell c-gasco">
+    <span class="cell-label">04 · case GASCO (cyan)</span>
+    <div class="marker">
+      <canvas id="c4"></canvas>
+      <div class="number">04</div>
+    </div>
+    <div class="eyebrow"><span class="line"></span><span class="text">Ver el sistema</span></div>
+    <p class="sample-text">Bot de procesamiento automático, 4,040 códigos al 88.7% de éxito en 14 rutas.</p>
+  </div>
+</div>
+
+<script src="https://unpkg.com/@rive-app/canvas@2.21.3"></script>
+<script>
+  ['c1','c2','c3','c4'].forEach(id => {
+    const cv = document.getElementById(id);
+    new rive.Rive({
+      src: '/rive/cases/orbit-marker.riv',
+      canvas: cv,
+      autoplay: true,
+      animations: ['orbit'],
+      onLoad: () => {
+        cv.width = cv.clientWidth * 2;
+        cv.height = cv.clientHeight * 2;
+      },
+      onLoadError: (e) => console.error('Rive load error', id, e),
+    });
+  });
+</script>
+</body>
+</html>

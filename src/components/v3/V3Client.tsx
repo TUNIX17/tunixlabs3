@@ -28,34 +28,48 @@ const HERO_ES = {
   accent: 'empresas reales.',
   sub: 'Minería, energía, educación — cuando Excel ya no alcanza, yo llego. 15 años operando antes de codear. MSc Finanzas + MIT AI/ML.',
   cta1: 'Hablemos de tu proyecto', cta2: 'Ver lo que construí',
+  engagement: null as null | { label: string; value: string },
+  metaGrid: [
+    { label: 'Base', value: 'Santiago, CL', acid: false },
+    { label: 'Operando hace', value: '15 años', acid: true },
+    { label: 'Credenciales', value: 'MSc Finanzas\nMIT Prof Ed', acid: false },
+    { label: 'Industrias', value: 'Minería\nMetalurgia\nTributario', acid: false },
+  ],
 };
 const HERO_EN = {
   cmd: './production --status',
   path: 'production', meta: 'UPTIME 15Y 03M',
-  lines: ['One operator.', 'MIT-trained.'],
-  accent: 'Production AI from Santiago.',
-  sub: '15 years running real operations before writing code. MSc Finance + MIT AI/ML. Nearshore at 3-5x below SF/NYC rates.',
+  lines: ['MIT-trained operator.', 'Production AI,'],
+  accent: 'shipped from Santiago.',
+  sub: '15 years running real ops before code. MSc Finance + MIT AI/ML. Senior ownership, direct collaboration, US time zones. No juniors, no account managers.',
   cta1: 'Let\'s talk about your project', cta2: 'See what I shipped',
+  engagement: { label: 'Typical engagement', value: 'USD 15k–60k' } as null | { label: string; value: string },
+  metaGrid: [
+    { label: 'Based', value: 'Santiago, CL', acid: false },
+    { label: 'Years of ops', value: '15', acid: true },
+    { label: 'Credentials', value: 'MSc Finance\nMIT Prof Ed', acid: false },
+    { label: 'Industries', value: 'Mining\nMetallurgy\nTax compliance', acid: false },
+  ],
 };
 
 const CASES_ES: CaseData[] = [
-  { id: 'apoderapp', cmd: './cases --show apoderapp', badge: 'SAAS · EDUCACIÓN', title: 'Tesoreros cobran cuotas por WhatsApp.', desc: 'Padres envían foto del comprobante. IA lo lee y registra. Sin Excel, sin caos.', metric: 'Verificación automática', image: '/cases/apoderapp/01.webp', color: '#5b21b6', path: 'cases/apoderapp', meta: 'PRODUCTO PROPIO' },
-  { id: 'fernandez', cmd: './cases --show fernandez', badge: 'ERP · MANUFACTURA', title: 'Transformación digital de una maestranza.', desc: 'OCR lee facturas, QR identifica herramientas, IA extrae datos. Un sistema, toda la empresa.', metric: 'Transformación completa', image: '/cases/fernandez/01.webp', color: '#92400e', path: 'cases/fernandez', meta: '50 AÑOS MIGRADOS' },
-  { id: 'schwager', cmd: './cases --show schwager', badge: 'VOICE AI · MINERÍA', title: 'Operarios llenan formularios hablando.', desc: 'Con guantes, bajo la lluvia, sin señal. Voice AI sobre Google Gemini para faenas mineras.', metric: '195+ operarios · <100ms', image: '/cases/schwager/01.webp', color: '#b85c38', path: 'cases/schwager', meta: '195+ OPERARIOS' },
-  { id: 'sime', cmd: './cases --show sime', badge: 'MANTENIMIENTO · MINERÍA', title: '4,000 hojas de ruta digitales al día.', desc: 'Reemplazo completo del sistema legacy. QR en terreno, aprobación móvil, auditoría automática.', metric: 'Cero papel en faena', image: '/cases/sime/01.webp', color: '#2d5a27', path: 'cases/sime', meta: '4K RUTAS/DÍA' },
-  { id: 'gasco', cmd: './cases --show gasco', badge: 'AUTOMATIZACIÓN · ENERGÍA', title: 'De 5 min por código a 30 segundos.', desc: 'Repartidores envían foto por WhatsApp. Bot lee el código y lo quema automáticamente.', metric: '14 repartidores en ruta', image: '/case-studies/bot-gas-distribution.png', color: '#0369a1', path: 'cases/gasco', meta: '14 RUTAS' },
-  { id: 'soma', cmd: './cases --show soma', badge: 'BI · MINERIA', title: 'Dashboards KPI que reemplazan 50 Excel', desc: 'Data de SAP sincronizada, KPIs operacionales y ejecutivos, alertas en tiempo real. Los directores de operaciones lo miran antes del café.', metric: 'SAP → decisiones en tiempo real', image: '/cases/soma/01.webp', color: '#0369a1', path: 'cases/soma', meta: 'BI OPERACIONAL' },
-  { id: 'speakly', cmd: './cases --show speakly', badge: 'SAAS · EDUCACION', title: 'Profesor + avatar AI con copiloto', desc: 'Plataforma de inglés con copiloto AI que asiste al profesor en tiempo real. Avatares conversacionales, progresión adaptativa, sin fricción.', metric: 'Profesor × AI en la misma clase', image: '/cases/speakly/01.webp', color: '#7c3aed', path: 'cases/speakly', meta: 'SAAS EDUTECH' },
+  { id: 'apoderapp', cmd: './cases --show apoderapp', badge: 'SAAS · EDUCACIÓN', title: 'Centros de padres sin Excel ni WhatsApp groups.', desc: 'PWA construida con 5 agentes Claude Code. Incluye librería sii-factura reusable con 88+ tests como feature de compliance.', metric: 'PWA · 5 agentes · 88+ tests', image: '/cases/apoderapp/01.webp', color: '#5b21b6', path: 'cases/apoderapp', meta: 'PRODUCTO PROPIO' },
+  { id: 'fernandez', cmd: './cases --show fernandez', badge: 'ERP · METALURGIA', title: 'ERP que reemplazó Excel área por área.', desc: 'ERP custom para una metalúrgica de 50 años. OCR lee facturas, QR identifica herramientas, LLM Vision digitaliza documentos. SII integrado.', metric: 'ERP full-stack · SII integrado', image: '/cases/fernandez/01.webp', color: '#92400e', path: 'cases/fernandez', meta: 'METALURGIA · 50 AÑOS' },
+  { id: 'schwager', cmd: './cases --show schwager', badge: 'VOICE AI · MINERÍA', title: 'Operarios llenan formularios hablando.', desc: 'Con guantes, bajo la lluvia, sin señal. Voice AI sobre Google Gemini para faenas mineras. App offline-first iOS + Android.', metric: '195+ operarios · <100 ms', image: '/cases/schwager/01.webp', color: '#b85c38', path: 'cases/schwager', meta: '195+ OPERARIOS' },
+  { id: 'sime', cmd: './cases --show sime', badge: 'MANTENIMIENTO · MINERÍA', title: '19,778 órdenes de trabajo digitalizadas.', desc: 'Reemplazo completo del sistema legacy: 1,056 pautas de seguridad, QR firmado, PDFs en AWS S3, aprobación móvil, auditoría automática por turno minero.', metric: '19,778 OTs · 115K actividades · 1,056 pautas', image: '/cases/sime/01.webp', color: '#2d5a27', path: 'cases/sime', meta: '19,778 OTs' },
+  { id: 'gasco', cmd: './cases --show gasco', badge: 'AUTOMATIZACIÓN · ENERGÍA', title: '4,040 códigos al 88.7% de éxito.', desc: 'Bot de procesamiento automático con validación contra reglas de negocio, dashboard por ruta y reportería diaria para una distribuidora regional de gas.', metric: '4,040 códigos · 88.7% · 14 rutas', image: '/case-studies/bot-gas-distribution.png', color: '#0369a1', path: 'cases/gasco', meta: '88.7% ÉXITO' },
+  { id: 'soma', cmd: './cases --show soma', badge: 'BI · MINERÍA', title: 'KPI de mantenimiento desde Excel de SAP.', desc: 'Plataforma que ingiere exports Excel de SAP PM (IH01, IW21-39, IP10-18) y calcula KPI siguiendo metodología SOMA de 8 fases para gran minería.', metric: 'OEE · MTBF · MTTR · CAUE', image: '/cases/soma/01.webp', color: '#0369a1', path: 'cases/soma', meta: 'SAP → KPI MINERO' },
+  { id: 'speakly', cmd: './cases --show speakly', badge: 'SAAS · EDUCACIÓN', title: 'Inglés 24/7: profesor + avatar IA + copiloto.', desc: 'Cuatro modos: profesor humano con copiloto IA, avatar 3D conversacional, pizarra colaborativa (Tldraw + Yjs) y test CEFR con OpenAI Realtime.', metric: 'Voice AI · GPT-4o · Deepgram', image: '/cases/speakly/01.webp', color: '#7c3aed', path: 'cases/speakly', meta: 'SAAS EDTECH' },
 ];
 
 const CASES_EN: CaseData[] = [
-  { id: 'apoderapp', cmd: './cases --show apoderapp', badge: 'SAAS · EDUCATION', title: 'School fee collection via WhatsApp.', desc: 'Parents send receipt photo. AI reads and verifies it. No spreadsheets, no chaos.', metric: 'Automated verification', image: '/cases/apoderapp/01.webp', color: '#5b21b6', path: 'cases/apoderapp', meta: 'OWN PRODUCT' },
-  { id: 'fernandez', cmd: './cases --show fernandez', badge: 'ERP · MANUFACTURING', title: 'Digital transformation of an industrial workshop.', desc: 'OCR reads invoices, QR tracks tools, AI extracts data. One system, entire company.', metric: 'Complete transformation', image: '/cases/fernandez/01.webp', color: '#92400e', path: 'cases/fernandez', meta: '50 YRS MIGRATED' },
-  { id: 'schwager', cmd: './cases --show schwager', badge: 'VOICE AI · MINING', title: 'Workers fill safety forms by talking.', desc: 'In gloves, rain, no signal. Voice AI on Google Gemini for mining field ops.', metric: '195+ workers · <100ms', image: '/cases/schwager/01.webp', color: '#b85c38', path: 'cases/schwager', meta: '195+ WORKERS' },
-  { id: 'sime', cmd: './cases --show sime', badge: 'MAINTENANCE · MINING', title: '4,000 digital route sheets per day.', desc: 'Full legacy replacement. QR signing on-site, mobile approvals, automated audit.', metric: 'Zero paper in the field', image: '/cases/sime/01.webp', color: '#2d5a27', path: 'cases/sime', meta: '4K ROUTES/DAY' },
-  { id: 'gasco', cmd: './cases --show gasco', badge: 'AUTOMATION · ENERGY', title: 'From 5 min per code to 30 seconds.', desc: 'Drivers send photo via WhatsApp. Bot reads the code and burns it automatically.', metric: '14 drivers on route', image: '/case-studies/bot-gas-distribution.png', color: '#0369a1', path: 'cases/gasco', meta: '14 ROUTES' },
-  { id: 'soma', cmd: './cases --show soma', badge: 'BI · MINING', title: 'BI dashboards replacing 50 spreadsheets', desc: 'SAP-synced data, operational and executive KPIs, real-time alerts. Ops directors check it before coffee.', metric: 'SAP → real-time decisions', image: '/cases/soma/01.webp', color: '#0369a1', path: 'cases/soma', meta: 'OPERATIONAL BI' },
-  { id: 'speakly', cmd: './cases --show speakly', badge: 'SAAS · EDUCATION', title: 'Teacher + AI avatar with copilot', desc: 'English learning platform with an AI copilot assisting the teacher in real time. Conversational avatars, adaptive progression, zero friction.', metric: 'Teacher × AI in the same class', image: '/cases/speakly/01.webp', color: '#7c3aed', path: 'cases/speakly', meta: 'SAAS EDTECH' },
+  { id: 'apoderapp', cmd: './cases --show apoderapp', badge: 'SAAS · EDUCATION', title: 'Parent associations out of spreadsheets and WhatsApp.', desc: 'PWA built with a 5-agent Claude Code architecture. Ships with a reusable sii-factura library (Chilean e-invoicing, 88+ tests) as a compliance feature.', metric: 'PWA · 5 agents · 88+ tests', image: '/cases/apoderapp/01.webp', color: '#5b21b6', path: 'cases/apoderapp', meta: 'OWN PRODUCT' },
+  { id: 'fernandez', cmd: './cases --show fernandez', badge: 'ERP · METALLURGY', title: 'ERP that replaced Excel area by area.', desc: 'Custom ERP for a 50-year-old metallurgic company. OCR reads invoices, QR tracks tools, LLM Vision digitizes shop-floor documents. Chilean SII integrated.', metric: 'Full-stack ERP · SII integrated', image: '/cases/fernandez/01.webp', color: '#92400e', path: 'cases/fernandez', meta: 'METALLURGY · 50 YRS' },
+  { id: 'schwager', cmd: './cases --show schwager', badge: 'VOICE AI · MINING', title: 'Workers fill safety forms by talking.', desc: 'In gloves, rain, no signal. Voice AI on Google Gemini for mining field ops. Offline-first app for iOS + Android.', metric: '195+ workers · <100 ms', image: '/cases/schwager/01.webp', color: '#b85c38', path: 'cases/schwager', meta: '195+ WORKERS' },
+  { id: 'sime', cmd: './cases --show sime', badge: 'MAINTENANCE · MINING', title: '19,778 work orders, fully digital.', desc: 'Full legacy replacement: 1,056 safety protocols, QR-signed PDFs on AWS S3, mobile approvals, automated audit per mining shift.', metric: '19,778 WOs · 115K activities · 1,056 protocols', image: '/cases/sime/01.webp', color: '#2d5a27', path: 'cases/sime', meta: '19,778 WOs' },
+  { id: 'gasco', cmd: './cases --show gasco', badge: 'AUTOMATION · ENERGY', title: '4,040 codes processed at 88.7% success.', desc: 'Automated processing bot with business-rule validation, per-route metrics dashboard and daily reporting for a regional gas distribution operator.', metric: '4,040 codes · 88.7% · 14 routes', image: '/case-studies/bot-gas-distribution.png', color: '#0369a1', path: 'cases/gasco', meta: '88.7% SUCCESS' },
+  { id: 'soma', cmd: './cases --show soma', badge: 'BI · MINING', title: 'Mining maintenance KPIs straight from SAP Excel.', desc: 'Platform ingesting SAP PM Excel exports (IH01, IW21-39, IP10-18) and computing KPIs following the SOMA 8-phase maintenance lifecycle for large-scale mining.', metric: 'OEE · MTBF · MTTR · CAUE', image: '/cases/soma/01.webp', color: '#0369a1', path: 'cases/soma', meta: 'SAP → MINING KPIs' },
+  { id: 'speakly', cmd: './cases --show speakly', badge: 'SAAS · EDUCATION', title: 'English 24/7: human teacher, AI copilot and 3D avatar.', desc: 'Four modes: human teacher with in-class AI copilot, 3D conversational avatar, collaborative whiteboard (Tldraw + Yjs) and CEFR test on OpenAI Realtime.', metric: 'Voice AI · GPT-4o · Deepgram', image: '/cases/speakly/01.webp', color: '#7c3aed', path: 'cases/speakly', meta: 'SAAS EDTECH' },
 ];
 
 interface ServiceData {
@@ -74,33 +88,33 @@ const SERVICES: ServiceData[] = [
   { key: 'business-intelligence', es: 'BI operacional y dashboards', en: 'Operational BI & Dashboards',
     descEs: 'Dashboards que los directores de operaciones miran antes del café. Data real, cero placeholders.',
     descEn: 'Dashboards that ops directors check before coffee. Real data, zero placeholders.',
-    stack: ['React', 'Prisma', 'PostgreSQL', 'ETL', 'Gantt'],
-    anchorEs: 'En producción: 4,000+ rutas diarias visualizadas', anchorEn: 'In production: 4,000+ daily routes visualized' },
+    stack: ['Turborepo', 'Fastify', 'React', 'PostgreSQL', 'AWS S3'],
+    anchorEs: 'En producción: SIME (19,778 OTs · 115K actividades · 1,056 pautas) y SOMA (KPI minero desde SAP Excel)', anchorEn: 'In production: SIME (19,778 WOs · 115K activities · 1,056 protocols) and SOMA (mining KPIs from SAP Excel)' },
   { key: 'desarrollos-web', es: 'SaaS verticales', en: 'Vertical SaaS',
     descEs: 'Plataformas completas: auth, pagos, admin, integraciones legacy. Código para pasar auditoría.',
     descEn: 'Full platforms: auth, payments, admin, legacy integrations. Code built for audit.',
-    stack: ['Next.js', 'Fastify', 'Prisma', 'Railway', 'Turborepo'],
-    anchorEs: 'En producción: Apoderapp, Speakly, ERP Fernández', anchorEn: 'In production: Apoderapp, Speakly, ERP Fernandez' },
+    stack: ['Next.js', 'Prisma', 'PostgreSQL', 'SII XML/CAF', 'Claude Code'],
+    anchorEs: 'En producción: Apoderapp (PWA + 88+ tests sii-factura), Speakly (4 modos, Voice AI con GPT-4o) y ERP Fernández (metalúrgica de 50 años)', anchorEn: 'In production: Apoderapp (PWA + 88+ sii-factura tests), Speakly (4 modes, Voice AI with GPT-4o) and ERP Fernandez (50-year metallurgic company)' },
   { key: 'consultoria-ia', es: 'Consultoría de IA', en: 'AI Consulting',
     descEs: 'Auditorías adversariales de IA desplegada. Encuentro la deuda escondida y propongo el approach más barato que funciona.',
     descEn: 'Adversarial audits of deployed AI. I find hidden debt and propose the cheapest approach that works.',
-    stack: ['Claude Code', 'Multi-agent systems', 'RAG'],
-    anchorEs: '15 años operando antes de codear', anchorEn: '15 years ops before code' },
+    stack: ['Claude Code', 'Multi-agent systems', 'RAG', 'Playwright'],
+    anchorEs: 'Experiencia propia: Agente_Tunix orquesta 7 proyectos en producción vía agentes Claude jerárquicos con closing pipeline (type_check → lint → build → test → audit)', anchorEn: 'Own experience: Agente_Tunix meta-system orchestrating 7 production projects via hierarchical Claude agents with closing pipelines (type_check → lint → build → test → audit)' },
   { key: 'rpa', es: 'Automatización (RPA)', en: 'Automation (RPA)',
-    descEs: 'Bots que reemplazan trabajo manual repetitivo. WhatsApp, OCR, validación automática.',
-    descEn: 'Bots that replace repetitive manual work. WhatsApp, OCR, automated validation.',
-    stack: ['Express', 'Prisma', 'OCR', 'WhatsApp API'],
-    anchorEs: 'En producción: Bot de códigos, 30seg por operación', anchorEn: 'In production: Code burning bot, 30sec per operation' },
+    descEs: 'Bots que reemplazan trabajo manual repetitivo. Validación contra reglas de negocio, integración directa con tus APIs.',
+    descEn: 'Bots that replace repetitive manual work. Business-rule validation, direct integration with your APIs.',
+    stack: ['Express', 'Prisma', 'React', 'PostgreSQL'],
+    anchorEs: 'En producción: Gasco (4,040 códigos al 88.7% en 14 rutas) y Schwager (RPA backoffice empujando data a ERP)', anchorEn: 'In production: Gasco (4,040 codes at 88.7% across 14 routes) and Schwager (backoffice RPA pushing data to ERP)' },
   { key: 'machine-learning', es: 'Machine Learning aplicado', en: 'Applied Machine Learning',
-    descEs: 'Modelos aplicados a data real de operaciones. No demos — predicción y clasificación en producción.',
-    descEn: 'Models applied to real operations data. No demos — prediction and classification in production.',
-    stack: ['Python', 'Dataiku', 'LLM Vision', 'Claude'],
-    anchorEs: 'MIT Professional Education AI/ML', anchorEn: 'MIT Professional Education AI/ML' },
-  { key: 'vision-artificial', es: 'Visión artificial', en: 'Computer Vision',
-    descEs: 'OCR, QR, LLM Vision para digitalizar documentos en planta. Lectura automática de facturas y comprobantes.',
-    descEn: 'OCR, QR, LLM Vision for on-floor document digitization. Automated invoice and receipt reading.',
-    stack: ['LLM Vision', 'OCR', 'QR', 'Claude'],
-    anchorEs: 'En producción: ERP Fernández, Apoderapp', anchorEn: 'In production: ERP Fernandez, Apoderapp' },
+    descEs: 'ML clásico + stack LLM moderno. Formación MIT Professional Education sobre Dataiku DSS, después replicado en Python con Claude como coding assistant.',
+    descEn: 'Classical ML + modern LLM stack. MIT Professional Education training on Dataiku DSS, later replicated in Python with Claude as coding assistant.',
+    stack: ['Python', 'Dataiku DSS', 'scikit-learn', 'Jupyter', 'Claude'],
+    anchorEs: 'Formación: MIT Professional Education "No Code AI and Machine Learning" (80h, 2024)', anchorEn: 'Training: MIT Professional Education "No Code AI and Machine Learning" (80h, 2024)' },
+  { key: 'vision-artificial', es: 'Visión artificial (capability en construcción)', en: 'Computer Vision (capability in progress)',
+    descEs: 'Sección honesta: tengo los fundamentos y el interés, pero todavía no hay proyectos de CV críticos en producción propios. Para misión crítica, derivo a especialista dedicado.',
+    descEn: 'Honest framing: fundamentals and interest present, but no mission-critical CV projects in production yet. For critical work I refer to a dedicated specialist.',
+    stack: ['Python', 'PyTorch (fundamentals)', 'OpenCV (basic)', 'Claude'],
+    anchorEs: 'Honesto: sin proyectos CV propios en producción todavía. Si es crítico, te derivo a quien corresponde.', anchorEn: 'Honest: no CV projects of my own in production yet. For mission-critical CV, I refer you to a specialist.' },
 ];
 
 // ── RIVE ──────────────────────────────────────────────────────
@@ -136,6 +150,7 @@ function RiveScene({ src }: { src: string }) {
   if (!ok) return null;
   return <div style={{ width: '100%', height: '100%' }}><RiveComponent /></div>;
 }
+
 
 function BurstTransition({ fire }: { fire: boolean }) {
   const { rive, RiveComponent } = useRive({
@@ -491,7 +506,7 @@ export default function V3Client() {
         opacity: booted ? 1 : 0,
         transition: 'all 0.9s cubic-bezier(0.2, 0.9, 0.25, 1)',
       }}>
-        {/* ── TOPBAR ── */}
+        {/* ── TOPBAR ── traffic lights + brand (live) + status lights */}
         <div style={{
           height: 44, padding: '0 20px',
           display: 'grid', gridTemplateColumns: 'auto 1fr auto', alignItems: 'center',
@@ -501,11 +516,53 @@ export default function V3Client() {
           transition: 'all 0.4s ease',
         }}>
           <TrafficLights state={tState} />
-          <div style={{ textAlign: 'center', fontFamily: 'JetBrains Mono, monospace', fontSize: 11, color: 'rgba(245,245,242,0.4)' }}>
-            tunixlabs · ~/<strong style={{ color: 'rgba(245,245,242,0.7)' }}>{tPath}</strong>
+          {/* Center: brand with pulsing mono-dot + mode accent */}
+          <div style={{
+            display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+            gap: 10,
+            fontFamily: 'JetBrains Mono, monospace', fontSize: 11,
+            color: 'rgba(245,245,242,0.7)',
+            textTransform: 'uppercase', letterSpacing: '0.22em',
+          }}>
+            <span className="v3-hero-monitor-blink" aria-hidden style={{
+              width: 6, height: 6, borderRadius: '50%',
+              background: '#ccff00', boxShadow: '0 0 8px #ccff00',
+              flexShrink: 0,
+            }} />
+            <span>tunixlabs</span>
+            <span style={{ color: 'rgba(245,245,242,0.25)' }}>//</span>
+            <span style={{ color: '#ccff00', fontWeight: 600 }}>{tPath}</span>
           </div>
-          <div style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 10, color: 'rgba(245,245,242,0.3)', textAlign: 'right' }}>
-            {tMeta}
+          {/* Right: status lights — local · live · prod */}
+          <div style={{
+            display: 'inline-flex', alignItems: 'center', gap: 14,
+            fontFamily: 'JetBrains Mono, monospace', fontSize: 9,
+            color: 'rgba(245,245,242,0.45)',
+            textTransform: 'uppercase', letterSpacing: '0.2em',
+          }}>
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}>
+              <span style={{
+                width: 5, height: 5, borderRadius: '50%',
+                background: 'rgba(245,245,242,0.3)', flexShrink: 0,
+              }} />
+              local
+            </span>
+            <span style={{
+              display: 'inline-flex', alignItems: 'center', gap: 5, color: '#ccff00',
+            }}>
+              <span className="v3-hero-monitor-blink" style={{
+                width: 5, height: 5, borderRadius: '50%',
+                background: '#ccff00', boxShadow: '0 0 6px #ccff00', flexShrink: 0,
+              }} />
+              live
+            </span>
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}>
+              <span style={{
+                width: 5, height: 5, borderRadius: '50%',
+                background: '#4ade80', boxShadow: '0 0 6px rgba(74,222,128,0.5)', flexShrink: 0,
+              }} />
+              prod
+            </span>
           </div>
         </div>
 
@@ -552,15 +609,32 @@ export default function V3Client() {
           }} />
         </div>
 
-        {/* ── PROMPT LINE (live typing engine) ── */}
+        {/* ── PROMPT LINE (live typing engine) + UPTIME badge ── */}
         <div style={{
           padding: '16px 32px 0',
           fontFamily: 'JetBrains Mono, monospace', fontSize: 13,
           color: 'rgba(245,245,242,0.5)', flexShrink: 0,
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+          gap: 16,
         }}>
-          <span style={{ color: '#ccff00' }}>$</span>{' '}
-          <span style={{ color: isTyping ? 'rgba(245,245,242,0.7)' : 'rgba(245,245,242,0.5)' }}>{typedCmd}</span>
-          <TerminalCursor isTyping={isTyping} isGlitching={transitioning} />
+          <div style={{ display: 'inline-flex', alignItems: 'center', minWidth: 0 }}>
+            <span style={{ color: '#ccff00', marginRight: 6 }}>$</span>
+            <span style={{ color: isTyping ? 'rgba(245,245,242,0.7)' : 'rgba(245,245,242,0.5)' }}>{typedCmd}</span>
+            <TerminalCursor isTyping={isTyping} isGlitching={transitioning} />
+          </div>
+          {/* UPTIME badge with live-dot on the right */}
+          <div style={{
+            display: 'inline-flex', alignItems: 'center', gap: 8,
+            fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.22em',
+            color: 'rgba(245,245,242,0.5)',
+            flexShrink: 0,
+          }}>
+            <span className="v3-hero-monitor-blink" aria-hidden style={{
+              width: 6, height: 6, borderRadius: '50%',
+              background: '#ccff00', boxShadow: '0 0 8px #ccff00',
+            }} />
+            <span>{tMeta}</span>
+          </div>
         </div>
 
         {/* ── CONTENT AREA ── */}
@@ -573,36 +647,183 @@ export default function V3Client() {
             opacity: isHero ? 1 : 0,
             transition: 'opacity 0.5s ease',
             pointerEvents: isHero ? 'auto' : 'none',
+            overflow: 'hidden',
           }}>
-            <h1 style={{ fontSize: 'clamp(32px, 5.5vw, 80px)', fontWeight: 800, lineHeight: 1.08, letterSpacing: '-0.03em', margin: 0 }}>
-              {hero.lines.map((l, i) => (
-                <span key={i} style={{ display: 'block', opacity: isHero && booted ? 1 : 0, transform: isHero && booted ? 'none' : 'translateY(40px) rotateX(15deg)', transition: 'all 0.8s cubic-bezier(0.2,0.9,0.25,1)', transformOrigin: 'left bottom', ...stg(i) }}>{l}</span>
+            {/* Corner brackets (scope/terminal signature) */}
+            <span aria-hidden style={{ position: 'absolute', width: 18, height: 18, top: 18, left: 18, borderTop: '1.5px solid #ccff00', borderLeft: '1.5px solid #ccff00', zIndex: 3, pointerEvents: 'none', opacity: isHero && booted ? 1 : 0, transition: 'opacity 0.6s ease 0.2s' }} />
+            <span aria-hidden style={{ position: 'absolute', width: 18, height: 18, top: 18, right: 18, borderTop: '1.5px solid #ccff00', borderRight: '1.5px solid #ccff00', zIndex: 3, pointerEvents: 'none', opacity: isHero && booted ? 1 : 0, transition: 'opacity 0.6s ease 0.3s' }} />
+            <span aria-hidden style={{ position: 'absolute', width: 18, height: 18, bottom: 18, left: 18, borderBottom: '1.5px solid #ccff00', borderLeft: '1.5px solid #ccff00', zIndex: 3, pointerEvents: 'none', opacity: isHero && booted ? 1 : 0, transition: 'opacity 0.6s ease 0.4s' }} />
+            <span aria-hidden style={{ position: 'absolute', width: 18, height: 18, bottom: 18, right: 18, borderBottom: '1.5px solid #ccff00', borderRight: '1.5px solid #ccff00', zIndex: 3, pointerEvents: 'none', opacity: isHero && booted ? 1 : 0, transition: 'opacity 0.6s ease 0.5s' }} />
+
+            {/* Hero monitor panel — live system indicator (right side) */}
+            <div aria-hidden className="v3-hero-monitor" style={{
+              position: 'absolute',
+              top: '50%', right: '3%',
+              transform: `translateY(-50%) ${isHero && booted ? 'translateX(0)' : 'translateX(20px)'}`,
+              width: 'min(28vw, 300px)',
+              padding: '16px 20px',
+              border: '1px solid rgba(204,255,0,0.22)',
+              background: 'rgba(204,255,0,0.025)',
+              borderRadius: 6,
+              fontFamily: 'JetBrains Mono, monospace',
+              opacity: isHero && booted ? 1 : 0,
+              transition: 'opacity 0.8s ease 0.5s, transform 0.8s cubic-bezier(0.2,0.9,0.25,1) 0.5s',
+              zIndex: 0,
+              pointerEvents: 'none',
+              overflow: 'hidden',
+            }}>
+              {/* Corner brackets */}
+              <span style={{ position: 'absolute', top: -1, left: -1, width: 10, height: 10, borderTop: '1.5px solid #ccff00', borderLeft: '1.5px solid #ccff00' }} />
+              <span style={{ position: 'absolute', top: -1, right: -1, width: 10, height: 10, borderTop: '1.5px solid #ccff00', borderRight: '1.5px solid #ccff00' }} />
+              <span style={{ position: 'absolute', bottom: -1, left: -1, width: 10, height: 10, borderBottom: '1.5px solid #ccff00', borderLeft: '1.5px solid #ccff00' }} />
+              <span style={{ position: 'absolute', bottom: -1, right: -1, width: 10, height: 10, borderBottom: '1.5px solid #ccff00', borderRight: '1.5px solid #ccff00' }} />
+
+              {/* Scan line sweeping top→bottom */}
+              <span className="v3-hero-monitor-scan" style={{
+                position: 'absolute', left: 0, right: 0, height: 2,
+                background: 'linear-gradient(90deg, transparent, #ccff00, transparent)',
+                pointerEvents: 'none',
+              }} />
+
+              {/* Header: prod · tunixlabs + LIVE dot */}
+              <div style={{
+                display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                fontSize: 8, textTransform: 'uppercase', letterSpacing: '0.2em',
+                color: 'rgba(245,245,242,0.5)',
+                marginBottom: 12,
+              }}>
+                <span>prod · tunixlabs</span>
+                <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, color: '#ccff00' }}>
+                  <span className="v3-hero-monitor-blink" style={{
+                    width: 5, height: 5, borderRadius: '50%', background: '#ccff00',
+                    boxShadow: '0 0 6px #ccff00',
+                  }} />
+                  LIVE
+                </span>
+              </div>
+
+              {/* Metric rows */}
+              {[
+                { k: 'systems', v: '07', acid: true },
+                { k: 'uptime', v: '15y 03m', acid: false },
+                { k: 'latency', v: '<100ms', acid: false },
+                { k: 'ops done', v: '19,778', acid: true },
+                { k: 'status', v: 'green', acid: true },
+              ].map((row, i, arr) => (
+                <div key={row.k} style={{
+                  display: 'flex', alignItems: 'baseline', justifyContent: 'space-between',
+                  padding: '7px 0',
+                  borderBottom: i < arr.length - 1 ? '1px dashed rgba(245,245,242,0.08)' : 'none',
+                  fontSize: 10,
+                }}>
+                  <span style={{ color: 'rgba(245,245,242,0.5)' }}>{row.k}</span>
+                  <span style={{ color: row.acid ? '#ccff00' : 'rgba(245,245,242,0.9)', fontWeight: 700 }}>{row.v}</span>
+                </div>
               ))}
-              {/* Accent line — character-by-character stagger reveal */}
-              <span style={{ display: 'block', color: '#ccff00' }}>
-                {hero.accent.split('').map((char, ci) => (
-                  <span key={ci} style={{
-                    display: 'inline-block',
-                    opacity: isHero && booted ? 1 : 0,
-                    transform: isHero && booted ? 'none' : 'translateY(50px) rotateX(20deg)',
-                    transition: 'all 0.6s cubic-bezier(0.2,0.9,0.25,1)',
-                    transitionDelay: `${hero.lines.length * 80 + 200 + ci * 25}ms`,
-                    transformOrigin: 'left bottom',
-                    ...(char === ' ' ? { width: '0.3em' } : {}),
-                  }}>{char}</span>
+            </div>
+
+            {/* Foreground content (headline + sub + CTAs + meta) */}
+            <div style={{ position: 'relative', zIndex: 2 }}>
+              <h1 style={{ fontSize: 'clamp(32px, 5.5vw, 80px)', fontWeight: 800, lineHeight: 1.08, letterSpacing: '-0.03em', margin: 0 }}>
+                {hero.lines.map((l, i) => (
+                  <span key={i} style={{ display: 'block', opacity: isHero && booted ? 1 : 0, transform: isHero && booted ? 'none' : 'translateY(40px) rotateX(15deg)', transition: 'all 0.8s cubic-bezier(0.2,0.9,0.25,1)', transformOrigin: 'left bottom', ...stg(i) }}>{l}</span>
                 ))}
-              </span>
-            </h1>
-            <p style={{ fontSize: 'clamp(14px, 1.4vw, 18px)', color: 'rgba(245,245,242,0.5)', maxWidth: 560, marginTop: 20, lineHeight: 1.6, opacity: isHero && booted ? 1 : 0, transform: isHero && booted ? 'none' : 'translateY(15px)', transition: 'all 0.7s ease 0.8s' }}>{hero.sub}</p>
-            <div style={{ display: 'flex', gap: 14, marginTop: 28, opacity: isHero && booted ? 1 : 0, transition: 'opacity 0.6s ease 1s' }}>
-              <button onClick={() => openTerminal()} data-cursor="grow" style={{ background: '#ccff00', color: '#0a0a0a', padding: '14px 32px', borderRadius: 10, fontSize: 14, fontWeight: 700, border: 'none', cursor: 'pointer', transition: 'transform 0.3s cubic-bezier(0.2,0.9,0.25,1), box-shadow 0.3s ease', boxShadow: '0 0 0 rgba(204,255,0,0)', }}
-                onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 8px 30px rgba(204,255,0,0.3)'; }}
-                onMouseLeave={e => { e.currentTarget.style.transform = ''; e.currentTarget.style.boxShadow = '0 0 0 rgba(204,255,0,0)'; }}
-              >{hero.cta1}</button>
-              <a href="#sec-case0" data-cursor="grow" style={{ border: '1px solid rgba(255,255,255,0.15)', color: '#f5f5f2', padding: '14px 32px', borderRadius: 10, fontSize: 14, textDecoration: 'none', transition: 'all 0.3s cubic-bezier(0.2,0.9,0.25,1)', }}
-                onMouseEnter={e => { e.currentTarget.style.borderColor = '#ccff00'; e.currentTarget.style.color = '#ccff00'; e.currentTarget.style.transform = 'translateY(-2px)'; }}
-                onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.15)'; e.currentTarget.style.color = '#f5f5f2'; e.currentTarget.style.transform = ''; }}
-              >{hero.cta2}</a>
+                {/* Accent line — character-by-character stagger reveal */}
+                <span style={{ display: 'block', color: '#ccff00' }}>
+                  {hero.accent.split('').map((char, ci) => (
+                    <span key={ci} style={{
+                      display: 'inline-block',
+                      opacity: isHero && booted ? 1 : 0,
+                      transform: isHero && booted ? 'none' : 'translateY(50px) rotateX(20deg)',
+                      transition: 'all 0.6s cubic-bezier(0.2,0.9,0.25,1)',
+                      transitionDelay: `${hero.lines.length * 80 + 200 + ci * 25}ms`,
+                      transformOrigin: 'left bottom',
+                      ...(char === ' ' ? { width: '0.3em' } : {}),
+                    }}>{char}</span>
+                  ))}
+                </span>
+              </h1>
+              <p style={{ fontSize: 'clamp(14px, 1.4vw, 18px)', color: 'rgba(245,245,242,0.5)', maxWidth: 560, marginTop: 20, lineHeight: 1.6, opacity: isHero && booted ? 1 : 0, transform: isHero && booted ? 'none' : 'translateY(15px)', transition: 'all 0.7s ease 0.8s' }}>{hero.sub}</p>
+
+              {/* Engagement anchor — only rendered if locale defines it (EN only for now) */}
+              {hero.engagement && (
+                <div style={{
+                  marginTop: 18,
+                  paddingTop: 14,
+                  borderTop: '1px dashed rgba(245,245,242,0.12)',
+                  maxWidth: 560,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 12,
+                  fontFamily: 'JetBrains Mono, monospace',
+                  fontSize: 12,
+                  letterSpacing: '0.05em',
+                  opacity: isHero && booted ? 1 : 0,
+                  transform: isHero && booted ? 'none' : 'translateY(12px)',
+                  transition: 'all 0.6s cubic-bezier(0.2,0.9,0.25,1) 0.95s',
+                }}>
+                  <span aria-hidden style={{
+                    display: 'inline-block',
+                    width: 6, height: 6,
+                    borderRadius: '50%',
+                    background: '#ccff00',
+                    boxShadow: '0 0 8px #ccff00',
+                    flexShrink: 0,
+                  }} />
+                  <span style={{ color: 'rgba(245,245,242,0.55)', textTransform: 'uppercase', letterSpacing: '0.2em', fontSize: 10 }}>
+                    {hero.engagement.label}
+                  </span>
+                  <span style={{ color: '#ccff00', fontWeight: 700, letterSpacing: '0.05em' }}>
+                    {hero.engagement.value}
+                  </span>
+                </div>
+              )}
+
+              <div style={{ display: 'flex', gap: 14, marginTop: 28, opacity: isHero && booted ? 1 : 0, transition: 'opacity 0.6s ease 1s' }}>
+                <button onClick={() => openTerminal()} data-cursor="grow" style={{ background: '#ccff00', color: '#0a0a0a', padding: '14px 32px', borderRadius: 10, fontSize: 14, fontWeight: 700, border: 'none', cursor: 'pointer', transition: 'transform 0.3s cubic-bezier(0.2,0.9,0.25,1), box-shadow 0.3s ease', boxShadow: '0 0 0 rgba(204,255,0,0)', }}
+                  onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 8px 30px rgba(204,255,0,0.3)'; }}
+                  onMouseLeave={e => { e.currentTarget.style.transform = ''; e.currentTarget.style.boxShadow = '0 0 0 rgba(204,255,0,0)'; }}
+                >{hero.cta1}</button>
+                <a href="#sec-case0" data-cursor="grow" style={{ border: '1px solid rgba(255,255,255,0.15)', color: '#f5f5f2', padding: '14px 32px', borderRadius: 10, fontSize: 14, textDecoration: 'none', transition: 'all 0.3s cubic-bezier(0.2,0.9,0.25,1)', }}
+                  onMouseEnter={e => { e.currentTarget.style.borderColor = '#ccff00'; e.currentTarget.style.color = '#ccff00'; e.currentTarget.style.transform = 'translateY(-2px)'; }}
+                  onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.15)'; e.currentTarget.style.color = '#f5f5f2'; e.currentTarget.style.transform = ''; }}
+                >{hero.cta2}</a>
+              </div>
+
+              {/* Meta grid (Base · Operando · Credenciales · Industrias) */}
+              <div style={{
+                marginTop: 36,
+                display: 'grid',
+                gridTemplateColumns: 'repeat(4, 1fr)',
+                borderTop: '1px solid rgba(245,245,242,0.15)',
+                opacity: isHero && booted ? 1 : 0,
+                transform: isHero && booted ? 'none' : 'translateY(20px)',
+                transition: 'all 0.7s cubic-bezier(0.2,0.9,0.25,1) 1.1s',
+              }}>
+                {hero.metaGrid.map((cell, i) => (
+                  <div key={i} style={{
+                    padding: '14px 16px',
+                    borderRight: i < hero.metaGrid.length - 1 ? '1px solid rgba(245,245,242,0.1)' : 'none',
+                  }}>
+                    <div style={{
+                      fontFamily: 'JetBrains Mono, monospace',
+                      fontSize: 9,
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.25em',
+                      color: 'rgba(245,245,242,0.4)',
+                      marginBottom: 6,
+                    }}>{cell.label}</div>
+                    <div style={{
+                      fontFamily: 'JetBrains Mono, monospace',
+                      fontSize: cell.acid ? 14 : 12,
+                      color: cell.acid ? '#ccff00' : 'rgba(245,245,242,0.85)',
+                      fontWeight: cell.acid ? 700 : 600,
+                      lineHeight: 1.35,
+                      whiteSpace: 'pre-line',
+                    }}>{cell.value}</div>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
 
@@ -698,8 +919,15 @@ export default function V3Client() {
                 >
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%', gap: 8 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 10, flex: 1, minWidth: 0 }}>
-                      <div style={{ width: 24, height: 24, flexShrink: 0, opacity: 0.7 }}>
-                        <RiveScene src={`/rive/services/${svc.key}.riv`} />
+                      <div style={{
+                        width: 24, height: 24, flexShrink: 0,
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      }}>
+                        <span style={{
+                          width: 7, height: 7, borderRadius: '50%',
+                          background: '#ccff00',
+                          boxShadow: '0 0 10px rgba(204,255,0,0.7), 0 0 2px rgba(204,255,0,1)',
+                        }} />
                       </div>
                       <span style={{ fontSize: 14, fontWeight: 700, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{isES ? svc.es : svc.en}</span>
                     </div>
@@ -720,33 +948,66 @@ export default function V3Client() {
 
           {/* ABOUT CONTENT */}
           <div style={{
-            position: 'absolute', inset: 0, padding: '24px 32px 32px',
+            position: 'absolute', inset: 0, padding: '40px 48px 32px',
             display: 'grid', gridTemplateColumns: '160px 1fr', gap: 32, alignItems: 'center',
             opacity: isAbout ? 1 : 0,
             transition: 'opacity 0.5s ease',
             pointerEvents: isAbout ? 'auto' : 'none',
+            overflow: 'hidden',
           }}>
+            {/* Corner brackets (acid) — signature scope frame */}
+            <span aria-hidden style={{ position: 'absolute', top: 20, left: 20, width: 18, height: 18, borderTop: '1.5px solid #ccff00', borderLeft: '1.5px solid #ccff00', opacity: isAbout ? 1 : 0, transition: 'opacity 0.6s ease 0.2s' }} />
+            <span aria-hidden style={{ position: 'absolute', top: 20, right: 20, width: 18, height: 18, borderTop: '1.5px solid #ccff00', borderRight: '1.5px solid #ccff00', opacity: isAbout ? 1 : 0, transition: 'opacity 0.6s ease 0.3s' }} />
+            <span aria-hidden style={{ position: 'absolute', bottom: 20, left: 20, width: 18, height: 18, borderBottom: '1.5px solid #ccff00', borderLeft: '1.5px solid #ccff00', opacity: isAbout ? 1 : 0, transition: 'opacity 0.6s ease 0.4s' }} />
+            <span aria-hidden style={{ position: 'absolute', bottom: 20, right: 20, width: 18, height: 18, borderBottom: '1.5px solid #ccff00', borderRight: '1.5px solid #ccff00', opacity: isAbout ? 1 : 0, transition: 'opacity 0.6s ease 0.5s' }} />
+
+            {/* Scan line (reuses hero monitor keyframe for consistency) */}
+            <span aria-hidden className="v3-hero-monitor-scan" style={{
+              position: 'absolute', left: 0, right: 0, height: 2,
+              background: 'linear-gradient(90deg, transparent, rgba(204,255,0,0.4), transparent)',
+              pointerEvents: 'none',
+              opacity: isAbout ? 1 : 0,
+              transition: 'opacity 0.8s ease 0.4s',
+              zIndex: 1,
+            }} />
+
             <div style={{
+              position: 'relative',
               width: 160, height: 160, borderRadius: '50%', overflow: 'hidden',
               border: '2px solid rgba(204,255,0,0.3)',
               opacity: isAbout ? 1 : 0,
               transform: isAbout ? 'none' : 'scale(0.8)',
               transition: 'all 0.6s cubic-bezier(0.2,0.9,0.25,1)',
               transitionDelay: '100ms',
+              boxShadow: isAbout ? '0 0 40px rgba(204,255,0,0.12)' : 'none',
             }}>
               <Image src="/team/alejandro-moyano.webp" alt="Alejandro Moyano" width={160} height={160} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
             </div>
-            <div>
-              <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 10, color: '#ccff00', letterSpacing: '.12em', opacity: isAbout ? 1 : 0, transition: 'opacity 0.4s ease', transitionDelay: '150ms' }}>
-                {isES ? 'SOBRE MÍ' : 'ABOUT'}
-              </span>
+            <div style={{ position: 'relative', zIndex: 2 }}>
+              {/* Eyebrow with live-dot */}
+              <div style={{
+                display: 'inline-flex', alignItems: 'center', gap: 10,
+                fontFamily: 'JetBrains Mono, monospace', fontSize: 10,
+                color: '#ccff00', letterSpacing: '.2em',
+                opacity: isAbout ? 1 : 0,
+                transform: isAbout ? 'none' : 'translateY(6px)',
+                transition: 'all 0.5s cubic-bezier(0.2,0.9,0.25,1)',
+                transitionDelay: '150ms',
+              }}>
+                <span className="v3-hero-monitor-blink" aria-hidden style={{
+                  width: 6, height: 6, borderRadius: '50%',
+                  background: '#ccff00', boxShadow: '0 0 8px #ccff00',
+                  flexShrink: 0,
+                }} />
+                <span>{isES ? 'SOBRE MÍ · LIVE' : 'ABOUT · LIVE'}</span>
+              </div>
               <h2 style={{ fontSize: 'clamp(20px, 2.5vw, 32px)', fontWeight: 700, margin: '10px 0', lineHeight: 1.2, opacity: isAbout ? 1 : 0, transform: isAbout ? 'none' : 'translateY(12px)', transition: 'all 0.5s ease', transitionDelay: '200ms' }}>
                 {isES ? 'Una persona. Siete sistemas en producción.' : 'One person. Seven production systems.'}
               </h2>
               <p style={{ color: 'rgba(245,245,242,0.5)', lineHeight: 1.6, fontSize: 'clamp(12px, 1.1vw, 15px)', marginBottom: 10, opacity: isAbout ? 1 : 0, transition: 'opacity 0.4s ease', transitionDelay: '300ms' }}>
                 {isES
-                  ? 'No soy un studio ni una agencia. Soy una persona que entiende el negocio porque lo opero hace 15 años — maestranzas, minas de cobre, distribuidoras de gas. MSc Finanzas, MIT Professional Education en AI/ML.'
-                  : "Not a studio. Not an agency. One person who understands business — 15 years running copper mines, gas distributors, industrial workshops. MSc Finance, MIT Professional Education AI/ML."
+                  ? 'No soy un studio ni una agencia. Soy una persona que entiende el negocio porque lo opero hace 15 años — gran minería del cobre, metalurgia de 50 años, distribuidoras de gas, centros educativos. MSc Finanzas, MIT Professional Education en AI/ML.'
+                  : "Not a studio. Not an agency. One person who understands business — 15 years running large-scale copper mining, 50-year metallurgy, gas distributors, educational institutions. MSc Finance, MIT Professional Education AI/ML."
                 }
               </p>
               <p style={{ color: 'rgba(245,245,242,0.5)', lineHeight: 1.6, fontSize: 'clamp(12px, 1.1vw, 15px)', opacity: isAbout ? 1 : 0, transition: 'opacity 0.4s ease', transitionDelay: '400ms' }}>
