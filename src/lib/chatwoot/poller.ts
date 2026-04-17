@@ -172,3 +172,15 @@ export function stopChatwootPolling(): void {
 export function pollerStatus() {
   return { running: !!timer, baselinePrimed, intervalMs: POLL_INTERVAL_MS };
 }
+
+// Self-start when imported on a Node.js server runtime. Guard against
+// accidental execution in non-Node contexts (Edge runtime, browser) and
+// against running inside the `next build` phase (where server code is
+// imported to collect metadata but should not start long-running timers).
+if (
+  typeof window === 'undefined' &&
+  process.env.NEXT_RUNTIME !== 'edge' &&
+  process.env.NEXT_PHASE !== 'phase-production-build'
+) {
+  startChatwootPolling();
+}

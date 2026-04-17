@@ -7,6 +7,11 @@
  * past a watermark.
  */
 import { sendMessage, getOwnerChatId, TelegramError } from '@/lib/telegram/bot';
+// Importing the poller eagerly ensures the module's side-effect kicks off
+// the setInterval on first import (i.e. when the first chat-related API
+// route runs). This is more reliable on Next.js 13.5 than the experimental
+// instrumentation hook, which was silently not firing on our deployment.
+import '@/lib/chatwoot/poller';
 
 const processed = new Set<number>();
 const WATERMARK = 5000;
