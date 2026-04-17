@@ -57,12 +57,16 @@ type ChatwootWebhookPayload = {
   conversation?: {
     id?: number;
     inbox_id?: number;
-    contact_inbox?: { inbox?: { identifier?: string } };
+    contact_inbox?: {
+      source_id?: string | null;
+      inbox?: { identifier?: string; channel_type?: string };
+    };
   };
-  inbox?: { id?: number; identifier?: string };
+  inbox?: { id?: number; identifier?: string; channel_type?: string };
   sender?: {
     name?: string;
     phone_number?: string | null;
+    identifier?: string | null;
     type?: string; // 'contact' | 'user' (agent) | 'agent_bot'
   };
 };
@@ -110,6 +114,22 @@ export async function POST(req: NextRequest) {
     return Response.json({ ok: true, skipped: `inbox:${inboxIdentifier}` });
   }
 
+  // The API Channel inbox is shared with the Evolution API bridge, so
+  // WhatsApp messages arrive at the same identifier. Web visitors from
+  // <TerminalChat> are anonymous — they have no phone_number and no
+  // WhatsApp JID identifier. Bail out early for anything that does.
+  const senderPhone = payload.sender?.phone_number ?? null;
+  const senderIdentifier = payload.sender?.identifier ?? null;
+  if (senderPhone && senderPhone.trim().length > 0) {
+    return Response.json({ ok: true, skipped: `sender_phone_present` });
+  }
+  const channelType =
+    payload.conversation?.contact_inbox?.inbox?.channel_type ??
+    payload.inbox?.channel_type;
+  if (channelType && /whatsapp/i.test(channelType)) {
+    return Response.json({ ok: true, skipped: `channel_type:${channelType}` });
+  }
+
   const conversationId = payload.conversation?.id;
   const messageId = payload.id;
   const content = (payload.content ?? '').trim();
@@ -122,6 +142,8 @@ export async function POST(req: NextRequest) {
     conversationId,
     content,
     senderName: payload.sender?.name || 'Visitor',
+    senderPhone,
+    senderIdentifier,
     source: 'webhook',
   });
 

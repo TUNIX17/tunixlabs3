@@ -23,7 +23,14 @@ const POLL_INTERVAL_MS = 12000;
 type ConversationSummary = {
   id: number;
   inbox_id: number;
-  meta?: { sender?: { name?: string } };
+  meta?: {
+    sender?: {
+      name?: string;
+      phone_number?: string | null;
+      identifier?: string | null;
+    };
+    channel?: string; // e.g. "Channel::Api", "Channel::Whatsapp"
+  };
   last_non_activity_message?: { id?: number };
 };
 
@@ -32,8 +39,30 @@ type AdminMessage = {
   content?: string;
   message_type: number; // 0 = incoming, 1 = outgoing (agent)
   created_at?: number;
-  sender?: { name?: string };
+  sender?: {
+    name?: string;
+    phone_number?: string | null;
+    identifier?: string | null;
+  };
 };
+
+/**
+ * A conversation is considered "WhatsApp" (and therefore NOT a web visitor)
+ * if the Chatwoot contact has a phone number, a WhatsApp JID identifier, or
+ * the conversation channel is one of the WhatsApp providers. The
+ * <TerminalChat> web visitor is anonymous and has none of these.
+ */
+function isWhatsAppConversation(conv: ConversationSummary): boolean {
+  const phone = conv.meta?.sender?.phone_number;
+  if (phone && phone.trim().length > 0) return true;
+  const ident = conv.meta?.sender?.identifier;
+  if (ident && /@(s\.whatsapp\.net|g\.us|c\.us|broadcast|lid)/i.test(ident)) {
+    return true;
+  }
+  const channel = conv.meta?.channel;
+  if (channel && /whatsapp/i.test(channel)) return true;
+  return false;
+}
 
 let timer: ReturnType<typeof setInterval> | null = null;
 let baselinePrimed = false;
@@ -56,11 +85,11 @@ async function listInboxConversations(): Promise<ConversationSummary[]> {
   if (!res.ok) throw new Error(`list conversations ${res.status}`);
   const data = await res.json();
   const all: ConversationSummary[] = data?.data?.payload ?? [];
-  // Filter by inbox (we still want to poll all inboxes in the account if the
-  // user eventually splits traffic, but right now we only want our own).
-  // We don't have the numeric inbox_id hardcoded — we resolve it lazily via
-  // a separate call if we ever need it. For now, accept all and rely on the
-  // contact phone to differentiate (WhatsApp contacts have phone_number).
+  // We don't have the numeric web inbox_id hardcoded, so we accept all
+  // conversations from the account here and filter downstream in pollOnce
+  // via isWhatsAppConversation (WhatsApp contacts carry phone_number and/or
+  // a JID identifier; anonymous web visitors carry neither). Long-term fix:
+  // create a dedicated API Channel inbox for the web and filter by inbox_id.
   return all;
 }
 
@@ -110,6 +139,11 @@ async function pollOnce(): Promise<void> {
   try {
     const convs = await listInboxConversations();
     for (const conv of convs) {
+      // Skip entire conversation if it's a WhatsApp contact — saves an
+      // extra API call per tick and avoids flooding the forwarder's logs.
+      if (isWhatsAppConversation(conv)) {
+        continue;
+      }
       let messages: AdminMessage[];
       try {
         messages = await listMessages(conv.id);
@@ -123,11 +157,17 @@ async function pollOnce(): Promise<void> {
         if (m.message_type !== 0) continue; // only incoming
         if (!m.content) continue;
         const senderName = conv.meta?.sender?.name || m.sender?.name || 'Visitor';
+        const senderPhone =
+          conv.meta?.sender?.phone_number ?? m.sender?.phone_number ?? null;
+        const senderIdentifier =
+          conv.meta?.sender?.identifier ?? m.sender?.identifier ?? null;
         await forwardVisitorMessage({
           messageId: m.id,
           conversationId: conv.id,
           content: m.content,
           senderName,
+          senderPhone,
+          senderIdentifier,
           source: 'poll',
         });
       }
