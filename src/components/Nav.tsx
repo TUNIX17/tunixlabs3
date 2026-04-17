@@ -66,7 +66,7 @@ export default function Nav() {
   return (
     <>
       <nav
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+        className={`fixed top-0 left-0 right-0 z-[210] transition-all duration-300 ${
           scrolled || mobileOpen
             ? 'backdrop-blur-md bg-ink/70 border-b border-white/5'
             : 'bg-transparent'
@@ -162,7 +162,7 @@ export default function Nav() {
       {/* Mobile overlay menu */}
       {mobileOpen && (
         <div
-          className="fixed inset-0 z-40 bg-ink/95 backdrop-blur-xl flex flex-col items-center justify-center gap-8"
+          className="fixed inset-0 z-[200] bg-ink/95 backdrop-blur-xl flex flex-col items-center justify-center gap-8"
           style={{ paddingTop: 80 }}
         >
           {links.map(({ href, label }, i) => (

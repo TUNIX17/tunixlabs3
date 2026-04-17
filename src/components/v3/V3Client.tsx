@@ -325,6 +325,17 @@ export default function V3Client() {
   const [mousePos, setMousePos] = useState({ x: 0.5, y: 0.5 });
   const { open: openTerminal } = useTerminalChat();
 
+  // Mobile detection (≤768px). Single source of truth for responsive overrides.
+  // Desktop path stays untouched: all `isMobile ?` branches fall through when false.
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia('(max-width: 768px)');
+    const update = () => setIsMobile(mq.matches);
+    update();
+    mq.addEventListener('change', update);
+    return () => mq.removeEventListener('change', update);
+  }, []);
+
   // Mouse tracking for parallax effects
   useEffect(() => {
     const onMove = (e: MouseEvent) => {
@@ -489,27 +500,39 @@ export default function V3Client() {
       )}
 
       {/* ════════════════════════════════════════════════════════
-          THE TERMINAL — fixed center, persistent, content swaps
+          THE TERMINAL — fixed center (desktop) / fullscreen (mobile), persistent, content swaps
           ════════════════════════════════════════════════════════ */}
       <div style={{
-        position: 'fixed', top: '50%', left: '50%',
-        transform: `translate(-50%, calc(-50% + ${scrollVelocity * -6}px)) scale(${1 - scrollVelocity * 0.025})`,
-        width: isAbout ? '56vw' : '86vw', maxWidth: isAbout ? 900 : 1400,
-        height: '76vh', maxHeight: 860,
+        position: 'fixed',
+        top: isMobile ? 0 : '50%',
+        left: isMobile ? 0 : '50%',
+        transform: isMobile
+          ? 'none'
+          : `translate(-50%, calc(-50% + ${scrollVelocity * -6}px)) scale(${1 - scrollVelocity * 0.025})`,
+        width: isMobile ? '100vw' : (isAbout ? '56vw' : '86vw'),
+        maxWidth: isMobile ? 'none' : (isAbout ? 900 : 1400),
+        height: isMobile ? '100dvh' : '76vh',
+        maxHeight: isMobile ? 'none' : 860,
         background: 'rgba(20,20,20,0.85)',
         backdropFilter: 'blur(24px) saturate(1.4)',
         WebkitBackdropFilter: 'blur(24px) saturate(1.4)',
-        borderRadius: 16,
-        boxShadow: `0 0 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.08), 0 0 ${currentCase ? '60px' : '30px'} ${currentCase ? currentCase.color + '25' : 'rgba(204,255,0,0.08)'}, inset 0 1px 0 rgba(255,255,255,0.06)`,
+        borderRadius: isMobile ? 0 : 16,
+        boxShadow: isMobile
+          ? 'none'
+          : `0 0 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.08), 0 0 ${currentCase ? '60px' : '30px'} ${currentCase ? currentCase.color + '25' : 'rgba(204,255,0,0.08)'}, inset 0 1px 0 rgba(255,255,255,0.06)`,
         display: 'flex', flexDirection: 'column',
         overflow: 'hidden', zIndex: 100,
+        paddingTop: isMobile ? 64 : 0,
         opacity: booted ? 1 : 0,
         transition: 'all 0.9s cubic-bezier(0.2, 0.9, 0.25, 1)',
       }}>
         {/* ── TOPBAR ── traffic lights + brand (live) + status lights */}
         <div style={{
-          height: 44, padding: '0 20px',
-          display: 'grid', gridTemplateColumns: 'auto 1fr auto', alignItems: 'center',
+          height: 44,
+          padding: isMobile ? '0 12px' : '0 20px',
+          display: 'grid',
+          gridTemplateColumns: isMobile ? 'auto 1fr' : 'auto 1fr auto',
+          alignItems: 'center',
           borderBottom: '1px solid rgba(255,255,255,0.06)',
           background: 'rgba(255,255,255,0.02)',
           flexShrink: 0,
@@ -533,9 +556,10 @@ export default function V3Client() {
             <span style={{ color: 'rgba(245,245,242,0.25)' }}>//</span>
             <span style={{ color: '#ccff00', fontWeight: 600 }}>{tPath}</span>
           </div>
-          {/* Right: status lights — local · live · prod */}
+          {/* Right: status lights — local · live · prod. Hidden on mobile (no room). */}
           <div style={{
-            display: 'inline-flex', alignItems: 'center', gap: 14,
+            display: isMobile ? 'none' : 'inline-flex',
+            alignItems: 'center', gap: 14,
             fontFamily: 'JetBrains Mono, monospace', fontSize: 9,
             color: 'rgba(245,245,242,0.45)',
             textTransform: 'uppercase', letterSpacing: '0.2em',
@@ -611,8 +635,9 @@ export default function V3Client() {
 
         {/* ── PROMPT LINE (live typing engine) + UPTIME badge ── */}
         <div style={{
-          padding: '16px 32px 0',
-          fontFamily: 'JetBrains Mono, monospace', fontSize: 13,
+          padding: isMobile ? '10px 16px 0' : '16px 32px 0',
+          fontFamily: 'JetBrains Mono, monospace',
+          fontSize: isMobile ? 11 : 13,
           color: 'rgba(245,245,242,0.5)', flexShrink: 0,
           display: 'flex', alignItems: 'center', justifyContent: 'space-between',
           gap: 16,
@@ -622,9 +647,10 @@ export default function V3Client() {
             <span style={{ color: isTyping ? 'rgba(245,245,242,0.7)' : 'rgba(245,245,242,0.5)' }}>{typedCmd}</span>
             <TerminalCursor isTyping={isTyping} isGlitching={transitioning} />
           </div>
-          {/* UPTIME badge with live-dot on the right */}
+          {/* UPTIME badge with live-dot on the right. Hidden on mobile to save room. */}
           <div style={{
-            display: 'inline-flex', alignItems: 'center', gap: 8,
+            display: isMobile ? 'none' : 'inline-flex',
+            alignItems: 'center', gap: 8,
             fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.22em',
             color: 'rgba(245,245,242,0.5)',
             flexShrink: 0,
@@ -642,12 +668,13 @@ export default function V3Client() {
 
           {/* HERO CONTENT */}
           <div style={{
-            position: 'absolute', inset: 0, padding: '24px 32px 32px',
+            position: 'absolute', inset: 0,
+            padding: isMobile ? '20px 18px 24px' : '24px 32px 32px',
             display: 'flex', flexDirection: 'column', justifyContent: 'center',
             opacity: isHero ? 1 : 0,
             transition: 'opacity 0.5s ease',
             pointerEvents: isHero ? 'auto' : 'none',
-            overflow: 'hidden',
+            overflow: isMobile ? 'auto' : 'hidden',
           }}>
             {/* Corner brackets (scope/terminal signature) */}
             <span aria-hidden style={{ position: 'absolute', width: 18, height: 18, top: 18, left: 18, borderTop: '1.5px solid #ccff00', borderLeft: '1.5px solid #ccff00', zIndex: 3, pointerEvents: 'none', opacity: isHero && booted ? 1 : 0, transition: 'opacity 0.6s ease 0.2s' }} />
@@ -655,7 +682,7 @@ export default function V3Client() {
             <span aria-hidden style={{ position: 'absolute', width: 18, height: 18, bottom: 18, left: 18, borderBottom: '1.5px solid #ccff00', borderLeft: '1.5px solid #ccff00', zIndex: 3, pointerEvents: 'none', opacity: isHero && booted ? 1 : 0, transition: 'opacity 0.6s ease 0.4s' }} />
             <span aria-hidden style={{ position: 'absolute', width: 18, height: 18, bottom: 18, right: 18, borderBottom: '1.5px solid #ccff00', borderRight: '1.5px solid #ccff00', zIndex: 3, pointerEvents: 'none', opacity: isHero && booted ? 1 : 0, transition: 'opacity 0.6s ease 0.5s' }} />
 
-            {/* Hero monitor panel — live system indicator (right side) */}
+            {/* Hero monitor panel — live system indicator (right side). Hidden on mobile: doesn't fit. */}
             <div aria-hidden className="v3-hero-monitor" style={{
               position: 'absolute',
               top: '50%', right: '3%',
@@ -671,6 +698,7 @@ export default function V3Client() {
               zIndex: 0,
               pointerEvents: 'none',
               overflow: 'hidden',
+              display: isMobile ? 'none' : 'block',
             }}>
               {/* Corner brackets */}
               <span style={{ position: 'absolute', top: -1, left: -1, width: 10, height: 10, borderTop: '1.5px solid #ccff00', borderLeft: '1.5px solid #ccff00' }} />
@@ -779,12 +807,12 @@ export default function V3Client() {
                 </div>
               )}
 
-              <div style={{ display: 'flex', gap: 14, marginTop: 28, opacity: isHero && booted ? 1 : 0, transition: 'opacity 0.6s ease 1s' }}>
-                <button onClick={() => openTerminal()} data-cursor="grow" style={{ background: '#ccff00', color: '#0a0a0a', padding: '14px 32px', borderRadius: 10, fontSize: 14, fontWeight: 700, border: 'none', cursor: 'pointer', transition: 'transform 0.3s cubic-bezier(0.2,0.9,0.25,1), box-shadow 0.3s ease', boxShadow: '0 0 0 rgba(204,255,0,0)', }}
+              <div style={{ display: 'flex', flexWrap: isMobile ? 'wrap' : 'nowrap', gap: 14, marginTop: 28, opacity: isHero && booted ? 1 : 0, transition: 'opacity 0.6s ease 1s' }}>
+                <button onClick={() => openTerminal()} data-cursor="grow" style={{ background: '#ccff00', color: '#0a0a0a', padding: '14px 32px', borderRadius: 10, fontSize: 14, fontWeight: 700, border: 'none', cursor: 'pointer', transition: 'transform 0.3s cubic-bezier(0.2,0.9,0.25,1), box-shadow 0.3s ease', boxShadow: '0 0 0 rgba(204,255,0,0)', flex: isMobile ? '1 1 100%' : '0 0 auto', textAlign: 'center', boxSizing: 'border-box' }}
                   onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 8px 30px rgba(204,255,0,0.3)'; }}
                   onMouseLeave={e => { e.currentTarget.style.transform = ''; e.currentTarget.style.boxShadow = '0 0 0 rgba(204,255,0,0)'; }}
                 >{hero.cta1}</button>
-                <a href="#sec-case0" data-cursor="grow" style={{ border: '1px solid rgba(255,255,255,0.15)', color: '#f5f5f2', padding: '14px 32px', borderRadius: 10, fontSize: 14, textDecoration: 'none', transition: 'all 0.3s cubic-bezier(0.2,0.9,0.25,1)', }}
+                <a href="#sec-case0" data-cursor="grow" style={{ border: '1px solid rgba(255,255,255,0.15)', color: '#f5f5f2', padding: '14px 32px', borderRadius: 10, fontSize: 14, textDecoration: 'none', transition: 'all 0.3s cubic-bezier(0.2,0.9,0.25,1)', flex: isMobile ? '1 1 100%' : '0 0 auto', textAlign: 'center', boxSizing: 'border-box' }}
                   onMouseEnter={e => { e.currentTarget.style.borderColor = '#ccff00'; e.currentTarget.style.color = '#ccff00'; e.currentTarget.style.transform = 'translateY(-2px)'; }}
                   onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.15)'; e.currentTarget.style.color = '#f5f5f2'; e.currentTarget.style.transform = ''; }}
                 >{hero.cta2}</a>
@@ -794,16 +822,24 @@ export default function V3Client() {
               <div style={{
                 marginTop: 36,
                 display: 'grid',
-                gridTemplateColumns: 'repeat(4, 1fr)',
+                gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)',
                 borderTop: '1px solid rgba(245,245,242,0.15)',
                 opacity: isHero && booted ? 1 : 0,
                 transform: isHero && booted ? 'none' : 'translateY(20px)',
                 transition: 'all 0.7s cubic-bezier(0.2,0.9,0.25,1) 1.1s',
               }}>
-                {hero.metaGrid.map((cell, i) => (
+                {hero.metaGrid.map((cell, i) => {
+                  const isLastCol = isMobile
+                    ? (i + 1) % 2 === 0
+                    : i === hero.metaGrid.length - 1;
+                  const isLastRow = isMobile
+                    ? i >= hero.metaGrid.length - 2
+                    : true;
+                  return (
                   <div key={i} style={{
                     padding: '14px 16px',
-                    borderRight: i < hero.metaGrid.length - 1 ? '1px solid rgba(245,245,242,0.1)' : 'none',
+                    borderRight: isLastCol ? 'none' : '1px solid rgba(245,245,242,0.1)',
+                    borderBottom: isMobile && !isLastRow ? '1px solid rgba(245,245,242,0.1)' : 'none',
                   }}>
                     <div style={{
                       fontFamily: 'JetBrains Mono, monospace',
@@ -822,7 +858,8 @@ export default function V3Client() {
                       whiteSpace: 'pre-line',
                     }}>{cell.value}</div>
                   </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
           </div>
@@ -832,8 +869,13 @@ export default function V3Client() {
             const isActive = active === `case${i}`;
             return (
               <div key={cs.id} className="v3-grid-2col" style={{
-                position: 'absolute', inset: 0, padding: '24px 32px 32px',
-                display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 32, alignItems: 'center',
+                position: 'absolute', inset: 0,
+                padding: isMobile ? '20px 18px 24px' : '24px 32px 32px',
+                display: 'grid',
+                gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr',
+                gap: isMobile ? 18 : 32,
+                alignItems: 'center',
+                overflow: isMobile ? 'auto' : 'hidden',
                 opacity: isActive ? 1 : 0,
                 transition: 'opacity 0.5s ease',
                 pointerEvents: isActive ? 'auto' : 'none',
@@ -889,7 +931,8 @@ export default function V3Client() {
 
           {/* SERVICES CONTENT — 2-col grid filling the terminal, click opens detail terminal */}
           <div style={{
-            position: 'absolute', inset: 0, padding: '16px 28px 24px',
+            position: 'absolute', inset: 0,
+            padding: isMobile ? '16px 16px 24px' : '16px 28px 24px',
             display: 'flex', flexDirection: 'column',
             opacity: isServices ? 1 : 0,
             transition: 'opacity 0.5s ease',
@@ -897,7 +940,8 @@ export default function V3Client() {
             overflow: 'auto',
           }}>
             <div style={{
-              display: 'grid', gridTemplateColumns: '1fr 1fr',
+              display: 'grid',
+              gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr',
               gap: 10, flex: 1,
             }} className="v3-grid-2col">
               {SERVICES.map((svc, i) => (
@@ -913,6 +957,8 @@ export default function V3Client() {
                   transform: isServices ? 'none' : 'translateY(8px)',
                   transition: 'all 0.4s ease',
                   transitionDelay: `${(i + 1) * 50 + 80}ms`,
+                  boxSizing: 'border-box',
+                  width: '100%', minWidth: 0,
                 }}
                   onMouseEnter={e => { e.currentTarget.style.borderColor = '#ccff00'; e.currentTarget.style.background = 'rgba(204,255,0,0.04)'; e.currentTarget.style.transform = 'translateY(-3px)'; e.currentTarget.style.boxShadow = '0 8px 24px rgba(204,255,0,0.08), inset 3px 0 0 #ccff00'; }}
                   onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(245,245,242,0.06)'; e.currentTarget.style.background = 'rgba(245,245,242,0.02)'; e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = 'none'; }}
@@ -948,12 +994,17 @@ export default function V3Client() {
 
           {/* ABOUT CONTENT */}
           <div style={{
-            position: 'absolute', inset: 0, padding: '40px 48px 32px',
-            display: 'grid', gridTemplateColumns: '160px 1fr', gap: 32, alignItems: 'center',
+            position: 'absolute', inset: 0,
+            padding: isMobile ? '28px 20px 24px' : '40px 48px 32px',
+            display: isMobile ? 'flex' : 'grid',
+            flexDirection: isMobile ? 'column' : undefined,
+            gridTemplateColumns: isMobile ? undefined : '160px 1fr',
+            gap: isMobile ? 18 : 32,
+            alignItems: 'center',
             opacity: isAbout ? 1 : 0,
             transition: 'opacity 0.5s ease',
             pointerEvents: isAbout ? 'auto' : 'none',
-            overflow: 'hidden',
+            overflow: isMobile ? 'auto' : 'hidden',
           }}>
             {/* Corner brackets (acid) — signature scope frame */}
             <span aria-hidden style={{ position: 'absolute', top: 20, left: 20, width: 18, height: 18, borderTop: '1.5px solid #ccff00', borderLeft: '1.5px solid #ccff00', opacity: isAbout ? 1 : 0, transition: 'opacity 0.6s ease 0.2s' }} />
@@ -1024,7 +1075,8 @@ export default function V3Client() {
 
           {/* CONTACT CONTENT */}
           <div style={{
-            position: 'absolute', inset: 0, padding: '24px 32px 32px',
+            position: 'absolute', inset: 0,
+            padding: isMobile ? '24px 18px 24px' : '24px 32px 32px',
             display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
             opacity: isContact ? 1 : 0,
             transition: 'opacity 0.5s ease',
@@ -1048,10 +1100,12 @@ export default function V3Client() {
             <p style={{ color: 'rgba(245,245,242,0.4)', fontSize: 16, marginBottom: 32, opacity: isContact ? 1 : 0, transition: 'all 0.5s ease 0.5s' }}>
               {isES ? 'Respondo en menos de 24 horas.' : 'I reply within 24 hours.'}
             </p>
-            <div style={{ display: 'flex', gap: 14, opacity: isContact ? 1 : 0, transition: 'opacity 0.6s ease 0.7s' }}>
+            <div style={{ display: 'flex', flexWrap: isMobile ? 'wrap' : 'nowrap', justifyContent: 'center', gap: 14, opacity: isContact ? 1 : 0, transition: 'opacity 0.6s ease 0.7s', width: isMobile ? '100%' : 'auto' }}>
               <button onClick={() => setShowContactForm(true)} data-cursor="grow" style={{
                 background: '#ccff00', color: '#0a0a0a', padding: '16px 40px', borderRadius: 10, fontSize: 15, fontWeight: 700, border: 'none', cursor: 'pointer',
                 transition: 'all 0.3s cubic-bezier(0.2,0.9,0.25,1)', boxShadow: '0 0 0 rgba(204,255,0,0)',
+                flex: isMobile ? '1 1 100%' : '0 0 auto',
+                boxSizing: 'border-box',
               }}
                 onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-3px)'; e.currentTarget.style.boxShadow = '0 12px 40px rgba(204,255,0,0.3)'; }}
                 onMouseLeave={e => { e.currentTarget.style.transform = ''; e.currentTarget.style.boxShadow = '0 0 0 rgba(204,255,0,0)'; }}
@@ -1059,8 +1113,10 @@ export default function V3Client() {
                 {isES ? 'Enviar mensaje' : 'Send message'}
               </button>
               <button onClick={() => openTerminal()} data-cursor="grow" style={{
-                border: '1px solid rgba(255,255,255,0.15)', color: '#f5f5f2', padding: '16px 40px', borderRadius: 10, fontSize: 15, background: 'transparent', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8,
+                border: '1px solid rgba(255,255,255,0.15)', color: '#f5f5f2', padding: '16px 40px', borderRadius: 10, fontSize: 15, background: 'transparent', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
                 transition: 'all 0.3s cubic-bezier(0.2,0.9,0.25,1)',
+                flex: isMobile ? '1 1 100%' : '0 0 auto',
+                boxSizing: 'border-box',
               }}
                 onMouseEnter={e => { e.currentTarget.style.borderColor = '#00e5cc'; e.currentTarget.style.color = '#00e5cc'; e.currentTarget.style.transform = 'translateY(-3px)'; }}
                 onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.15)'; e.currentTarget.style.color = '#f5f5f2'; e.currentTarget.style.transform = ''; }}
@@ -1091,8 +1147,9 @@ export default function V3Client() {
             position: 'fixed',
             top: '50%', left: '50%',
             transform: 'translate(-50%,-50%)',
-            width: '60vw', maxWidth: 800,
-            maxHeight: '70vh',
+            width: isMobile ? '92vw' : '60vw',
+            maxWidth: 800,
+            maxHeight: isMobile ? '84vh' : '70vh',
             background: 'rgba(15,15,15,0.95)',
             backdropFilter: 'blur(24px)',
             borderRadius: 14,
@@ -1188,7 +1245,9 @@ export default function V3Client() {
           <div style={{
             position: 'fixed', top: '50%', left: '50%',
             transform: 'translate(-50%,-50%)',
-            width: '50vw', maxWidth: 600, maxHeight: '75vh',
+            width: isMobile ? '92vw' : '50vw',
+            maxWidth: 600,
+            maxHeight: isMobile ? '88vh' : '75vh',
             background: 'rgba(15,15,15,0.95)', backdropFilter: 'blur(24px)',
             borderRadius: 14,
             boxShadow: '0 0 100px rgba(204,255,0,0.08), 0 0 0 1px rgba(204,255,0,0.15)',
@@ -1314,7 +1373,7 @@ export default function V3Client() {
       {/* ── RIVE BURST TRANSITION (anime-style speed lines) ── */}
       <BurstTransition fire={transitioning} />
 
-      {/* ── ASIDE TERMINAL (appears during About) ── */}
+      {/* ── ASIDE TERMINAL (appears during About) — decorative, hidden on mobile ── */}
       <div style={{
         position: 'fixed',
         top: '50%', right: '4vw',
@@ -1329,7 +1388,7 @@ export default function V3Client() {
         opacity: isAbout ? 1 : 0,
         pointerEvents: isAbout ? 'auto' : 'none',
         transition: 'all 0.9s cubic-bezier(0.2, 0.9, 0.25, 1)',
-        display: 'flex', flexDirection: 'column',
+        display: isMobile ? 'none' : 'flex', flexDirection: 'column',
         overflow: 'hidden',
       }}>
         {/* Aside topbar */}
@@ -1373,10 +1432,11 @@ export default function V3Client() {
         </div>
       )}
 
-      {/* ── SCROLL PROGRESS — Rive vertical indicator ── */}
+      {/* ── SCROLL PROGRESS — Rive vertical indicator. Hidden on mobile (obstructs narrow viewport). ── */}
       <div style={{
         position: 'fixed', right: 20, top: '50%', transform: 'translateY(-50%)',
         zIndex: 150, pointerEvents: 'none',
+        display: isMobile ? 'none' : 'block',
       }}>
         <ScrollProgressBar scrollPct={scrollPct} />
       </div>
