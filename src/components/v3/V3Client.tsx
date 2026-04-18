@@ -152,31 +152,6 @@ function RiveScene({ src }: { src: string }) {
 }
 
 
-function BurstTransition({ fire }: { fire: boolean }) {
-  const { rive, RiveComponent } = useRive({
-    src: '/design-explorations/rive/burst-transition.riv',
-    artboard: 'Burst',
-    stateMachines: ['transition'],
-    autoplay: true,
-    layout: new Layout({ fit: Fit.Cover, alignment: Alignment.Center }),
-  });
-  const trigger = useStateMachineInput(rive, 'transition', 'fire');
-  const prevFire = useRef(false);
-
-  useEffect(() => {
-    if (fire && !prevFire.current && trigger) {
-      trigger.fire();
-    }
-    prevFire.current = fire;
-  }, [fire, trigger]);
-
-  return (
-    <div style={{ position: 'fixed', inset: 0, zIndex: 150, pointerEvents: 'none' }}>
-      <RiveComponent />
-    </div>
-  );
-}
-
 function Waveform() {
   const [ok, setOk] = useState(true);
   const { RiveComponent } = useRive({
@@ -670,7 +645,8 @@ export default function V3Client() {
           <div style={{
             position: 'absolute', inset: 0,
             padding: isMobile ? '20px 18px 24px' : '24px 32px 32px',
-            display: 'flex', flexDirection: 'column', justifyContent: 'center',
+            display: 'flex', flexDirection: 'column',
+            justifyContent: isMobile ? 'flex-start' : 'center',
             opacity: isHero ? 1 : 0,
             transition: 'opacity 0.5s ease',
             pointerEvents: isHero ? 'auto' : 'none',
@@ -1370,10 +1346,7 @@ export default function V3Client() {
         </>
       )}
 
-      {/* ── RIVE BURST TRANSITION (anime-style speed lines) ── */}
-      <BurstTransition fire={transitioning} />
-
-      {/* ── ASIDE TERMINAL (appears during About) — decorative, hidden on mobile ── */}
+{/* ── ASIDE TERMINAL (appears during About) — decorative, hidden on mobile ── */}
       <div style={{
         position: 'fixed',
         top: '50%', right: '4vw',
