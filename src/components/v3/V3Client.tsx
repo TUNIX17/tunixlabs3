@@ -983,10 +983,10 @@ export default function V3Client() {
             overflow: isMobile ? 'auto' : 'hidden',
           }}>
             {/* Corner brackets (acid) — signature scope frame */}
-            <span aria-hidden style={{ position: 'absolute', top: 20, left: 20, width: 18, height: 18, borderTop: '1.5px solid #ccff00', borderLeft: '1.5px solid #ccff00', opacity: isAbout ? 1 : 0, transition: 'opacity 0.6s ease 0.2s' }} />
-            <span aria-hidden style={{ position: 'absolute', top: 20, right: 20, width: 18, height: 18, borderTop: '1.5px solid #ccff00', borderRight: '1.5px solid #ccff00', opacity: isAbout ? 1 : 0, transition: 'opacity 0.6s ease 0.3s' }} />
-            <span aria-hidden style={{ position: 'absolute', bottom: 20, left: 20, width: 18, height: 18, borderBottom: '1.5px solid #ccff00', borderLeft: '1.5px solid #ccff00', opacity: isAbout ? 1 : 0, transition: 'opacity 0.6s ease 0.4s' }} />
-            <span aria-hidden style={{ position: 'absolute', bottom: 20, right: 20, width: 18, height: 18, borderBottom: '1.5px solid #ccff00', borderRight: '1.5px solid #ccff00', opacity: isAbout ? 1 : 0, transition: 'opacity 0.6s ease 0.5s' }} />
+            <span aria-hidden style={{ position: 'absolute', top: 20, left: 20, width: 18, height: 18, borderTop: '1.5px solid #ccff00', borderLeft: '1.5px solid #ccff00', opacity: isAbout ? 1 : 0, transition: 'opacity 0.35s ease 0.05s' }} />
+            <span aria-hidden style={{ position: 'absolute', top: 20, right: 20, width: 18, height: 18, borderTop: '1.5px solid #ccff00', borderRight: '1.5px solid #ccff00', opacity: isAbout ? 1 : 0, transition: 'opacity 0.35s ease 0.08s' }} />
+            <span aria-hidden style={{ position: 'absolute', bottom: 20, left: 20, width: 18, height: 18, borderBottom: '1.5px solid #ccff00', borderLeft: '1.5px solid #ccff00', opacity: isAbout ? 1 : 0, transition: 'opacity 0.35s ease 0.11s' }} />
+            <span aria-hidden style={{ position: 'absolute', bottom: 20, right: 20, width: 18, height: 18, borderBottom: '1.5px solid #ccff00', borderRight: '1.5px solid #ccff00', opacity: isAbout ? 1 : 0, transition: 'opacity 0.35s ease 0.14s' }} />
 
             {/* Scan line (reuses hero monitor keyframe for consistency) */}
             <span aria-hidden className="v3-hero-monitor-scan" style={{
@@ -1004,8 +1004,8 @@ export default function V3Client() {
               border: '2px solid rgba(204,255,0,0.3)',
               opacity: isAbout ? 1 : 0,
               transform: isAbout ? 'none' : 'scale(0.8)',
-              transition: 'all 0.6s cubic-bezier(0.2,0.9,0.25,1)',
-              transitionDelay: '100ms',
+              transition: 'all 0.4s cubic-bezier(0.2,0.9,0.25,1)',
+              transitionDelay: '30ms',
               boxShadow: isAbout ? '0 0 40px rgba(204,255,0,0.12)' : 'none',
             }}>
               <Image src="/team/alejandro-moyano.webp" alt="Alejandro Moyano" width={160} height={160} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
@@ -1018,8 +1018,8 @@ export default function V3Client() {
                 color: '#ccff00', letterSpacing: '.2em',
                 opacity: isAbout ? 1 : 0,
                 transform: isAbout ? 'none' : 'translateY(6px)',
-                transition: 'all 0.5s cubic-bezier(0.2,0.9,0.25,1)',
-                transitionDelay: '150ms',
+                transition: 'all 0.35s cubic-bezier(0.2,0.9,0.25,1)',
+                transitionDelay: '50ms',
               }}>
                 <span className="v3-hero-monitor-blink" aria-hidden style={{
                   width: 6, height: 6, borderRadius: '50%',
@@ -1028,22 +1028,22 @@ export default function V3Client() {
                 }} />
                 <span>{isES ? 'SOBRE MÍ · LIVE' : 'ABOUT · LIVE'}</span>
               </div>
-              <h2 style={{ fontSize: 'clamp(20px, 2.5vw, 32px)', fontWeight: 700, margin: '10px 0', lineHeight: 1.2, opacity: isAbout ? 1 : 0, transform: isAbout ? 'none' : 'translateY(12px)', transition: 'all 0.5s ease', transitionDelay: '200ms' }}>
+              <h2 style={{ fontSize: 'clamp(20px, 2.5vw, 32px)', fontWeight: 700, margin: '10px 0', lineHeight: 1.2, opacity: isAbout ? 1 : 0, transform: isAbout ? 'none' : 'translateY(12px)', transition: 'all 0.35s ease', transitionDelay: '80ms' }}>
                 {isES ? 'Una persona. Siete sistemas en producción.' : 'One person. Seven production systems.'}
               </h2>
-              <p style={{ color: 'rgba(245,245,242,0.5)', lineHeight: 1.6, fontSize: 'clamp(12px, 1.1vw, 15px)', marginBottom: 10, opacity: isAbout ? 1 : 0, transition: 'opacity 0.4s ease', transitionDelay: '300ms' }}>
+              <p style={{ color: 'rgba(245,245,242,0.5)', lineHeight: 1.6, fontSize: 'clamp(12px, 1.1vw, 15px)', marginBottom: 10, opacity: isAbout ? 1 : 0, transition: 'opacity 0.3s ease', transitionDelay: '110ms' }}>
                 {isES
                   ? 'No soy un studio ni una agencia. Soy una persona que entiende el negocio porque lo opero hace 15 años — gran minería del cobre, metalurgia de 50 años, distribuidoras de gas, centros educativos. MSc Finanzas, MIT Professional Education en AI/ML.'
                   : "Not a studio. Not an agency. One person who understands business — 15 years running large-scale copper mining, 50-year metallurgy, gas distributors, educational institutions. MSc Finance, MIT Professional Education AI/ML."
                 }
               </p>
-              <p style={{ color: 'rgba(245,245,242,0.5)', lineHeight: 1.6, fontSize: 'clamp(12px, 1.1vw, 15px)', opacity: isAbout ? 1 : 0, transition: 'opacity 0.4s ease', transitionDelay: '400ms' }}>
+              <p style={{ color: 'rgba(245,245,242,0.5)', lineHeight: 1.6, fontSize: 'clamp(12px, 1.1vw, 15px)', opacity: isAbout ? 1 : 0, transition: 'opacity 0.3s ease', transitionDelay: '140ms' }}>
                 {isES
                   ? 'Cada sistema que entrego resuelve un problema que vi con mis propios ojos: operarios que no pueden escribir con guantes, tesoreros ahogados en comprobantes, talleres de 50 años sin visibilidad.'
                   : "Every system I ship solves a problem I've seen firsthand: workers who can't type with gloves, treasurers drowning in receipts, 50-year-old shops with zero visibility."
                 }
               </p>
-              <a href="https://linkedin.com/in/alejandro-moyano/" target="_blank" rel="noopener noreferrer" style={{ display: 'inline-block', marginTop: 12, fontFamily: 'JetBrains Mono, monospace', fontSize: 11, color: '#ccff00', textDecoration: 'none', opacity: isAbout ? 1 : 0, transition: 'opacity 0.4s ease', transitionDelay: '500ms' }}>
+              <a href="https://linkedin.com/in/alejandro-moyano/" target="_blank" rel="noopener noreferrer" style={{ display: 'inline-block', marginTop: 12, fontFamily: 'JetBrains Mono, monospace', fontSize: 11, color: '#ccff00', textDecoration: 'none', opacity: isAbout ? 1 : 0, transition: 'opacity 0.3s ease', transitionDelay: '170ms' }}>
                 → LinkedIn
               </a>
             </div>
@@ -1423,7 +1423,7 @@ export default function V3Client() {
           <div key={i} data-section={`case${i}`} id={`sec-case${i}`} style={{ height: '110vh' }} />
         ))}
         <div data-section="services" id="sec-services" style={{ height: '110vh' }} />
-        <div data-section="about" id="sec-about" style={{ height: '110vh' }} />
+        <div data-section="about" id="sec-about" style={{ height: '140vh' }} />
         <div data-section="contact" id="sec-contact" style={{ height: '110vh' }} />
       </div>
 
