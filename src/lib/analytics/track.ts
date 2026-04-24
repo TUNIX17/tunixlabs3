@@ -59,6 +59,8 @@ export const Events = {
   CHAT_TERMINAL_OPEN: 'Chat Terminal: Open',
   CHAT_TERMINAL_MESSAGE_SENT: 'Chat Terminal: Message Sent',
   CHAT_TERMINAL_AGENT_REPLY: 'Chat Terminal: Agent Reply',
+  CHAT_TERMINAL_IDLE_FALLBACK_SHOWN: 'Chat Terminal: Idle WhatsApp Fallback Shown',
+  CHAT_TERMINAL_IDLE_FALLBACK_CLICK: 'Chat Terminal: Idle WhatsApp Fallback Click',
   CHAT_INIT_ERROR: 'Chat Terminal: Init Error',
 } as const;
 

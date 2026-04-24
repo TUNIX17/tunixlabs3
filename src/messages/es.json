@@ -598,6 +598,7 @@
     "send": "Enviar",
     "sendError": "no enviado — click para reintentar",
     "agentTyping": "Alejandro está escribiendo",
-    "initError": "No puedo conectar el chat ahora. Escríbeme a contacto@tunixlabs.com."
+    "initError": "No puedo conectar el chat ahora. Escríbeme a contacto@tunixlabs.com.",
+    "idleFallback": "Parece que Alejandro está sin señal ahora. Si prefieres WhatsApp, escríbele directo a <wa>+56 9 3036 7979</wa> — responde ahí cuando esté disponible."
   }
 }

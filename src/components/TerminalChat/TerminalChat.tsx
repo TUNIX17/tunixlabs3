@@ -13,12 +13,15 @@ import { trackEvent, Events } from '@/lib/analytics/track';
 import { useTerminalChat } from './TerminalChatProvider';
 import { useChatwootChat } from './useChatwootChat';
 
+const IDLE_FALLBACK_MS = 90_000;
+
 export function TerminalChat() {
   const { isOpen, close } = useTerminalChat();
   const t = useTranslations('TerminalChat');
   const { messages, isConnected, isAgentTyping, isBootstrapping, error, sendMessage } =
     useChatwootChat(isOpen);
   const [draft, setDraft] = useState('');
+  const [showIdleFallback, setShowIdleFallback] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -45,6 +48,24 @@ export function TerminalChat() {
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
   }, [isOpen, close]);
+
+  useEffect(() => {
+    if (!isOpen) {
+      setShowIdleFallback(false);
+      return;
+    }
+    const last = messages[messages.length - 1];
+    if (!last || last.direction !== 'outgoing' || last.status !== 'sent') {
+      setShowIdleFallback(false);
+      return;
+    }
+    setShowIdleFallback(false);
+    const id = window.setTimeout(() => {
+      setShowIdleFallback(true);
+      trackEvent(Events.CHAT_TERMINAL_IDLE_FALLBACK_SHOWN);
+    }, IDLE_FALLBACK_MS);
+    return () => window.clearTimeout(id);
+  }, [isOpen, messages]);
 
   if (!isOpen) return null;
 
@@ -265,6 +286,44 @@ export function TerminalChat() {
               )}
             </div>
           ))}
+
+          {showIdleFallback && !isAgentTyping && (
+            <div
+              style={{
+                background: 'rgba(204,255,0,0.06)',
+                border: '1px dashed rgba(204,255,0,0.25)',
+                borderRadius: '12px 12px 12px 2px',
+                padding: '10px 14px',
+                maxWidth: '85%',
+                fontSize: 13,
+                color: 'rgba(245,245,242,0.85)',
+                lineHeight: 1.5,
+                alignSelf: 'flex-start',
+                animation: 'v3fadeIn 0.3s ease',
+              }}
+            >
+              {t.rich('idleFallback', {
+                wa: (chunks) => (
+                  <a
+                    href="https://wa.me/56930367979"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={() =>
+                      trackEvent(Events.CHAT_TERMINAL_IDLE_FALLBACK_CLICK)
+                    }
+                    style={{
+                      color: '#ccff00',
+                      textDecoration: 'underline',
+                      fontWeight: 600,
+                      whiteSpace: 'nowrap',
+                    }}
+                  >
+                    {chunks}
+                  </a>
+                ),
+              })}
+            </div>
+          )}
 
           {isAgentTyping && (
             <div

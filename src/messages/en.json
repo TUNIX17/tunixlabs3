@@ -598,6 +598,7 @@
     "send": "Send",
     "sendError": "not sent — click to retry",
     "agentTyping": "Alejandro is typing",
-    "initError": "Can't reach chat right now. Email contacto@tunixlabs.com."
+    "initError": "Can't reach chat right now. Email contacto@tunixlabs.com.",
+    "idleFallback": "Looks like Alejandro is away from the keyboard. Prefer WhatsApp? Message him directly at <wa>+56 9 3036 7979</wa> — he'll reply there when he's back."
   }
 }
