@@ -11,6 +11,16 @@
  * swap the URL in `organizationSchema.logo` only.
  */
 
+import {
+  LEGAL_NAME,
+  LEGAL_RUT,
+  LEGAL_STREET,
+  LEGAL_CITY,
+  LEGAL_REGION,
+  LEGAL_POSTAL_CODE,
+  LEGAL_PHONE_E164,
+} from '@/components/LegalIdentity';
+
 const SITE_URL = 'https://tunixlabs.com';
 const LOGO_URL = `${SITE_URL}/og/tunixlabs-og.png`;
 
@@ -18,6 +28,14 @@ export const organizationSchema: Record<string, unknown> = {
   '@context': 'https://schema.org',
   '@type': 'Organization',
   name: 'Tunix Labs',
+  // `legalName` and `taxID` are what let an automated reviewer tie the brand
+  // to the incorporation documents. `addressLocality` said "Santiago" until
+  // 2026-08-09, which contradicted the registered domicile in Rancagua —
+  // exactly the kind of mismatch a verification check flags. Keep these in
+  // sync with src/components/LegalIdentity.tsx, the single source for the
+  // human-readable copy of the same facts.
+  legalName: LEGAL_NAME,
+  taxID: LEGAL_RUT,
   url: SITE_URL,
   logo: LOGO_URL,
   founder: {
@@ -26,13 +44,18 @@ export const organizationSchema: Record<string, unknown> = {
   },
   address: {
     '@type': 'PostalAddress',
+    streetAddress: LEGAL_STREET,
+    addressLocality: LEGAL_CITY,
+    addressRegion: LEGAL_REGION,
+    postalCode: LEGAL_POSTAL_CODE,
     addressCountry: 'CL',
-    addressLocality: 'Santiago',
   },
+  telephone: LEGAL_PHONE_E164,
   contactPoint: {
     '@type': 'ContactPoint',
     contactType: 'customer support',
     email: 'hola@tunixlabs.com',
+    telephone: LEGAL_PHONE_E164,
   },
 };
 

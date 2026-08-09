@@ -1,5 +1,6 @@
 import dynamic from 'next/dynamic';
 import { setRequestLocale } from 'next-intl/server';
+import LegalIdentity from '@/components/LegalIdentity';
 
 const V3Client = dynamic(() => import('@/components/v3/V3Client'), {
   ssr: false,
@@ -38,6 +39,11 @@ export default async function InicioPage({
             <li><a href={`/${locale}/servicios/machine-learning`}>Machine Learning</a></li>
           </ul>
           <p><a href={`/${locale}/contacto`}>{isES ? 'Contacto' : 'Contact'}</a></p>
+          {/* The registered entity behind the brand. V3Client renders this in its
+              footer, but it loads with ssr:false — so without this copy the served
+              HTML contains no legal identity at all, which is precisely what an
+              automated business-verification check would look for. */}
+          <LegalIdentity />
         </div>
       </noscript>
     </>

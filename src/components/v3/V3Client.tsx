@@ -7,6 +7,7 @@ import { useLocale } from 'next-intl';
 import { blurMap } from '@/generated/blurMap';
 import { CustomCursor } from './CustomCursor';
 import { useTerminalChat } from '@/components/TerminalChat';
+import LegalIdentity from '@/components/LegalIdentity';
 import '@/app/[locale]/v3/v3.css';
 
 /* ══════════════════════════════════════════════════════════════
@@ -1431,12 +1432,16 @@ export default function V3Client() {
       <footer style={{
         position: 'relative', zIndex: 1,
         padding: '24px 32px',
-        display: 'flex', justifyContent: 'space-between',
-        fontSize: 11, color: 'rgba(245,245,242,0.2)',
         borderTop: '1px solid rgba(255,255,255,0.04)',
       }}>
-        <span>© 2026 TunixLabs</span>
-        <a href="https://linkedin.com/in/alejandro-moyano/" target="_blank" rel="noopener noreferrer" style={{ color: 'inherit', textDecoration: 'none' }}>LinkedIn</a>
+        <div style={{
+          display: 'flex', justifyContent: 'space-between',
+          fontSize: 11, color: 'rgba(245,245,242,0.2)',
+        }}>
+          <span>© 2026 TunixLabs</span>
+          <a href="https://linkedin.com/in/alejandro-moyano/" target="_blank" rel="noopener noreferrer" style={{ color: 'inherit', textDecoration: 'none' }}>LinkedIn</a>
+        </div>
+        <LegalIdentity />
       </footer>
 
     </>

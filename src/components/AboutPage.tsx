@@ -8,6 +8,7 @@ import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/navigation';
 import { FiExternalLink, FiArrowRight } from 'react-icons/fi';
 import MITCredentialBadge from './MITCredentialBadge';
+import LegalIdentity from './LegalIdentity';
 
 type Locale = 'es' | 'en';
 
@@ -582,6 +583,7 @@ export default function AboutPage({ locale }: { locale: Locale }) {
         <p className="font-mono text-[10px] uppercase tracking-[0.3em] text-white/30">
           Tunix Labs · {locale === 'es' ? 'Hecho en Chile, operando LATAM y USA' : 'Made in Chile, operating LATAM and USA'}
         </p>
+        <LegalIdentity />
       </footer>
     </article>
   );

@@ -10,6 +10,7 @@ import { FiArrowLeft, FiArrowRight, FiArrowUpRight, FiCheckCircle } from 'react-
 import { BsChatDots } from 'react-icons/bs';
 import { trackEvent, Events } from '@/lib/analytics/track';
 import { useTerminalChat } from '@/components/TerminalChat';
+import LegalIdentity from '@/components/LegalIdentity';
 import { CASES } from '@/lib/cases-data';
 
 export type ServiceContent = {
@@ -588,6 +589,7 @@ export default function ServiceLayout({ service }: Props) {
         <p className="mt-2 font-mono text-[10px] uppercase tracking-[0.3em] text-white/30">
           &copy; 2026 · {footerT('copyright')}
         </p>
+        <LegalIdentity />
       </footer>
     </article>
   );

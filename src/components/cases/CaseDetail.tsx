@@ -6,6 +6,7 @@ import { motion, useScroll, useTransform, useInView, animate } from 'motion/reac
 import { useRive, Layout, Fit, Alignment } from '@rive-app/react-canvas';
 import { Link } from '@/i18n/navigation';
 import type { Case } from '@/lib/cases-data';
+import LegalIdentity from '@/components/LegalIdentity';
 import { FiArrowLeft, FiArrowRight, FiArrowUpRight } from 'react-icons/fi';
 
 type Locale = 'es' | 'en';
@@ -749,6 +750,7 @@ export default function CaseDetail({
         <p className="font-mono text-[10px] uppercase tracking-[0.3em] text-white/30">
           {copy.buildSignature}
         </p>
+        <LegalIdentity />
       </footer>
     </article>
   );
