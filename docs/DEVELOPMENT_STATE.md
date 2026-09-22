@@ -1,8 +1,28 @@
 # TunixLabs - Development State
 
-**Last Updated:** 2026-02-10
-**Current Phase:** Security Hardening
+**Last Updated:** 2026-09-21
+**Current Phase:** Security Hardening (unchanged since 2026-02-10 — see sprint log below)
 **Sprint:** 4.0 - Security Audit & Remediation (35 vulnerabilities fixed)
+
+---
+
+## 2026-09-21 — CLAUDE.md rewrite, quirks captured here
+
+`CLAUDE.md` was rewritten from a 2025 RAG-template contract (raggy, `.venv/bin/python`,
+dead Linux paths) to the 2026 Tunix standard. Everything below is state/quirk material that
+doesn't belong in that contract but is worth knowing before touching this repo:
+
+- **`vercel.json` is dead config.** The real deploy target is Railway (`railway.json` +
+  `nixpacks.toml`, confirmed by `docs/DEVELOPMENT_STATE.md` history below: "Railway hace
+  deploy automático al push a main"). Don't assume Vercel from the file's presence.
+- **No test infrastructure despite `playwright` in devDependencies.** It's only used by the
+  one-off `scripts/screenshot-*.mjs` visual-check scripts — no `playwright.config`, no
+  `*.test.ts`/`*.spec.ts` anywhere. This was already a stale TODO in the sprint log below
+  ("Testing setup (Jest + Playwright)") that never got picked up. Closing pipeline `test`
+  gate is a stub until this is wired for real.
+- **Prisma client isn't generated automatically.** Neither `package.json` nor the `prisma`/
+  `@prisma/client` packages define a `postinstall` script, so `npx prisma generate` has to
+  run explicitly before `npm run build` (now baked into the closing pipeline's `build` gate).
 
 ---
 
