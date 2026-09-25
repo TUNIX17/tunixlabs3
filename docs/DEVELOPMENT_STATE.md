@@ -1,8 +1,41 @@
 # TunixLabs - Development State
 
-**Last Updated:** 2026-09-21
+**Last Updated:** 2026-09-25
 **Current Phase:** Security Hardening (unchanged since 2026-02-10 — see sprint log below)
 **Sprint:** 4.0 - Security Audit & Remediation (35 vulnerabilities fixed)
+
+---
+
+## 2026-09-25 — Costo RAM en Railway + diagnóstico "nadie contacta"
+
+**Decisión (owner):** `CHATWOOT_POLL_DISABLED=true` en Railway (deploy `35091615`, SUCCESS).
+El poller de Chatwoot era la causa del costo: USD 6,95 de RAM en el ciclo 23-08 → 23-09 (más
+que Apoderapp), con la RAM subiendo sola entre deploys (500 → 790 MB; 253 → 471 MB en 3 días)
+y casi cero tráfico. Con el token en 403, cada tick lanzaba sin leer el body y corrían **2 loops**
+(`instrumentation.ts` + import de efecto lateral en `lib/chatwoot/forwarder.ts`; el guard
+`if (timer)` es por instancia del módulo). Detalle en `Agente-Tunix` memory `lessons-cross-project.md`.
+
+### Known issues
+- 🔴 **Aviso chat → Telegram muerto**: el token admin de Chatwoot da 403 (el inbox público sí
+  responde 200, los visitantes pueden escribir). Revisar el inbox "WhatsApp Tunix" en
+  app.chatwoot.com por conversaciones "Visitor" sin leer.
+- 🔴 **SEO roto**: `/robots.txt` y `/sitemap.xml` dan 404; `/es/contacto` y
+  `/es/servicios/<slug>` declaran canonical `/es/inicio` con el título de la home (Google los
+  trata como duplicados). El índice de búsqueda solo muestra la home, con el título viejo.
+- 🟡 **Sin medición**: Plausible está en el código, pero `NEXT_PUBLIC_PLAUSIBLE_DOMAIN` no está
+  en Railway. Railway ve unas 8 req/h, incluyendo bots y scanners (`/.git/config`).
+- 🟡 **0 leads en la BD, nunca** (Lead y Message vacías). El form de contacto solo manda email
+  por Resend y no guarda nada. Los HTTP logs de Railway (retención ~30 días, 26-08 → 25-09)
+  muestran **0 POST a `/api/contact`, `/api/chat/*`, `/api/leads/*` y `/api/webhooks/*`**: los
+  únicos POST fueron ~1.000 probes de WordPress. El webhook de Chatwoot no llegó ni una vez. El
+  chat va del navegador directo a Chatwoot, así que solo se ve en app.chatwoot.com.
+- 🟢 Variable `NEXT_PUBLIC_ADMIN_PASSWORD` en Railway sin uso en el código: borrarla.
+
+### Next actions
+1. PR técnico: robots + sitemap, canonical por página, Plausible, alta en Search Console.
+2. Arreglar el poller antes de reactivarlo: 1 solo loop, leer el body en error, backoff, token nuevo.
+3. Decisión de producto (owner): copy para un comprador (ICP único, prueba con nombre, primer
+   paso concreto) en vez del tono de developer.
 
 ---
 
