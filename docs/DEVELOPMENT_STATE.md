@@ -30,9 +30,21 @@ y casi cero tráfico. Con el token en 403, cada tick lanzaba sin leer el body y 
   únicos POST fueron ~1.000 probes de WordPress. El webhook de Chatwoot no llegó ni una vez. El
   chat va del navegador directo a Chatwoot, así que solo se ve en app.chatwoot.com.
 - 🟢 Variable `NEXT_PUBLIC_ADMIN_PASSWORD` en Railway sin uso en el código: borrarla.
+- 🟡 **Rate limit del form se salta cambiando `X-Forwarded-For`** (preexistente, confirmado en
+  local): `getClientIP` toma la primera IP del header, que la pone el cliente. Como cada POST ahora
+  crea un Lead, conviene tomar la IP del proxy (Cloudflare `CF-Connecting-IP`, o el último salto
+  de XFF) y agregar un honeypot.
+- 🟢 `og:title` y `twitter:title` de servicios y contacto siguen siendo los de la home (preexistente).
+  En Next 13.5, un `openGraph` en el hijo reemplaza el objeto entero: hay que repetir las imágenes.
+- 🟢 Gate `lint` en verde falso: no hay config de ESLint y `next lint` solo pregunta cómo crearla.
+- ❓ **Decisión del owner:** el slug `/casos/gasco` nombra la marca del grupo de gas, y ahora
+  va en el sitemap. El copy visible dice «distribuidora regional de gas».
 
 ### Next actions
-1. PR técnico: robots + sitemap, canonical por página, Plausible, alta en Search Console.
+1. PR técnico `fix/seo-y-captura-contacto` (robots, sitemap, canonical, captura del form):
+   revisado por code-reviewer + tunix-auditor (APROBAR). Falta el merge del owner. Después,
+   Cloudflare Web Analytics (gratis, 1 clic, el dominio ya pasa por Cloudflare) y alta en
+   Search Console, ambos desde las cuentas del owner.
 2. Arreglar el poller antes de reactivarlo: 1 solo loop, leer el body en error, backoff, token nuevo.
 3. Decisión de producto (owner): copy para un comprador (ICP único, prueba con nombre, primer
    paso concreto) en vez del tono de developer.
