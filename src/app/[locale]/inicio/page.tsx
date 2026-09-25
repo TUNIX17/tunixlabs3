@@ -1,10 +1,15 @@
 import dynamic from 'next/dynamic';
 import { setRequestLocale } from 'next-intl/server';
 import LegalIdentity from '@/components/LegalIdentity';
+import { alternatesFor, toLocale } from '@/lib/seo/alternates';
 
 const V3Client = dynamic(() => import('@/components/v3/V3Client'), {
   ssr: false,
 });
+
+export function generateMetadata({ params: { locale } }: { params: { locale: string } }) {
+  return { alternates: alternatesFor(toLocale(locale), '/inicio') };
+}
 
 export default async function InicioPage({
   params: { locale },

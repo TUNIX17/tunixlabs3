@@ -61,14 +61,9 @@ export async function generateMetadata({ params: { locale } }: Props) {
     title: t('title'),
     description: t('description'),
     keywords,
-    alternates: {
-      canonical: `/${locale}/inicio`,
-      languages: {
-        es: '/es/inicio',
-        en: '/en/inicio',
-        'x-default': '/es/inicio',
-      },
-    },
+    // No `alternates` here: pages inherit it, and a layout-level canonical
+    // made every page without its own metadata canonicalize to the home.
+    // Each page sets it with alternatesFor() from '@/lib/seo/alternates'.
     openGraph: {
       type: 'website',
       locale: ogLocale,

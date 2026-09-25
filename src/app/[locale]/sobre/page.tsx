@@ -1,5 +1,6 @@
 import { setRequestLocale, getTranslations } from 'next-intl/server';
 import AboutPage from '@/components/AboutPage';
+import { alternatesFor, toLocale } from '@/lib/seo/alternates';
 
 type Locale = 'es' | 'en';
 
@@ -18,14 +19,7 @@ export async function generateMetadata({ params: { locale } }: Props) {
     description: isES
       ? 'CEO y operador de Tunix Labs. MSc Finanzas + MIT Professional Education. 15 años liderando operaciones antes de escribir código. Sistemas en producción, no demos.'
       : 'Tunix Labs CEO and solo operator. MSc Finance + MIT Professional Education. 15 years leading real ops before writing code. Production systems, not demos.',
-    alternates: {
-      canonical: `/${locale}/${isES ? 'sobre' : 'about'}`,
-      languages: {
-        es: '/es/sobre',
-        en: '/en/about',
-        'x-default': '/es/sobre',
-      },
-    },
+    alternates: alternatesFor(toLocale(locale), '/sobre'),
     openGraph: {
       title: t('title'),
       description: t('roleLine'),

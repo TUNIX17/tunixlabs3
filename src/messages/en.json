@@ -280,6 +280,10 @@
     }
   },
   "ContactPage": {
+    "meta": {
+      "title": "Contact — Let's talk about your project | TunixLabs",
+      "description": "Fill out the form or reach me directly on WhatsApp or email. I respond within 24 hours."
+    },
     "hero": {
       "title": "Let's talk about your project",
       "description": "Fill out the form or contact me directly. I respond within 24 hours."
