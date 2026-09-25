@@ -46,20 +46,21 @@ export async function POST(request: NextRequest) {
 
     // Save first: the lead shows up in /admin/leads even if both
     // notifications fail. Before, the email was the only record.
-    const saved = await saveContactLead(contact);
-    const [emailed] = await Promise.all([
+    const leadId = await saveContactLead(contact);
+    const [emailed, notified] = await Promise.all([
       sendContactEmail(contact),
       notifyTelegram(contact),
     ]);
 
-    if (!saved && !emailed) {
+    if (!leadId && !emailed) {
+      // The forms map this code to a translated message with WhatsApp and email.
       return NextResponse.json(
-        {
-          error:
-            'No pude recibir tu mensaje. Escríbeme por WhatsApp al +56 9 3036 7979 o a contacto@tunixlabs.com.',
-        },
+        { error: 'No pude recibir tu mensaje.', code: 'CONTACT_UNAVAILABLE' },
         { status: 500 }
       );
+    }
+    if (!emailed && !notified) {
+      console.error(`[Contact] Lead ${leadId} guardado sin email ni Telegram: revisar /admin/leads`);
     }
 
     return NextResponse.json(
@@ -77,24 +78,49 @@ export async function POST(request: NextRequest) {
 
 type ContactInput = z.infer<typeof ContactFormSchema>;
 
-async function saveContactLead({ nombre, email, asunto, mensaje }: ContactInput): Promise<boolean> {
+/** Returns the lead id, or null if it could not be saved. */
+async function saveContactLead({ nombre, email, asunto, mensaje }: ContactInput): Promise<string | null> {
+  const message = { role: 'user', content: `${asunto}\n\n${mensaje}` };
   try {
-    await prisma.lead.create({
+    // Same email as an earlier lead (voice agent, Calendly, a previous
+    // message): append to it, like /api/leads/capture does, instead of
+    // creating a duplicate. emailSequenceActive goes false either way:
+    // someone who wrote by hand gets a personal reply, not the automated
+    // welcome / case-study / offer sequence.
+    const existing = await prisma.lead.findFirst({
+      where: { email },
+      orderBy: { createdAt: 'desc' },
+      select: { id: true },
+    });
+    if (existing) {
+      await prisma.lead.update({
+        where: { id: existing.id },
+        data: {
+          emailSequenceActive: false,
+          messages: { create: message },
+          activities: { create: { type: 'lead_updated', details: 'Mensaje desde contact-form' } },
+        },
+      });
+      return existing.id;
+    }
+    const lead = await prisma.lead.create({
       data: {
         name: nombre,
         email,
         source: 'contact-form',
         notes: asunto,
-        // Someone who wrote by hand gets a personal reply, not the voice
-        // agent's automated welcome / case-study / offer sequence.
         emailSequenceActive: false,
-        messages: { create: { role: 'user', content: `${asunto}\n\n${mensaje}` } },
+        messages: { create: message },
+        activities: { create: { type: 'lead_created', details: 'Lead capturado desde contact-form' } },
       },
+      select: { id: true },
     });
-    return true;
+    return lead.id;
   } catch (error) {
-    console.error('[Contact] No se pudo guardar el lead:', error);
-    return false;
+    // Class and code only: Prisma error messages can echo the visitor's data.
+    const code = (error as { code?: string } | null)?.code ?? '';
+    console.error('[Contact] No se pudo guardar el lead:', error instanceof Error ? error.name : 'unknown', code);
+    return null;
   }
 }
 
@@ -128,18 +154,22 @@ async function sendContactEmail({ nombre, email, asunto, mensaje }: ContactInput
   }
 }
 
-async function notifyTelegram({ nombre, email, asunto, mensaje }: ContactInput): Promise<void> {
-  if (!process.env.TELEGRAM_BOT_TOKEN || !process.env.TELEGRAM_OWNER_CHAT_ID) return;
+async function notifyTelegram({ nombre, email, asunto, mensaje }: ContactInput): Promise<boolean> {
+  if (!process.env.TELEGRAM_BOT_TOKEN || !process.env.TELEGRAM_OWNER_CHAT_ID) {
+    console.error('[Contact] Telegram no configurado - faltan TELEGRAM_BOT_TOKEN o TELEGRAM_OWNER_CHAT_ID');
+    return false;
+  }
+  // Cut by code points so a split emoji doesn't make Telegram reject the text.
+  const body = Array.from(mensaje).slice(0, 3000).join('');
   try {
-    await sendMessage(
-      getOwnerChatId(),
-      `📩 Contacto web · ${nombre} <${email}>\n\n${asunto}\n\n${mensaje.slice(0, 3000)}`
-    );
+    await sendMessage(getOwnerChatId(), `📩 Contacto web · ${nombre} <${email}>\n\n${asunto}\n\n${body}`);
+    return true;
   } catch (error) {
     console.error(
       '[Contact] Aviso a Telegram falló:',
       error instanceof TelegramError ? error.message : error
     );
+    return false;
   }
 }
 

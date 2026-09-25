@@ -61,6 +61,9 @@ export async function sendMessage(
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ chat_id: chatId, text, ...options }),
+    // Callers await this inside HTTP handlers (the contact form); a hung
+    // api.telegram.org must not hold the visitor's request open.
+    signal: AbortSignal.timeout(10_000),
   });
   if (!res.ok) {
     const body = await res.text().catch(() => '');

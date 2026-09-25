@@ -7,7 +7,7 @@ import { useLocale } from 'next-intl';
 import { blurMap } from '@/generated/blurMap';
 import { CustomCursor } from './CustomCursor';
 import { useTerminalChat } from '@/components/TerminalChat';
-import LegalIdentity from '@/components/LegalIdentity';
+import LegalIdentity, { LEGAL_EMAIL, LEGAL_PHONE } from '@/components/LegalIdentity';
 import '@/app/[locale]/v3/v3.css';
 
 /* ══════════════════════════════════════════════════════════════
@@ -1342,6 +1342,13 @@ export default function V3Client() {
                   {isES ? 'Cerrar' : 'Close'}
                 </button>
               </div>
+              {formStatus === 'error' && (
+                <p role="alert" style={{ margin: 0, fontSize: 13, color: '#fca5a5' }}>
+                  {isES
+                    ? `No pude recibir tu mensaje. Escríbeme por WhatsApp al ${LEGAL_PHONE} o a ${LEGAL_EMAIL}.`
+                    : `I couldn't receive your message. Reach me on WhatsApp at ${LEGAL_PHONE} or at ${LEGAL_EMAIL}.`}
+                </p>
+              )}
             </form>
           </div>
         </>

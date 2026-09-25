@@ -302,6 +302,7 @@
       "sending": "Enviando...",
       "successTitle": "Mensaje enviado",
       "successMessage": "Te responderé pronto a tu correo.",
+      "errorUnavailable": "No pude recibir tu mensaje. Escríbeme por WhatsApp al {phone} o a {email}.",
       "sendAnother": "Enviar otro mensaje"
     },
     "directContact": {
