@@ -1,10 +1,13 @@
 /**
  * API Route: Contact Form
- * Receives contact form data and sends email via Resend
+ * Saves the message as a Lead, then notifies by email (Resend) and Telegram.
  */
 
 import { NextRequest, NextResponse } from 'next/server';
 import { Resend } from 'resend';
+import type { z } from 'zod';
+import { prisma } from '@/lib/prisma';
+import { sendMessage, getOwnerChatId, TelegramError } from '@/lib/telegram/bot';
 import { ContactFormSchema } from '@/lib/validation/schemas';
 import { getClientIP } from '@/lib/auth';
 import { contactLimiter } from '@/lib/rateLimit';
@@ -39,38 +42,25 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { nombre, email, asunto, mensaje } = result.data;
+    const contact = result.data;
 
-    // Check if Resend is configured
-    if (!resend) {
-      console.error('[Contact] Resend no configurado - RESEND_API_KEY no definida');
+    // Save first: the lead shows up in /admin/leads even if both
+    // notifications fail. Before, the email was the only record.
+    const saved = await saveContactLead(contact);
+    const [emailed] = await Promise.all([
+      sendContactEmail(contact),
+      notifyTelegram(contact),
+    ]);
+
+    if (!saved && !emailed) {
       return NextResponse.json(
-        { error: 'Servicio de email no disponible temporalmente' },
-        { status: 503 }
+        {
+          error:
+            'No pude recibir tu mensaje. Escríbeme por WhatsApp al +56 9 3036 7979 o a contacto@tunixlabs.com.',
+        },
+        { status: 500 }
       );
     }
-
-    // Sanitize all user inputs before using in HTML
-    const safeName = escapeHtml(nombre);
-    const safeEmail = escapeHtml(email);
-    const safeAsunto = escapeHtml(sanitizeEmailSubject(asunto));
-    const safeMensaje = escapeHtml(mensaje);
-
-    // Send email
-    const emailResult = await resend.emails.send({
-      from: 'TunixLabs Web <noreply@tunixlabs.com>',
-      to: NOTIFICATION_EMAIL,
-      replyTo: email,
-      subject: `[Contacto Web] ${sanitizeEmailSubject(asunto)}`,
-      html: generateContactEmailHtml({
-        nombre: safeName,
-        email: safeEmail,
-        asunto: safeAsunto,
-        mensaje: safeMensaje,
-      }),
-    });
-
-    console.log('[Contact] Email enviado:', emailResult);
 
     return NextResponse.json(
       { success: true, message: 'Mensaje enviado correctamente' },
@@ -81,6 +71,74 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(
       { error: 'Error al enviar el mensaje. Intenta nuevamente.' },
       { status: 500 }
+    );
+  }
+}
+
+type ContactInput = z.infer<typeof ContactFormSchema>;
+
+async function saveContactLead({ nombre, email, asunto, mensaje }: ContactInput): Promise<boolean> {
+  try {
+    await prisma.lead.create({
+      data: {
+        name: nombre,
+        email,
+        source: 'contact-form',
+        notes: asunto,
+        // Someone who wrote by hand gets a personal reply, not the voice
+        // agent's automated welcome / case-study / offer sequence.
+        emailSequenceActive: false,
+        messages: { create: { role: 'user', content: `${asunto}\n\n${mensaje}` } },
+      },
+    });
+    return true;
+  } catch (error) {
+    console.error('[Contact] No se pudo guardar el lead:', error);
+    return false;
+  }
+}
+
+async function sendContactEmail({ nombre, email, asunto, mensaje }: ContactInput): Promise<boolean> {
+  if (!resend) {
+    console.error('[Contact] Resend no configurado - RESEND_API_KEY no definida');
+    return false;
+  }
+  try {
+    // resend v6 does not throw on API errors: it returns { error }.
+    const { error } = await resend.emails.send({
+      from: 'TunixLabs Web <noreply@tunixlabs.com>',
+      to: NOTIFICATION_EMAIL,
+      replyTo: email,
+      subject: `[Contacto Web] ${sanitizeEmailSubject(asunto)}`,
+      html: generateContactEmailHtml({
+        nombre: escapeHtml(nombre),
+        email: escapeHtml(email),
+        asunto: escapeHtml(sanitizeEmailSubject(asunto)),
+        mensaje: escapeHtml(mensaje),
+      }),
+    });
+    if (error) {
+      console.error('[Contact] Resend rechazó el email:', error);
+      return false;
+    }
+    return true;
+  } catch (error) {
+    console.error('[Contact] Error enviando email:', error);
+    return false;
+  }
+}
+
+async function notifyTelegram({ nombre, email, asunto, mensaje }: ContactInput): Promise<void> {
+  if (!process.env.TELEGRAM_BOT_TOKEN || !process.env.TELEGRAM_OWNER_CHAT_ID) return;
+  try {
+    await sendMessage(
+      getOwnerChatId(),
+      `📩 Contacto web · ${nombre} <${email}>\n\n${asunto}\n\n${mensaje.slice(0, 3000)}`
+    );
+  } catch (error) {
+    console.error(
+      '[Contact] Aviso a Telegram falló:',
+      error instanceof TelegramError ? error.message : error
     );
   }
 }
