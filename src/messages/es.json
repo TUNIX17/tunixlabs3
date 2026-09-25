@@ -280,6 +280,10 @@
     }
   },
   "ContactPage": {
+    "meta": {
+      "title": "Contacto — Hablemos de tu proyecto | TunixLabs",
+      "description": "Completa el formulario o escríbeme directamente por WhatsApp o email. Respondo en menos de 24 horas."
+    },
     "hero": {
       "title": "Hablemos de tu proyecto",
       "description": "Completa el formulario o escríbeme directamente. Respondo en menos de 24h."
@@ -298,6 +302,7 @@
       "sending": "Enviando...",
       "successTitle": "Mensaje enviado",
       "successMessage": "Te responderé pronto a tu correo.",
+      "errorUnavailable": "No pude recibir tu mensaje. Escríbeme por WhatsApp al {phone} o a {email}.",
       "sendAnother": "Enviar otro mensaje"
     },
     "directContact": {

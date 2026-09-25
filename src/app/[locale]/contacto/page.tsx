@@ -6,6 +6,7 @@ import { FiMail, FiSend, FiCheck, FiAlertCircle } from 'react-icons/fi';
 import { BsChatDots } from 'react-icons/bs';
 import { trackEvent, Events } from '@/lib/analytics/track';
 import { useTerminalChat } from '@/components/TerminalChat';
+import { LEGAL_EMAIL, LEGAL_PHONE } from '@/components/LegalIdentity';
 
 type FormStatus = 'idle' | 'loading' | 'success' | 'error';
 
@@ -50,7 +51,11 @@ export default function ContactoPage() {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || 'Error al enviar el mensaje');
+        throw new Error(
+          data.code === 'CONTACT_UNAVAILABLE'
+            ? t('form.errorUnavailable', { phone: LEGAL_PHONE, email: LEGAL_EMAIL })
+            : data.error || 'Error al enviar el mensaje'
+        );
       }
 
       setStatus('success');

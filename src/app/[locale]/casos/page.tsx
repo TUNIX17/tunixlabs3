@@ -2,6 +2,7 @@ import { setRequestLocale } from 'next-intl/server';
 import Image from 'next/image';
 import { Link } from '@/i18n/navigation';
 import { CASES } from '@/lib/cases-data';
+import { alternatesFor, toLocale } from '@/lib/seo/alternates';
 
 type Locale = 'es' | 'en';
 
@@ -45,14 +46,7 @@ export async function generateMetadata({ params: { locale } }: Props) {
   return {
     title: copy.metaTitle,
     description: copy.metaDescription,
-    alternates: {
-      canonical: `/${locale}/casos`,
-      languages: {
-        es: '/es/casos',
-        en: '/en/cases',
-        'x-default': '/es/casos',
-      },
-    },
+    alternates: alternatesFor(toLocale(locale), '/casos'),
   };
 }
 

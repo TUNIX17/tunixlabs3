@@ -1,6 +1,7 @@
 import { setRequestLocale } from 'next-intl/server';
 import { Link } from '@/i18n/navigation';
 import JsonLd from '@/components/seo/JsonLd';
+import { alternatesFor, toLocale } from '@/lib/seo/alternates';
 
 /**
  * Services index page (/es/servicios, /en/services).
@@ -188,14 +189,7 @@ export async function generateMetadata({ params: { locale } }: Props) {
   return {
     title: copy.metaTitle,
     description: copy.metaDescription,
-    alternates: {
-      canonical: `/${locale}/servicios`,
-      languages: {
-        es: '/es/servicios',
-        en: '/en/services',
-        'x-default': '/es/servicios',
-      },
-    },
+    alternates: alternatesFor(toLocale(locale), '/servicios'),
   };
 }
 

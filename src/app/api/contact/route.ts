@@ -1,10 +1,13 @@
 /**
  * API Route: Contact Form
- * Receives contact form data and sends email via Resend
+ * Saves the message as a Lead, then notifies by email (Resend) and Telegram.
  */
 
 import { NextRequest, NextResponse } from 'next/server';
 import { Resend } from 'resend';
+import type { z } from 'zod';
+import { prisma } from '@/lib/prisma';
+import { sendMessage, getOwnerChatId, TelegramError } from '@/lib/telegram/bot';
 import { ContactFormSchema } from '@/lib/validation/schemas';
 import { getClientIP } from '@/lib/auth';
 import { contactLimiter } from '@/lib/rateLimit';
@@ -39,38 +42,26 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { nombre, email, asunto, mensaje } = result.data;
+    const contact = result.data;
 
-    // Check if Resend is configured
-    if (!resend) {
-      console.error('[Contact] Resend no configurado - RESEND_API_KEY no definida');
+    // Save first: the lead shows up in /admin/leads even if both
+    // notifications fail. Before, the email was the only record.
+    const leadId = await saveContactLead(contact);
+    const [emailed, notified] = await Promise.all([
+      sendContactEmail(contact),
+      notifyTelegram(contact),
+    ]);
+
+    if (!leadId && !emailed) {
+      // The forms map this code to a translated message with WhatsApp and email.
       return NextResponse.json(
-        { error: 'Servicio de email no disponible temporalmente' },
-        { status: 503 }
+        { error: 'No pude recibir tu mensaje.', code: 'CONTACT_UNAVAILABLE' },
+        { status: 500 }
       );
     }
-
-    // Sanitize all user inputs before using in HTML
-    const safeName = escapeHtml(nombre);
-    const safeEmail = escapeHtml(email);
-    const safeAsunto = escapeHtml(sanitizeEmailSubject(asunto));
-    const safeMensaje = escapeHtml(mensaje);
-
-    // Send email
-    const emailResult = await resend.emails.send({
-      from: 'TunixLabs Web <noreply@tunixlabs.com>',
-      to: NOTIFICATION_EMAIL,
-      replyTo: email,
-      subject: `[Contacto Web] ${sanitizeEmailSubject(asunto)}`,
-      html: generateContactEmailHtml({
-        nombre: safeName,
-        email: safeEmail,
-        asunto: safeAsunto,
-        mensaje: safeMensaje,
-      }),
-    });
-
-    console.log('[Contact] Email enviado:', emailResult);
+    if (!emailed && !notified) {
+      console.error(`[Contact] Lead ${leadId} guardado sin email ni Telegram: revisar /admin/leads`);
+    }
 
     return NextResponse.json(
       { success: true, message: 'Mensaje enviado correctamente' },
@@ -82,6 +73,103 @@ export async function POST(request: NextRequest) {
       { error: 'Error al enviar el mensaje. Intenta nuevamente.' },
       { status: 500 }
     );
+  }
+}
+
+type ContactInput = z.infer<typeof ContactFormSchema>;
+
+/** Returns the lead id, or null if it could not be saved. */
+async function saveContactLead({ nombre, email, asunto, mensaje }: ContactInput): Promise<string | null> {
+  const message = { role: 'user', content: `${asunto}\n\n${mensaje}` };
+  try {
+    // Same email as an earlier lead (voice agent, Calendly, a previous
+    // message): append to it, like /api/leads/capture does, instead of
+    // creating a duplicate. emailSequenceActive goes false either way:
+    // someone who wrote by hand gets a personal reply, not the automated
+    // welcome / case-study / offer sequence.
+    const existing = await prisma.lead.findFirst({
+      where: { email },
+      orderBy: { createdAt: 'desc' },
+      select: { id: true },
+    });
+    if (existing) {
+      await prisma.lead.update({
+        where: { id: existing.id },
+        data: {
+          emailSequenceActive: false,
+          messages: { create: message },
+          activities: { create: { type: 'lead_updated', details: 'Mensaje desde contact-form' } },
+        },
+      });
+      return existing.id;
+    }
+    const lead = await prisma.lead.create({
+      data: {
+        name: nombre,
+        email,
+        source: 'contact-form',
+        notes: asunto,
+        emailSequenceActive: false,
+        messages: { create: message },
+        activities: { create: { type: 'lead_created', details: 'Lead capturado desde contact-form' } },
+      },
+      select: { id: true },
+    });
+    return lead.id;
+  } catch (error) {
+    // Class and code only: Prisma error messages can echo the visitor's data.
+    const code = (error as { code?: string } | null)?.code ?? '';
+    console.error('[Contact] No se pudo guardar el lead:', error instanceof Error ? error.name : 'unknown', code);
+    return null;
+  }
+}
+
+async function sendContactEmail({ nombre, email, asunto, mensaje }: ContactInput): Promise<boolean> {
+  if (!resend) {
+    console.error('[Contact] Resend no configurado - RESEND_API_KEY no definida');
+    return false;
+  }
+  try {
+    // resend v6 does not throw on API errors: it returns { error }.
+    const { error } = await resend.emails.send({
+      from: 'TunixLabs Web <noreply@tunixlabs.com>',
+      to: NOTIFICATION_EMAIL,
+      replyTo: email,
+      subject: `[Contacto Web] ${sanitizeEmailSubject(asunto)}`,
+      html: generateContactEmailHtml({
+        nombre: escapeHtml(nombre),
+        email: escapeHtml(email),
+        asunto: escapeHtml(sanitizeEmailSubject(asunto)),
+        mensaje: escapeHtml(mensaje),
+      }),
+    });
+    if (error) {
+      console.error('[Contact] Resend rechazó el email:', error);
+      return false;
+    }
+    return true;
+  } catch (error) {
+    console.error('[Contact] Error enviando email:', error);
+    return false;
+  }
+}
+
+async function notifyTelegram({ nombre, email, asunto, mensaje }: ContactInput): Promise<boolean> {
+  if (!process.env.TELEGRAM_BOT_TOKEN || !process.env.TELEGRAM_OWNER_CHAT_ID) {
+    console.error('[Contact] Telegram no configurado - faltan TELEGRAM_BOT_TOKEN o TELEGRAM_OWNER_CHAT_ID');
+    return false;
+  }
+  // Cut by code points so a split emoji doesn't make Telegram reject the text.
+  const body = Array.from(mensaje).slice(0, 3000).join('');
+  try {
+    await sendMessage(getOwnerChatId(), `📩 Contacto web · ${nombre} <${email}>\n\n${asunto}\n\n${body}`);
+    return true;
+  } catch (error) {
+    console.error(
+      '[Contact] Aviso a Telegram falló:',
+      error instanceof TelegramError ? error.message : error
+    );
+    return false;
   }
 }
 

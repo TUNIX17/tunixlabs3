@@ -61,14 +61,9 @@ export async function generateMetadata({ params: { locale } }: Props) {
     title: t('title'),
     description: t('description'),
     keywords,
-    alternates: {
-      canonical: `/${locale}/inicio`,
-      languages: {
-        es: '/es/inicio',
-        en: '/en/inicio',
-        'x-default': '/es/inicio',
-      },
-    },
+    // No `alternates` here: pages inherit it, and a layout-level canonical
+    // made every page without its own metadata canonicalize to the home.
+    // Each page sets it with alternatesFor() from '@/lib/seo/alternates'.
     openGraph: {
       type: 'website',
       locale: ogLocale,
@@ -119,8 +114,9 @@ export default async function LocaleLayout({ children, params: { locale } }: Pro
     <html lang={locale}>
       <head>
         {/*
-          hreflang is emitted by Next.js via generateMetadata.alternates.languages
-          (see above). Do not duplicate it here.
+          hreflang is emitted by Next.js from each page's
+          generateMetadata.alternates.languages (alternatesFor() in
+          '@/lib/seo/alternates'). Do not duplicate it here.
 
           Plausible analytics. Only injected when NEXT_PUBLIC_PLAUSIBLE_DOMAIN
           is set (production) so local dev never hits plausible.io. The
