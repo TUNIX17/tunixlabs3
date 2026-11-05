@@ -61,11 +61,7 @@ export class RateLimiter {
 export const loginLimiter = new RateLimiter(5, 15 * 60 * 1000);
 /** 60 requests per minute */
 export const apiLimiter = new RateLimiter(60, 60 * 1000);
-/** 20 requests per minute */
-export const proxyLimiter = new RateLimiter(20, 60 * 1000);
 /** 3 requests per 10 minutes */
 export const contactLimiter = new RateLimiter(3, 10 * 60 * 1000);
-/** 30 requests per minute */
-export const captureLimiter = new RateLimiter(30, 60 * 1000);
 /** 5 requests per minute */
 export const exportLimiter = new RateLimiter(5, 60 * 1000);

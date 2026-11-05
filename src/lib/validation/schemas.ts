@@ -73,42 +73,6 @@ export const UpdateLeadSchema = z.object({
   status: LeadStatusEnum.optional(),
 });
 
-/** Message entry within a capture payload */
-const CaptureMessageSchema = z.object({
-  role: z.enum(['user', 'assistant']),
-  content: z.string().max(10000),
-});
-
-/** POST /api/leads/capture - Capture lead from conversation session */
-export const CaptureLeadSchema = z.object({
-  // Lead fields (all optional)
-  name: z.string().max(200).optional(),
-  email: z.string().email().max(255).optional(),
-  phone: z.string().max(50).optional(),
-  company: z.string().max(200).optional(),
-  role: z.string().max(200).optional(),
-  interests: z
-    .array(z.string().max(100))
-    .max(10)
-    .optional(),
-  painPoints: z
-    .array(z.string().max(100))
-    .max(10)
-    .optional(),
-  budget: z.string().max(100).optional(),
-  timeline: z.string().max(100).optional(),
-  companySize: z.string().max(100).optional(),
-  location: z.string().max(200).optional(),
-  notes: z.string().max(5000).optional(),
-  // Session fields
-  sessionId: z.string().max(200).optional(),
-  conversationPhase: z.string().max(100).optional(),
-  turnCount: z.number().int().min(0).max(1000).optional(),
-  sessionDurationSeconds: z.number().min(0).max(36000).optional(),
-  messages: z.array(CaptureMessageSchema).max(200).optional(),
-  source: z.string().max(100).optional(),
-});
-
 /** GET /api/leads - Query parameters */
 export const LeadQuerySchema = z.object({
   page: z.coerce.number().int().min(1).default(1),
@@ -118,30 +82,6 @@ export const LeadQuerySchema = z.object({
   source: z.string().max(100).optional(),
   startDate: z.string().max(30).optional(),
   endDate: z.string().max(30).optional(),
-});
-
-// ---------------------------------------------------------------------------
-// Proxy Schemas
-// ---------------------------------------------------------------------------
-
-/** POST /api/cerebras-proxy */
-export const CerebrasProxySchema = z.object({
-  endpoint: z.enum(['/chat/completions', '/models']),
-  payload: z.record(z.string(), z.unknown()),
-  method: z.enum(['POST', 'GET']).default('POST'),
-});
-
-/** POST /api/groq-proxy */
-export const GroqProxySchema = z.object({
-  endpoint: z.enum([
-    '/chat/completions',
-    '/audio/speech',
-    '/audio/transcriptions',
-    '/models',
-  ]),
-  payload: z.record(z.string(), z.unknown()),
-  method: z.enum(['POST', 'GET']).default('POST'),
-  responseType: z.enum(['json', 'arraybuffer']).default('json'),
 });
 
 // ---------------------------------------------------------------------------

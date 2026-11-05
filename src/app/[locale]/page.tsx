@@ -1,28 +1,42 @@
-import { redirect } from '@/i18n/navigation';
+import { hasLocale } from 'next-intl';
+import { getTranslations, setRequestLocale } from 'next-intl/server';
+import { notFound } from 'next/navigation';
+import LegalIdentity from '@/components/LegalIdentity';
 import { routing } from '@/i18n/routing';
 
-/**
- * Locale root page — redirects `/:locale` to the canonical landing page
- * for that locale. The previous version hardcoded `locale: 'es'`, which
- * silently kicked every EN visitor back to the Spanish site regardless of
- * how they arrived (direct link, language switcher, browser Accept-Language).
- * That was the "EN doesn't work" bug reported on 2026-04-08.
- *
- * This version reads the incoming `params.locale` and passes it through to
- * `redirect()`, so `/es` goes to `/es/inicio` and `/en` goes to `/en/home`
- * (the localized URL for the same internal `/inicio` page). The internal
- * href is always the canonical `/inicio` because next-intl resolves it to
- * the right localized slug per-locale from `routing.ts`.
- */
 type Props = {
-  params: { locale: string };
+  params: Promise<{ locale: string }>;
 };
 
-export default function LocaleRootPage({ params: { locale } }: Props) {
-  const safeLocale = routing.locales.includes(
-    locale as typeof routing.locales[number]
-  )
-    ? (locale as typeof routing.locales[number])
-    : routing.defaultLocale;
-  redirect({ href: '/inicio', locale: safeLocale });
+/**
+ * Placeholder de la web personal (F0). El contenido real llega en F2.
+ * LegalIdentity debe seguir en el HTML del servidor de todas las páginas.
+ */
+export default async function HomePage({ params }: Props) {
+  const { locale } = await params;
+  if (!hasLocale(routing.locales, locale)) notFound();
+  setRequestLocale(locale);
+  const t = await getTranslations('Home');
+
+  return (
+    <>
+      <main
+        style={{
+          minHeight: '100vh',
+          display: 'grid',
+          placeItems: 'center',
+          padding: '24px 16px',
+          textAlign: 'center',
+        }}
+      >
+        <div style={{ maxWidth: '40rem' }}>
+          <h1 style={{ fontSize: '2rem', margin: '0 0 0.75rem' }}>{t('name')}</h1>
+          <p style={{ margin: 0, opacity: 0.8 }}>{t('tagline')}</p>
+        </div>
+      </main>
+      <footer style={{ padding: '0 0 24px' }}>
+        <LegalIdentity />
+      </footer>
+    </>
+  );
 }

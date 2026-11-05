@@ -1,23 +1,26 @@
 {
   "name": "tunixlabs",
   "version": "1.0.0",
-  "description": "Sitio web de TunixLabs con consultoría en IA y sistema de tesorería",
+  "description": "Web personal de Alejandro Moyano (AI Engineer) y panel CRM de leads",
   "main": "index.js",
+  "engines": {
+    "node": ">=20.9"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "eslint .",
+    "test": "vitest run",
+    "postinstall": "prisma generate"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/TUNIX17/tunixlabs.git"
   },
   "keywords": [
-    "ia",
-    "consultoria",
-    "tesoreria",
-    "automatizacion"
+    "ai-engineer",
+    "portfolio"
   ],
   "author": "TUNIX17",
   "license": "ISC",
@@ -27,43 +30,30 @@
   "homepage": "https://github.com/TUNIX17/tunixlabs#readme",
   "dependencies": {
     "@prisma/client": "^5.22.0",
-    "@react-email/render": "^2.0.2",
-    "@ricky0123/vad-react": "^0.0.36",
-    "@ricky0123/vad-web": "^0.0.30",
-    "@rive-app/react-canvas": "^4.28.0",
-    "@swc/helpers": "0.5.18",
     "@types/bcryptjs": "^2.4.6",
-    "@types/uuid": "^10.0.0",
-    "axios": "^1.13.5",
     "bcryptjs": "^3.0.3",
-    "form-data": "^4.0.2",
-    "lenis": "^1.3.21",
-    "motion": "^12.38.0",
-    "next": "^13.4.0",
-    "next-intl": "^4.7.0",
-    "onnxruntime-web": "^1.23.2",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "react-icons": "^5.5.0",
+    "next": "16.4.5",
+    "next-intl": "4.14.9",
+    "react": "~19.3.1",
+    "react-dom": "~19.3.1",
+    "react-is": "~19.3.1",
     "recharts": "^3.6.0",
     "resend": "^6.7.0",
-    "uuid": "^11.1.0",
     "zod": "^4.3.5"
   },
   "devDependencies": {
-    "@types/axios": "^0.9.36",
-    "@types/node": "^18.0.0",
-    "@types/react": "^18.0.0",
-    "@types/react-dom": "^18.0.0",
+    "@types/node": "^22",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
     "autoprefixer": "^10.4.14",
-    "copy-webpack-plugin": "^13.0.1",
-    "eslint": "^8.38.0",
-    "eslint-config-next": "^13.4.0",
+    "eslint": "^9",
+    "eslint-config-next": "16.4.5",
     "playwright": "^1.59.1",
     "postcss": "^8.4.21",
     "prisma": "^5.22.0",
     "sharp": "^0.34.5",
     "tailwindcss": "^3.3.1",
-    "typescript": "^5.0.4"
+    "typescript": "^5.0.4",
+    "vitest": "^5.1.0"
   }
 }

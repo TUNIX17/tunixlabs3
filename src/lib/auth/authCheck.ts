@@ -17,64 +17,6 @@ export function requireAuth(request: NextRequest): NextResponse | null {
 }
 
 /**
- * Check Bearer token auth for cron endpoints.
- */
-export function requireCronAuth(request: Request): NextResponse | null {
-  const authHeader = request.headers.get('authorization');
-  const cronSecret = process.env.CRON_SECRET;
-
-  if (!cronSecret) {
-    if (process.env.NODE_ENV === 'production') {
-      return NextResponse.json({ error: 'Service unavailable' }, { status: 503 });
-    }
-    return null; // Allow in development without secret
-  }
-
-  if (authHeader !== `Bearer ${cronSecret}`) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
-
-  return null; // Authorized
-}
-
-/**
- * Check auth for proxy/voice routes.
- * In production, verifies that the request originates from an allowed domain
- * (tunixlabs.com or Railway deployment URL) via Origin/Referer header inspection.
- * Also accepts authenticated admin sessions. In development, all requests are permitted.
- */
-export function requireProxyAuth(request: NextRequest): NextResponse | null {
-  if (isAuthenticatedFromRequest(request)) return null;
-
-  const origin = request.headers.get('origin');
-  const referer = request.headers.get('referer');
-  const allowedOrigins = [
-    process.env.NEXT_PUBLIC_APP_URL,
-    process.env.RAILWAY_PUBLIC_DOMAIN ? `https://${process.env.RAILWAY_PUBLIC_DOMAIN}` : null,
-    'https://tunixlabs.com',
-    'https://www.tunixlabs.com',
-    'https://tunixlabs3-production.up.railway.app',
-  ].filter(Boolean);
-
-  if (process.env.NODE_ENV === 'production') {
-    let requestOrigin = origin;
-    if (!requestOrigin && referer) {
-      try {
-        requestOrigin = new URL(referer).origin;
-      } catch {
-        console.warn('[Auth] Malformed Referer header:', referer);
-        requestOrigin = null;
-      }
-    }
-    if (!requestOrigin || !allowedOrigins.some(o => requestOrigin === o)) {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-    }
-  }
-
-  return null;
-}
-
-/**
  * Get client IP for rate limiting.
  */
 export function getClientIP(request: NextRequest | Request): string {

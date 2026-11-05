@@ -8,16 +8,14 @@
 html {
   box-sizing: border-box;
   /*
-    overflow-x: hidden is load-bearing. The V3 terminal-frame design uses
-    fixed positioning and full-viewport sections. Without this clip, some
-    edge-case widths produce a horizontal scrollbar on mobile.
+    overflow-x: hidden evita barras horizontales en anchos extremos (se revisa en F1).
   */
   overflow-x: hidden;
   -webkit-text-size-adjust: 100%;
   -ms-text-size-adjust: 100%;
   -ms-overflow-style: scrollbar;
   -webkit-tap-highlight-color: transparent;
-  /* scroll-behavior handled by Lenis (JS-based smooth scroll, lerp 0.1) */
+  /* scroll suave: se decide en F1 con la escena 3D */
   color-scheme: dark;
 }
 

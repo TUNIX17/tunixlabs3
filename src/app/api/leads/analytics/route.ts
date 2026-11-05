@@ -43,30 +43,17 @@ export async function GET(request: NextRequest) {
         _count: true
       }),
 
-      // Leads por dia (ultimos 30 dias)
-      prisma.$queryRaw<{ date: string; count: bigint }[]>`
-        SELECT DATE(created_at) as date, COUNT(*) as count
-        FROM leads
-        WHERE created_at >= ${thirtyDaysAgo}
-        GROUP BY DATE(created_at)
-        ORDER BY date ASC
-      `,
+      // Leads de los ultimos 30 dias (se agrupan por dia en memoria; evita SQL
+      // crudo atado a nombres de tabla/columna que el schema de Prisma no usa)
+      prisma.lead.findMany({
+        where: { createdAt: { gte: thirtyDaysAgo } },
+        select: { createdAt: true }
+      }),
 
-      // Distribucion de scores
-      prisma.$queryRaw<{ range: string; count: bigint }[]>`
-        SELECT
-          CASE
-            WHEN score >= 0 AND score <= 25 THEN '0-25'
-            WHEN score > 25 AND score <= 50 THEN '26-50'
-            WHEN score > 50 AND score <= 75 THEN '51-75'
-            WHEN score > 75 AND score <= 100 THEN '76-100'
-            ELSE 'unknown'
-          END as range,
-          COUNT(*) as count
-        FROM leads
-        GROUP BY range
-        ORDER BY range
-      `,
+      // Scores de todos los leads (para la distribucion por rango)
+      prisma.lead.findMany({
+        select: { score: true }
+      }),
 
       // Leads recientes con score alto
       prisma.lead.findMany({
@@ -114,17 +101,34 @@ export async function GET(request: NextRequest) {
       status: item.status
     }));
 
-    // Formatear datos por dia
-    const dailyData = leadsByDay.map((item: { date: string; count: bigint }) => ({
-      date: new Date(item.date).toLocaleDateString('es-CL', { month: 'short', day: 'numeric' }),
-      count: Number(item.count)
-    }));
+    // Formatear datos por dia (agrupados por fecha YYYY-MM-DD, en orden)
+    const countsByDay = new Map<string, number>();
+    for (const { createdAt } of leadsByDay) {
+      const day = createdAt.toISOString().slice(0, 10);
+      countsByDay.set(day, (countsByDay.get(day) ?? 0) + 1);
+    }
+    const dailyData = Array.from(countsByDay.entries())
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([date, count]) => ({
+        date: new Date(date).toLocaleDateString('es-CL', { month: 'short', day: 'numeric', timeZone: 'UTC' }),
+        count
+      }));
 
-    // Formatear datos de score
-    const scoreData = scoreDistribution.map((item: { range: string; count: bigint }) => ({
-      range: item.range,
-      count: Number(item.count)
-    }));
+    // Formatear datos de score (mismos rangos que antes, ordenados por rango)
+    const rangeOf = (score: number) =>
+      score >= 0 && score <= 25 ? '0-25'
+      : score > 25 && score <= 50 ? '26-50'
+      : score > 50 && score <= 75 ? '51-75'
+      : score > 75 && score <= 100 ? '76-100'
+      : 'unknown';
+    const countsByRange = new Map<string, number>();
+    for (const { score } of scoreDistribution) {
+      const range = rangeOf(score);
+      countsByRange.set(range, (countsByRange.get(range) ?? 0) + 1);
+    }
+    const scoreData = Array.from(countsByRange.entries())
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([range, count]) => ({ range, count }));
 
     // Calcular funnel de conversion
     const funnel = calculateFunnel(byStatus);

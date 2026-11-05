@@ -56,10 +56,6 @@ export default function LeadDetailPage({ params }: { params: Promise<{ id: strin
   const [notes, setNotes] = useState('');
   const [status, setStatus] = useState('');
 
-  useEffect(() => {
-    fetchLead();
-  }, [resolvedParams.id]);
-
   const fetchLead = async () => {
     try {
       const res = await fetch(`/api/leads/${resolvedParams.id}`);
@@ -76,6 +72,13 @@ export default function LeadDetailPage({ params }: { params: Promise<{ id: strin
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    // Carga inicial del lead.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    fetchLead();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [resolvedParams.id]);
 
   const handleSave = async () => {
     if (!lead) return;

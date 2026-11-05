@@ -1,10 +1,11 @@
 /**
  * API Route: Contact Form
- * Receives contact form data and sends email via Resend
+ * Guarda el mensaje como Lead (CRM) y avisa por email con Resend.
  */
 
 import { NextRequest, NextResponse } from 'next/server';
 import { Resend } from 'resend';
+import prisma from '@/lib/prisma';
 import { ContactFormSchema } from '@/lib/validation/schemas';
 import { getClientIP } from '@/lib/auth';
 import { contactLimiter } from '@/lib/rateLimit';
@@ -15,6 +16,55 @@ const resend = process.env.RESEND_API_KEY
   : null;
 
 const NOTIFICATION_EMAIL = process.env.NOTIFICATION_EMAIL || 'contacto@tunixlabs.com';
+
+type ContactData = { nombre: string; email: string; asunto: string; mensaje: string };
+
+/**
+ * Crea o actualiza el Lead del formulario de contacto (patrón findFirst →
+ * update/create + Activity de api/webhooks/calendly; el email no es único en
+ * el schema). Devuelve el id del lead, o null si la base de datos falla.
+ */
+async function saveContactLead(data: ContactData): Promise<string | null> {
+  try {
+    const { nombre, email, asunto, mensaje } = data;
+    let lead = await prisma.lead.findFirst({ where: { email } });
+
+    if (lead) {
+      lead = await prisma.lead.update({
+        where: { id: lead.id },
+        data: { name: lead.name || nombre },
+      });
+    } else {
+      lead = await prisma.lead.create({
+        data: {
+          name: nombre,
+          email,
+          source: 'contact-form',
+          status: 'NEW',
+          score: 20,
+          // Las secuencias de correo están apagadas; el lead no entra en ninguna.
+          emailSequenceActive: false,
+        },
+      });
+    }
+
+    await prisma.message.create({
+      data: { leadId: lead.id, role: 'user', content: mensaje },
+    });
+    await prisma.activity.create({
+      data: {
+        leadId: lead.id,
+        type: 'contact_form',
+        details: `Formulario de contacto: ${asunto}`,
+      },
+    });
+
+    return lead.id;
+  } catch (error) {
+    console.error('[Contact] No se pudo guardar el lead:', error);
+    return null;
+  }
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -41,36 +91,48 @@ export async function POST(request: NextRequest) {
 
     const { nombre, email, asunto, mensaje } = result.data;
 
-    // Check if Resend is configured
+    // 1) El lead se guarda ANTES de tocar Resend: sin RESEND_API_KEY el mensaje
+    //    igual queda en el CRM.
+    const leadId = await saveContactLead({ nombre, email, asunto, mensaje });
+
+    // 2) Aviso por email (best effort).
+    let emailSent = false;
     if (!resend) {
-      console.error('[Contact] Resend no configurado - RESEND_API_KEY no definida');
-      return NextResponse.json(
-        { error: 'Servicio de email no disponible temporalmente' },
-        { status: 503 }
-      );
+      console.warn('[Contact] Resend no configurado - RESEND_API_KEY no definida');
+    } else {
+      try {
+        // Sanitize all user inputs before using in HTML
+        const safeName = escapeHtml(nombre);
+        const safeEmail = escapeHtml(email);
+        const safeAsunto = escapeHtml(sanitizeEmailSubject(asunto));
+        const safeMensaje = escapeHtml(mensaje);
+
+        const emailResult = await resend.emails.send({
+          from: 'TunixLabs Web <noreply@tunixlabs.com>',
+          to: NOTIFICATION_EMAIL,
+          replyTo: email,
+          subject: `[Contacto Web] ${sanitizeEmailSubject(asunto)}`,
+          html: generateContactEmailHtml({
+            nombre: safeName,
+            email: safeEmail,
+            asunto: safeAsunto,
+            mensaje: safeMensaje,
+          }),
+        });
+        console.log('[Contact] Email enviado:', emailResult);
+        emailSent = true;
+      } catch (error) {
+        console.error('[Contact] Error enviando email:', error);
+      }
     }
 
-    // Sanitize all user inputs before using in HTML
-    const safeName = escapeHtml(nombre);
-    const safeEmail = escapeHtml(email);
-    const safeAsunto = escapeHtml(sanitizeEmailSubject(asunto));
-    const safeMensaje = escapeHtml(mensaje);
-
-    // Send email
-    const emailResult = await resend.emails.send({
-      from: 'TunixLabs Web <noreply@tunixlabs.com>',
-      to: NOTIFICATION_EMAIL,
-      replyTo: email,
-      subject: `[Contacto Web] ${sanitizeEmailSubject(asunto)}`,
-      html: generateContactEmailHtml({
-        nombre: safeName,
-        email: safeEmail,
-        asunto: safeAsunto,
-        mensaje: safeMensaje,
-      }),
-    });
-
-    console.log('[Contact] Email enviado:', emailResult);
+    // Se rechaza solo si el mensaje no quedó en ningún lado.
+    if (!leadId && !emailSent) {
+      return NextResponse.json(
+        { error: 'Error al enviar el mensaje. Intenta nuevamente.' },
+        { status: 500 }
+      );
+    }
 
     return NextResponse.json(
       { success: true, message: 'Mensaje enviado correctamente' },

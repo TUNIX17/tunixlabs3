@@ -1,10 +1,7 @@
-import { NextIntlClientProvider } from 'next-intl';
+import { NextIntlClientProvider, hasLocale } from 'next-intl';
 import { getMessages, getTranslations, setRequestLocale } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 import { routing } from '@/i18n/routing';
-import Nav from '@/components/Nav';
-import { TerminalChatProvider } from '@/components/TerminalChat';
-import { LenisProvider } from '@/components/kinetic-swiss/LenisProvider';
 import JsonLd from '@/components/seo/JsonLd';
 import {
   organizationSchema,
@@ -12,85 +9,44 @@ import {
   websiteSchema,
 } from '@/components/seo/schemas';
 import '../../styles/globals.css';
-// Kinetic Swiss v3 design tokens (paper/ink/acid palette).
-import '../../styles/kinetic-swiss-vars.css';
-// Motion layer — reserved for scroll-reveal and transition overrides.
-// Imported AFTER globals so the cascade gives it the last word.
-import '../../styles/animations.css';
 
 type Props = {
   children: React.ReactNode;
-  params: { locale: string };
+  params: Promise<{ locale: string }>;
 };
 
 export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
 }
 
-export async function generateMetadata({ params: { locale } }: Props) {
+export async function generateMetadata({ params }: Props) {
+  const { locale } = await params;
   const t = await getTranslations({ locale, namespace: 'Metadata' });
-
-  const keywordsByLocale: Record<string, string[]> = {
-    es: [
-      'desarrollo web chile',
-      'agencia IA santiago',
-      'voice AI latam',
-      'SaaS B2B chile',
-      'BI dashboards mineria',
-      'integracion SAP',
-      'AI readiness',
-      'nearshore development',
-    ],
-    en: [
-      'AI agency LATAM',
-      'voice AI development',
-      'nearshore software',
-      'enterprise AI consulting',
-      'SaaS B2B development',
-      'BI dashboards mining',
-      'machine learning agency',
-      'react nextjs experts',
-    ],
-  };
-
-  const keywords = keywordsByLocale[locale] ?? keywordsByLocale.es;
   const ogLocale = locale === 'en' ? 'en_US' : 'es_CL';
 
   return {
     metadataBase: new URL('https://tunixlabs.com'),
     title: t('title'),
     description: t('description'),
-    keywords,
     alternates: {
-      canonical: `/${locale}/inicio`,
+      canonical: `/${locale}`,
       languages: {
-        es: '/es/inicio',
-        en: '/en/inicio',
-        'x-default': '/es/inicio',
+        es: '/es',
+        en: '/en',
+        'x-default': '/es',
       },
     },
     openGraph: {
       type: 'website',
       locale: ogLocale,
-      siteName: 'Tunix Labs',
+      siteName: 'Alejandro Moyano',
       title: t('title'),
       description: t('description'),
-      images: [
-        {
-          url: `/og/tunixlabs-og-${locale}.png`,
-          width: 1200,
-          height: 630,
-          alt: locale === 'es'
-            ? 'Tunix Labs — Una persona, siete sistemas en producción'
-            : 'Tunix Labs — One operator, seven production systems',
-        },
-      ],
     },
     twitter: {
       card: 'summary_large_image',
       title: t('title'),
       description: t('description'),
-      images: [`/og/tunixlabs-og-${locale}.png`],
     },
     robots: {
       index: true,
@@ -103,14 +59,14 @@ export async function generateMetadata({ params: { locale } }: Props) {
   };
 }
 
-export default async function LocaleLayout({ children, params: { locale } }: Props) {
-  if (!routing.locales.includes(locale as typeof routing.locales[number])) {
+export default async function LocaleLayout({ children, params }: Props) {
+  const { locale } = await params;
+  if (!hasLocale(routing.locales, locale)) {
     notFound();
   }
 
-  // next-intl: enable static rendering by telling next-intl which locale
-  // the current segment is using. Must be called BEFORE any awaited
-  // server-side translation / i18n call in this layout or its descendants.
+  // next-intl: habilita el render estático para este segmento. Debe llamarse
+  // ANTES de cualquier await de traducciones en el layout o sus hijos.
   setRequestLocale(locale);
 
   const messages = await getMessages();
@@ -119,14 +75,9 @@ export default async function LocaleLayout({ children, params: { locale } }: Pro
     <html lang={locale}>
       <head>
         {/*
-          hreflang is emitted by Next.js via generateMetadata.alternates.languages
-          (see above). Do not duplicate it here.
-
-          Plausible analytics. Only injected when NEXT_PUBLIC_PLAUSIBLE_DOMAIN
-          is set (production) so local dev never hits plausible.io. The
-          `tagged-events` build lets us track clicks on elements tagged with
-          `plausible-event-name=...` classes without importing a JS SDK.
-          Events are fired via `src/lib/analytics/track.ts`.
+          Plausible: solo se inyecta si NEXT_PUBLIC_PLAUSIBLE_DOMAIN está
+          definida (producción), para que el desarrollo local no llame a
+          plausible.io. Los eventos salen por src/lib/analytics/track.ts.
         */}
         {process.env.NEXT_PUBLIC_PLAUSIBLE_DOMAIN && (
           <script
@@ -135,25 +86,12 @@ export default async function LocaleLayout({ children, params: { locale } }: Pro
             src="https://plausible.io/js/script.outbound-links.tagged-events.js"
           />
         )}
-        {/*
-          JSON-LD schemas — Organization, Person (CEO), WebSite with SearchAction.
-          Emitted per locale layout so every page inherits the signals. JSON-LD
-          is language-agnostic; we only have one canonical set (no localized
-          duplicates) to avoid confusing crawlers.
-        */}
         <JsonLd schema={organizationSchema} />
         <JsonLd schema={personSchema} />
         <JsonLd schema={websiteSchema} />
       </head>
       <body>
-        <NextIntlClientProvider messages={messages}>
-          <LenisProvider>
-            <TerminalChatProvider>
-              <Nav />
-              <main className="min-h-screen">{children}</main>
-            </TerminalChatProvider>
-          </LenisProvider>
-        </NextIntlClientProvider>
+        <NextIntlClientProvider messages={messages}>{children}</NextIntlClientProvider>
       </body>
     </html>
   );

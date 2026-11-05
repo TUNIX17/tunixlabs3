@@ -61,10 +61,6 @@ export default function AdminDashboard() {
   const [analytics, setAnalytics] = useState<AnalyticsData | null>(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    fetchData();
-  }, []);
-
   const fetchData = async () => {
     try {
       // Fetch leads and analytics in parallel
@@ -101,6 +97,13 @@ export default function AdminDashboard() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    // Carga inicial de datos del panel.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    fetchData();
+     
+  }, []);
 
   const statCards = [
     { label: 'Total Leads', value: stats.total, icon: '👥', color: 'bg-blue-500' },

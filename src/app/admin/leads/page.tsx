@@ -64,6 +64,8 @@ export default function LeadsPage() {
   }, [page, search, statusFilter]);
 
   useEffect(() => {
+    // Carga de datos al cambiar filtros: fetchLeads marca "loading" antes del fetch.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchLeads();
   }, [fetchLeads]);
 
